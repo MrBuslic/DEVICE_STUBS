@@ -1,0 +1,14 @@
+LIBRARY unrbstd_32
+EXPORTS
+
+unrbstd_close @1
+unrbstd_error_message @2
+unrbstd_error_query @3
+unrbstd_init @4
+unrbstd_power @5
+unrbstd_power_state @6
+unrbstd_reset @7
+unrbstd_revision_query @8
+unrbstd_self_test @9
+unrbstd_switch @10
+unrbstd_switch_state @11

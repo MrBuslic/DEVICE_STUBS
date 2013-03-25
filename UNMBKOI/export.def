@@ -1,0 +1,24 @@
+LIBRARY unmbkoi_32
+EXPORTS
+
+unmbkoi_alloc @1
+unmbkoi_chan_select @2
+unmbkoi_close @3
+unmbkoi_config_sync @4
+unmbkoi_config_trans_ctrl @5
+unmbkoi_connect @6
+unmbkoi_data_len @7
+unmbkoi_error_message @8
+unmbkoi_error_query @9
+unmbkoi_ext_connect @10
+unmbkoi_init @11
+unmbkoi_invers @12
+unmbkoi_load_data @13
+unmbkoi_reset @14
+unmbkoi_revision_query @15
+unmbkoi_self_test @16
+unmbkoi_start @17
+unmbkoi_state_q @18
+unmbkoi_stop @19
+unmbkoi_test_ok2 @20
+

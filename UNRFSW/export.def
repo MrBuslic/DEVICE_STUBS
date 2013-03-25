@@ -1,0 +1,12 @@
+LIBRARY unrfsw_32
+EXPORTS
+
+unrfsw_close @1
+unrfsw_error_message @2
+unrfsw_error_query @3
+unrfsw_init @4
+unrfsw_reset @5
+unrfsw_revision_query @6
+unrfsw_self_test @7
+unrfsw_switch @8
+unrfsw_switch_state @9

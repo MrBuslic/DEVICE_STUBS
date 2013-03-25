@@ -1,0 +1,32 @@
+#include "unrbstd.h"
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
+//Инициализация
+ViStatus _VI_FUNC unrbstd_init (ViRsrc rsrcName, ViBoolean id_query,ViBoolean reset, ViPSession vi){return 0;}
+
+//Служебные функции
+ViStatus _VI_FUNC unrbstd_reset (ViSession vi){return 0;}
+ViStatus _VI_FUNC unrbstd_error_message (ViSession vi, ViStatus error, ViChar message[]){return 0;}
+ViStatus _VI_FUNC unrbstd_error_query (ViSession vi, ViPInt32 error, ViChar _VI_FAR error_message[]){return 0;}
+ViStatus _VI_FUNC unrbstd_self_test (ViSession vi,ViPInt16 test_result,ViChar _VI_FAR test_message[]){return 0;}
+ViStatus _VI_FUNC unrbstd_revision_query (ViSession vi, ViChar _VI_FAR driver_revision[], ViChar _VI_FAR instrument_revision[]){return 0;}
+
+//Прикладные функции
+//Включение. канала
+ViStatus _VI_FUNC unrbstd_switch (ViSession vi, ViInt32 chan, ViInt32 state){return 0;}
+//Запрос состояния канала
+ViStatus _VI_FUNC unrbstd_switch_state (ViSession vi, ViInt32 chan, ViInt32 *state){return 0;}
+//Включение питания
+ViStatus _VI_FUNC unrbstd_power (ViSession vi, ViInt32 chan, ViInt32 state){return 0;}
+//Запрос состояния питания
+ViStatus _VI_FUNC unrbstd_power_state (ViSession vi, ViInt32 chan, ViInt32 *state){return 0;}
+
+//Закрытие
+ViStatus _VI_FUNC unrbstd_close (ViSession vi){return 0;}
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+}
+#endif
+

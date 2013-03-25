@@ -1,0 +1,28 @@
+LIBRARY unms_32
+EXPORTS
+
+unms_chan_cfg @1
+unms_close @2
+unms_connect @3
+unms_error_message @4
+unms_error_query @5
+unms_get_count @6
+unms_init @7
+unms_input_trigger @8
+unms_installHandler @9
+unms_irq_cfg @10
+unms_irq_q @11
+unms_irq_reset @12
+unms_out_cfg @13
+unms_out_pulse @14
+unms_reset @15
+unms_reset_timer @16
+unms_revision_query @17
+unms_self_test @18
+unms_sft_interface @19
+unms_start @20
+unms_start_count @21
+unms_state_q @22
+unms_time_q @23
+unms_timer_cfg @24
+unms_timer_irq @25

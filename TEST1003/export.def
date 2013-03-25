@@ -1,0 +1,16 @@
+LIBRARY test1003
+EXPORTS
+
+test1003_close @1
+test1003_error_message @2
+test1003_open @3
+test1003_reset @4
+test1003_revision_query @5
+test1003_run_programm @6
+test1003_run_selftest @7
+test1003_set_callback @8
+test1003_set_mode @9
+test1003_set_programm @10
+test1003_set_time @11
+test1003_state_Q @12
+test1003_stop @13

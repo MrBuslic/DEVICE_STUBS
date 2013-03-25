@@ -1,0 +1,31 @@
+LIBRARY unfoi_32
+EXPORTS
+
+unfoi_chan_query @2
+unfoi_chan_route @3
+unfoi_chan_setup @4
+unfoi_chan_voltage @5
+unfoi_chans_query @6
+unfoi_chans_route @7
+unfoi_chans_setup @8
+unfoi_chans_voltage @9
+unfoi_close @10
+unfoi_conf_chan @11
+unfoi_conf_chans @12
+unfoi_config_hierarch @13
+unfoi_default_constant @14
+unfoi_enable_event @15
+unfoi_error_message @16
+unfoi_error_query @17
+unfoi_getDeviceList @18
+unfoi_init @19
+unfoi_instal_handler @20
+unfoi_off @21
+unfoi_reset @22
+unfoi_revision_query @23
+unfoi_run @24
+unfoi_self_test @25
+unfoi_start @26
+unfoi_state @27
+unfoi_time @28
+unfoi_time_query @29

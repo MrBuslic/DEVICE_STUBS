@@ -1,0 +1,35 @@
+LIBRARY unmt8k4l_32
+EXPORTS
+
+unmt8k4l_alloc @1
+unmt8k4l_alloc_q @2
+unmt8k4l_calibrI @3
+unmt8k4l_close @4
+unmt8k4l_config_trigger @5
+unmt8k4l_connect @6
+unmt8k4l_displacement @7
+unmt8k4l_error_message @8
+unmt8k4l_error_query @9
+unmt8k4l_init @10
+unmt8k4l_input_trigger @11
+unmt8k4l_input_trigger_q @12
+unmt8k4l_mask_interrupt @13
+unmt8k4l_mask_interrupt_q @14
+unmt8k4l_mode_1 @15
+unmt8k4l_mode_block @16
+unmt8k4l_mode_cycle @17
+unmt8k4l_mode_q @18
+unmt8k4l_numReadyData @19
+unmt8k4l_read_block @20
+unmt8k4l_read_packet @21
+unmt8k4l_read_sample @22
+unmt8k4l_reset @23
+unmt8k4l_revision_query @24
+unmt8k4l_sample_period @25
+unmt8k4l_sample_period_q @26
+unmt8k4l_sample_width_q @27
+unmt8k4l_self_test @28
+unmt8k4l_set_user_ihandle @29
+unmt8k4l_start @30
+unmt8k4l_state @31
+unmt8k4l_stop @32

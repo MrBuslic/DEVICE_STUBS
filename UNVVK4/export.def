@@ -1,0 +1,32 @@
+LIBRARY unvvk4
+EXPORTS
+
+unvvk4_Off_commut @1
+unvvk4_close @2
+unvvk4_commut_AllOutput @3
+unvvk4_commut_AllOutput_Q @4
+unvvk4_commut_GroupOutput @5
+unvvk4_commut_ListOutput @6
+unvvk4_commut_MeasureLine @7
+unvvk4_commut_MeasureLine_Q @8
+unvvk4_commut_Output @9
+unvvk4_commut_Output_Q @10
+unvvk4_commut_Rele @11
+unvvk4_config_AllOutput @12
+unvvk4_config_AllOutput_Q @13
+unvvk4_config_GroupOutput @14
+unvvk4_config_ListOutput @15
+unvvk4_config_MeasureLine @16
+unvvk4_config_MeasureLine_Q @17
+unvvk4_config_Output @18
+unvvk4_config_Output_Q @19
+unvvk4_error_message @20
+unvvk4_error_query @21
+unvvk4_init @22
+unvvk4_reset @23
+unvvk4_revision_query @24
+unvvk4_self_test @25
+unvvk4_start_commut @26
+unvvk4_testOK_off @27
+unvvk4_texnolog @28
+unvvk4_texnolog2 @29

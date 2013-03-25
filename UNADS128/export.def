@@ -1,0 +1,21 @@
+LIBRARY unads128_32
+EXPORTS
+
+unads128_analog_q @1
+unads128_close @2
+unads128_conf_analog @3
+unads128_error_message @4
+unads128_error_query @5
+unads128_init @6
+unads128_input @7
+unads128_install_handler @8
+unads128_read_data @9
+unads128_reset @10
+unads128_revision_query @11
+unads128_self_test @12
+unads128_sft_interface @13
+unads128_start @14
+unads128_start_check @15
+unads128_state @16
+unads128_stop @17
+unads128_test1 @18

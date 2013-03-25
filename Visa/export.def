@@ -1,0 +1,10 @@
+LIBRARY visa32
+EXPORTS
+
+viClose @132
+viFindNext @130
+viFindRsrc @129
+viGetAttribute @133
+viOpen @131
+viOpenDefaultRM @141
+viQueryf @279

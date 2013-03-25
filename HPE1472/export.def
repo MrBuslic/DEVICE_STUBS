@@ -1,0 +1,30 @@
+LIBRARY hpe1472_32
+EXPORTS
+
+hpe1472_init @1
+hpe1472_close @2
+hpe1472_reset @3
+hpe1472_self_test @4
+hpe1472_error_query @5
+hpe1472_error_message @6
+hpe1472_revision_query @7
+hpe1472_timeOut @8
+hpe1472_timeOut_Q @9
+hpe1472_errorQueryDetect @10
+hpe1472_errorQueryDetect_Q @11
+hpe1472_dcl @12
+hpe1472_opc @13
+hpe1472_opc_Q @14
+hpe1472_wai @15
+hpe1472_readStatusByte_Q @16
+hpe1472_statEven_Q @17
+hpe1472_statEvenClr @18
+hpe1472_routClos @22
+hpe1472_routClos_Q @23
+hpe1472_routClosList @24
+hpe1472_routClosList_Q @25
+hpe1472_systCdes_Q @26
+hpe1472_systCopt_Q @27
+hpe1472_systCpon @28
+hpe1472_systCtyp_Q @29
+hpe1472_setAll @30

@@ -1,0 +1,205 @@
+#include <unols.h>
+#include <windows.h>
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
+/*
+// Объявляем функцию DllMain
+BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
+      DWORD fdwReason, LPVOID lpvReserved)
+{
+
+switch (fdwReason)      // Дерево разбора уведомлений
+{
+  case DLL_PROCESS_ATTACH: // Подключение DLL
+    MessageBox(NULL,"Подключение Заглушки UNOLS для ОЛС","Использование заглушек!", MB_ICONINFORMATION);
+
+    if (lpvReserved)  // Определение способа загрузки
+      MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+    else
+      MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+    return 1; // успешная инициализация
+
+  case DLL_PROCESS_DETACH: // Отключение DLL
+    // Здесь – освобождаем память, закрываем
+    // файлы и т.д.
+    break;
+
+  case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
+    // Здесь – если надо переходим на
+    // многопоточный режим работы с
+    // использованием средств синхронизации
+    // таких как критическая секция, мутанты,
+    // семафоры и т.д.
+    break;
+
+  case DLL_THREAD_DETACH:
+      //Уведомление о завершении потока
+    // Здесь – если надо освобождаем все ресурсы, 
+    // вязанные с завершившимся потоком. Какой именно
+    // поток завершился можно узнать просмотром списка
+    // потоков средствами TOOLHELP32
+    break;
+
+  }
+return TRUE;    // Код возврата игнорируется
+}
+*/
+/****************************************************************************
+		Функция инициализация сеанса с инструментом
+*****************************************************************************/
+ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName, 
+								ViBoolean 	id_query,
+								ViBoolean 	reset, 
+								ViPSession 	vi){ return 0; }
+/****************************************************************************
+		Функции конфигурации
+*****************************************************************************/
+ViStatus _VI_FUNC unols_set_synhro_mode (ViSession vi, ViInt16 mode){ return 0; } 
+
+ViStatus _VI_FUNC unols_synhro_gener (ViSession vi, ViInt16 devise,  ViUInt16 sourse,
+                                      ViBoolean front, ViUInt16 diT, ViReal64 T){ return 0; }
+
+ViStatus _VI_FUNC unols_synhro_trigger (ViSession vi, ViInt16 devise, ViUInt16 sourse){ return 0; }
+
+ViStatus _VI_FUNC unols_synhro_stop (ViSession vi, ViInt16 devise, ViUInt16 sourse){ return 0; }
+
+ViStatus _VI_FUNC unols_config_trigger (ViSession vi, ViInt16 devise, 
+                                        ViUInt32 _VI_FAR event[],
+                                        ViUInt32 _VI_FAR chanEvent[]){ return 0; }
+
+ViStatus _VI_FUNC unols_config_stop (ViSession vi, ViInt16 devise, 
+                                     ViUInt32 _VI_FAR event[],
+                                     ViUInt32 _VI_FAR chanEvent[]){ return 0; }
+
+ViStatus _VI_FUNC unols_set_mode (ViSession vi, ViInt16 devise, ViInt16 mode, ViBoolean endless, ViBoolean stepMode){ return 0; }
+
+ViStatus _VI_FUNC unols_config_mode (ViSession vi, ViUInt16 devise,  
+                                     ViUInt16 packs, ViUInt32 _VI_FAR periodPack[], 
+                                     ViUInt32 _VI_FAR seriesPack[]){ return 0; }
+ViStatus _VI_FUNC unols_config_preTrig (ViSession vi, ViUInt16 statePreTrig){ return 0; }
+
+ViStatus _VI_FUNC unols_config_channel (ViSession vi, ViInt16 devise,
+                                        ViUInt32 _VI_FAR stateChans[],
+                                        ViUInt32 _VI_FAR chans[],
+										ViUInt16 defState){ return 0; }
+
+ViStatus _VI_FUNC unols_config_Uout (ViSession vi, ViReal64 _VI_FAR U[]){ return 0; } 
+
+ViStatus _VI_FUNC unols_config_inpExt (ViSession vi, ViInt16 sourse,  ViInt16 st){ return 0; }  
+
+ViStatus _VI_FUNC unols_config_handler (ViSession vi,  ViAddr userCallback, ViUInt16 regEvent,
+                                        ViUInt16 genEvent, ViUInt16 errorEvent){ return 0; }
+
+ViStatus _VI_FUNC unols_set_synhro_mode_Q (ViSession vi, ViPInt16 mode){ return 0; }
+
+ViStatus _VI_FUNC unols_synhro_gener_Q (ViSession vi, ViInt16 devise, ViPUInt16 sourse,
+                                        ViPBoolean front, ViPUInt16 diT, ViPReal64 T){ return 0; }
+
+
+ViStatus _VI_FUNC unols_synhro_trigger_Q (ViSession vi, ViInt16 devise, ViPUInt16 sourse){ return 0; }
+
+ViStatus _VI_FUNC unols_synhro_stop_Q (ViSession vi, ViInt16 devise, ViPUInt16 sourse){ return 0; }
+
+ViStatus _VI_FUNC unols_config_trigger_Q (ViSession vi, ViInt16 devise,
+                                       	  ViUInt32 _VI_FAR event[],
+                                          ViUInt32 _VI_FAR chanEvent[]){ return 0; }
+
+ViStatus _VI_FUNC unols_config_stop_Q (ViSession vi, ViInt16 devise,
+                                       	  ViUInt32 _VI_FAR event[],
+                                          ViUInt32 _VI_FAR chanEvent[]){ return 0; }
+
+ViStatus _VI_FUNC unols_set_mode_Q (ViSession vi, ViInt16 devise, ViPInt16 mode, ViPBoolean endless, ViPBoolean stepMode){ return 0; }
+
+ViStatus _VI_FUNC unols_config_handler_Q (ViSession vi,  ViPAddr userCallback, ViPUInt16 regEvent,
+                                        ViPUInt16 genEvent, ViPUInt16 errorEvent){ return 0; }
+ViStatus _VI_FUNC unols_config_channel_Q (ViSession vi, ViInt16 devise,
+                                        ViUInt32 _VI_FAR stateChans[],
+										ViPUInt16 defState){ return 0; }
+ViStatus _VI_FUNC unols_config_Uout_Q (ViSession vi, ViReal64 _VI_FAR U[]){ return 0; }
+ViStatus _VI_FUNC unols_config_mode_Q (ViSession vi, ViUInt16 devise, ViPUInt16 packs,
+                                       ViUInt32 _VI_FAR periodPacks[], 
+									   ViUInt32 _VI_FAR seriesPacks[]){ return 0; }
+ViStatus _VI_FUNC unols_config_preTrig_Q (ViSession vi, ViPUInt16 statePreTrig){ return 0; }   
+ViStatus _VI_FUNC unols_config_inpExt_Q (ViSession vi,  ViPInt16 st){ return 0; }     
+
+
+/****************************************************************************
+		Функции управления/состояния
+*****************************************************************************/
+ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){ return 0; }  
+ViStatus _VI_FUNC unols_trigger_imm (ViSession vi, ViInt16 devise){ return 0; }     
+ViStatus _VI_FUNC unols_stop (ViSession vi, ViInt16 devise){ return 0; }   
+ViStatus _VI_FUNC unols_reset_status (ViSession vi, ViInt16 devise, ViUInt16 maskEvent, ViUInt16 errorEvent){ return 0; } 
+ViStatus _VI_FUNC unols_reset_DRAM (ViSession vi, ViInt16 devise, ViUInt32 period, ViUInt32 offsetData){ return 0; }
+ViStatus _VI_FUNC unols_status_Q (ViSession vi, ViInt16 devise,  
+                                  ViPUInt16  stateDev, ViPUInt16 eventDev, ViPUInt16 errDev){ return 0; }
+/****************************************************************************
+		 Данные
+*****************************************************************************/
+ViStatus _VI_FUNC unols_countData (ViSession vi, ViInt16 devise, ViPUInt32 count){ return 0; }  
+
+ViStatus _VI_FUNC unols_write_allData (ViSession vi, ViInt16 devise, ViUInt32 period,
+                                       ViUInt32 offsetData, void* data){ return 0; }   
+ViStatus _VI_FUNC unols_read_allData (ViSession vi, ViInt16 devise, ViUInt32 period,
+                                    ViUInt32 offsetData, void* data){ return 0; }	 
+ViStatus _VI_FUNC unols_read_dataKF (ViSession vi, ViUInt32 period,    
+                                    ViUInt32 offsetData, void* data, void* maska){ return 0; }									
+ViStatus _VI_FUNC unols_write_dataKF (ViSession vi, ViUInt32 period,   
+                                    ViUInt32 offsetData, void* data, void* maska){ return 0; }
+ViStatus _VI_FUNC unols_write_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
+                                       ViUInt32 offsetData, void* data){ return 0; }   
+ViStatus _VI_FUNC unols_read_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
+                                    ViUInt32 offsetData, void* data){ return 0; }	 
+/****************************************************************************
+		Сервисные функции 
+*****************************************************************************/
+ViStatus _VI_FUNC unols_reset (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_self_test (ViSession 	vi, 
+									ViPInt16 	test_result, 
+									ViChar 		_VI_FAR test_message[]){ return 0; }
+ViStatus _VI_FUNC unols_testOK_off_1 (ViSession 	vi, 
+									ViPInt16 	test_result, 
+									ViChar 		_VI_FAR test_message[]){ return 0; }
+ViStatus _VI_FUNC unols_testOK_off_2 (ViSession 	vi, 
+									ViPInt16 	test_result, 
+									ViChar 		_VI_FAR test_message[]){ return 0; }
+ViStatus _VI_FUNC unols_error_query(ViSession vi, 
+									 ViPInt32 error, 
+									 ViChar _VI_FAR error_message[]){ return 0; }
+ViStatus _VI_FUNC unols_error_message (ViSession vi, 
+										ViStatus error, 
+										ViChar _VI_FAR message[]){ return 0; }
+ViStatus _VI_FUNC unols_revision_query (ViSession vi,
+										ViChar _VI_FAR driver_revision[],
+										ViChar _VI_FAR instrument_revision[]){ return 0; }
+/****************************************************************************
+		Функция закрытия сеанса с инструментом
+*****************************************************************************/
+ViStatus _VI_FUNC unols_close (ViSession vi){ return 0; }
+
+/****************************************************************************          
+		Функции загрузки контроллеров
+*****************************************************************************/ 
+ViStatus _VI_FUNC unols_readyPLD (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_loadPLD (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_prgPLD (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_vrfPLD (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_cmpVersions (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_readFlashVersion (ViSession vi, ViChar _VI_FAR flash_rev[]){ return 0; }
+
+/****************************************************************************
+
+	Технологические функции 
+
+*****************************************************************************/   
+ViStatus _VI_FUNC unols_synhro_gener_ext (ViSession vi, ViInt16 state, ViUInt16 diT, ViReal64 T){ return 0; }      
+ViStatus _VI_FUNC unols_synhro_gener_ext_Q (ViSession vi, ViPInt16 state,ViPUInt16 diT, ViPReal64 T){ return 0; }
+ViStatus _VI_FUNC unols_trigger_ext (ViSession vi){ return 0; }   
+
+
+
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+}
+#endif

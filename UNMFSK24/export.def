@@ -1,0 +1,25 @@
+LIBRARY unmfsk24_32
+EXPORTS
+
+unmfsk24_close @1
+unmfsk24_cmd_time_q @2
+unmfsk24_command @3
+unmfsk24_config_trigger @4
+unmfsk24_config_trigger_q @5
+unmfsk24_connect @6
+unmfsk24_error_message @7
+unmfsk24_error_query @8
+unmfsk24_group_command @9
+unmfsk24_gstart_q @10
+unmfsk24_init @11
+unmfsk24_manual_cmd @12
+unmfsk24_manual_group_cmd @13
+unmfsk24_reset @14
+unmfsk24_revision_query @15
+unmfsk24_self_test @16
+unmfsk24_set_cmd_time @17
+unmfsk24_sft_interface @18
+unmfsk24_start @19
+unmfsk24_state @20
+unmfsk24_stop @21
+unmfsk24_zmfsk_test @22

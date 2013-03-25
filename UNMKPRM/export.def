@@ -1,0 +1,28 @@
+LIBRARY unmkprm_32
+EXPORTS
+
+unmkprm_alloc @1
+unmkprm_close @2
+unmkprm_config_adjust_level @3
+unmkprm_config_adjust_level2 @4
+unmkprm_config_psp @5
+unmkprm_config_sync_level @6
+unmkprm_connect @7
+unmkprm_error_message @8
+unmkprm_error_query @9
+unmkprm_init @10
+unmkprm_inp_type @11
+unmkprm_install_handler @12
+unmkprm_mode_block @13
+unmkprm_mode_cycle @14
+unmkprm_num_ready_data @15
+unmkprm_read_packet @16
+unmkprm_read_str_block @17
+unmkprm_read_str_packet @18
+unmkprm_reset @19
+unmkprm_revision_query @20
+unmkprm_self_test @21
+unmkprm_start @22
+unmkprm_state_q @23
+unmkprm_stop @24
+unmkprm_test_ok2 @25

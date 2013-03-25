@@ -1,0 +1,23 @@
+LIBRARY unmbkupi_32
+EXPORTS
+
+unmbkupi_alloc @1
+unmbkupi_close @2
+unmbkupi_config_recv_ctrl @3
+unmbkupi_config_sync @4
+unmbkupi_connect @5
+unmbkupi_error_message @6
+unmbkupi_error_query @7
+unmbkupi_init @8
+unmbkupi_mode_block @9
+unmbkupi_mode_cycle @10
+unmbkupi_num_ready_data @11
+unmbkupi_read_block @12
+unmbkupi_read_packet @13
+unmbkupi_reset @14
+unmbkupi_revision_query @15
+unmbkupi_self_test @16
+unmbkupi_start @17
+unmbkupi_state_q @18
+unmbkupi_stop @19
+unmbkupi_test_ok2 @20

@@ -1,0 +1,121 @@
+#include <unvvk4.h>
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
+/****************************************************************************
+		Функция инициализация сеанса с инструментом
+*****************************************************************************/
+ViStatus _VI_FUNC unvvk4_init (	ViRsrc 		rsrcName, 
+								ViBoolean 	id_query,
+								ViBoolean 	reset, 
+								ViPSession 	vi){ return 0; }
+
+/****************************************************************************
+		Функции конфигурации
+*****************************************************************************/
+
+
+/****************************************************************************
+		Сервисные функции 
+*****************************************************************************/
+ViStatus _VI_FUNC unvvk4_reset (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unvvk4_self_test (ViSession 	vi, 
+									ViPInt16 	test_result, 
+									ViChar 		_VI_FAR test_message[]){ return 0; }
+//ViStatus _VI_FUNC unvvk4_testOK_off (ViSession 	vi, 
+//									ViPInt16 	test_result, 
+//									ViChar 		_VI_FAR test_message[]){ return 0; }
+ViStatus _VI_FUNC  unvvk4_testOK_off (ViSession vi_vvk4, ViInt16 NumTest, ViPInt16 test_result, ViChar _VI_FAR test_message[]){ return 0; }
+
+ViStatus _VI_FUNC unvvk4_error_query(ViSession vi, 
+									 ViPInt32 error, 
+									 ViChar _VI_FAR error_message[]){ return 0; }
+ViStatus _VI_FUNC unvvk4_error_message (ViSession vi, 
+										ViStatus error, 
+										ViChar _VI_FAR message[]){ return 0; }
+ViStatus _VI_FUNC unvvk4_revision_query (ViSession vi,
+										ViChar _VI_FAR driver_revision[],
+										ViChar _VI_FAR instrument_revision[]){ return 0; }
+/****************************************************************************
+		Функция закрытия сеанса с инструментом
+*****************************************************************************/
+ViStatus _VI_FUNC unvvk4_close (ViSession vi){ return 0; }
+
+//Ф-ии загрузки контроллеров
+////ViStatus _VI_FUNC unvvk4_readyPLD (ViSession vi){ return 0; }
+//ViStatus _VI_FUNC unvvk4_loadPLD (ViSession vi){ return 0; }
+//ViStatus _VI_FUNC unvvk4_prgPLD (ViSession vi){ return 0; }
+//ViStatus _VI_FUNC unvvk4_vrfPLD (ViSession vi){ return 0; }
+
+//Технологические ф-ии чтения/записи калибровочных коэффициентов
+//ViStatus _VI_FUNC unvvk4_readDataRPZU (ViSession vi, void* buff, ViInt32 size){ return 0; }
+//ViStatus _VI_FUNC unvvk4_writeDataRPZU (ViSession vi, void* buff, ViInt32 size){ return 0; }
+
+
+
+
+
+
+
+// Функция "Исполнения коммутации"
+ViStatus _VI_FUNC unvvk4_start_commut (ViSession vi_vvk4){ return 0; }
+
+// Функция "Подключение выхода"	   //
+ViStatus _VI_FUNC unvvk4_commut_Output (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViInt16 state){ return 0; }				
+// Функция "Коммутация группы выходов"	   0-снять конфигурацию, 1-сконфигурировать 
+ViStatus _VI_FUNC unvvk4_commut_ListOutput (ViSession vi_vvk4, ViInt16 line, ViPChar MasOn, ViPChar MasOff){ return 0; }
+// Функция "Коммутация всех выходов"	 
+ViStatus _VI_FUNC unvvk4_commut_AllOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *NN_output){ return 0; }
+// Функция "Коммутация измерительных линий" :	 0-отключить, 1-подключить	  
+ViStatus _VI_FUNC unvvk4_commut_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine, ViInt16 state){ return 0; }
+
+// Функция "Конфигурация выхода"
+ViStatus _VI_FUNC unvvk4_config_Output (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViInt16 state){ return 0; }
+// Функция "Конфигурация группы выходов"	   0-снять конфигурацию, 1-сконфигурировать 
+ViStatus _VI_FUNC unvvk4_config_ListOutput (ViSession vi_vvk4, ViInt16 line, ViPChar MasOn, ViPChar MasOff){ return 0; }
+// Функция "Конфигурация всех выходов"	   0-снять конфигурацию, 1-сконфигурировать 
+ViStatus _VI_FUNC unvvk4_config_AllOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *NN_output){ return 0; }
+// Функция "Конфигурация измерительных линий" :	 0-отключить, 1-подключить	  
+ViStatus _VI_FUNC unvvk4_config_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine, ViInt16 state){ return 0; }
+
+// Функция "Запрос состояния конфигурации входных измерительных линий"  
+ViStatus _VI_FUNC unvvk4_config_MeasureLine_Q (ViSession vi_vvk4, ViInt16 *Mas){ return 0; }
+// Функция "Запрос состояния коммутации входных измерительных линий"  
+ViStatus _VI_FUNC unvvk4_commut_MeasureLine_Q (ViSession vi_vvk4, ViInt16 *Mas){ return 0; }
+// Функция "Запрос состояния конфигурации выхода" :	 0-сконфигурировать на отключение, 1-сконфигурировать на подключение	  
+ViStatus _VI_FUNC unvvk4_config_Output_Q (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViPInt16 state){ return 0; }
+// Функция "Запрос состояния коммутации выхода" :	 0-сконфигурировать на отключение, 1-сконфигурировать на подключение	  
+ViStatus _VI_FUNC unvvk4_commut_Output_Q (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViPInt16 state){ return 0; }
+
+							
+// Функция "Отключение коммутации"	   
+ViStatus _VI_FUNC unvvk4_Off_commut (ViSession vi_vvk4){ return 0; }
+
+
+// Функция "Запрос состояния конфигурации выходов" :	 0-отключить, 1-подключить	  
+ViStatus _VI_FUNC unvvk4_config_AllOutput_Q (ViSession vi_vvk4, ViInt16 line, ViInt16 *Mas){ return 0; }
+// Функция "Запрос состояния коммутации выходов" :	 0-отключить, 1-подключить	  
+ViStatus _VI_FUNC unvvk4_commut_AllOutput_Q (ViSession vi_vvk4, ViInt16 line, ViInt16 *Mas){ return 0; }
+
+//		Функция "Коммутация реле"	   //
+//*************************************************************/
+ViStatus _VI_FUNC unvvk4_commut_Rele (
+								ViSession 	vi_vvk4, 
+								ViInt16 	rele, 
+								ViInt16 	state){ return 0; }				
+// Конфигурация группы выходов
+ViStatus _VI_FUNC unvvk4_config_GroupOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *MasOutput, ViInt16 state){ return 0; }
+// Коммутация группы выходов
+ViStatus _VI_FUNC unvvk4_commut_GroupOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *MasOutput, ViInt16 state){ return 0; }
+
+
+////////////////////////  для технологической панели  ////////////////////////////////////////////////////
+ViStatus _VI_FUNC unvvk4_texnolog(ViSession vi_vvk4, ViInt16 x1, ViInt16 x2){ return 0; }
+////////////////////////  для технологической панели  ////////////////////////////////////////////////////
+ViStatus _VI_FUNC unvvk4_texnolog2(ViSession vi_vvk4, ViPInt16 x1, ViPInt16 x2){ return 0; }
+
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+}
+#endif
