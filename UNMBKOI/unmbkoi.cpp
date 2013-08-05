@@ -49,6 +49,12 @@ ViStatus _VI_FUNC unmbkoi_invers (
 								ViInt32 inv3
 								){ return 0; }
 
+
+ViStatus _VI_FUNC unmbkoi_config_frame_type (
+									ViSession mvi, 
+									ViInt32 type
+									) { return 0; }
+
 ViStatus _VI_FUNC unmbkoi_ext_connect (
 									ViSession mvi, 
 									ViInt32 out1, 

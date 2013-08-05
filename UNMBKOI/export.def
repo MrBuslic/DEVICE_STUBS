@@ -21,4 +21,5 @@ unmbkoi_start @17
 unmbkoi_state_q @18
 unmbkoi_stop @19
 unmbkoi_test_ok2 @20
+unmbkoi_config_frame_type @21
 
