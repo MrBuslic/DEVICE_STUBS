@@ -35,6 +35,7 @@ add_subdirectory(UNRBSTD)
 add_subdirectory(Visa)
 add_subdirectory(VTVM6068)
 add_subdirectory(NRPZ_stub)
+add_subdirectory(SCHWARZ_stub)
 add_subdirectory(TEST1003)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
