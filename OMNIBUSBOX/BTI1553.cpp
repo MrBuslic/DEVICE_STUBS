@@ -6,9 +6,14 @@
 #ifdef _WIN32
 #undef _WIN32
 #endif
-#include <BTI1553.h>
-#define _WIN32
-#include <windows.h>
+
+#include "OmniBus_interface.hpp"
+
+#ifdef _TEST_FACILITY_
+extern OmniDriver_interface* omni;
+#else
+	OmniDriver_interface* omni = new OmniDriver_interface();
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -130,7 +135,10 @@ BTI1553API MSGADDR __stdcall BTI1553_ListBlockRd(LPUSHORT buf,LISTADDR listaddr,
 BTI1553API MSGADDR __stdcall BTI1553_ListBlockWr(LPUSHORT buf,LISTADDR listaddr,HCORE handleval){ return 0; }
 BTI1553API INT __stdcall BTI1553_ListDataRd(LPUSHORT buf,INT count,LISTADDR listaddr,HCORE handleval){ return 0; }
 BTI1553API INT __stdcall BTI1553_ListDataWr(LPUSHORT buf,INT count,LISTADDR listaddr,HCORE handleval){ return 0; }
-BTI1553API BOOL __stdcall BTI1553_ListMultiBlockRd(LPUSHORT buf,LPINT blkcountptr,LISTADDR listaddr,HCORE handleval){ return 0; }
+BTI1553API BOOL __stdcall BTI1553_ListMultiBlockRd(LPUSHORT buf,LPINT blkcountptr,LISTADDR listaddr,HCORE handleval)
+{ 
+	return omni->ListMultiBlockRd(buf, blkcountptr, listaddr, handleval);
+}
 BTI1553API BOOL __stdcall BTI1553_ListMultiBlockWr(LPUSHORT buf,INT blkcount,LISTADDR listaddr,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_MonConfig(ULONG configval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_MonFilterSA(INT taval,ULONG rcvsamask,ULONG xmtsamask,ULONG rcvmcmask,ULONG xmtmcmask,INT channum,HCORE handleval){ return 0; }
@@ -138,7 +146,10 @@ BTI1553API ERRVAL __stdcall BTI1553_MonFilterTA(ULONG tamask,INT channum,HCORE h
 BTI1553API MSGADDR __stdcall BTI1553_MsgBlockRd(LPMSGFIELDS1553 buf,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API MSGADDR __stdcall BTI1553_MsgBlockWr(LPMSGFIELDS1553 buf,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API VOID __stdcall BTI1553_MsgDataRd(LPUSHORT buf,INT count,MSGADDR msgaddr,HCORE handleval){ }
-BTI1553API VOID __stdcall BTI1553_MsgDataWr(LPUSHORT buf,INT count,MSGADDR msgaddr,HCORE handleval){  }
+BTI1553API VOID __stdcall BTI1553_MsgDataWr(LPUSHORT buf,INT count,MSGADDR msgaddr,HCORE handleval)
+{
+	omni->MsgDataWr(buf, count, msgaddr, handleval);
+}
 BTI1553API ULONG __stdcall BTI1553_MsgFieldRd(USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API ULONG __stdcall BTI1553_MsgFieldWr(ULONG fieldval,USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API VOID __stdcall BTI1553_MsgGroupDataRd(INT nummsgs,USHORT databufs[][32],LPMSGADDR msgaddrptr,HCORE handleval){  }
