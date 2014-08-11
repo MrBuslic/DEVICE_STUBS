@@ -10,7 +10,7 @@ extern "C" {
 /*= GLOBAL USER-CALLABLE FUNCTION DECLARATIONS (Exportable Functions) =======*/
 /*****************************************************************************/
 ViStatus _VI_FUNC rssmf_init (ViRsrc resourceName, ViBoolean IDQuery,
-                              ViBoolean resetDevice, ViPSession instrumentHandle){return 0;}
+                              ViBoolean resetDevice, ViPSession instrumentHandle){return -1;}
 ViStatus _VI_FUNC rssmf_confLFFreqSweep (ViSession instrumentHandle, ViInt32 mode,
                                          ViReal64 startFrequency,
                                          ViReal64 stopFrequency, ViInt32 spacing,

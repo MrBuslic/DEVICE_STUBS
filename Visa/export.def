@@ -5,6 +5,9 @@ viClose @132
 viFindNext @130
 viFindRsrc @129
 viGetAttribute @133
+viSetAttribute @134
 viOpen @131
 viOpenDefaultRM @141
+viSetBuf @267
+viPrintf @269
 viQueryf @279
