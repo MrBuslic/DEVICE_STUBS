@@ -11,3 +11,5 @@ viOpenDefaultRM @141
 viSetBuf @267
 viPrintf @269
 viQueryf @279
+viOut32 @282
+viMoveOut32 @288

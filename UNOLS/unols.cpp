@@ -154,48 +154,156 @@ ViStatus _VI_FUNC unols_read_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 per
 /****************************************************************************
 		Сервисные функции 
 *****************************************************************************/
-ViStatus _VI_FUNC unols_reset (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_reset (ViSession vi){return 0;}
 ViStatus _VI_FUNC unols_self_test (ViSession 	vi, 
 									ViPInt16 	test_result, 
-									ViChar 		_VI_FAR test_message[]){ return 0; }
+									ViChar 		_VI_FAR test_message[]){return 0;}
 ViStatus _VI_FUNC unols_testOK_off_1 (ViSession 	vi, 
 									ViPInt16 	test_result, 
-									ViChar 		_VI_FAR test_message[]){ return 0; }
+									ViChar 		_VI_FAR test_message[]){return 0;}
 ViStatus _VI_FUNC unols_testOK_off_2 (ViSession 	vi, 
 									ViPInt16 	test_result, 
-									ViChar 		_VI_FAR test_message[]){ return 0; }
+									ViChar 		_VI_FAR test_message[]){return 0;}
+ViStatus _VI_FUNC unols_mTestOK_off_3 (ViSession 	vi, 
+									  ViPInt16 	test_result, 
+									  ViChar 		_VI_FAR test_message[]){return 0;}
+ViStatus _VI_FUNC unols_mTestOK_off_4 (ViSession 	vi, 
+									  ViPInt16 	test_result, 
+									  ViChar 		_VI_FAR test_message[]){return 0;}
 ViStatus _VI_FUNC unols_error_query(ViSession vi, 
 									 ViPInt32 error, 
-									 ViChar _VI_FAR error_message[]){ return 0; }
+									 ViChar _VI_FAR error_message[]){return 0;}
 ViStatus _VI_FUNC unols_error_message (ViSession vi, 
 										ViStatus error, 
-										ViChar _VI_FAR message[]){ return 0; }
+										ViChar _VI_FAR message[]){return 0;}
 ViStatus _VI_FUNC unols_revision_query (ViSession vi,
 										ViChar _VI_FAR driver_revision[],
-										ViChar _VI_FAR instrument_revision[]){ return 0; }
+										ViChar _VI_FAR instrument_revision[]){return 0;}
+
+
+
+/*Внутренняя  функция*/
+ViStatus _VI_FUNC unols_mConfig_mode_KF2 (ViSession vi, ViUInt16 packs, ViUInt16 packsEnd,
+	                                        ViUInt32 _VI_FAR periodPacks){return 0;}	
+// режим работы -3 
+ViStatus _VI_FUNC unols_mSet_modeKF   (ViSession vi,  ViInt32 mode){return 0;}   //    статусы ++
+ViStatus _VI_FUNC unols_mSet_modeKF_Q (ViSession vi,  ViPInt32 mode){return 0;} //++   статусы ++   
+// параметры обмена (количество кадров)
+ViStatus _VI_FUNC unols_mConfig_modeKF   (ViSession vi,  ViInt32 packs){return 0;}	   // статусы ++ 
+ViStatus _VI_FUNC unols_mConfig_modeKF_Q (ViSession vi,  ViPInt32 packs){return 0;}// ++  // статусы ++
+// источник  запуска
+ViStatus _VI_FUNC unols_mSynhro_triggerKF  (ViSession vi,  ViInt32 sourse){return 0;}
+ViStatus _VI_FUNC unols_mSynhro_triggerKF_Q (ViSession vi,  ViPInt32 sourse){return 0;}
+// прерывание
+ViStatus _VI_FUNC unols_mConfig_handlerKF (ViSession vi,  ViAddr userCallback, ViUInt32 genEvent){return 0;}     // статусы ++ 
+ViStatus _VI_FUNC unols_mConfig_handlerKF_Q (ViSession vi,  ViPAddr userCallback, ViPUInt32 genEvent){return 0;}//++   // статусы ++ 
+
+/****************************************************************************
+
+	Функции конфигурации режима регистрации
+	
+*****************************************************************************/   
+// установка частоты
+ViStatus _VI_FUNC unols_mSet_freqKR   (ViSession vi,  ViInt32 freq){return 0;}   //    статусы ++  
+ViStatus _VI_FUNC unols_mSet_freqKR_Q (ViSession vi,  ViPInt32 freq){return 0;}//++   //    статусы ++  
+// параметры обмена (количество кадров)
+ViStatus _VI_FUNC unols_mConfig_modeKR   (ViSession vi,  ViInt32 packs){return 0;} 	 //    статусы ++  
+ViStatus _VI_FUNC unols_mConfig_modeKR_Q (ViSession vi,  ViPInt32 packs){return 0;}    //    статусы ++  
+// источник  запуска
+ViStatus _VI_FUNC unols_mSynhro_triggerKR  (ViSession vi,  ViInt32 sourse){return 0;}  
+ViStatus _VI_FUNC unols_mSynhro_triggerKR_Q (ViSession vi,  ViPInt32 sourse){return 0;}//++   
+// прерывание
+ViStatus _VI_FUNC unols_mConfig_handlerKR (ViSession vi,  ViAddr userCallback, ViUInt32 regEvent){return 0;} //    статусы ++  
+ViStatus _VI_FUNC unols_mConfig_handlerKR_Q (ViSession vi, ViPAddr userCallback, ViPUInt32 regEvent){return 0;}//++		//    статусы ++  
+ 
+// Запрос количества принятых (зарегистрированных) пакетов
+ViStatus _VI_FUNC unols_mPacksKR_Q (ViSession vi, ViPUInt32 packs){return 0;} 
+/****************************************************************************
+		Функции управления/состояния
+*****************************************************************************/
+ViStatus _VI_FUNC unols_mStart (ViSession vi, ViInt32 devise){return 0;}  
+ViStatus _VI_FUNC unols_mStop (ViSession vi, ViInt32 devise){return 0;}   
+ViStatus _VI_FUNC unols_mReset_status (ViSession vi, ViInt32 devise, ViUInt32 maskEvent){return 0;} 
+ViStatus _VI_FUNC unols_mReset_DDR (ViSession vi, ViInt32 devise){return 0;} 
+ViStatus _VI_FUNC unols_mStatus_Q (ViSession vi, ViInt32 devise,  
+								  ViPUInt32  stateDev, ViPUInt32 eventDev, ViPUInt32 errDev){return 0;}
+ViStatus _VI_FUNC unols_mStateDDR_KF_Q (ViSession vi, ViPUInt32 packs, ViPUInt32 adr){return 0;} 							
+							
+ViStatus _VI_FUNC unols_mPacksKF_Q (ViSession vi, ViPUInt32 packs){return 0;}
+
+// Запрос типа ПО загруженного в модуль
+ViStatus _VI_FUNC unols_mModuleType_Q (ViSession vi, ViPUInt32 type){return 0;}
+	
+/****************************************************************************
+		 Данные
+*****************************************************************************/
+ViStatus _VI_FUNC unols_mWrite_dataKF (ViSession vi,ViChar _VI_FAR file_name[], ViPUInt32 adr){return 0;} 
+// Чтение данных из ОЗУ ПРИЕМА 
+ViStatus _VI_FUNC unols_mRead_dataKR (ViSession vi, ViUInt32 packs, ViChar _VI_FAR directory_name[]){return 0;}
+
+
 /****************************************************************************
 		Функция закрытия сеанса с инструментом
 *****************************************************************************/
-ViStatus _VI_FUNC unols_close (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unols_close (ViSession vi){return 0;}
 
 /****************************************************************************          
 		Функции загрузки контроллеров
 *****************************************************************************/ 
-ViStatus _VI_FUNC unols_readyPLD (ViSession vi){ return 0; }
-ViStatus _VI_FUNC unols_loadPLD (ViSession vi){ return 0; }
-ViStatus _VI_FUNC unols_prgPLD (ViSession vi){ return 0; }
-ViStatus _VI_FUNC unols_vrfPLD (ViSession vi){ return 0; }
-ViStatus _VI_FUNC unols_cmpVersions (ViSession vi){ return 0; }
-ViStatus _VI_FUNC unols_readFlashVersion (ViSession vi, ViChar _VI_FAR flash_rev[]){ return 0; }
+ViStatus _VI_FUNC unols_readyPLD (ViSession vi){return 0;}
+ViStatus _VI_FUNC unols_loadPLD (ViSession vi){return 0;}
+ViStatus _VI_FUNC unols_mPrgPLD (ViSession vi, ViInt32 type){return 0;}  
+ViStatus _VI_FUNC unols_prgPLD (ViSession vi){return 0;}
+ViStatus _VI_FUNC unols_mVrfPLD (ViSession vi, ViInt32 type){return 0;} 
+ViStatus _VI_FUNC unols_vrfPLD (ViSession vi){return 0;}
+ViStatus _VI_FUNC unols_cmpVersions (ViSession vi){return 0;}
+ViStatus _VI_FUNC unols_readFlashVersion (ViSession vi, ViChar _VI_FAR flash_rev[]){return 0;}
+ViStatus _VI_FUNC unols_mRAM_KR_Q(ViSession vi, ViPInt32 state){return 0;}
+ViStatus _VI_FUNC unols_mRAM_KF_Q(ViSession vi, ViPInt32 state){return 0;} 
 
 /****************************************************************************
 
 	Технологические функции 
 
-*****************************************************************************/   
-ViStatus _VI_FUNC unols_synhro_gener_ext (ViSession vi, ViInt16 state, ViUInt16 diT, ViReal64 T){ return 0; }      
-ViStatus _VI_FUNC unols_synhro_gener_ext_Q (ViSession vi, ViPInt16 state,ViPUInt16 diT, ViPReal64 T){ return 0; }
-ViStatus _VI_FUNC unols_trigger_ext (ViSession vi){ return 0; }   
+*****************************************************************************/ 
+ViStatus _VI_FUNC unols_synhro_gener_ext (ViSession vi, ViInt16 state, ViUInt16 diT, ViReal64 T){return 0;}   // Установка  внешней частоты      
+ViStatus _VI_FUNC unols_synhro_gener_ext_Q (ViSession vi, ViPInt16 state,ViPUInt16 diT, ViPReal64 T){return 0;}
+
+ViStatus _VI_FUNC unols_trigger_ext (ViSession vi){return 0;}    // Запуск от внешнего источника 
+
+ViStatus _VI_FUNC unols_mWrite_allData_3 (ViSession vi, ViUInt16 packs, ViChar _VI_FAR file_name[], 
+	                                     ViPUInt32 adr){return 0;} // нескольких файлов
+ViStatus _VI_FUNC unols_mRead_allData_3 (ViSession vi, ViUInt16 packs,  ViChar _VI_FAR file_name[],
+	                                    ViUInt32 period){return 0;} 
+ViStatus _VI_FUNC unols_mConfig_channel (ViSession vi, ViInt16 devise,
+										ViUInt32 _VI_FAR stateChans[],
+										ViUInt32 _VI_FAR chans[],
+										ViUInt16 defState){return 0;}
+ViStatus _VI_FUNC unols_mConfig_Uout (ViSession vi, ViReal64 _VI_FAR U[]){return 0;} 
+ViStatus _VI_FUNC unols_mWrite_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
+									   ViUInt32 offsetData, void* data){return 0;}
+ViStatus _VI_FUNC unols_mRead_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
+									ViUInt32 offsetData, void* data){return 0;}
+
+// Технологическая функция Включение/отключение модуляции
+ViStatus _VI_FUNC unols_mModulation  (ViSession vi,   ViInt32 state){return 0;}
+ViStatus _VI_FUNC unols_mModulation_Q  (ViSession vi, ViPInt32 state){return 0;}
+
+ViStatus _VI_FUNC unols_TPO_KR(ViSession vi, ViInt32 inpOut, ViInt32 state){return 0;}  // ПРИЕМ (КR) Поддержка проверки  ВЫВОДА/ВВОДА    
+ViStatus _VI_FUNC unols_TPO_KF(ViSession vi, ViInt32 inpOut, ViInt32 state){return 0;}  // ВЫДАЧА (КФ) Проверка ВЫВОДА/ВВОДА  
+ViStatus _VI_FUNC unols_TPO_KR_Q(ViSession vi, ViInt32 inpOut, ViPInt32 state){return 0;}
+ViStatus _VI_FUNC unols_TPO_KF_Q(ViSession vi, ViInt32 inpOut, ViPInt32 state){return 0;}
+
+ViStatus _VI_FUNC unols_mGener_ext_code (ViSession vi,  ViUInt32 code, ViUInt32 state){return 0;} //  Запись, чтение кодов генератора   ++
+ViStatus _VI_FUNC unols_mGener_ext_code_Q (ViSession vi, ViPUInt32 code, ViPUInt32 state){return 0;} 
+
+// Контроль частот 
+ViStatus _VI_FUNC unols_mClockFrequInpOut (ViSession vi,  ViPUInt32 state){return 0;}
+ViStatus _VI_FUNC unols_mTestInpFreq (ViSession vi,  ViInt32 state){return 0;} // Прием на удвоенной частоте
+//ViStatus _VI_FUNC unols_mTestInpFreq_Q (ViSession vi,  ViPInt32 state){return 0;}   
+ViStatus unols_setNameFileKF(ViChar _VI_FAR file_name[]){return 0;}	
+ViStatus unols_mWrRdData(ViSession vi, ViInt32 ofset, ViInt32 j, ViInt32 data[]){return 0;} // функция для тестов
+
 
 
 
