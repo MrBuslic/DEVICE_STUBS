@@ -55,6 +55,9 @@ ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName,
 /****************************************************************************
 		Функции конфигурации
 *****************************************************************************/
+ViStatus _VI_FUNC unols_mSet_modeKF   (ViSession vi,  ViInt32 mode){return 0;}
+ViStatus _VI_FUNC unols_mConfig_mode_KF2 (ViSession vi, ViUInt16 packs, ViUInt16 packsEnd,
+	ViUInt32 _VI_FAR periodPacks){return 0;}
 ViStatus _VI_FUNC unols_set_synhro_mode (ViSession vi, ViInt16 mode){ return 0; } 
 
 ViStatus _VI_FUNC unols_synhro_gener (ViSession vi, ViInt16 devise,  ViUInt16 sourse,
@@ -127,6 +130,7 @@ ViStatus _VI_FUNC unols_config_inpExt_Q (ViSession vi,  ViPInt16 st){ return 0; 
 /****************************************************************************
 		Функции управления/состояния
 *****************************************************************************/
+ViStatus _VI_FUNC unols_mStart (ViSession vi, ViInt32 devise){return 0;}
 ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){ return 0; }  
 ViStatus _VI_FUNC unols_trigger_imm (ViSession vi, ViInt16 devise){ return 0; }     
 ViStatus _VI_FUNC unols_stop (ViSession vi, ViInt16 devise){ return 0; }   

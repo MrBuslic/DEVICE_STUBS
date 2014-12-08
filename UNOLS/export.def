@@ -58,3 +58,6 @@ unols_vrfPLD @54
 unols_write_DataOZU @55
 unols_write_allData @56
 unols_write_dataKF @57
+unols_mStart @58
+unols_mConfig_mode_KF2 @59
+unols_mSet_modeKF @60
