@@ -37,6 +37,7 @@ add_subdirectory(VTVM6068)
 add_subdirectory(NRPZ_stub)
 add_subdirectory(SCHWARZ_stub)
 add_subdirectory(TEST1003)
+add_subdirectory(UNMVI102)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})
