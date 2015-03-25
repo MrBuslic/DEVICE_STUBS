@@ -1,7 +1,7 @@
 #ifndef _OMNIBUS_INT_HPP_
 #define _OMNIBUS_INT_HPP_
 
-#include <BTI1553.h>
+#include "BTI1553.H"
 #define _WIN32
 #include <windows.h>
 

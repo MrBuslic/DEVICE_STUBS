@@ -279,7 +279,7 @@ ViStatus _VI_FUNC unols_mConfig_channel (ViSession vi, ViInt16 devise,
 										ViUInt32 _VI_FAR stateChans[],
 										ViUInt32 _VI_FAR chans[],
 										ViUInt16 defState){return 0;}
-ViStatus _VI_FUNC unols_mConfig_Uout (ViSession vi, ViReal64 _VI_FAR U[]){return 0;} 
+ViStatus _VI_FUNC unols_mConfig_Uout (ViSession vi, ViReal64 _VI_FAR U){return 0;} 
 ViStatus _VI_FUNC unols_mWrite_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
 									   ViUInt32 offsetData, void* data){return 0;}
 ViStatus _VI_FUNC unols_mRead_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
