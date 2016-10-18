@@ -131,7 +131,3 @@ ViStatus _VI_FUNC unmn3i_readFlash(ViSession mvi){ return 0; }
 ViStatus _VI_FUNC unmn3i_writeFlash(ViSession mvi){ return 0; }
 ViStatus _VI_FUNC unmn3i_get_attribute (ViSession mvi, ViInt32 attr, ViPAttrState value){ return 0; }
 ViStatus _VI_FUNC unmn3i_resetCoeff(ViSession mvi){ return 0; }
-
-#if defined(__cplusplus) || defined(__cplusplus__)
-}
-#endif
