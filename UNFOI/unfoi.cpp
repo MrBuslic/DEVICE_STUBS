@@ -1,27 +1,55 @@
+#include <socket_rpc.h>
 #include <unfoi.h>
 #include <windows.h>
+#include "foi_rpc.h"
 
-#if defined(__cplusplus) || defined(__cplusplus__)
-extern "C" {
-#endif
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
-/*
+class rpc_buffer_class
+{
+	public:
+		RPC_foi_SLOT_Thread foi_slot_thr;
+		RPC_foi_SIGNAL_Thread foi_signal_thr;
+};
+
+SINGLETON_DEF(rpc_buffer_class);
+
 // Объявляем функцию DllMain
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
       DWORD fdwReason, LPVOID lpvReserved)
 {
-
+	RPC_foi_SLOT_Thread& slot_thr(Srpc_buffer_class::Instance().foi_slot_thr);
+	RPC_foi_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().foi_signal_thr);
 switch (fdwReason)      // Дерево разбора уведомлений
 {
   case DLL_PROCESS_ATTACH: // Подключение DLL
-    MessageBox(NULL,"Подключение Заглушки UNFOI для ФОИ","Использование заглушек!", MB_ICONINFORMATION);
+    //MessageBox(NULL,"Подключение Заглушки UNFOI для ФОИ","Использование заглушек!", MB_ICONINFORMATION);
 
-    if (lpvReserved)  // Определение способа загрузки
-      MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    else
-      MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    return 1; // успешная инициализация
+    //if (lpvReserved)  // Определение способа загрузки
+    //  MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+    //else
+    //  MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+    //return 1; // успешная инициализация
+	
 
+	if (!slot_thr.isRunning())
+	{
+		slot_thr.set_connection_params("127.0.0.1", 30001);
+		slot_thr.start();
+	}
+	//if (!slot_thr.wait_connected(3))
+	//	return false;
+	if (!signal_thr.isRunning())
+	{
+		signal_thr.set_connection_params("127.0.0.1", 30002);
+		signal_thr.start();
+	}
+	//if (!signal_thr.wait_connected(3))
+	//	return false;
+
+
+
+	  break;
   case DLL_PROCESS_DETACH: // Отключение DLL
     // Здесь – освобождаем память, закрываем
     // файлы и т.д.
@@ -41,13 +69,17 @@ switch (fdwReason)      // Дерево разбора уведомлений
     // вязанные с завершившимся потоком. Какой именно
     // поток завершился можно узнать просмотром списка
     // потоков средствами TOOLHELP32
-    MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
+    //MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
     break;
 
   }
 return TRUE;    // Код возврата игнорируется
 }
-*/
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
+
 /*----------------------------------------------------------------------*/
 /*  Инициализация                                                       */
 /*----------------------------------------------------------------------*/
