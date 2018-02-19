@@ -9,59 +9,26 @@
 /* Purpose : Include file for the VISA Library 3.0 specification             */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-
+#include <socket_rpc.h>
 #include <Visa.h>
 #include <windows.h>
+
 
 #if defined(__cplusplus) || defined(__cplusplus__)
    extern "C" {
 #endif
-/*
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-      DWORD fdwReason, LPVOID lpvReserved)
-{
 
-switch (fdwReason)      // ť森 ᨡﱠ 㦤ﭫ殨鍊{
-  case DLL_PROCESS_ATTACH: // Ю嫫殨塄LL
-    MessageBox(NULL,"Ю嫫殨塇ᤫ먠UNFOI 嬿 ՎȢ,"ɱ௫询ᮨ塧ᤫ檡", MB_ICONINFORMATION);
-
-    if (lpvReserved)  // ϯ楥즭饠௱ 衣諨
-      MessageBox(NULL,"DLL 衣禭ࡱ 㮮顪ﭯﮮ㫮颬"ɱ௫询ᮨ塧ᤫ檡", MB_ICONINFORMATION);
-    else
-      MessageBox(NULL,"DLL 衣禭ࡱ 㮮顪ﭯﮮ㫮颬"ɱ௫询ᮨ塧ᤫ檡", MB_ICONINFORMATION);
-    return 1; // স 鮨顫騠鿍
-
-  case DLL_PROCESS_DETACH: // ϲ묾殨塄LL
-    // Ȥ沼 ֠ﲢ祠欠࡬, 衪㡥썊    // ᪫ 衲.䮍
-    break;
-
-  case DLL_THREAD_ATTACH: // Ԣ楮��� 졯ﳮ률
-    // Ȥ沼 ֠沫衭᥮ র涮婬 
-    // ���䯯ﳮ 槨조᢮ 
-    // 鲯לּ询ᮨ欠楱⡱鮵ﮨ衶騍
-    // ᫨ 롪 뱨鸥롿 櫶鿬 ���᮲,
-    // 歠ﱻ 衲.䮍
-    break;
-
-  case DLL_THREAD_DETACH:
-      //Ԣ楮��� ᣥ殨衯ﳮ렍
-    // Ȥ沼 ֠沫衭᥮ ﲢ祠欠㲥 河, 
-    // 䀧ᮭ塱 衢汸飸魱 ௲﫮쮠ˠ믩 魥
-    // ௲猪衢汸鬱 ���讠 ౮���ﬠੱ렍
-    // ௲﫮⡱楱㡬衔OOLHELP32
-    MessageBox(NULL,"ɱ௫询ᮨ塧ᤫ檡","Ƞ㦰殨塯ﳮ렢, MB_ICONINFORMATION);
-    break;
-
-  }
-return TRUE;    // ˮ䡢諸᳠ 餭ﱨ泱
-}
-*/
 /*- Resource Manager Functions and Operations -------------------------------*/
 
 ViStatus _VI_FUNC  viOpenDefaultRM (ViPSession vi){ return 0; }
 
 ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList vi,
-                                    ViPUInt32 retCnt, ViChar _VI_FAR desc[]){*retCnt=0; return 0; }
+	ViPUInt32 retCnt, ViChar _VI_FAR desc[])
+	{
+		strcpy(desc, "VXI::1::INSTR");
+		*retCnt = 1;
+		return 0;
+	}
 
 ViStatus _VI_FUNC  viFindNext      (ViFindList vi, ViChar _VI_FAR desc[]){ return 0; }
 
@@ -74,13 +41,39 @@ ViStatus _VI_FUNC  viParseRsrcEx   (ViSession rmSesn, ViRsrc rsrcName, ViPUInt16
                                     ViChar _VI_FAR aliasIfExists[]){ return 0; }
 
 ViStatus _VI_FUNC  viOpen          (ViSession sesn, ViRsrc name, ViAccessMode mode,
-                                    ViUInt32 timeout, ViPSession vi){ return 0; }
+	ViUInt32 timeout, ViPSession vi){
+	*vi = 1; return 0;
+}
 
 /*- Resource Template Operations --------------------------------------------*/
 
 ViStatus _VI_FUNC  viClose         (ViObject vi){ return 0; }
 ViStatus _VI_FUNC  viSetAttribute  (ViObject vi, ViAttr attrName, ViAttrState attrValue){ return 0; }
-ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR attrValue){ return 0; }
+ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR attrValue)
+{
+	switch (attrName)
+	{
+		case VI_ATTR_INTF_TYPE:
+		{
+			int* tmp_res = (int*)attrValue;
+			*tmp_res = VI_INTF_VXI;
+			break;
+		}
+		case VI_ATTR_MODEL_CODE:
+		{
+			int* tmp_res = (int*)attrValue;
+			*tmp_res = 0x10B;
+			break;
+		}
+		case VI_ATTR_SLOT:
+		{
+			int* tmp_res = (int*)attrValue;
+			*tmp_res = 2;
+			break;
+		}
+	};
+	return 0; 
+}
 ViStatus _VI_FUNC  viStatusDesc    (ViObject vi, ViStatus status, ViChar _VI_FAR desc[]){ return 0; }
 ViStatus _VI_FUNC  viTerminate     (ViObject vi, ViUInt16 degree, ViJobId jobId){ return 0; }
 

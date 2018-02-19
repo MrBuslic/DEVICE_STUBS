@@ -95,8 +95,10 @@ ViStatus _VI_FUNC unfoi_init (ViRsrc rsrcName, ViBoolean id_query,
 ViStatus _VI_FUNCC unfoi_chans_setup (ViSession vi, ViInt16 chans[], ViInt16 line[],
 							ViReal64 U[], ViReal64 time){ return 0; }
 ViStatus _VI_FUNCC unfoi_chan_setup (ViSession vi, ViInt16 chan, ViInt16 line, /*+*/
-						   ViReal64 U, ViReal64 time){ return 0; }
-ViStatus _VI_FUNCC unfoi_run (ViSession vi){ return 0; }
+	ViReal64 U, ViReal64 time){
+	return Srpc_buffer_class::Instance().foi_slot_thr.get_foi_obj()->unfoi_chan_setup(chan, line, U, time);
+}
+ViStatus _VI_FUNCC unfoi_run(ViSession vi){ return Srpc_buffer_class::Instance().foi_slot_thr.get_foi_obj()->unfoi_run(); }
 ViStatus _VI_FUNCC unfoi_start (ViSession vi){ return 0; }	   
 ViStatus _VI_FUNCC unfoi_conf_chans (ViSession vi, ViInt16 chans[], ViInt16 lines[],
 						   ViReal64 U, ViReal64 time){ return 0; }
