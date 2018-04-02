@@ -362,7 +362,7 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_reset (ViSession mvi,
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*--------------------------------------------------------------------------*/
-_UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,
+_UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                                                  //Запрос типа
 									ViInt16 N,
 									ViInt16 *Present,
 									ViInt16 *Type){ return 0; }
