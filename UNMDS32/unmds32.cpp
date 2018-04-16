@@ -1,52 +1,83 @@
-extern "C"
-{
 #include <unmds32.h>
-}
+#include <socket_rpc.h>
 #include <windows.h>
-/*
+#include "mds32_rpc.h"
+
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+
+class rpc_buffer_class
+{
+public:
+	RPC_mds32_SLOT_Thread mds32_slot_thr;
+	RPC_mds32_SIGNAL_Thread mds32_signal_thr;
+};
+
+SINGLETON_DEF(rpc_buffer_class);
+
 // Объявляем функцию DllMain
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
       DWORD fdwReason, LPVOID lpvReserved)
 {
+	RPC_mds32_SLOT_Thread& slot_thr(Srpc_buffer_class::Instance().mds32_slot_thr);
+	RPC_mds32_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().mds32_signal_thr);
+	switch (fdwReason)      // Дерево разбора уведомлений
+	{
+	case DLL_PROCESS_ATTACH: // Подключение DLL
+	    //MessageBox(NULL,"Подключение Заглушки UNMDS32 для Мезонина МДС-32","Использование заглушек!", MB_ICONINFORMATION);
 
-switch (fdwReason)      // Дерево разбора уведомлений
-{
-  case DLL_PROCESS_ATTACH: // Подключение DLL
-    MessageBox(NULL,"Подключение Заглушки UNMDS32 для Мезонина МДС-32","Использование заглушек!", MB_ICONINFORMATION);
+		//if (lpvReserved)  // Определение способа загрузки
+		// MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+		//else
+		//MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+		//return 1; // успешная инициализация
 
-    if (lpvReserved)  // Определение способа загрузки
-      MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    else
-      MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    return 1; // успешная инициализация
+		if (!slot_thr.isRunning())
+		{
+			slot_thr.set_connection_params("127.0.0.1", 30005);
+			slot_thr.start();
+		}
+		//if (!slot_thr.wait_connected(3))
+		//	return false;
+		if (!signal_thr.isRunning())
+		{
+			signal_thr.set_connection_params("127.0.0.1", 30006);
+			signal_thr.start();
+		}
+		//if (!signal_thr.wait_connected(3))
+		//	return false;
+		break;
 
-  case DLL_PROCESS_DETACH: // Отключение DLL
-    // Здесь – освобождаем память, закрываем
-    // файлы и т.д.
-    break;
+	case DLL_PROCESS_DETACH: // Отключение DLL
+		// Здесь – освобождаем память, закрываем
+		// файлы и т.д.
+		break;
 
-  case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
-    // Здесь – если надо переходим на
-    // многопоточный режим работы с
-    // использованием средств синхронизации
-    // таких как критическая секция, мутанты,
-    // семафоры и т.д.
-    break;
+	case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
+		// Здесь – если надо переходим на
+		// многопоточный режим работы с
+		// использованием средств синхронизации
+		// таких как критическая секция, мутанты,
+		// семафоры и т.д.
+		break;
 
-  case DLL_THREAD_DETACH:
-      //Уведомление о завершении потока
-    // Здесь – если надо освобождаем все ресурсы, 
-    // вязанные с завершившимся потоком. Какой именно
-    // поток завершился можно узнать просмотром списка
-    // потоков средствами TOOLHELP32
-    MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
-    break;
+		case DLL_THREAD_DETACH:
+		//Уведомление о завершении потока
+		// Здесь – если надо освобождаем все ресурсы, 
+		// вязанные с завершившимся потоком. Какой именно
+		// поток завершился можно узнать просмотром списка
+		// потоков средствами TOOLHELP32
+		//MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
+		break;
 
-  }
-return TRUE;    // Код возврата игнорируется
+	}
+	return TRUE;    // Код возврата игнорируется
 }
-*/
-//--------------------- Initialize --------------------------------------------
+
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
+
+	//--------------------- Initialize --------------------------------------------
 #ifdef UNMDS32_OLD_INIT	
 ViStatus _VI_FUNC unmds32_init (ViSession arg0, ViUInt16 arg1, ViBoolean arg2,
                               ViBoolean arg3, ViSession *arg4){ return 0; }
@@ -90,7 +121,11 @@ ViStatus _VI_FUNC unmds32_sample_period (ViSession mvi, ViReal64 periodS){ retur
 ViStatus _VI_FUNC unmds32_sample_period_q (ViSession arg0, ViReal64 *arg1){ return 0; }
 
 //---------------------- Set input trigger ------------------------------
-ViStatus _VI_FUNC unmds32_input_trigger (ViSession mvi, ViBoolean state){ return 0; }
+ViStatus _VI_FUNC unmds32_input_trigger (ViSession mvi, ViBoolean state){
+	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_input_trigger(state);
+}
+
+
 ViStatus _VI_FUNC unmds32_input_trigger_group (ViSession mvi, ViBoolean state, ViUInt16 group){ return 0; }
 
 //---------------------- Query input trigger ------------------------------
@@ -114,7 +149,9 @@ ViStatus _VI_FUNC unmds32_sample_width_q (ViSession mvi,ViPUInt16 n,ViPUInt16 nB
 ViStatus _VI_FUNC unmds32_config_trigger (ViSession arg0, ViUInt16 arg1){ return 0; }
 
 //---------------------
-ViStatus _VI_FUNC unmds32_start (ViSession mvi){ return 0; }
+ViStatus _VI_FUNC unmds32_start (ViSession mvi){ 
+	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_start();
+}
 
 //---------------------
 ViStatus _VI_FUNC unmds32_state (ViSession arg0, ViBoolean *arg1){ return 0; }
@@ -126,8 +163,19 @@ ViStatus _VI_FUNC unmds32_stop (ViSession mvi){ return 0; }
 ViStatus _VI_FUNC unmds32_numReadyData (ViSession arg0, ViUInt32 *arg1){ return 0; }
 
 //--------------------- Read one sample --------------------------
-ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,
-		ViPUInt32 firstTime,ViPUInt32 lastTime){ return 0; }
+ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,ViPUInt32 firstTime,ViPUInt32 lastTime){
+	unsigned int tmp_buf;
+	int _firstTime;
+	int _lastTime;
+	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
+	for (int i = 0; i < 32; i++)
+		buf[i] = tmp_buf[i].toInt();//??
+	lastTime = _lastTime;
+	firstTime = _firstTime;
+	
+}
+
+
 //--------------------- Read data in block mode -----------------------------       
 ViStatus _VI_FUNC unmds32_read_block (ViSession mvi, ViUInt32 firstSample,
 					ViUInt32 numSamples,ViPUInt32 buf){ return 0; }
@@ -152,4 +200,6 @@ ViStatus _VI_FUNC unmds32_revision_query (ViSession mvi, ViChar _VI_FAR driverVe
 //-----------------------------                                    
 ViStatus _VI_FUNC unmds32_close (ViSession mvi){ return 0; }
 
-
+#if defined(__cplusplus) || defined(__cplusplus__)
+}
+#endif

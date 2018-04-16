@@ -34,14 +34,14 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 		if (!slot_thr.isRunning())
 		{
-			slot_thr.set_connection_params("127.0.0.1", 30001);
+			slot_thr.set_connection_params("127.0.0.1", 30003);
 			slot_thr.start();
 		}
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		if (!signal_thr.isRunning())
 		{
-			signal_thr.set_connection_params("127.0.0.1", 30002);
+			signal_thr.set_connection_params("127.0.0.1", 30004);
 			signal_thr.start();
 		}
 		//if (!signal_thr.wait_connected(3))

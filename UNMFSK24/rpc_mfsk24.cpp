@@ -25,7 +25,7 @@ RpcMFSK24Widget::RpcMFSK24Widget() : QWidget(), auto_scroll(true)
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcMFSK24Widget::auto_scroll_clicked);
 
 	QGridLayout* gr_layout = new QGridLayout;
-	for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 6; j++)
 		{
 			QPushButton* tmp_label = new QPushButton;
