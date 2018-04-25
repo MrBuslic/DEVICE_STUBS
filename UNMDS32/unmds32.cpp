@@ -164,15 +164,15 @@ ViStatus _VI_FUNC unmds32_numReadyData (ViSession arg0, ViUInt32 *arg1){ return 
 
 //--------------------- Read one sample --------------------------
 ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,ViPUInt32 firstTime,ViPUInt32 lastTime){
-	unsigned int tmp_buf;
+	int tmp_buf;
 	int _firstTime;
 	int _lastTime;
 	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
-	for (int i = 0; i < 32; i++)
-		buf[i] = tmp_buf[i].toInt();//??
+	buf = tmp_buf;
 	lastTime = _lastTime;
 	firstTime = _firstTime;
 	
+	return 0;
 }
 
 

@@ -14,8 +14,10 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 	int unmds32_input_trigger(bool state);
-	int unmds32_read_sample(unsigned int&, int& _lasteTime);
+	int unmds32_read_sample(int& _buf, int& _firstTime, int& _lasteTime);
 	int unmds32_start();
+	void check_box_clicked();
+	void line_edit_changed(const QString& _text);
 	////////////////////////////////////
 };
 

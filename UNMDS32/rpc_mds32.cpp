@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QCheckBox>
 #include <QLabel>
+#include <QLineEdit>
 #include "mds32_socket_rpc.h"
 
 RpcMDS32Widget::RpcMDS32Widget() : QWidget(), auto_scroll(true)
@@ -24,16 +25,21 @@ RpcMDS32Widget::RpcMDS32Widget() : QWidget(), auto_scroll(true)
 	auto_scroll_box->setChecked(true);
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcMDS32Widget::auto_scroll_clicked);
 	
+	buf_edit = new QLineEdit;
+	connect(buf_edit, &QLineEdit::textEdited, this, &RpcMDS32Widget::line_edit_changed);
 	QGridLayout* gr_layout = new QGridLayout;
 	for (int i = 0; i < 4; i++)
 	for (int j = 0; j < 8; j++)
 	{
+		
 		QCheckBox* tmp_check = new QCheckBox;
+		connect(tmp_check, &QCheckBox::clicked, this, &RpcMDS32Widget::check_box_clicked);
 		checks << tmp_check;
 		gr_layout->addWidget(tmp_check, i, j);
 	}
 
 	v_lay->addLayout(gr_layout);
+	v_lay->addWidget(buf_edit);
 	v_lay->addWidget(edit);
 	v_lay->addWidget(auto_scroll_box);
 
@@ -57,11 +63,32 @@ RpcMDS32Widget::RpcMDS32Widget() : QWidget(), auto_scroll(true)
 	rpc_signal_srv->start();
 }
 
+void RpcMDS32Widget::check_box_clicked()
+{
+	unsigned int tmp_buf = 0;
+	for (int i = 0; i < 32; i++)
+	{
+		if (checks[i]->isChecked())
+			tmp_buf += 1 << i;
+	}
+
+	buf_edit->setText(QString("0x%1").arg(tmp_buf, 8, 16, QChar('0')));
+}
+
+void RpcMDS32Widget::line_edit_changed(const QString& _text)
+{
+	unsigned int tmp_buf = _text.toUInt(0, 0);
+	for (int i = 0; i < 32; i++)
+	{
+		if (tmp_buf & (1 << i))
+			checks[i]->setChecked(true);
+		else
+			checks[i]->setChecked(false);
+	}
+}
+
 int RpcMDS32Widget::unmds32_input_trigger(bool state)
 {
-	for (int i = 0; i < 32; i++)
-		checks[i]->setChecked(state);
-
 	QString _msg = QString("%1 %2  входные реле").arg(QTime::currentTime().toString("hh:mm : ss.zzz")).arg((state == true) ? "замыкаю" : "размыкаю");
 	{
 		QMutexLocker lock(&log_mutex);
@@ -75,12 +102,23 @@ int RpcMDS32Widget::unmds32_input_trigger(bool state)
 	return 0; 
 }
 
-int RpcMDS32Widget::unmds32_read_sample(unsigned int& _buf, int& _firstTime, int& _lasteTime)
+int RpcMDS32Widget::unmds32_read_sample(int& _buf, int& _firstTime, int& _lasteTime)
 {
-	_buf = buf;
+	_buf = buf_edit->text().toUInt(0, 0);
 	_firstTime = 0;
 	_lasteTime = 0;
-	return 0; 
+	
+	QString _msg = QString("%1 Изменение данных: %2").arg(QTime::currentTime().toString("hh:mm : ss.zzz")).arg(_buf);
+	{
+		QMutexLocker lock(&log_mutex);
+		log_buffer << _msg;
+	}
+	_cursor->insertText(_msg + "\n");
+
+
+	if (auto_scroll)
+		_scroll_bar->setValue(_scroll_bar->maximum());
+	return (buf_edit, _firstTime, _lasteTime);
 }
 
 int RpcMDS32Widget::unmds32_start()

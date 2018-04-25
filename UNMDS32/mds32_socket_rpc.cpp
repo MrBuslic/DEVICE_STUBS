@@ -73,8 +73,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["unmds32_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unmds32_input_trigger;
-		operators_map["unmds32_read_sample(unsigned, int&)"] = &Socket_RPC_SLOT_Object::unmds32_read_sample;
+		operators_map["unmds32_read_sample(int&, int&, int&)"] = &Socket_RPC_SLOT_Object::unmds32_read_sample;
 		operators_map["unmds32_start()"] = &Socket_RPC_SLOT_Object::unmds32_start;
+		operators_map["check_box_clicked()"] = &Socket_RPC_SLOT_Object::check_box_clicked;
+		operators_map["line_edit_changed(QString&)"] = &Socket_RPC_SLOT_Object::line_edit_changed;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 	}
@@ -320,10 +322,13 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
-			unsigned int& = _values.at(0).value<unsigned>();
-			int _lasteTime = _values.at(1).value<int>();
-			int res = app->unmds32_read_sample(int&, _lasteTime);
-			_values[1] = _lasteTime;
+			int _buf = _values.at(0).value<int>();
+			int _firstTime = _values.at(1).value<int>();
+			int _lasteTime = _values.at(2).value<int>();
+			int res = app->unmds32_read_sample(_buf, _firstTime, _lasteTime);
+			_values[0] = _buf;
+			_values[1] = _firstTime;
+			_values[2] = _lasteTime;
 			with_return = true;
 			return res;
 		}
@@ -350,6 +355,41 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::check_box_clicked(QVariantList& _values)
+	{
+		try
+		{
+			app->check_box_clicked();
+			return 0;
+		}
+		catch(std::exception &err)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::line_edit_changed(QVariantList& _values)
+	{
+		try
+		{
+			QString _text = _values.at(0).value<QString>();
+			app->line_edit_changed(_text);
+			_values[0] = _text;
+			with_return = true;
+			return 0;
+		}
+		catch(std::exception &err)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

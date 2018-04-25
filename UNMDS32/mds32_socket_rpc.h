@@ -107,6 +107,8 @@ public:
 	QVariant unmds32_input_trigger(QVariantList& _values);
 	QVariant unmds32_read_sample(QVariantList& _values);
 	QVariant unmds32_start(QVariantList& _values);
+	QVariant check_box_clicked(QVariantList& _values);
+	QVariant line_edit_changed(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
