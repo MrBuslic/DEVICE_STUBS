@@ -24,6 +24,7 @@ AG7972Widget::AG7972Widget() : QWidget(), u(0.0), i(0.0)
 
 	server = new QTcpServer();
 	connect(server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
+	connect(R_edit, SIGNAL(editingFinished()), this, SLOT(update_graphics()));
 	server->listen(QHostAddress::Any, 30101);
 }
 
@@ -35,8 +36,12 @@ void AG7972Widget::tcp_slot()
 
 void AG7972Widget::update_graphics()
 {
+	calc_meas();
 	u_label->setText(QString("Установленное напряжение : %1В").arg(u));
 	i_label->setText(QString("Установленный ток ограничения : %1А").arg(i));
+	state_label->setText(QString("Состояние выхода: %1").arg(state ? "включено" : "выключено"));
+	u_meas_label->setText(QString("Измеренное напряжение : %1В").arg(u_meas));
+	i_meas_label->setText(QString("Измеренный ток : %1А").arg(i_meas));
 }
 
 void AG7972Widget::read_data()
@@ -75,21 +80,9 @@ void AG7972Widget::read_data()
 	}
 	if (command_string == "MEAS:VOLT?")
 	{
-		double out_u;
-		if (!state)
-			out_u = 0;
-		else
-		{
-			double tmp_r = R_edit->text().toDouble();
-			double tmp_i = u / tmp_r;
-			if (tmp_i > i)
-				out_u = tmp_r * i;
-			else
-				out_u = u;
-		}
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(tmp_arr);
-		tmp_stream << out_u;
+		tmp_stream << u_meas;
 		socket->write(tmp_arr);
 		socket->waitForBytesWritten();
 	}
@@ -101,7 +94,67 @@ void AG7972Widget::read_data()
 		socket->write(tmp_arr);
 		socket->waitForBytesWritten();
 	}
+	if (command_string == "VOLT?")
+	{
+		/* вывести переменную u*/
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(tmp_arr);
+		tmp_stream << u;
+		socket->write(tmp_arr);
+		socket->waitForBytesWritten();
+	}
+	if (command_string == "CURR?")
+	{
+		/*выводить curr, переменную создал*/
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(tmp_arr);
+		tmp_stream << i;
+		socket->write(tmp_arr);
+		socket->waitForBytesWritten();
+	}
+
+	if (command_string == "MEAS:CURR?")
+	{
+		/*выводить измеренное curr, переменную создал*/
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(tmp_arr);
+		tmp_stream << i_meas;
+		socket->write(tmp_arr);
+		socket->waitForBytesWritten();
+	}
+
+	if (command_string == "*TST?")
+	{
+		/* должен выводить 0*/
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(tmp_arr);
+		tmp_stream << "0"; /*как я понял - не таким образом*/
+		socket->write(tmp_arr);
+		socket->waitForBytesWritten();
+	}
+
+
+	if (command_string == "CURR:LIM %1")
+	{
+		i = params.at(0).toDouble();
+	}
+
 
 	update_graphics();
+}
+
+void AG7972Widget::calc_meas()
+{
+	if (!state)
+		u_meas = 0;
+	else
+	{
+		double tmp_r = R_edit->text().toDouble();
+		i_meas = u / tmp_r;
+		if (i_meas > i)
+			u_meas = tmp_r * i;
+		else
+			u_meas = u;
+	}
 }
 

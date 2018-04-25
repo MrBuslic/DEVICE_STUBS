@@ -30,6 +30,7 @@ public:
 public slots:
 	void tcp_slot();
 	void read_data();
+	void update_graphics();
 private:
 	QTcpServer* server;
 	QTcpSocket* socket;
@@ -45,7 +46,10 @@ private:
 	double i;
 	bool state;
 
-	void update_graphics();
+	double u_meas;
+	double i_meas;
+	void calc_meas();
+	
 signals:
 	void power_out(int n, double _u);
 };
