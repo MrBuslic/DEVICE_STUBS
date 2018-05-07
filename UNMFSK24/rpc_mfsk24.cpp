@@ -8,7 +8,7 @@
 #include "mfsk24_socket_rpc.h"
 #include <QVector>
 
-RpcMFSK24Widget::RpcMFSK24Widget() : QWidget(), auto_scroll(true)
+RpcMFSK24Widget::RpcMFSK24Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -50,8 +50,6 @@ RpcMFSK24Widget::RpcMFSK24Widget() : QWidget(), auto_scroll(true)
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30010;
-	int signal_port = 30011;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
@@ -60,6 +58,7 @@ RpcMFSK24Widget::RpcMFSK24Widget() : QWidget(), auto_scroll(true)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
+	setWindowTitle(QString("mfsk24 %1").arg(slot_port - 30009));
 }
 
 int RpcMFSK24Widget::unmfsk24_manual_group_cmd(int _state_chan, QVariantList _vec)
@@ -147,7 +146,7 @@ int RpcMFSK24Widget::unmfsk24_start(QVariantList _state)
 {
 	QString tmp_channels;
 	QTime t = QTime::currentTime();
-	QString _msg = QString("%1 одновременная выдача команд:\n").arg(t.toString("hh:mm:ss.zzz"));
+	QString _msg = QString("%1 Одновременная выдача команд:\n").arg(t.toString("hh:mm:ss.zzz"));
 	
 
 	
