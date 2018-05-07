@@ -34,7 +34,7 @@ RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
 	QString ip_str = "127.0.0.1";
 	int slot_port = 30001;
 	int signal_port = 30002;
-	Socket_RPC_SLOT_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Thread;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();

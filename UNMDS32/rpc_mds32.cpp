@@ -9,7 +9,7 @@
 #include <QLineEdit>
 #include "mds32_socket_rpc.h"
 
-RpcMDS32Widget::RpcMDS32Widget() : QWidget(), auto_scroll(true)
+RpcMDS32Widget::RpcMDS32Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -51,9 +51,7 @@ RpcMDS32Widget::RpcMDS32Widget() : QWidget(), auto_scroll(true)
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30005;
-	int signal_port = 30006;
-	Socket_RPC_SLOT_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Thread;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
@@ -61,6 +59,7 @@ RpcMDS32Widget::RpcMDS32Widget() : QWidget(), auto_scroll(true)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
+	setWindowTitle(QString("mds32 %1").arg(slot_port - 30019));
 }
 
 void RpcMDS32Widget::check_box_clicked()
@@ -102,7 +101,7 @@ int RpcMDS32Widget::unmds32_input_trigger(bool state)
 	return 0; 
 }
 
-int RpcMDS32Widget::unmds32_read_sample(int& _buf, int& _firstTime, int& _lasteTime)
+int RpcMDS32Widget::unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _lasteTime)
 {
 	_buf = buf_edit->text().toUInt(0, 0);
 	_firstTime = 0;

@@ -1,15 +1,42 @@
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
 #include <unmds32.h>
+#if defined(__cplusplus) || defined(__cplusplus__)
+}
+#endif
 #include <socket_rpc.h>
 #include <windows.h>
 #include "mds32_rpc.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-
+int mds_count = 0;
 class rpc_buffer_class
 {
 public:
-	RPC_mds32_SLOT_Thread mds32_slot_thr;
-	RPC_mds32_SIGNAL_Thread mds32_signal_thr;
+	QList<RPC_mds32_SLOT_Thread*> mds32_slot_thr;
+	QList<RPC_mds32_SIGNAL_Thread*> mds32_signal_thr;
+	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+private:
+	rpc_buffer_class()
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			RPC_mds32_SLOT_Thread* slot_thr = new RPC_mds32_SLOT_Thread;
+			slot_thr->set_connection_params("127.0.0.1", 30020+i);
+			slot_thr->start();
+			//if (!slot_thr.wait_connected(3))
+			//	return false;
+			RPC_mds32_SIGNAL_Thread* signal_thr = new RPC_mds32_SIGNAL_Thread;
+			signal_thr->set_connection_params("127.0.0.1", 30025+i);
+			signal_thr->start();
+			//if (!signal_thr.wait_connected(3))
+			//	return false;
+
+			mds32_slot_thr.push_back(slot_thr);
+			mds32_signal_thr.push_back(signal_thr);
+		}
+	}
 };
 
 SINGLETON_DEF(rpc_buffer_class);
@@ -18,8 +45,7 @@ SINGLETON_DEF(rpc_buffer_class);
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
       DWORD fdwReason, LPVOID lpvReserved)
 {
-	RPC_mds32_SLOT_Thread& slot_thr(Srpc_buffer_class::Instance().mds32_slot_thr);
-	RPC_mds32_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().mds32_signal_thr);
+	Srpc_buffer_class::Instance();
 	switch (fdwReason)      // Дерево разбора уведомлений
 	{
 	case DLL_PROCESS_ATTACH: // Подключение DLL
@@ -31,20 +57,6 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		//MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
 		//return 1; // успешная инициализация
 
-		if (!slot_thr.isRunning())
-		{
-			slot_thr.set_connection_params("127.0.0.1", 30005);
-			slot_thr.start();
-		}
-		//if (!slot_thr.wait_connected(3))
-		//	return false;
-		if (!signal_thr.isRunning())
-		{
-			signal_thr.set_connection_params("127.0.0.1", 30006);
-			signal_thr.start();
-		}
-		//if (!signal_thr.wait_connected(3))
-		//	return false;
 		break;
 
 	case DLL_PROCESS_DETACH: // Отключение DLL
@@ -83,7 +95,12 @@ ViStatus _VI_FUNC unmds32_init (ViSession arg0, ViUInt16 arg1, ViBoolean arg2,
                               ViBoolean arg3, ViSession *arg4){ return 0; }
 #else
 ViStatus _VI_FUNC unmds32_init (ViRsrc rsrcName, ViBoolean IDquery,
-                                 ViBoolean doReset, ViSession *mezvi){ return 0; }
+                                 ViBoolean doReset, ViSession *mezvi)
+{ 
+	mds_count++;
+	*mezvi = mds_count;
+	return 0; 
+}
 ViStatus _VI_FUNC unmds32_connect (ViSession mezvi, ViSession vi, ViUInt16 m_num, ViBoolean IDquery,
                                  ViBoolean doReset){ return 0; }
 #endif
@@ -122,7 +139,7 @@ ViStatus _VI_FUNC unmds32_sample_period_q (ViSession arg0, ViReal64 *arg1){ retu
 
 //---------------------- Set input trigger ------------------------------
 ViStatus _VI_FUNC unmds32_input_trigger (ViSession mvi, ViBoolean state){
-	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_input_trigger(state);
+	return Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_input_trigger(state);
 }
 
 
@@ -150,7 +167,7 @@ ViStatus _VI_FUNC unmds32_config_trigger (ViSession arg0, ViUInt16 arg1){ return
 
 //---------------------
 ViStatus _VI_FUNC unmds32_start (ViSession mvi){ 
-	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_start();
+	return Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_start();
 }
 
 //---------------------
@@ -164,13 +181,13 @@ ViStatus _VI_FUNC unmds32_numReadyData (ViSession arg0, ViUInt32 *arg1){ return 
 
 //--------------------- Read one sample --------------------------
 ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,ViPUInt32 firstTime,ViPUInt32 lastTime){
-	int tmp_buf;
-	int _firstTime;
-	int _lastTime;
-	return Srpc_buffer_class::Instance().mds32_slot_thr.get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
-	buf = tmp_buf;
-	lastTime = _lastTime;
-	firstTime = _firstTime;
+	uint tmp_buf;
+	uint _firstTime;
+	uint _lastTime;
+	Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
+	*buf = tmp_buf;
+	*lastTime = _lastTime;
+	*firstTime = _firstTime;
 	
 	return 0;
 }

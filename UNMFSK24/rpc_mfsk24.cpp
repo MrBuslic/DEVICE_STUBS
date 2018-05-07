@@ -50,9 +50,9 @@ RpcMFSK24Widget::RpcMFSK24Widget() : QWidget(), auto_scroll(true)
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30003;
-	int signal_port = 30004;
-	Socket_RPC_SLOT_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Thread;
+	int slot_port = 30010;
+	int signal_port = 30011;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();

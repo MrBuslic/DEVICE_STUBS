@@ -365,7 +365,25 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_reset (ViSession mvi,
 _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                                                  //Запрос типа
 									ViInt16 N,
 									ViInt16 *Present,
-									ViInt16 *Type){ return 0; }
+									ViInt16 *Type)
+{
+	if ((N == 1) || (N == 2))//MDS32
+	{
+		*Present = 1;
+		*Type = 0x9;
+	}
+	else if ((N == 3) || (N == 4))//MFSK24
+	{
+		*Present = 1;
+		*Type = 0x0A;
+	}
+	else
+	{
+		*Present = 0;
+		*Type = 0;
+	}
+	return 0; 
+}
 /*--------------------------------------------------------------------------*/
 /*                                                                          */
 /*--------------------------------------------------------------------------*/

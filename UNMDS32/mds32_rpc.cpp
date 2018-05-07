@@ -134,7 +134,7 @@ int RPC_mds32_SLOT_Object::unmds32_input_trigger(bool state)
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished unmds32_input_trigger");
 	return res.toInt();
 }
-int RPC_mds32_SLOT_Object::unmds32_read_sample(int& _buf, int& _firstTime, int& _lasteTime)
+int RPC_mds32_SLOT_Object::unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _lasteTime)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -142,10 +142,10 @@ int RPC_mds32_SLOT_Object::unmds32_read_sample(int& _buf, int& _firstTime, int& 
 	tmp_list << QVariant(_firstTime);
 	tmp_list << QVariant(_lasteTime);
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call unmds32_read_sample");
-	dynamic_call("unmds32_read_sample(int&, int&, int&)", tmp_list);
-	_buf = tmp_list.at(0).toInt();
-	_firstTime = tmp_list.at(1).toInt();
-	_lasteTime = tmp_list.at(2).toInt();
+	dynamic_call("unmds32_read_sample(uint&, uint&, uint&)", tmp_list);
+	_buf = tmp_list.at(0).toUInt();
+	_firstTime = tmp_list.at(1).toUInt();
+	_lasteTime = tmp_list.at(2).toUInt();
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished unmds32_read_sample");
 	return res.toInt();
 }
