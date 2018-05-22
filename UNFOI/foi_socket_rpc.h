@@ -93,12 +93,10 @@ class Socket_RPC_SLOT_Object : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Object();
+	Socket_RPC_SLOT_Object(RpcFoiWidget* _app, int socketDescriptor);
 	~Socket_RPC_SLOT_Object()
 	{
 	}
-	void set_app(RpcFoiWidget* _app);
-	void set_socket(QTcpSocket* _rpc_socket);
 	typedef QVariant (Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
@@ -118,28 +116,36 @@ private:
 	static int obj_num;
 };
 
-class Socket_RPC_SLOT_Server : public QObject
-{
-	Q_OBJECT
-public:
-	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port);
-	void set_app(RpcFoiWidget* _app)
-	{
-		app = _app;
-	}
-public slots:
-	void tcp_slot();
-private:
-	QTcpServer* rpc_server;
-	RpcFoiWidget* app;
-	QList<std::shared_ptr<Socket_RPC_SLOT_Object> > rpc_objects;
-};
-
 class Socket_RPC_SLOT_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Thread();
+	Socket_RPC_SLOT_Thread(RpcFoiWidget* _app, int _socketDescriptor);
+	void run();
+	std::shared_ptr<Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
+	private:
+	std::shared_ptr<Socket_RPC_SLOT_Object> rpc_obj;
+	RpcFoiWidget* app;
+	int socketDescriptor;
+};
+
+class Socket_RPC_SLOT_Server : public QTcpServer
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcFoiWidget* _app);
+protected:
+	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
+private:
+	RpcFoiWidget* app;
+	QList<std::shared_ptr<Socket_RPC_SLOT_Thread> > rpc_objects;
+};
+
+class Socket_RPC_SLOT_Server_Thread : public QThread
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SLOT_Server_Thread();
 	void set_app(RpcFoiWidget* _app)
 	{
 		app = _app;
