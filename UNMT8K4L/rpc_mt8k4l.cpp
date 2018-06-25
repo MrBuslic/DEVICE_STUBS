@@ -27,11 +27,11 @@ RpcMT8K4LWidget::RpcMT8K4LWidget(int slot_port, int signal_port) : QWidget(), au
 
 	QGridLayout* gr_layout = new QGridLayout;
 	for (int i = 0; i < 2; i++)
-	for (int j = 0; j < 4; i++)
+	for (int j = 0; j < 4; j++)
 	{
-		buf_edit = new QLineEdit;
-		checks << buf_edit;
-		gr_layout->addWidget(buf_edit, i,j);
+		QLineEdit* tmp_edit = new QLineEdit;
+		checks << tmp_edit;
+		gr_layout->addWidget(tmp_edit, i, j);
 	}
 
 	v_lay->addLayout(gr_layout);
@@ -80,23 +80,27 @@ int RpcMT8K4LWidget::unmt8k4l_sample_width_q(uint& frame_width, uint&  width_in_
 }
 
 
-int RpcMT8K4LWidget::unmt8k4l_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime)
+int RpcMT8K4LWidget::unmt8k4l_read_sample(QVariantList& _buf, uint& _firstTime, uint& _thisTime)
 {
-	_buf = buf_edit->text().toUInt(0, 0);
+	_buf.clear();
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 4; j++)
+		{
+			_buf << checks[i * 4 + j]->text().toDouble();
+		}
 	_firstTime = 0;
 	_thisTime = 0;
 	
-	QString _msg = QString("%1 Изменение данных: %2").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(_buf);
+	QString _msg = QString("%1 Запрос данных").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
 	{
 		QMutexLocker lock(&log_mutex);
 		log_buffer << _msg;
 	}
 	_cursor->insertText(_msg + "\n");
-
-
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
-	return (buf_edit, _firstTime, _thisTime);
+
+	return 0;
 }
 
 int RpcMT8K4LWidget::unmt8k4l_start()

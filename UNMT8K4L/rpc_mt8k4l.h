@@ -33,7 +33,7 @@ public slots:
 	int unmt8k4l_start();
 	int unmt8k4l_input_trigger(bool state);
 	int unmt8k4l_sample_width_q(uint& frame_width, uint&  width_in_bytes);
-	int unmt8k4l_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime);
+	int unmt8k4l_read_sample(QVariantList& _buf, uint& _firstTime, uint& _thisTime);
 
 private:
 	QTextEdit* edit;
@@ -49,7 +49,6 @@ private:
 
 	bool state;
 	QList<QLineEdit*> checks;
-	QLineEdit* buf_edit;
 
 };
 

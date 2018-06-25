@@ -80,7 +80,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		operators_map["unmt8k4l_start()"] = &Socket_RPC_SLOT_Object::unmt8k4l_start;
 		operators_map["unmt8k4l_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unmt8k4l_input_trigger;
 		operators_map["unmt8k4l_sample_width_q(uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmt8k4l_sample_width_q;
-		operators_map["unmt8k4l_read_sample(uint&, uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmt8k4l_read_sample;
+		operators_map["unmt8k4l_read_sample(QVariantList&, uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmt8k4l_read_sample;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -354,7 +354,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
-			uint _buf = _values.at(0).value<uint>();
+			QVariantList _buf = _values.at(0).value<QVariantList>();
 			uint _firstTime = _values.at(1).value<uint>();
 			uint _thisTime = _values.at(2).value<uint>();
 			int res = app->unmt8k4l_read_sample(_buf, _firstTime, _thisTime);

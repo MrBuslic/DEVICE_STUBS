@@ -156,7 +156,7 @@ int RPC_mt8k4l_SLOT_Object::unmt8k4l_sample_width_q(uint& frame_width, uint& wid
 	SRPCSignalClass::Instance().toLog("mt8k4l dynamic_call finished unmt8k4l_sample_width_q");
 	return res.toInt();
 }
-int RPC_mt8k4l_SLOT_Object::unmt8k4l_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime)
+int RPC_mt8k4l_SLOT_Object::unmt8k4l_read_sample(QVariantList& _buf, uint& _firstTime, uint& _thisTime)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -164,8 +164,8 @@ int RPC_mt8k4l_SLOT_Object::unmt8k4l_read_sample(uint& _buf, uint& _firstTime, u
 	tmp_list << QVariant(_firstTime);
 	tmp_list << QVariant(_thisTime);
 	SRPCSignalClass::Instance().toLog("mt8k4l dynamic_call unmt8k4l_read_sample");
-	dynamic_call("unmt8k4l_read_sample(uint&, uint&, uint&)", tmp_list);
-	_buf = tmp_list.at(0).toUInt();
+	dynamic_call("unmt8k4l_read_sample(QVariantList&, uint&, uint&)", tmp_list);
+	_buf = tmp_list.at(0).toList();
 	_firstTime = tmp_list.at(1).toUInt();
 	_thisTime = tmp_list.at(2).toUInt();
 	SRPCSignalClass::Instance().toLog("mt8k4l dynamic_call finished unmt8k4l_read_sample");
