@@ -9,7 +9,9 @@ extern "C" {
 #include <windows.h>
 #include "mds32_rpc.h"
 
+#ifndef SINGLETON_DEF
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#endif
 int mds_count = 0;
 class rpc_buffer_class
 {

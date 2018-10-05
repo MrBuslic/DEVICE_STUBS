@@ -1,9 +1,13 @@
 #include <unmn8i.h>
-#if defined(__cplusplus) || defined(__cplusplus__)
- }
-#endif
 
-	
+
+typedef ViStatus(_VI_FUNCH * UNMN8IIntHandle)(ViSession mvi,
+	 ViInt32 reason, ViPBoolean levelUp,
+	 ViPBoolean levelDown, ViAddr userdata);
+
+
+UNMN8IIntHandle _interrupt_handle;
+
 //--------------------------------
 // Definitions of driver functions
 //--------------------------------
@@ -61,7 +65,9 @@ ViStatus _VI_FUNC unmn8i_input_trigger_q (ViSession mvi, ViBoolean *on){ return 
 
 //--------------------- Query sample width -----------------------------------------
 ViStatus _VI_FUNC unmn8i_sample_width_q (ViSession mvi, ViUInt16 *widthWord,
-                                        ViUInt16 *widthByte){ return 0; }
+	ViUInt16 *widthByte){
+	*widthWord = 8; return 0;
+}
 
 //---------------------- Set mask interrupt --------------------------------
 ViStatus _VI_FUNC unmn8i_mask_interrupt (ViSession mvi, ViBoolean enableFIFO,
@@ -82,7 +88,12 @@ ViStatus _VI_FUNC unmn8i_overlevel_q(ViSession mvi, ViBoolean LevelUp[], ViBoole
 
 
 
-ViStatus _VI_FUNC unmn8i_installHandler (ViSession mvi, ViPAttrState handle, ViPAttrState userData){ return 0; }
+ViStatus _VI_FUNC unmn8i_installHandler (ViSession mvi, ViPAttrState handle, ViPAttrState userData)
+{
+	_interrupt_handle = reinterpret_cast<UNMN8IIntHandle>(handle);
+	(*_interrupt_handle)(mvi, UNMN8I_IRQ_PACKET_READY, 0, 0, 0);
+	return 0; 
+}
 
 ViStatus _VI_FUNC unmn8i_reset_flag (ViSession mvi){ return 0; }
 
