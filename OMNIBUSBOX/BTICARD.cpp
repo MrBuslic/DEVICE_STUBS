@@ -7,55 +7,86 @@
 #undef _WIN32
 #endif
 #include <BTICARD.h>
+#include <BTI1553.H>
 #define _WIN32
+
+#include "omnibus_rpc.h"
+
 #include <windows.h>
+
+
+#include "BufferClass.h"
+#include "instruments.h"
+#include <QApplication>
+
+// Объявляем функцию DllMain
+BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
+DWORD fdwReason, LPVOID lpvReserved)
+{
+	RPC_omnibus_SLOT_Thread& slot_thr(Srpc_buffer_class::Instance().omnibus_slot_thr);
+	RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
+
+	//получение айпи
+	/*QString tmp_srvr_ip;
+	QString ipSettingsFile = QString(QCoreApplication::applicationDirPath() + "/" + "ipSettings.ini");
+	QSettings *ipSettings = new QSettings(ipSettingsFile, QSettings::IniFormat, NULL);
+	ipSettings->beginGroup("IP");*/
+	QString ip_str = instr::GetIpFromSettings("rpc_omnibus") ;//ipSettings->value(QString("rpc_omnibus"), "").toString();
+	//ipSettings->endGroup();
+
+switch (fdwReason)      // Дерево разбора уведомлений
+{
+case DLL_PROCESS_ATTACH: // Подключение DLL
+	if (!slot_thr.isRunning())
+	{
+		slot_thr.set_connection_params(ip_str, 50001);
+		slot_thr.start();
+	}
+	//if (!slot_thr.wait_connected(3))
+	//	return false;
+	if (!signal_thr.isRunning())
+	{
+		signal_thr.set_connection_params(ip_str, 50002);
+		signal_thr.start();
+		signal_thr.wait_connected(3);
+		QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	}
+	
+
+
+break; // успешная инициализация
+
+case DLL_PROCESS_DETACH: // Отключение DLL
+// Здесь – освобождаем память, закрываем
+// файлы и т.д.
+break;
+
+case DLL_THREAD_ATTACH: // Уведомление о новом потоке
+// Здесь – если надо переходим на
+// многопоточный режим работы с
+// использованием средств синхронизации
+// таких как критическая секция, мутанты,
+// семафоры и т.д.
+break;
+
+case DLL_THREAD_DETACH:
+//Уведомление о завершении потока
+// Здесь – если надо освобождаем все ресурсы,
+// вязанные с завершившимся потоком. Какой именно
+// поток завершился можно узнать просмотром списка
+// потоков средствами TOOLHELP32
+
+break;
+
+}
+return TRUE;    // Код возврата игнорируется
+}
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
-// Объявляем функцию DllMain
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-      DWORD fdwReason, LPVOID lpvReserved)
-{
 
-switch (fdwReason)      // Дерево разбора уведомлений
-{
-  case DLL_PROCESS_ATTACH: // Подключение DLL
-    MessageBox(NULL,"Подключение Заглушки BTICARD для OmniBusBox","Использование заглушек!", MB_ICONINFORMATION);
-
-    if (lpvReserved)  // Определение способа загрузки
-      MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    else
-      MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    return 1; // успешная инициализация
-
-  case DLL_PROCESS_DETACH: // Отключение DLL
-    // Здесь – освобождаем память, закрываем
-    // файлы и т.д.
-    break;
-
-  case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
-    // Здесь – если надо переходим на
-    // многопоточный режим работы с
-    // использованием средств синхронизации
-    // таких как критическая секция, мутанты,
-    // семафоры и т.д.
-    break;
-
-  case DLL_THREAD_DETACH:
-      //Уведомление о завершении потока
-    // Здесь – если надо освобождаем все ресурсы, 
-    // вязанные с завершившимся потоком. Какой именно
-    // поток завершился можно узнать просмотром списка
-    // потоков средствами TOOLHELP32
-    MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
-    break;
-
-  }
-return TRUE;    // Код возврата игнорируется
-}
-*/
 
 
 
@@ -93,7 +124,7 @@ BTICardAPI ULONG __stdcall BTICard_CardGetInfo(USHORT infotype,INT channum,HCORE
 BTICardAPI ERRVAL __stdcall BTICard_CardGetInfoEx(LPUSHORT bufmodel,USHORT bufmodelcount,LPUSHORT buffeature,USHORT buffeaturecount,HCORE handleval){ return 0; }
 BTICardAPI BOOL __stdcall BTICard_CardIsRunning(HCORE handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_CardNop(HCARD handleval){ return 0; }
-BTICardAPI ERRVAL __stdcall BTICard_CardOpen(LPHCARD lpHandle,INT cardnum){ return 0; }
+BTICardAPI ERRVAL __stdcall BTICard_CardOpen(LPHCARD lpHandle, INT cardnum){ *lpHandle = 0; return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_CardOpenStr(LPHCARD lpHandle,LPCSTR cardstr){ return 0; }
 BTICardAPI LPCSTR __stdcall BTICard_CardProductStr(HCORE handleval){ return 0; }
 BTICardAPI VOID __stdcall BTICard_CardReset(HCORE handleval){  }
@@ -154,7 +185,7 @@ BTICardAPI ERRVAL __stdcall BTICard_CoProcMemWrL(ULONG value,ULONG addrval,HCARD
 BTICardAPI ERRVAL __stdcall BTICard_CoProcMemWrsL(LPULONG valueptr,ULONG addrval,ULONG count,HCARD handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_CoProcMemWrsW(LPUSHORT valueptr,ULONG addrval,ULONG count,HCARD handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_CoProcMemWrW(USHORT value,ULONG addrval,HCARD handleval){ return 0; }
-BTICardAPI ERRVAL __stdcall BTICard_CoreOpen(LPHCORE lphCore,INT corenum,HCARD hCard){ return 0; }
+BTICardAPI ERRVAL __stdcall BTICard_CoreOpen(LPHCORE lphCore, INT corenum, HCARD hCard){ *lphCore = corenum; return 0; }
 BTICardAPI VOID __stdcall BTICard_DARClr(USHORT maskval,USHORT addrval,HCORE handleval){  }
 BTICardAPI BOOL __stdcall BTICard_DARGet(USHORT maskval,USHORT addrval,HCORE handleval){ return 0; }
 BTICardAPI ULONG __stdcall BTICard_DARRdL(USHORT addrval,HCORE handleval){ return 0; }
@@ -264,12 +295,43 @@ BTICardAPI VOID __stdcall BTICard_IOWINWrW(USHORT value,INT addrval,HCORE handle
 BTICardAPI VOID __stdcall BTICard_IOWrL(ULONG value,INT addrval,HCORE handleval){  }
 BTICardAPI VOID __stdcall BTICard_IOWrW(USHORT value,INT addrval,HCORE handleval){  }
 BTICardAPI ERRVAL __stdcall BTICard_IRIGConfig(ULONG configval,HCORE handleval){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetDays(ULONG irigvalh,ULONG irigvall){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetHours(ULONG irigvalh,ULONG irigvall){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetMicrosec(ULONG irigvalh,ULONG irigvall){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetMillisec(ULONG irigvalh,ULONG irigvall){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetMin(ULONG irigvalh,ULONG irigvall){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetSec(ULONG irigvalh,ULONG irigvall){ return 0; }
+BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetDays(ULONG irigvalh,ULONG irigvall)
+{
+	unsigned long long tmp_timestamp;
+	tmp_timestamp = irigvall + ((unsigned long long)irigvalh << 32);
+	return QDateTime::fromMSecsSinceEpoch(tmp_timestamp / 1000).date().dayOfYear()-1;
+}
+BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetHours(ULONG irigvalh,ULONG irigvall)
+{
+	unsigned long long tmp_timestamp;
+	tmp_timestamp = irigvall + ((unsigned long long)irigvalh << 32);
+	return QDateTime::fromMSecsSinceEpoch(tmp_timestamp / 1000).time().hour();
+}
+BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetMicrosec(ULONG irigvalh,ULONG irigvall)
+{
+	unsigned long long tmp_timestamp;
+	tmp_timestamp = irigvall + ((unsigned long long)irigvalh << 32);
+	return tmp_timestamp % 1000;
+}
+BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetMillisec(ULONG irigvalh,ULONG irigvall)
+{
+	unsigned long long tmp_timestamp;
+	tmp_timestamp = irigvall + ((unsigned long long)irigvalh << 32);
+	return QDateTime::fromMSecsSinceEpoch(tmp_timestamp / 1000).time().msec();
+}
+BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetMin(ULONG irigvalh,ULONG irigvall)
+{
+	unsigned long long tmp_timestamp;
+	tmp_timestamp = irigvall + ((unsigned long long)irigvalh << 32);
+	return QDateTime::fromMSecsSinceEpoch(tmp_timestamp / 1000).time().minute();
+}
+BTICardAPI ULONG __stdcall BTICard_IRIGFieldGetSec(ULONG irigvalh,ULONG irigvall)
+{
+	unsigned long long tmp_timestamp;
+	tmp_timestamp = irigvall + ((unsigned long long)irigvalh << 32);
+	return QDateTime::fromMSecsSinceEpoch(tmp_timestamp / 1000).time().second();
+}
+
 BTICardAPI VOID __stdcall BTICard_IRIGFieldPutDays(ULONG value,LPULONG irigvalh,LPULONG irigvall){  }
 BTICardAPI VOID __stdcall BTICard_IRIGFieldPutHours(ULONG value,LPULONG irigvalh,LPULONG irigvall){  }
 BTICardAPI VOID __stdcall BTICard_IRIGFieldPutMicrosec(ULONG value,LPULONG irigvalh,LPULONG irigvall){ }
@@ -338,20 +400,35 @@ BTICardAPI ERRVAL __stdcall BTICard_ROMRdsW(LPUSHORT valueptr,ULONG addrval,USHO
 BTICardAPI ERRVAL __stdcall BTICard_ROMRdW(LPUSHORT valueptr,ULONG addrval,HCORE handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_ROMWrsW(USHORT enableflag,LPUSHORT valueptr,ULONG addrval,USHORT countval,HCORE handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_ROMWrW(USHORT value,ULONG addrval,HCORE handleval){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_SeqBlkRd(LPUSHORT buf,ULONG bufcount,LPULONG blkcnt,HCORE handleval){ Sleep(200); return 0; }
+BTICardAPI ULONG __stdcall BTICard_SeqBlkRd(LPUSHORT buf, ULONG bufcount, LPULONG blkcnt, HCORE handleval){ return Srpc_buffer_class::Instance().get_msgs_size(); }
 BTICardAPI ULONG __stdcall BTICard_SeqBlkRdEx(LPUSHORT buf,ULONG bufcount,ULONG maxblkcnt,LPULONG blkcnt,HCORE handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_SeqClear(HCORE handleval){ return 0; }
-BTICardAPI USHORT __stdcall BTICard_SeqCommRd(LPUSHORT buf,USHORT bufcount,HCORE handleval){ return 0; }
-BTICardAPI ERRVAL __stdcall BTICard_SeqConfig(ULONG configval,HCORE handleval){ return 0; }
+BTICardAPI USHORT __stdcall BTICard_SeqCommRd(LPUSHORT buf, USHORT bufcount, HCORE handleval){ return Srpc_buffer_class::Instance().get_msgs_size(); }
+BTICardAPI ERRVAL __stdcall BTICard_SeqConfig(ULONG configval,HCORE handleval)
+{
+	RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
+	QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	return 0;
+}
 BTICardAPI ERRVAL __stdcall BTICard_SeqConfigEx(ULONG configval,ULONG seqcount,USHORT cardnum,HCORE handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_SeqConfigExx(ULONG configval,ULONG seqaddr,ULONG seqcount,USHORT cardnum,HCORE handleval){ return 0; }
-BTICardAPI ULONG __stdcall BTICard_SeqDMARd(LPUSHORT buf,ULONG bufcount,HCORE handleval){ return 0; }
+BTICardAPI ULONG __stdcall BTICard_SeqDMARd(LPUSHORT buf, ULONG bufcount, HCORE handleval){ return Srpc_buffer_class::Instance().get_msgs_size(); }
 BTICardAPI BOOL __stdcall BTICard_SeqFindCheckVersion(LPUSHORT pRecord,USHORT version){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_SeqFindInit(LPUSHORT seqbuf,ULONG seqbufsize,LPSEQFINDINFO sfinfo){ return 0; }
-BTICardAPI ERRVAL __stdcall BTICard_SeqFindMore1553(LPSEQRECORDMORE1553 *pRecMore,LPSEQRECORD1553 pRecBase){ return 0; }
+BTICardAPI ERRVAL __stdcall BTICard_SeqFindMore1553(LPSEQRECORDMORE1553 *pRecMore,LPSEQRECORD1553 pRecBase)
+{
+	*pRecMore = Srpc_buffer_class::Instance().get_more();
+	return 0;
+}
 BTICardAPI ERRVAL __stdcall BTICard_SeqFindMore1553Ex(LPSEQRECORDMORE1553 pRecMore,USHORT recordsize,LPSEQRECORD1553 pRecBase){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_SeqFindNext(LPUSHORT *pRecord,LPUSHORT seqtype,LPSEQFINDINFO sfinfo){ return 0; }
-BTICardAPI ERRVAL __stdcall BTICard_SeqFindNext1553(LPSEQRECORD1553 *pRecord,LPSEQFINDINFO sfinfo){ return 0; }
+BTICardAPI ERRVAL __stdcall BTICard_SeqFindNext1553(LPSEQRECORD1553 *pRecord,LPSEQFINDINFO sfinfo)
+{
+	if (Srpc_buffer_class::Instance().get_msgs_size() == 0)
+		return -1;
+	*pRecord = Srpc_buffer_class::Instance().get_msg();
+	return 0; 
+}
 BTICardAPI ERRVAL __stdcall BTICard_SeqFindNext1553Ex(LPSEQRECORD1553 pRecord,USHORT recordsize,LPSEQFINDINFO sfinfo){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_SeqFindNext429(LPSEQRECORD429 *pRecord,LPSEQFINDINFO sfinfo){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_SeqFindNext429Ex(LPSEQRECORD429 pRecord,USHORT recordsize,LPSEQFINDINFO sfinfo){ return 0; }
@@ -392,7 +469,7 @@ BTICardAPI VOID __stdcall BTICard_TimerClear(HCORE handleval){  }
 BTICardAPI ULONG __stdcall BTICard_TimerRd(HCORE handleval){ return 0; }
 BTICardAPI INT __stdcall BTICard_TimerResolution(INT timerresol,HCORE handleval){ return 0; }
 BTICardAPI USHORT __stdcall BTICard_TimerResolutionEx(USHORT timershift,HCORE handleval){ return 0; }
-BTICardAPI INT __stdcall BTICard_TimerStatus(HCORE handleval){ return 0; }
+BTICardAPI INT __stdcall BTICard_TimerStatus(HCORE handleval){ return TIMETAG_FORMAT_BCD; }
 BTICardAPI VOID __stdcall BTICard_TimerWr(ULONG value,HCORE handleval){ }
 BTICardAPI INT __stdcall BTICard_ValAsciiCmpi(LPSTR str1,LPSTR str2){ return 0; }
 BTICardAPI LPSTR __stdcall BTICard_ValAsciiCpy(LPSTR strdest,LPCSTR strsrc,INT count){ return 0; }
