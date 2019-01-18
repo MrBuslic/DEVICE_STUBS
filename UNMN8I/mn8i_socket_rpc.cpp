@@ -77,11 +77,18 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
+		operators_map["measurement_timer_ontimer()"] = &Socket_RPC_SLOT_Object::measurement_timer_ontimer;
+		operators_map["infin_timer_ontimer()"] = &Socket_RPC_SLOT_Object::infin_timer_ontimer;
 		operators_map["unmn8i_start()"] = &Socket_RPC_SLOT_Object::unmn8i_start;
 		operators_map["unmn8i_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unmn8i_input_trigger;
 		operators_map["unmn8i_sample_width_q(uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_sample_width_q;
 		operators_map["unmn8i_read_sample(uint&, uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_read_sample;
 		operators_map["unmn8i_read_packet(bool, uint, QVariantList&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_read_packet;
+		operators_map["unmn8i_sample_period(double)"] = &Socket_RPC_SLOT_Object::unmn8i_sample_period;
+		operators_map["unmn8i_mode_cycle(uint)"] = &Socket_RPC_SLOT_Object::unmn8i_mode_cycle;
+		operators_map["unmn8i_num_ready_data(uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_num_ready_data;
+		operators_map["unmn8i_stop()"] = &Socket_RPC_SLOT_Object::unmn8i_stop;
+		operators_map["button_clicked()"] = &Socket_RPC_SLOT_Object::button_clicked;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -320,6 +327,38 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			return 0;
 		}
 	}
+	QVariant Socket_RPC_SLOT_Object::measurement_timer_ontimer(QVariantList& _values)
+	{
+		try
+		{
+			app->measurement_timer_ontimer();
+			return 0;
+		}
+		catch(std::exception &err)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::infin_timer_ontimer(QVariantList& _values)
+	{
+		try
+		{
+			app->infin_timer_ontimer();
+			return 0;
+		}
+		catch(std::exception &err)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 	QVariant Socket_RPC_SLOT_Object::unmn8i_start(QVariantList& _values)
 	{
 		try
@@ -418,6 +457,91 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unmn8i_sample_period(QVariantList& _values)
+	{
+		try
+		{
+			double _periodS = _values.at(0).value<double>();
+			int res = app->unmn8i_sample_period(_periodS);
+			return res;
+		}
+		catch(std::exception &err)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unmn8i_mode_cycle(QVariantList& _values)
+	{
+		try
+		{
+			uint _size = _values.at(0).value<uint>();
+			int res = app->unmn8i_mode_cycle(_size);
+			return res;
+		}
+		catch(std::exception &err)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unmn8i_num_ready_data(QVariantList& _values)
+	{
+		try
+		{
+			uint _num = _values.at(0).value<uint>();
+			int res = app->unmn8i_num_ready_data(_num);
+			_values[0] = _num;
+			with_return = true;
+			return res;
+		}
+		catch(std::exception &err)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unmn8i_stop(QVariantList& _values)
+	{
+		try
+		{
+			int res = app->unmn8i_stop();
+			return res;
+		}
+		catch(std::exception &err)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::button_clicked(QVariantList& _values)
+	{
+		try
+		{
+			app->button_clicked();
+			return 0;
+		}
+		catch(std::exception &err)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

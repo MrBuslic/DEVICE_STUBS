@@ -103,11 +103,18 @@ public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant log_timer_ontimer(QVariantList& _values);
+	QVariant measurement_timer_ontimer(QVariantList& _values);
+	QVariant infin_timer_ontimer(QVariantList& _values);
 	QVariant unmn8i_start(QVariantList& _values);
 	QVariant unmn8i_input_trigger(QVariantList& _values);
 	QVariant unmn8i_sample_width_q(QVariantList& _values);
 	QVariant unmn8i_read_sample(QVariantList& _values);
 	QVariant unmn8i_read_packet(QVariantList& _values);
+	QVariant unmn8i_sample_period(QVariantList& _values);
+	QVariant unmn8i_mode_cycle(QVariantList& _values);
+	QVariant unmn8i_num_ready_data(QVariantList& _values);
+	QVariant unmn8i_stop(QVariantList& _values);
+	QVariant button_clicked(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
