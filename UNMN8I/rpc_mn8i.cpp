@@ -7,10 +7,10 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPushButton>
 #include "mn8i_socket_rpc.h"
 
-
-RpcMN8IWidget::RpcMN8IWidget(int slot_port, int signal_port) : QWidget(), auto_scroll(true)
+RpcMN8IWidget::RpcMN8IWidget(int slot_port, int signal_port) : QWidget(), auto_scroll(true), measuring(false), state(false)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -25,33 +25,31 @@ RpcMN8IWidget::RpcMN8IWidget(int slot_port, int signal_port) : QWidget(), auto_s
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcMN8IWidget::auto_scroll_clicked);
-	
-	QString val = QString::number(5);
 
-	QGridLayout* gr_layout = new QGridLayout;
+	  QGridLayout* gr_layout = new QGridLayout;
 	for (int i = 0; i < 2; i++)
-	for (int j = 0; j < 4; j++)
+	 for (int j = 0; j < 4; j++)
 	{
-		QTextEdit* tmp_edit = new QTextEdit;//!!!
-		tmp_edit->setMaximumSize(110, 120);
-		checks << tmp_edit;
-		gr_layout->addWidget(tmp_edit, i, j);
-		for (int k = 0; k < 6; k++)
-			tmp_edit->insertPlainText(val + "\n");
-	}
-
+		QLineEdit* tmp_edit = new QLineEdit;
+	 	checks << tmp_edit;
+	 	gr_layout->addWidget(tmp_edit, i*2, j);
+		QPushButton* push_b = new QPushButton(QString::number(j+1+i*4));
+		connect(push_b, &QPushButton::clicked, this, &RpcMN8IWidget::button_clicked);
+		buttons.insert(push_b, i * 2 + j);
+ 		gr_layout->addWidget(push_b,i*2+1, j);
+	} 
+	  
 	v_lay->addLayout(gr_layout);
 	v_lay->addWidget(edit);
 	v_lay->addWidget(auto_scroll_box);
 
-
-	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
+	 log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
 	if (!dir.exists())
 		QDir().mkdir("d:/logs");
 	connect(&log_timer, &QTimer::timeout, this, &RpcMN8IWidget::log_timer_ontimer);
 	log_timer.start(200);
-
+ 
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
@@ -73,10 +71,9 @@ int RpcMN8IWidget::unmn8i_input_trigger(bool state)
 	}
 	_cursor->insertText(_msg + "\n");
 
-
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
-	return 0;
+	return 0; 
 }
 
 int RpcMN8IWidget::unmn8i_sample_width_q(uint& frame_width, uint&  width_in_bytes)
@@ -92,7 +89,7 @@ int RpcMN8IWidget::unmn8i_read_sample(uint& _buf, uint& _firstTime, uint& _thisT
 	_buf = buf_edit->text().toUInt(0, 0);
 	_firstTime = 0;
 	_thisTime = 0;
-	
+	 
 	QString _msg = QString("%1 Запрос данных").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
 	{
 		QMutexLocker lock(&log_mutex);
@@ -104,42 +101,105 @@ int RpcMN8IWidget::unmn8i_read_sample(uint& _buf, uint& _firstTime, uint& _thisT
 
 	return 0;
 }
+int RpcMN8IWidget::unmn8i_num_ready_data (uint&_num)
+{
+	_num = buffer.size() ; 
+	return 0;
+}
+int RpcMN8IWidget::unmn8i_mode_cycle(uint _size)
+{
+	samples = _size;
+	return 0;
+}
+
+int RpcMN8IWidget::unmn8i_sample_period(double _periodS)
+{
+	periodS = _periodS;
+	return 0;
+}
 
 int RpcMN8IWidget::unmn8i_start()
 {
-	QString _msg = QString("%1 Запускаю процесс измерения в текущей конфигурации").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-	{
+	QString _msg;
+	if (samples == 1)
+		_msg = QString("%1 Запускаю процесс однократного измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+	else
+		if (samples == 0)
+			_msg = QString("%1 Запускаю процесс непрерывного измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+		else 
+			_msg = QString("%1 Запускаю процесс измерения %2 семплов").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(samples);
+	 
 		QMutexLocker lock(&log_mutex);
 		log_buffer << _msg;
+
+	if (samples == 1)
+	{ 
+		buffer.clear();
+		QVariantList tmp_measurment; 
+		for (int i = 0; i < 8; i++)
+			tmp_measurment << checks[i]->text().toDouble();
+
+		buffer << QVariant(tmp_measurment);
+
+		emit packet_ready();
 	}
+	else
+	{
+		if (samples == 0)
+		{
+			buffer.clear(); 
+			infin_timer = std::unique_ptr<QTimer>(new QTimer);
+			connect(infin_timer.get(), &QTimer::timeout, this, &RpcMN8IWidget::infin_timer_ontimer);
+			infin_timer->start(periodS*1000);
+			infinit = true;
 
-	buffer.clear();
-	QVariantList tmp_measurment;
-	for (int j = 0; j < 6; j++) //!!!!
-	for (int i = 0; i < 8; i++)
-		
-		tmp_measurment << checks[i*8+j]->toPlainText().toDouble();//!!!!!
-	buffer << QVariant(tmp_measurment);
+		}
 
-	emit packet_ready();
-
+		else
+		{
+			buffer.clear();
+			buffer.reserve(samples);
+			for (int i = 0; i < samples; i++)
+			{
+				QVariantList tmp_measurment;
+				for (int j = 0; j < 8; j++)
+					tmp_measurment << 0;
+				buffer << QVariant(tmp_measurment);
+			}
+			measuring = true;
+			begin_time = QTime::currentTime();
+			QTimer::singleShot(samples * 1000 * periodS, this, SLOT(measurement_timer_ontimer()));
+		}
+	}
+	 
 	_cursor->insertText(_msg + "\n");
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
 	return 0;
 }
 
+int RpcMN8IWidget::unmn8i_stop()
+{
+	if (infin_timer != std::unique_ptr<QTimer>())
+		infin_timer->stop();
+	infinit = false;
+
+	return 0;
+}
+
 int RpcMN8IWidget::unmn8i_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples)
 {
 	if (buffer.isEmpty())
-	{
+
 		realNumSamples = 0;
-	}
+
 	else
 	{
-		buf = buffer;
-		realNumSamples = 1;
-		buffer.clear();
+		realNumSamples = numSamples;
+		if (realNumSamples > buffer.size())
+			realNumSamples = buffer.size();
+		buf = buffer.mid(0, realNumSamples);
+		buffer.erase(buffer.begin(), buffer.begin()+realNumSamples);
 	}
 	return 0;
 
@@ -167,4 +227,49 @@ void RpcMN8IWidget::log_timer_ontimer()
 	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
 		log_stream << *itr << "\n";
 	log_file.close();
+}
+
+void RpcMN8IWidget::measurement_timer_ontimer()
+{
+	measuring = false;
+	emit packet_ready();
+}
+
+void RpcMN8IWidget::infin_timer_ontimer()
+{ 
+	QVariantList tmp_measurment;
+	for (int i = 0; i < 8; i++)
+		tmp_measurment << checks[i]->text().toDouble();
+
+	buffer << QVariant(tmp_measurment);
+
+
+}  
+
+void RpcMN8IWidget::button_clicked()
+{
+
+	if (!measuring)
+		return;
+
+	QMap<QObject*, int>::iterator itr = buttons.find(sender());
+	if (itr == buttons.end())
+		return;
+
+	int cur_msecs = begin_time.msecsTo(QTime::currentTime());
+
+	double msecs_d = (double)(double(cur_msecs) / (double)(1000));
+
+	int start_ind = msecs_d / periodS;
+
+	impulse_length = checks[itr.value()]->text().toDouble();
+
+	int samples_length = impulse_length / periodS;
+
+	for (int i = start_ind; i < start_ind + samples_length; i++)
+	{
+		QVariantList tmp_meas = buffer[i].toList();
+		tmp_meas[itr.value()] = 26.5;
+		buffer[i] = tmp_meas;
+	}
 }

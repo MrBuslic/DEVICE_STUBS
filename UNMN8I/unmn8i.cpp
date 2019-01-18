@@ -34,7 +34,7 @@ void rpc_buffer_class::packet_ready()
 {
 	QObject* tmp_sender = sender();
 	for (int i = 0; i < mn8i_signal_thr.count(); i++)
-		if (mn8i_signal_thr[i]->get_obj().get() == tmp_sender)
+	 	if (mn8i_signal_thr[i]->get_obj().get() == tmp_sender)
 			(*_interrupt_handle)(i, UNMN8I_IRQ_PACKET_READY, 0, 0, 0);
 }
 
@@ -47,7 +47,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	switch (fdwReason)      // Дерево разбора уведомлений
 	{
 	case DLL_PROCESS_ATTACH: // Подключение DLL
-		//MessageBox(NULL,"Подключение Заглушки UNMT8K4L для Мезонина МТ8К4Л","Использование заглушек!", MB_ICONINFORMATION);
+		//MessageBox(NULL,"Подключение Заглушки UNMN8I для Мезонина МН8И","Использование заглушек!", MB_ICONINFORMATION);
 
 		//if (lpvReserved)  // Определение способа загрузки
 		// MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
@@ -93,9 +93,9 @@ extern "C" {
 //--------------------- Initialize --------------------------------------------
 ViStatus _VI_FUNC unmn8i_init (ViRsrc rsrcName, ViBoolean IDquery,
                                  ViBoolean doReset, ViSession *mezvi)
-{
+{ 
 	mn8i_count++;
-	*mezvi = mn8i_count;
+	*mezvi = mn8i_count; 
 	return 0; 
 }
 ViStatus _VI_FUNC unmn8i_connect(ViSession mezvi, ViSession vi, ViUInt16 m_num, ViBoolean IDquery,
@@ -108,7 +108,11 @@ ViStatus _VI_FUNC unmn8i_mode_once (ViSession mvi){ return 0; }
 ViStatus _VI_FUNC unmn8i_mode_block (ViSession mvi, ViUInt32 size){ return 0; }
 
 //--------------------- Set cycle mode ------------------------------
-ViStatus _VI_FUNC unmn8i_mode_cycle (ViSession mvi, ViUInt32 size){ return 0; }
+ViStatus _VI_FUNC unmn8i_mode_cycle (ViSession mvi, ViUInt32 size)
+{ 
+	Srpc_buffer_class::Instance().mn8i_slot_thr[mvi - 1]->get_mn8i_obj()->unmn8i_mode_cycle(size);
+	return 0;   
+}  
 
 //---------------------- Query mode -----------------------------
 ViStatus _VI_FUNC unmn8i_mode_q (ViSession mvi, ViUInt16 *mode, ViUInt32 *size){ return 0; }
@@ -129,7 +133,11 @@ ViStatus _VI_FUNC unmn8i_range_q (ViSession mvi, ViUInt16 chan, ViReal64 *diap){
 ViStatus _VI_FUNC unmn8i_mn6i_ranges_q (ViSession mvi, ViUInt16 chan, ViReal64 *diap){ return 0; }
 
 //---------------------- Set sample period -----------------------
-ViStatus _VI_FUNC unmn8i_sample_period (ViSession mvi, ViReal64 periodS){ return 0; }
+ViStatus _VI_FUNC unmn8i_sample_period (ViSession mvi, ViReal64 periodS)
+{ 
+	Srpc_buffer_class::Instance().mn8i_slot_thr[mvi - 1]->get_mn8i_obj()->unmn8i_sample_period(periodS);
+	return 0;  
+}  
 
 //---------------------- Query sample period -----------------------
 ViStatus _VI_FUNC unmn8i_sample_period_q (ViSession mvi, ViReal64 *periodS,
@@ -178,8 +186,6 @@ ViStatus _VI_FUNC unmn8i_mask_interrupt_q (ViSession mvi, ViBoolean *enableFIFO,
 ViStatus _VI_FUNC unmn8i_overlevel_q(ViSession mvi, ViBoolean LevelUp[], ViBoolean LevelDown[]){ return 0; }
 
 
-
-
 ViStatus _VI_FUNC unmn8i_installHandler (ViSession mvi, ViPAttrState handle, ViPAttrState userData)
 { 
 	_interrupt_handle = reinterpret_cast<UNMN8IIntHandle>(handle);
@@ -205,7 +211,11 @@ ViStatus _VI_FUNC unmn8i_start (ViSession mvi){
 ViStatus _VI_FUNC unmn8i_state (ViSession mvi, ViInt16 *stateParam, ViInt16 *errState){ return 0; }
 
 //----------------------------------------
-ViStatus _VI_FUNC unmn8i_stop (ViSession mvi){ return 0; }
+ViStatus _VI_FUNC unmn8i_stop (ViSession mvi){ 
+
+return Srpc_buffer_class::Instance().mn8i_slot_thr[mvi - 1]->get_mn8i_obj()->unmn8i_stop();
+
+}
 
 //--------------------- Read one sample --------------------------
 ViStatus _VI_FUNC unmn8i_read_sample (ViSession mvi, ViPReal64 buf, 
@@ -217,7 +227,8 @@ ViStatus _VI_FUNC unmn8i_read_sample (ViSession mvi, ViPReal64 buf,
 	*buf = tmp_buf;
 	*firstTime = _firstTime;
 	*thisTime = _thisTime;
-	return 0; }
+	return 0;  
+}
 
 //--------------------- Read data in block mode -----------------------------       
 ViStatus _VI_FUNC unmn8i_read_block (ViSession mvi, ViUInt32 firstSample,
@@ -231,15 +242,21 @@ ViStatus _VI_FUNC unmn8i_read_packet (ViSession mvi, ViBoolean isHot, ViUInt32 n
 	QVariantList tmp_buffer;
 	Srpc_buffer_class::Instance().mn8i_slot_thr[mvi - 1]->get_mn8i_obj()->unmn8i_read_packet(isHot, numSamples, tmp_buffer, _realNumSamples);
 	*realNumSamples = _realNumSamples;
-	for (int j = 0; j < 6; j++)
-		for (int i = 0; i < 8; i++)
-			buf[i*8+j] = tmp_buffer[j].toList()[i].toDouble();
+	for (int i = 0; i < _realNumSamples; i++)
+			for (int j = 0; j < 8; j++)
+				buf[i*8+j] = tmp_buffer[i].toList()[j].toDouble();
 		return 0;
 }
 ViStatus _VI_FUNC unmn8i_read_packet_float (ViSession mvi, ViBoolean isHot, ViUInt32 numSamples,
 										ViReal32 *buf, ViUInt32 *realNumSamples){ return 0; }
 //--------------------- Query how much data is ready for read --------
-ViStatus _VI_FUNC unmn8i_num_ready_data (ViSession mvi, ViUInt32 *num){ return 0; }
+ViStatus _VI_FUNC unmn8i_num_ready_data (ViSession mvi, ViUInt32 *num)
+{	
+	uint _num;
+	Srpc_buffer_class::Instance().mn8i_slot_thr[mvi - 1]->get_mn8i_obj()->unmn8i_num_ready_data(_num);
+	*num = _num;
+	return 0;
+}
 
 //---------------------- Calibrate ------------------------
 ViStatus _VI_FUNC unmn8i_displacement (ViSession mvi){ return 0; }
@@ -264,7 +281,6 @@ ViStatus _VI_FUNC unmn8i_revision_query (ViSession mvi, ViChar verSoft[],
 
 //----------------------------------------
 ViStatus _VI_FUNC unmn8i_close (ViSession mvi){ return 0; }
-
 
 
 ///ҫ禡 㮳殭饠騯//

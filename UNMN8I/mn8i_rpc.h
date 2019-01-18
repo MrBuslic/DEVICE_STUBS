@@ -13,11 +13,18 @@ public:
 public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
+	void measurement_timer_ontimer();
+	void infin_timer_ontimer();
 	int unmn8i_start();
 	int unmn8i_input_trigger(bool state);
 	int unmn8i_sample_width_q(uint& frame_width, uint& width_in_bytes);
 	int unmn8i_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime);
 	int unmn8i_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples);
+	int unmn8i_sample_period(double _periodS);
+	int unmn8i_mode_cycle(uint _size);
+	int unmn8i_num_ready_data(uint& _num);
+	int unmn8i_stop();
+	void button_clicked();
 	////////////////////////////////////
 };
 
