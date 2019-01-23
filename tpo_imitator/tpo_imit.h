@@ -22,15 +22,22 @@ private:
 	QPushButton* read_button;
 	MKO_Widget* mko_imit;
 	SimInterruptWid* inter_imit;
-	bool count_crc(bool flag, int CRC, QVariantList& words); // flag = true - сичтаем контрольную сумму для командного слова. // flag = false - считаем контрольную сумму для слов
+	void write_data(QVariantList& words);
+	void read_data(QVariantList& words);
+	void unknown_com();
+	int count_crc_for_cwd(QVariantList& words);
+	int count_crc_for_words(QVariantList& words);
+	int count_byte_for_words(QVariantList& words);
 public slots:
 	void send_request();
-	void send_receipt(int answer, QVariantList& ans_word);
+	void send_receipt(int answer, int& os);
+	void send_read_receipt(int answer, int byte_count, int crc_for_words, int& os);
 	void slot_process_msg(QVariantList& words);
 signals:
 	void signal_send_message(int adr, int subadr, int direct, int count_words, QVariantList& words);
 	void signal_process_msg(QVariantList& words);
 	void signal_send_new_msg(int mko, int line, int cwd, QVariantList& words, int& os);
-	void signal_send_receipt(int answer, QVariantList& ans_word);
+	void signal_send_receipt(int answer, int& os);
+	void signal_send_read_receipt(int answer, int byte_count, int crc_for_words, int& os);
 };
 #endif
