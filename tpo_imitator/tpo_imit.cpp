@@ -31,20 +31,31 @@ union MKORETWord
 	};
 };
 
-union VIP_State
+enum eControlChan	// 
 {
-	uint all_state;
-	struct
-	{
-		uint ch_1 : 1,
-			ch_2 : 1,
-			ch_3 : 1,
-			ch_4 : 1,
-			ch_5 : 1,
-			ch_6 : 1,
-			ch_7 : 1,
-			ch_8 : 1;
-	};
+	controlOnCommon = 15,
+	controlOnVM0 = 17,
+	controlOnVM1 = 18,
+	controlOnVM2 = 19,
+	controlOnVM3 = 20,
+
+	controlOffCommon = 16,
+	controlOffVM0 = 21,
+	controlOffVM1 = 22,
+	controlOffVM2 = 23,
+	controlOffVM3 = 24,
+
+#ifdef OLD_CRATE
+	controlHoldVM0 = 1,
+	controlHoldVM1 = 2,
+	controlHoldVM2 = 3,
+	controlHoldVM3 = 4,
+#else
+	controlHoldVM0 = 21,
+	controlHoldVM1 = 22,
+	controlHoldVM2 = 23,
+	controlHoldVM3 = 24,
+#endif
 };
 
 TPO_Widget::TPO_Widget() :QWidget()
@@ -163,7 +174,7 @@ void TPO_Widget::vip_init()
 {
 	for (int i = 0; i < 5; i++)
 	{
-		pitanie[i] = false;
+		pitanie[i] = true;
 	}
 }
 
@@ -172,7 +183,7 @@ void TPO_Widget::slot_mds32_button()
 	QString ip_str = mds_32_edit_ip->text();
 	int port = mds_32_edit_port->text().toInt();
 	mds32_imit->create_signal_thread(ip_str, port);
-	QObject::connect(mds32_imit->get_mds32_exchange_thread()->get_obj().get(), SIGNAL(mds32_get_sample(int, uint&, int&)), this, SLOT(mds32_send_sample(int, uint&, int&)), Qt::QueuedConnection);
+	QObject::connect(mds32_imit->get_mds32_exchange_thread()->get_obj().get(), SIGNAL(mds32_get_sample(int, uint&, int&)), this, SLOT(mds32_send_sample(int, uint&, int&)), Qt::BlockingQueuedConnection);
 }
 
 void TPO_Widget::slot_mfsk24_button()
@@ -180,135 +191,78 @@ void TPO_Widget::slot_mfsk24_button()
 	QString ip_str = mfsk24_edit_ip->text();
 	int port = mfsk24_edit_port->text().toInt();
 	mfsk24_imit->create_signal_thread(ip_str, port);
-	QObject::connect(mfsk24_imit->get_mds32_exchange_thread()->get_obj().get(), SIGNAL(mfsk24_impulse_change(int, int)), this, SLOT(slot_mfsk24_impulse_change(int, int)), Qt::QueuedConnection);
+	QObject::connect(mfsk24_imit->get_mds32_exchange_thread()->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(slot_mfsk24_impulse_change(QVariantList)), Qt::BlockingQueuedConnection);
 }
 
 void TPO_Widget::mds32_send_sample(int channel, uint& buf, int& flag)
 {
-	VIP_State vip;
 	switch (channel)
 	{
 	case 1:
-		{
-			if (pitanie[channel-1] == false)
-			{
-				vip.ch_1 = 1;
-				buf = vip.all_state;
-				flag = 1;
-			}
-			else
-			{
-				vip.ch_1 = 0;
-				buf = vip.all_state;
-				flag = 0;
-			}
-		}
 	case 2:
-	{
-		if (pitanie[channel - 1] == false)
-		{
-			vip.ch_2 = 1;
-			buf = vip.all_state;
-			flag = 1;
-		}
-		else
-		{
-			vip.ch_2 = 0;
-			buf = vip.all_state;
-			flag = 0;
-		}
-	}
 	case 3:
-	{
-		if (pitanie[channel - 1] == false)
-		{
-			vip.ch_3 = 1;
-			buf = vip.all_state;
-			flag = 1;
-		}
-		else
-		{
-			vip.ch_3 = 0;
-			buf = vip.all_state;
-			flag = 0;
-		}
-	}
 	case 4:
-	{
-		if (pitanie[channel - 1] == false)
-		{
-			vip.ch_4 = 1;
-			buf = vip.all_state;
-			flag = 1;
-		}
-		else
-		{
-			vip.ch_4 = 0;
-			buf = vip.all_state;
-			flag = 0;
-		}
-	}
 	case 5:
 	{
+		flag = 1;
 		if (pitanie[channel - 1] == false)
 		{
-			vip.ch_5 = 1;
-			buf = vip.all_state;
-			flag = 1;
+			buf = 1;
 		}
 		else
 		{
-			vip.ch_5 = 0;
-			buf = vip.all_state;
-			flag = 0;
+			buf = 0;
 		}
+		break;
 	}
+	
 	default:
 		edit->append("The specified channel is not for us!");
 	}
 }
 
-void TPO_Widget::slot_mfsk24_impulse_change(int channel, int duration)
+void TPO_Widget::slot_mfsk24_impulse_change(QVariantList channels)
 {
-	if ((duration > 300) && (duration < 100))
+	if ((channels.count() % 2) != 0)
 	{
-		switch (channel)
+		edit->append("Error in size of channels array!");
+		return;
+	}
+	QMap<int, int> channels_map;
+	for (int i = 0; i < channels.count(); i+=2)
+	{
+		channels_map.insert(channels[i].toInt(), channels[i + 1].toInt());
+	}
+	if (channels_map.contains(controlOnCommon))
+	{
+		if ((channels_map[controlOnCommon] > 300) && (channels_map[controlOnCommon] < 100))
 		{
-		case 15:
-			pitanie[0] = true;
-		case 17:
-			pitanie[1] = true;
-		case 18:
-			pitanie[2] = true;
-		case 19:
-			pitanie[3] = true;
-		case 20:
-			pitanie[4] = true;
-		case 16:
-			pitanie[0] = false;
-		case 21:
-			pitanie[1] = false;
-		case 22:
-			pitanie[2] = false;
-		case 23:
-			pitanie[3] = false;
-		case 24:
-			pitanie[4] = false;
-		default:
-			edit->append("The specified channel is not for us!");
+			for (int i = 0; i < 4; i++)
+			{
+				if (channels_map.contains(controlOnVM0 + i) && (channels_map[controlOnVM0 + i] > 300) && (channels_map[controlOnVM0 + i] < 100))
+				{
+					pitanie[i] = true;
+					edit->append(QString("Turning VM%1 ON").arg(i));
+				}
+			}
 		}
 	}
-	else
+
+	if (channels_map.contains(controlOffCommon))
 	{
-		if (duration < 100)
+		if ((channels_map[controlOffCommon] > 300) && (channels_map[controlOffCommon] < 100))
 		{
-			edit->append("Catch noise in the exchange with mfsk24! Duration is lower 100 ms");
-		}
-		if (duration > 300)
-		{
-			edit->append("Catch noise in the exchange with mfsk24! Duration is more 300 ms");
+			for (int i = 0; i < 4; i++)
+			{
+				if (channels_map.contains(controlOffVM0 + i) && (channels_map[controlOffVM0 + i] > 300) && (channels_map[controlOffVM0 + i] < 100))
+				{
+					pitanie[i] = false;
+					edit->append(QString("Turning VM%1 OFF").arg(i));
+				}
+			}
 		}
 	}
+
 }
 
 void TPO_Widget::send_request()
@@ -340,7 +294,7 @@ void TPO_Widget::slot_process_msg(QVariantList& words)
 	ret_word.ret_word = words[0].toInt(0);
 	com_code = ret_word.com_word;
 
-	for (int i = 0; i++; i < words.size())
+	for (int i = 0; i < words.size(); i++)
 	{
 		str = QString("Get word %1 - 0x%2").arg(i + 1).arg(words[i].toInt(), 4, 16, QChar('0'));
 		edit->append(str);
@@ -464,7 +418,7 @@ void TPO_Widget::write_data(QVariantList& words)
 		cwd.count_word = count_words_for_transmit;
 		cwd.trans_dir = 0;
 
-		for (int i = 0; i++; i < count_words_for_transmit)
+		for (int i = 0; i < count_words_for_transmit; i++)
 		{
 			trans_words << 0;
 		}
@@ -574,7 +528,7 @@ void TPO_Widget::read_data(QVariantList& words)
 		cwd.count_word = count_words_for_transmit;
 		cwd.trans_dir = 1;
 
-		for (int i = 0; i++; i < count_words_for_transmit)
+		for (int i = 0; i < count_words_for_transmit; i++)
 		{
 			trans_words << 0;
 		}

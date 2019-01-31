@@ -50,12 +50,12 @@ private:
 	
 	QVariantList state;
 	QMap<int, int> impulses;
-
+	QVariantList map_convert();
 	QList<QPushButton*> labels;
 signals:
 	void mfsk24_();
 	void mfsk24_state_change(int channel, int state);
-	void mfsk24_impulse_change(int channel, int duration);
+	void mfsk24_impulse_change(QVariantList channels);
 
 };
 

@@ -367,21 +367,21 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                  
 									ViInt16 *Present,
 									ViInt16 *Type)
 {
-	if (N == 1)
+	//if (N == 1)
+	//{
+	//	*Present = 1;
+	//	*Type = 0x17;
+	//}
+	if ((N == 1) || (N == 2))//MDS32
 	{
 		*Present = 1;
-		*Type = 0x17;
+		*Type = 0x9;
 	}
-	//if ((N == 1) || (N == 2))//MDS32
-	//{
-	//	*Present = 1;
-	//	*Type = 0x9;
-	//}
-	//else if ((N == 3) || (N == 4))//MFSK24
-	//{
-	//	*Present = 1;
-	//	*Type = 0x0A;
-	//}
+	else if ((N == 3) || (N == 4))//MFSK24
+	{
+		*Present = 1;
+		*Type = 0x0A;
+	}
 	else
 	{
 		*Present = 0;

@@ -76,7 +76,7 @@ void RPC_mfsk24_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_impulse_change)) {
 		SRPCSignalClass::Instance().toLog("mfsk24_impulse_change connected");
-		emit connect_signal("mfsk24_impulse_change(int, int)", true);
+		emit connect_signal("mfsk24_impulse_change(QVariantList)", true);
 	}
 }
 
@@ -94,7 +94,7 @@ void RPC_mfsk24_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_impulse_change)) {
 		SRPCSignalClass::Instance().toLog("mfsk24_impulse_change disconnected");
-		//emit connect_signal("mfsk24_impulse_change(int, int)", false);
+		//emit connect_signal("mfsk24_impulse_change(QVariantList)", false);
 	}
 }
 
@@ -161,15 +161,12 @@ void RPC_mfsk24_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name);
 			}
-			if (op_name == "mfsk24_impulse_change(int, int)")
+			if (op_name == "mfsk24_impulse_change(QVariantList)")
 			{
-				int channel;
-				tmp_stream >> channel;
-				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" channel = "+RPCSignalClass::QVariantToString(channel));
-				int duration;
-				tmp_stream >> duration;
-				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" duration = "+RPCSignalClass::QVariantToString(duration));
-				emit mfsk24_impulse_change(channel, duration);
+				QVariantList channels;
+				tmp_stream >> channels;
+				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" channels = "+RPCSignalClass::QVariantToString(channels));
+				emit mfsk24_impulse_change(channels);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;

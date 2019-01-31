@@ -121,7 +121,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			return;
 		disconnect(app, SIGNAL(mfsk24_()), this, SLOT(mfsk24_()));
 		disconnect(app, SIGNAL(mfsk24_state_change(int, int)), this, SLOT(mfsk24_state_change(int, int)));
-		disconnect(app, SIGNAL(mfsk24_impulse_change(int, int)), this, SLOT(mfsk24_impulse_change(int, int)));
+		disconnect(app, SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk24_impulse_change(QVariantList)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(RpcMFSK24Widget* _app)
 	{
@@ -130,8 +130,8 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		data_map.insert("mfsk24_()", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(mfsk24_state_change(int, int)), this, SLOT(mfsk24_state_change(int, int)), Qt::DirectConnection);
 		data_map.insert("mfsk24_state_change(int, int)", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(mfsk24_impulse_change(int, int)), this, SLOT(mfsk24_impulse_change(int, int)), Qt::DirectConnection);
-		data_map.insert("mfsk24_impulse_change(int, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk24_impulse_change(QVariantList)), Qt::DirectConnection);
+		data_map.insert("mfsk24_impulse_change(QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -303,16 +303,15 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_state_change finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::mfsk24_impulse_change(int channel, int duration)
+	void Socket_RPC_SIGNAL_Object::mfsk24_impulse_change(QVariantList channels)
 	{
-		auto& descriptor = *data_map["mfsk24_impulse_change(int, int)"].get();
+		auto& descriptor = *data_map["mfsk24_impulse_change(QVariantList)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("mfsk24_impulse_change(int, int)");
-		tmp_stream << channel;
-		tmp_stream << duration;
+		tmp_stream << QString("mfsk24_impulse_change(QVariantList)");
+		tmp_stream << channels;
 		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_impulse_change").arg(objectName()).arg(QThread::currentThread()->objectName()));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);

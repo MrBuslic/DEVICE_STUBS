@@ -48,7 +48,7 @@ public slots:
 	void slot_mds32_button();
 	void slot_mfsk24_button();
 	void mds32_send_sample(int channel, uint& buf, int& flag);
-	void slot_mfsk24_impulse_change(int channel, int duration);
+	void slot_mfsk24_impulse_change(QVariantList);
 	//void slot_foi_button();
 	//void slot_omnibus_button();
 signals:

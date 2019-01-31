@@ -49,7 +49,7 @@ void MKO_Widget::slot_send_new_msg(int mko, int line, int cwd, QVariantList& wor
 void MKO_Widget::send_message(int adr, int subadr, int direct, int count_words, QVariantList& words)
 {
 	int mko = 1;
-	int line = 1;
+	int line = 0;
 	int os = 1;
 
 	MKOWord tmp_cwd;

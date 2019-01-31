@@ -34,9 +34,9 @@ set(UNADS128_SOURCES unads128.cpp unads128_h.h ads128_rpc.h ads128_rpc.cpp)
 
 include_directories($ENV{VISA_HOME}include)
 
-add_library(unads128_32 SHARED ${UNADS128_HEADERS} ${UNADS128_SOURCES} export.def)
+add_library(unads128 SHARED ${UNADS128_HEADERS} ${UNADS128_SOURCES} export.def)
 
-target_link_libraries(unads128_32 socket_rpc)
+target_link_libraries(unads128 socket_rpc)
 
 set(RPC_ADS128_SOURCES rpc_ads128.h rpc_ads128.cpp ads128_main.cpp ads128_socket_rpc.h ads128_socket_rpc.cpp)
 

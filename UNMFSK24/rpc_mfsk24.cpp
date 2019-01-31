@@ -144,6 +144,17 @@ int RpcMFSK24Widget::unmfsk24_set_cmd_time(int _chan, int _time)
 	return 0;
 }
 
+QVariantList RpcMFSK24Widget::map_convert()
+{
+	QVariantList tmp_list;
+	for (QMap<int, int>::iterator itr = impulses.begin(); itr != impulses.end(); ++itr)
+	{
+		tmp_list << itr.key()+1;
+		tmp_list << itr.value();
+	}
+	return tmp_list;
+}
+
 int RpcMFSK24Widget::unmfsk24_start(QVariantList _state)
 {
 	QString tmp_channels;
@@ -157,10 +168,11 @@ int RpcMFSK24Widget::unmfsk24_start(QVariantList _state)
 		if (impulses.contains(i))
 		{
 			_msg += QString("\tканал: %1 время: %2").arg(i + 1).arg(impulses[i]);
-			emit mfsk24_impulse_change(i + 1, impulses[i]);
+			
 		}
 			
 	}
+	emit mfsk24_impulse_change(map_convert());
 	{
 		QMutexLocker lock(&log_mutex);
 		log_buffer << _msg;

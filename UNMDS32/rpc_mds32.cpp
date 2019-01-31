@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "mds32_socket_rpc.h"
+#include <bitset>
 
 union mds_chan
 {
@@ -118,28 +119,38 @@ int RpcMDS32Widget::unmds32_input_trigger(bool state)
 
 int RpcMDS32Widget::unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _lasteTime)
 {
-	mds_chan chan;
-	int flag = 1;
-	for (int i = 0; i < 8; i++)
+	std::bitset<32> channels(0xFFFFFFFF);
+	std::bitset<32> edit_channels(buf_edit->text().toUInt(0, 0));
+	int flag = 0;
+	for (int i = 0; i < 32; i++)
 	{
-		emit mds32_get_sample(i+1, chan.channel, flag);
+		uint tmp = 0;
+		emit mds32_get_sample(i+1, tmp, flag);
+		if (flag)
+		{
+			channels.set(i, tmp);
+		}
+		else
+		{
+			channels.set(i, edit_channels[i]);
+		}
 	}
 
-	_buf = chan.channel;
+	_buf = channels.to_ulong();
 	//_buf = buf_edit->text().toUInt(0, 0);
 	_firstTime = 0;
 	_lasteTime = 0;
 	
-	QString _msg = QString("%1 Изменение данных: %2").arg(QTime::currentTime().toString("hh:mm : ss.zzz")).arg(_buf);
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
+	//QString _msg = QString("%1 Изменение данных: %2").arg(QTime::currentTime().toString("hh:mm : ss.zzz")).arg(_buf);
+	//{
+	//	QMutexLocker lock(&log_mutex);
+	//	log_buffer << _msg;
+	//}
+	//_cursor->insertText(_msg + "\n");
 
 
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
+	//if (auto_scroll)
+	//	_scroll_bar->setValue(_scroll_bar->maximum());
 	return 0;
 }
 

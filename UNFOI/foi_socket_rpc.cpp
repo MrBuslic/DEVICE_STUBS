@@ -292,11 +292,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _state = _values.at(0).value<int>();
 			app->auto_scroll_clicked(_state);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -312,7 +313,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->log_timer_ontimer();
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -325,14 +326,16 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _n = _values.at(0).value<int>();
 			short _chan = _values.at(1).value<short>();
 			double _u = _values.at(2).value<double>();
 			double _t = _values.at(3).value<double>();
 			int res = app->unfoi_chan_setup(_n, _chan, _u, _t);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -346,9 +349,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		try
 		{
 			int res = app->unfoi_run();
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
