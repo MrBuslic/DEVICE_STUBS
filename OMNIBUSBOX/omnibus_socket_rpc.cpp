@@ -1,4 +1,4 @@
-	#include "mn8i_socket_rpc.h"
+	#include "omnibus_socket_rpc.h"
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
@@ -12,7 +12,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		rpc_srv = new Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
 		rpc_srv->set_app(app);
-		SRPCSignalClass::Instance().toLog("mn8i signal thread started");
+		SRPCSignalClass::Instance().toLog("omnibus signal thread started");
 		exec();
 	}
 
@@ -27,7 +27,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 
 	void Socket_RPC_SIGNAL_Server::tcp_slot()
 	{
-		SRPCSignalClass::Instance().toLog("mn8i signal client connected");
+		SRPCSignalClass::Instance().toLog("omnibus signal client connected");
 		std::shared_ptr<Socket_RPC_SIGNAL_Object> tmp_obj(new Socket_RPC_SIGNAL_Object);
 		tmp_obj->set_app(app);
 		tmp_obj->set_socket(rpc_server->nextPendingConnection());
@@ -39,7 +39,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcMN8IWidget* _app) : QTcpServer(), app(_app)
+	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcOmnibusWidget* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
@@ -49,7 +49,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	void Socket_RPC_SLOT_Server_Thread::run()
 	{
 		rpc_srv = new Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
-		SRPCSignalClass::Instance().toLog("mn8i slot thread started");
+		SRPCSignalClass::Instance().toLog("omnibus slot thread started");
 		exec();
 	}
 
@@ -59,36 +59,29 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		exec();
 	}
 
-	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(RpcMN8IWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(RpcOmnibusWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
 	void Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
-		SRPCSignalClass::Instance().toLog("mn8i slot client connected");
+		SRPCSignalClass::Instance().toLog("omnibus slot client connected");
 		std::shared_ptr<Socket_RPC_SLOT_Thread> tmp_obj(new Socket_RPC_SLOT_Thread(app, socketDescriptor));
 		tmp_obj->start();
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(RpcMN8IWidget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(RpcOmnibusWidget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
-	setObjectName(QString("mn8i_SLOT_Object_%1").arg(obj_num++));
+	setObjectName(QString("omnibus_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
-		operators_map["measurement_timer_ontimer()"] = &Socket_RPC_SLOT_Object::measurement_timer_ontimer;
-		operators_map["infin_timer_ontimer()"] = &Socket_RPC_SLOT_Object::infin_timer_ontimer;
-		operators_map["unmn8i_start()"] = &Socket_RPC_SLOT_Object::unmn8i_start;
-		operators_map["unmn8i_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unmn8i_input_trigger;
-		operators_map["unmn8i_sample_width_q(uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_sample_width_q;
-		operators_map["unmn8i_read_sample(uint&, uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_read_sample;
-		operators_map["unmn8i_read_packet(bool, uint, QVariantList&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_read_packet;
-		operators_map["unmn8i_sample_period(double)"] = &Socket_RPC_SLOT_Object::unmn8i_sample_period;
-		operators_map["unmn8i_mode_cycle(uint)"] = &Socket_RPC_SLOT_Object::unmn8i_mode_cycle;
-		operators_map["unmn8i_num_ready_data(uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_num_ready_data;
-		operators_map["unmn8i_stop()"] = &Socket_RPC_SLOT_Object::unmn8i_stop;
-		operators_map["button_clicked()"] = &Socket_RPC_SLOT_Object::button_clicked;
+		operators_map["switch_ab(int, int, bool)"] = &Socket_RPC_SLOT_Object::switch_ab;
+		operators_map["set_new_data(int, int, int, QVariantList)"] = &Socket_RPC_SLOT_Object::set_new_data;
+		operators_map["send_msg(int, int, int, QVariantList&, int&)"] = &Socket_RPC_SLOT_Object::send_msg;
+		operators_map["get_dt()"] = &Socket_RPC_SLOT_Object::get_dt;
+		operators_map["message_to_log_slot(QString)"] = &Socket_RPC_SLOT_Object::message_to_log_slot;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -99,7 +92,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 
 	Socket_RPC_SIGNAL_Object::Socket_RPC_SIGNAL_Object() : QObject()
 	{
-		setObjectName(QString("mn8i_SIGNAL_Object_%1").arg(obj_num++));
+		setObjectName(QString("omnibus_SIGNAL_Object_%1").arg(obj_num++));
 		connect(this, SIGNAL(send_signal(QByteArray*)), this, SLOT(send_signal_slot(QByteArray*)), Qt::BlockingQueuedConnection);
 	}
 
@@ -126,13 +119,16 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(packet_ready()), this, SLOT(packet_ready()));
+		disconnect(app, SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+		disconnect(app, SIGNAL(message_to_log(QString)), this, SLOT(message_to_log(QString)));
 	}
-	void Socket_RPC_SIGNAL_Object::set_app(RpcMN8IWidget* _app)
+	void Socket_RPC_SIGNAL_Object::set_app(RpcOmnibusWidget* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(packet_ready()), this, SLOT(packet_ready()), Qt::DirectConnection);
-		data_map.insert("packet_ready()", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)), Qt::DirectConnection);
+		data_map.insert("new_message(QVariant, int, int, int, QVariantList, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(message_to_log(QString)), this, SLOT(message_to_log(QString)), Qt::DirectConnection);
+		data_map.insert("message_to_log(QString)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -262,25 +258,52 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::packet_ready()
+	void Socket_RPC_SIGNAL_Object::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 	{
-		auto& descriptor = *data_map["packet_ready()"].get();
+		auto& descriptor = *data_map["new_message(QVariant, int, int, int, QVariantList, int)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("packet_ready()");
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal packet_ready").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		tmp_stream << QString("new_message(QVariant, int, int, int, QVariantList, int)");
+		tmp_stream << dt;
+		tmp_stream << mko;
+		tmp_stream << line;
+		tmp_stream << cwd;
+		tmp_stream << words;
+		tmp_stream << os;
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_message").arg(objectName()).arg(QThread::currentThread()->objectName()));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
 		tmp_arr2 += tmp_arr;
 		descriptor.mutex.lock();
 		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal packet_ready sended").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_message sended").arg(objectName()));
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal packet_ready finished").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_message finished").arg(objectName()));
+	}
+	void Socket_RPC_SIGNAL_Object::message_to_log(QString _msg)
+	{
+		auto& descriptor = *data_map["message_to_log(QString)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("message_to_log(QString)");
+		tmp_stream << _msg;
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal message_to_log").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal message_to_log sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal message_to_log finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -327,11 +350,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::measurement_timer_ontimer(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::switch_ab(QVariantList& _values)
 	{
 		try
 		{
-			app->measurement_timer_ontimer();
+			int mko = _values.at(0).value<int>();
+			int addr = _values.at(1).value<int>();
+			bool _on = _values.at(2).value<bool>();
+			app->switch_ab(mko, addr, _on);
 			return 0;
 		}
 		catch(std::exception &err)
@@ -343,11 +369,15 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::infin_timer_ontimer(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::set_new_data(QVariantList& _values)
 	{
 		try
 		{
-			app->infin_timer_ontimer();
+			int mko = _values.at(0).value<int>();
+			int addr = _values.at(1).value<int>();
+			int saddr = _values.at(2).value<int>();
+			QVariantList words = _values.at(3).value<QVariantList>();
+			app->set_new_data(mko, addr, saddr, words);
 			return 0;
 		}
 		catch(std::exception &err)
@@ -359,180 +389,52 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_start(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::send_msg(QVariantList& _values)
 	{
 		try
 		{
-			int res = app->unmn8i_start();
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_input_trigger(QVariantList& _values)
-	{
-		try
-		{
-			bool state = _values.at(0).value<bool>();
-			int res = app->unmn8i_input_trigger(state);
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_sample_width_q(QVariantList& _values)
-	{
-		try
-		{
-			uint frame_width = _values.at(0).value<uint>();
-			uint width_in_bytes = _values.at(1).value<uint>();
-			int res = app->unmn8i_sample_width_q(frame_width, width_in_bytes);
-			_values[0] = frame_width;
-			_values[1] = width_in_bytes;
+			int mko = _values.at(0).value<int>();
+			int line = _values.at(1).value<int>();
+			int cwd = _values.at(2).value<int>();
+			QVariantList words = _values.at(3).value<QVariantList>();
+			int os = _values.at(4).value<int>();
+			app->send_msg(mko, line, cwd, words, os);
+			_values[3] = words;
+			_values[4] = os;
 			with_return = true;
+			return 0;
+		}
+		catch(std::exception &err)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::get_dt(QVariantList& _values)
+	{
+		try
+		{
+			QVariant res = app->get_dt();
 			return res;
 		}
 		catch(std::exception &err)
 		{
-			return 1;
+			return QVariant();
 		}
 		catch(...)
 		{
-			return 1;
+			return QVariant();
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_read_sample(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::message_to_log_slot(QVariantList& _values)
 	{
 		try
 		{
-			uint _buf = _values.at(0).value<uint>();
-			uint _firstTime = _values.at(1).value<uint>();
-			uint _thisTime = _values.at(2).value<uint>();
-			int res = app->unmn8i_read_sample(_buf, _firstTime, _thisTime);
-			_values[0] = _buf;
-			_values[1] = _firstTime;
-			_values[2] = _thisTime;
-			with_return = true;
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_read_packet(QVariantList& _values)
-	{
-		try
-		{
-			bool isHot = _values.at(0).value<bool>();
-			uint numSamples = _values.at(1).value<uint>();
-			QVariantList buf = _values.at(2).value<QVariantList>();
-			uint realNumSamples = _values.at(3).value<uint>();
-			int res = app->unmn8i_read_packet(isHot, numSamples, buf, realNumSamples);
-			_values[2] = buf;
-			_values[3] = realNumSamples;
-			with_return = true;
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_sample_period(QVariantList& _values)
-	{
-		try
-		{
-			double _periodS = _values.at(0).value<double>();
-			int res = app->unmn8i_sample_period(_periodS);
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_mode_cycle(QVariantList& _values)
-	{
-		try
-		{
-			uint _size = _values.at(0).value<uint>();
-			int res = app->unmn8i_mode_cycle(_size);
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_num_ready_data(QVariantList& _values)
-	{
-		try
-		{
-			uint _num = _values.at(0).value<uint>();
-			int res = app->unmn8i_num_ready_data(_num);
-			_values[0] = _num;
-			with_return = true;
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unmn8i_stop(QVariantList& _values)
-	{
-		try
-		{
-			int res = app->unmn8i_stop();
-			return res;
-		}
-		catch(std::exception &err)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::button_clicked(QVariantList& _values)
-	{
-		try
-		{
-			app->button_clicked();
+			QString _msg = _values.at(0).value<QString>();
+			app->message_to_log_slot(_msg);
 			return 0;
 		}
 		catch(std::exception &err)

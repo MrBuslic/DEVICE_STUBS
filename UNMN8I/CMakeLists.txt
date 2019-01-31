@@ -14,7 +14,7 @@ include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})
 include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
-include_directories(${UNMN8I_SOURCE_DIR}/../../../lib/socket_rpc/include)
+include_directories(${UNMN8I_SOURCE_DIR}/../../lib/socket_rpc/include)
 
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
