@@ -35,6 +35,7 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
+	void mds32_get_sample(int channel, uint& buf, int& flag);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
