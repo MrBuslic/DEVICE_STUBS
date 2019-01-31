@@ -1,6 +1,14 @@
-extern "C" {
 #include <unads128.h>
-}
+#include <windows.h>
+#include "unads128_h.h"
+
+int ads128_count = 0; 
+
+
+#if defined(__cplusplus) || defined(__cplusplus__) 
+extern "C" { 
+#endif 
+
 ViStatus _VI_FUNC unads128_sft_interface (ViSession vi,  UN_SFT_INTERFACE sftInterface){ return 0; }
 
 ViStatus _VI_FUNC unads128_init ( 
@@ -117,3 +125,6 @@ ViStatus _VI_FUNC unads128_calibrate (
 								){ return 0; }
 */
 
+#if defined(__cplusplus) || defined(__cplusplus__) 
+} 
+#endif 
