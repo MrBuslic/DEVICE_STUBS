@@ -36,6 +36,8 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void mfsk24_();
+	void mfsk24_state_change(int channel, int state);
+	void mfsk24_impulse_change(int channel, int duration);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();

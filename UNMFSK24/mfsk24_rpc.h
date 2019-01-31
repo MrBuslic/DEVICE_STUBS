@@ -53,6 +53,8 @@ protected:
 signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void mfsk24_();
+	void mfsk24_state_change(int channel, int state);
+	void mfsk24_impulse_change(int channel, int duration);
 };
 
 class RPC_mfsk24_SIGNAL_Thread : public RPC_SIGNAL_Thread
