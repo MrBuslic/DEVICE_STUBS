@@ -38,6 +38,8 @@ include_directories("../../lib/db_ctrl")
 include_directories("../../lib/mongo_ctrl")
 include_directories("../../lib/socket_rpc/include")
 include_directories("../OMNIBUSBOX")
+include_directories("../UNMDS32")
+include_directories("../UNMFSK24")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
@@ -52,15 +54,15 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(TPO_HEADERS tpo_imit.h CrcUnit.h Integer.h mko_imit.h CBK_MAIN_Thread.h interrupts.h)
-SET(TPO_SOURCES main.cpp tpo_imit.cpp CrcUnit.cpp mko_imit.cpp CBK_MAIN_Thread.cpp interrupts.cpp)
+SET(TPO_HEADERS tpo_imit.h CrcUnit.h Integer.h mko_imit.h CBK_MAIN_Thread.h interrupts.h VIP_imit.h)
+SET(TPO_SOURCES main.cpp tpo_imit.cpp CrcUnit.cpp mko_imit.cpp CBK_MAIN_Thread.cpp interrupts.cpp VIP_imit.cpp)
 
 
 
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MONGO_HOME}/lib)
 
-SET(HELP_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h  ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
+SET(HELP_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../UNMDS32/mds32_rpc.h ${PROJECT_SOURCE_DIR}/../UNMFSK24/mfsk24_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../UNMDS32/mds32_rpc.cpp ${PROJECT_SOURCE_DIR}/../UNMFSK24/mfsk24_rpc.cpp)
 SET(RPC_FOI_RESOURCES ${PROJECT_SOURCE_DIR}/../UNFOI/foi_rpc.h ${PROJECT_SOURCE_DIR}/../UNFOI/foi_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
