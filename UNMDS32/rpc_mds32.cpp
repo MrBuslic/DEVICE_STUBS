@@ -9,6 +9,21 @@
 #include <QLineEdit>
 #include "mds32_socket_rpc.h"
 
+union mds_chan
+{
+	uint channel;
+	struct
+	{
+		uint ch_1 : 1,
+			 ch_2 : 1,
+			 ch_3 : 1,
+			 ch_4 : 1,
+			 ch_5 : 1,
+			 ch_6 : 1,
+			 ch_7 : 1,
+			 ch_8 : 1;
+	};
+};
 RpcMDS32Widget::RpcMDS32Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
@@ -103,7 +118,15 @@ int RpcMDS32Widget::unmds32_input_trigger(bool state)
 
 int RpcMDS32Widget::unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _lasteTime)
 {
-	_buf = buf_edit->text().toUInt(0, 0);
+	mds_chan chan;
+	int flag = 1;
+	for (int i = 0; i < 8; i++)
+	{
+		emit mds32_get_sample(i+1, chan.channel, flag);
+	}
+
+	_buf = chan.channel;
+	//_buf = buf_edit->text().toUInt(0, 0);
 	_firstTime = 0;
 	_lasteTime = 0;
 	
@@ -117,7 +140,7 @@ int RpcMDS32Widget::unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _las
 
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
-	return (buf_edit, _firstTime, _lasteTime);
+	return 0;
 }
 
 int RpcMDS32Widget::unmds32_start()

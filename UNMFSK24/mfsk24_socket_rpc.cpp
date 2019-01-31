@@ -120,12 +120,18 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(mfsk24_()), this, SLOT(mfsk24_()));
+		disconnect(app, SIGNAL(mfsk24_state_change(int, int)), this, SLOT(mfsk24_state_change(int, int)));
+		disconnect(app, SIGNAL(mfsk24_impulse_change(int, int)), this, SLOT(mfsk24_impulse_change(int, int)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(RpcMFSK24Widget* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(mfsk24_()), this, SLOT(mfsk24_()), Qt::DirectConnection);
 		data_map.insert("mfsk24_()", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(mfsk24_state_change(int, int)), this, SLOT(mfsk24_state_change(int, int)), Qt::DirectConnection);
+		data_map.insert("mfsk24_state_change(int, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(mfsk24_impulse_change(int, int)), this, SLOT(mfsk24_impulse_change(int, int)), Qt::DirectConnection);
+		data_map.insert("mfsk24_impulse_change(int, int)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -275,6 +281,50 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_ finished").arg(objectName()));
 	}
+	void Socket_RPC_SIGNAL_Object::mfsk24_state_change(int channel, int state)
+	{
+		auto& descriptor = *data_map["mfsk24_state_change(int, int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("mfsk24_state_change(int, int)");
+		tmp_stream << channel;
+		tmp_stream << state;
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_state_change").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_state_change sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_state_change finished").arg(objectName()));
+	}
+	void Socket_RPC_SIGNAL_Object::mfsk24_impulse_change(int channel, int duration)
+	{
+		auto& descriptor = *data_map["mfsk24_impulse_change(int, int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("mfsk24_impulse_change(int, int)");
+		tmp_stream << channel;
+		tmp_stream << duration;
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_impulse_change").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_impulse_change sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_impulse_change finished").arg(objectName()));
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -291,11 +341,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _state = _values.at(0).value<int>();
 			app->auto_scroll_clicked(_state);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -311,7 +362,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->log_timer_ontimer();
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -324,12 +375,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _state_chan = _values.at(0).value<int>();
 			QVariantList _vec = _values.at(1).value<QVariantList>();
 			int res = app->unmfsk24_manual_group_cmd(_state_chan, _vec);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -342,13 +395,16 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariantList _state = _values.at(0).value<QVariantList>();
 			int res = app->unmfsk24_state(_state);
 			_values[0] = _state;
+			SRPCSignalClass::Instance().toLog(QString("%1 _state = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
 			with_return = true;
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -361,12 +417,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _chan = _values.at(0).value<int>();
 			int _state_chan = _values.at(1).value<int>();
 			int res = app->unmfsk24_manual_cmd(_chan, _state_chan);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -379,11 +437,13 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariantList _state = _values.at(0).value<QVariantList>();
 			int res = app->unmfsk24_start(_state);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -396,12 +456,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _chan = _values.at(0).value<int>();
 			int _time = _values.at(1).value<int>();
 			int res = app->unmfsk24_set_cmd_time(_chan, _time);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}

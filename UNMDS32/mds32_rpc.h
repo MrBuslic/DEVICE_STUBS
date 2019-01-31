@@ -52,6 +52,7 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
+	void mds32_get_sample(int channel, uint& buf, int& flag);
 };
 
 class RPC_mds32_SIGNAL_Thread : public RPC_SIGNAL_Thread

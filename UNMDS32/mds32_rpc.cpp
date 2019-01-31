@@ -64,10 +64,18 @@ void RPC_mds32_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
 
 void RPC_mds32_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_mds32_SIGNAL_Object::mds32_get_sample)) {
+		SRPCSignalClass::Instance().toLog("mds32_get_sample connected");
+		emit connect_signal("mds32_get_sample(int, uint&, int&)", true);
+	}
 }
 
 void RPC_mds32_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_mds32_SIGNAL_Object::mds32_get_sample)) {
+		SRPCSignalClass::Instance().toLog("mds32_get_sample disconnected");
+		//emit connect_signal("mds32_get_sample(int, uint&, int&)", false);
+	}
 }
 
 void RPC_mds32_SIGNAL_Object::read_data()
@@ -101,6 +109,33 @@ void RPC_mds32_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("mds32 new signal " + op_name);
 
+			if (op_name == "mds32_get_sample(int, uint&, int&)")
+			{
+				int channel;
+				tmp_stream >> channel;
+				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" channel = "+RPCSignalClass::QVariantToString(channel));
+				uint buf;
+				tmp_stream >> buf;
+				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" buf = "+RPCSignalClass::QVariantToString(buf));
+				int flag;
+				tmp_stream >> flag;
+				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" flag = "+RPCSignalClass::QVariantToString(flag));
+				emit mds32_get_sample(channel, buf, flag);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QVariantList return_list;
+				return_list << QVariant(channel);
+				return_list << QVariant(buf);
+				return_list << QVariant(flag);
+				tmp_stream2 << return_list;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("mds32 signal finished " + op_name);
+			}
 		}
 	}
 }
@@ -113,14 +148,14 @@ void RPC_mds32_SLOT_Object::auto_scroll_clicked(int _state)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call auto_scroll_clicked");
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("auto_scroll_clicked(int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished auto_scroll_clicked");
 }
 void RPC_mds32_SLOT_Object::log_timer_ontimer()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call log_timer_ontimer");
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("log_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished log_timer_ontimer");
 }
@@ -128,40 +163,49 @@ int RPC_mds32_SLOT_Object::unmds32_input_trigger(bool state)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(state);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call unmds32_input_trigger");
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call unmds32_input_trigger %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmds32_input_trigger(bool)", tmp_list);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished unmds32_input_trigger");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call finished unmds32_input_trigger %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mds32_SLOT_Object::unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _lasteTime)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(_buf);
 	tmp_list << QVariant(_firstTime);
 	tmp_list << QVariant(_lasteTime);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call unmds32_read_sample");
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call unmds32_read_sample %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmds32_read_sample(uint&, uint&, uint&)", tmp_list);
 	_buf = tmp_list.at(0).toUInt();
+	tmp_ret_params += " _buf="+RPCSignalClass::QVariantToString(tmp_list.at(0));
 	_firstTime = tmp_list.at(1).toUInt();
+	tmp_ret_params += " _firstTime="+RPCSignalClass::QVariantToString(tmp_list.at(1));
 	_lasteTime = tmp_list.at(2).toUInt();
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished unmds32_read_sample");
+	tmp_ret_params += " _lasteTime="+RPCSignalClass::QVariantToString(tmp_list.at(2));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call finished unmds32_read_sample %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mds32_SLOT_Object::unmds32_start()
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call unmds32_start");
+	QString tmp_ret_params;
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call unmds32_start %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmds32_start()", tmp_list);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished unmds32_start");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call finished unmds32_start %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 void RPC_mds32_SLOT_Object::check_box_clicked()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call check_box_clicked");
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call check_box_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("check_box_clicked()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished check_box_clicked");
 }
@@ -169,7 +213,7 @@ void RPC_mds32_SLOT_Object::line_edit_changed(const QString& _text)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(_text);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call line_edit_changed");
+	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call line_edit_changed %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("line_edit_changed(QString&)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished line_edit_changed");
 }
