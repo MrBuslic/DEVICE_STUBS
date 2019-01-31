@@ -39,7 +39,6 @@ include_directories("../../lib/mongo_ctrl")
 include_directories("../../lib/socket_rpc/include")
 include_directories("../OMNIBUSBOX")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
-include_directories(D:/Illarionov/env_socket/ServerSide/rpc/socket_rpc/include)
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
@@ -67,7 +66,7 @@ SET(RPC_FOI_RESOURCES ${PROJECT_SOURCE_DIR}/../UNFOI/foi_rpc.h ${PROJECT_SOURCE_
 
 add_executable(tpo_imitator ${MY_WIN_FLAG} ${TPO_HEADERS} ${TPO_SOURCES} ${HELP_SOURCES} ${RPC_FOI_RESOURCES})
 target_link_libraries (tpo_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} git2 my_git common_functions  mongo_controller_v3 db_ctrl socket_rpc socket_rpc unfoi_32) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} git2 my_git common_functions  mongo_controller_v3 db_ctrl socket_rpc unfoi_32) 
 
 if(WIN32)
   qt5_use_modules(tpo_imitator Core Widgets Network Gui)

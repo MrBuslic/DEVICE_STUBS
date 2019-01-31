@@ -28,7 +28,7 @@ if(WIN32)
 endif()
 
 set(UNFOI_SOURCES unfoi.cpp foi_rpc.h foi_rpc.cpp)
-include_directories($ENV{VISA_HOME}include)
+include_directories($ENV{VISA_HOME}/include)
 
 add_library(unfoi_32 SHARED ${UNFOI_HEADERS} ${UNFOI_SOURCES} export.def)
 target_link_libraries(unfoi_32 socket_rpc)
