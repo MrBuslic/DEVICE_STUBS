@@ -288,20 +288,21 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		}
 		if (tmp_cwd.subadr == 29) //KU
 		{
+			int ku;
 			int max_ku;
 			max_ku = 0;
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
-				int nim = (itr->toInt() /*& 0x0300*/) >> 8;
-				for (int i = 0; i <= 7; i++)
+				int nim = (itr->toInt() & 0x0700) >> 8;
+				for (int num_ku = 0; num_ku <= 7; num_ku++)
 				{
-					int num_ku = (itr->toInt()&(1 << i));
-					if (num_ku != 0)
+					ku = (itr->toInt()&(1 << num_ku));
+					if (ku != 0)
 					{
 						if (max_ku <= 4)
 						{
-							MV_DEV& param_ku = mvku_modules[num_ku / 8].get_settings();
-							emit new_ku(num_ku, param_ku.length_kom, param_ku.u_kom);
+							MV_DEV& param_ku = mvku_modules[nim].get_settings();
+							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
 							max_ku++;
 						}
 					}
