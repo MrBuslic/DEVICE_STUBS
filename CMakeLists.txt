@@ -41,6 +41,7 @@ add_subdirectory(UNMVI102)
 
 add_subdirectory(bkupi_imitator)
 add_subdirectory(tpo_imitator)
+add_subdirectory(mbk04_imitator)
 add_subdirectory(LKA-05_imitator)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
