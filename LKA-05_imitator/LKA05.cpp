@@ -120,30 +120,6 @@ LKA05_widg::~LKA05_widg()
 
 }
 
-/*LKA05_widg::choose_dialog(QWidget* parent) :QDialog(parent)
-{
-	setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-
-	QLabel* lab = new QLabel("Выберите конфигурацию:");
-	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	v_lay->addWidget(lab);
-	QHBoxLayout* h_lay = new QHBoxLayout;
-	MU1_set();
-	accept_btn = new QPushButton("Подтвердить");
-	reject_btn = new QPushButton("Отмена");
-
-	h_lay->addWidget(CheckButtonsBox);
-	v_lay->addLayout(h_lay);
-	QHBoxLayout* h_lay2 = new QHBoxLayout;
-	h_lay2->addWidget(accept_btn, 0, Qt::AlignLeft);
-	h_lay2->addWidget(reject_btn, 0, Qt::AlignRight);
-	v_lay->addLayout(h_lay2);
-
-	connect(accept_btn, SIGNAL(clicked()), this, SLOT(accept()));
-	connect(reject_btn, SIGNAL(clicked()), this, SLOT(reject()));
-}*/
-
-
 void LKA05_widg::choose_dialog()
 {
 	
@@ -156,10 +132,6 @@ void LKA05_widg::choose_dialog()
 	//	okBut.setFlat(true);
 	MU1_set(words);
 	
-//	if (ind = 2)
-//	{
-//		if ()
-//	}
 
 	QVBoxLayout* v_lay = new QVBoxLayout(dlg);
 	okBut = new QPushButton("ok", dlg);
@@ -276,8 +248,72 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			paint_buttons();
 			set_new_tm();
 		}
-
-
+		if (tmp_cwd.subadr == 28) //MK
+		{
+			int max_p;
+			max_p = 0;
+			int num_vertic;
+			//QVariantList pshm_list;
+			
+			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			{
+				int mshm = (itr->toInt()) >> 12;
+				if (mshm >=12)
+				{
+					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
+					break;
+				}
+				MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
+				for (int pshm = 0; pshm <= 11; pshm++)
+				{
+					num_vertic = (itr->toInt()&(1<<pshm));
+					if (num_vertic != 0)
+					{
+						if (max_p <= 4)
+						{
+							//pshm_list << pshm;
+							MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
+							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_mshm.dt_kom-param_pshm.dt_kom));
+							max_p++;
+						}
+						else 
+						{
+							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
+							break;
+						}
+						
+					}
+				}
+			}
+		}
+		if (tmp_cwd.subadr == 29) //KU
+		{
+			int ku;
+			int max_ku;
+			max_ku = 0;
+			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			{
+				int nim = (itr->toInt() & 0x0700) >> 8;
+				for (int num_ku = 0; num_ku <= 7; num_ku++)
+				{
+					ku = (itr->toInt()&(1 << num_ku));
+					if (ku != 0)
+					{
+						if (max_ku <= 4)
+						{
+							MV_DEV& param_ku = mvku_modules[nim].get_settings();
+							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
+							max_ku++;
+						}
+					}
+					else
+					{
+						QMessageBox::critical(0, "Больше 4", "Ошибка СД");
+						break;
+					}
+				}
+			}
+		}
 
 	}
 }
@@ -345,7 +381,7 @@ void LKA05_widg::set_new_tm()
 	{
 		tm_words << mvmk_modules[i].get_tm();
 	}
-	slot_thr.get_omnibus_obj()->set_new_data(1, 4, 17, tm_words);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
 }
 
 MU_MODULE::MU_MODULE() : current_dev(MAIN)

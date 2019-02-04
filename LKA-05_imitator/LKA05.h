@@ -102,6 +102,14 @@ public:
 	{
 		return current_dev;
 	}
+	MV_DEV& get_settings()
+	{
+		return devices[current_dev];
+	}
+//	void set_settings()
+//	{	
+//	}
+
 private:
 	QMap<CURRENT_DEV, MV_DEV> devices;
 	CURRENT_DEV current_dev;
@@ -164,7 +172,7 @@ public slots:
 	void save_choose_set();
 signals:
 	void new_ku(int ku_n, int length, double u);
-	void new_mk(int mshm, int pshm, int length, double u, int dt);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
 private:
 	MU_MODULE mu_module;
 	QList<MV_MODULE> mvku_modules;

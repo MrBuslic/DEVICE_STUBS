@@ -49,7 +49,6 @@ case DLL_PROCESS_ATTACH: // Подключение DLL
 		signal_thr.set_connection_params(ip_str, 50002);
 		signal_thr.start();
 		signal_thr.wait_connected(3);
-		QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	}
 	
 

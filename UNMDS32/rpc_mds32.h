@@ -36,6 +36,8 @@ public slots:
 
 	void check_box_clicked();
 	void line_edit_changed(const QString& _text);
+signals:
+	void mds32_get_sample(int channel, uint& buf, int& flag);
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
