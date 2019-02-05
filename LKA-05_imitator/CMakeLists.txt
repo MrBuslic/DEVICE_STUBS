@@ -38,12 +38,12 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(BKUPI_HEADERS LKA05.h)
+SET(BKUPI_HEADERS LKA05.h LKA05Modules.h)
 SET(BKUPI_SOURCES main.cpp LKA05.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.h ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.cpp lka05_socket_rpc.h lka05_socket_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_executable(LKA-05_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES})
@@ -56,7 +56,10 @@ if(WIN32)
 endif()
 
 
-
+ADD_CUSTOM_COMMAND(TARGET LKA-05_imitator
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/LKA05.h ${PROJECT_SOURCE_DIR} lka05
+)
 
 
 
