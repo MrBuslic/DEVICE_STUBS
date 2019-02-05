@@ -66,7 +66,11 @@ MainWidget::MainWidget()
 	main_widg->setCentralWidget(central);
 	v_l->addWidget(main_widg);
 	this->setLayout(v_l);
-	
+	o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 	devices.insert(CURRENT_DEV::MAIN, MV_DEV());
 	devices.insert(CURRENT_DEV::RESERVE, MV_DEV());
 
@@ -148,7 +152,7 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 
 void MainWidget::state_changed()
 {
-	int tmp_new_tm;
+	int tmp_new_tm = 0xFFFF;
 	short new_ok0;
 	short new_ok1;
 	short new_ok2;
@@ -159,8 +163,8 @@ void MainWidget::state_changed()
 	switch (current_dev)
 	{
 	case CURRENT_DEV::MAIN :
-		o_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		o_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);"); //green light - working
+		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
 		new_ok0 = 0;
 		new_ok1 = 1;
 		break;
@@ -168,50 +172,64 @@ void MainWidget::state_changed()
 		o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 		new_ok0 = 1;
-		new_ok1 = 0;
+		new_ok1 =1;
 		break;
 	case CURRENT_DEV::RESERVE:
-		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 		r_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-		new_ok0 = 0;
+		new_ok0 = 1;
 		 new_ok1 = 0;
 		break;
 
 	default:
 		break;
 	}
-	tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok0 << 0);
-	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
-
-	switch (current_rezh)
+	if (current_dev != CURRENT_DEV::OFF)
 	{
-	case REZH_FRAME::VTF :
-		new_ok2 = 0;
-		new_ok3 = 0;
-		new_ok4 = 1;
-		break;
-	case REZH_FRAME::PI8:
-		new_ok2 = 0;
-		new_ok3 = 1;
-		new_ok4 = 0;
-		break;
-	case REZH_FRAME::PI15:
-		new_ok2 = 1;
-		new_ok3 = 0;
-		new_ok4 = 0;
-		break;
-	case REZH_FRAME::OFF_REZH:
-		new_ok2 = 0;
-		new_ok3 = 1;
-		new_ok4 = 1;
-		break;
+		tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok0 << 0);
+		tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
 
-	default:
-		break;
+		switch (current_rezh)
+		{
+		case REZH_FRAME::VTF:
+			new_ok2 = 0;
+			new_ok3 = 0;
+			new_ok4 = 1;
+			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			vtf_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+			break;
+		case REZH_FRAME::PI8:
+			new_ok2 = 0;
+			new_ok3 = 1;
+			new_ok4 = 0;
+			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			break;
+		case REZH_FRAME::PI15:
+			new_ok2 = 1;
+			new_ok3 = 0;
+			new_ok4 = 0;
+			ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			break;
+		case REZH_FRAME::OFF_REZH:
+			new_ok2 = 0;
+			new_ok3 = 1;
+			new_ok4 = 1;
+			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+			break;
+
+		default:
+			break;
+		}
+		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
 	}
-	tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
-	tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
-	tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
-
 	emit new_tm(tmp_new_tm);
 }
