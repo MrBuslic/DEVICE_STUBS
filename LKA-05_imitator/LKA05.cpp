@@ -1,5 +1,5 @@
 #include "LKA05.h"
-
+#include "lka05_socket_rpc.h"
 #include <QMessageBox>
 
 union MKOWord
@@ -99,6 +99,31 @@ LKA05_widg::LKA05_widg()
 		this->deleteLater();
 		return;
 	}
+
+	mbk04_slot_thr.set_connection_params("127.0.0.1", 50051);
+	mbk04_slot_thr.start(); // вот тут падает
+
+	mbk04_signal_thr.set_connection_params("127.0.0.1", 50052);
+	mbk04_signal_thr.start(); // вот тут падает
+
+	if (!mbk04_slot_thr.wait_connected(3) || !mbk04_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mbk04_");
+		this->deleteLater();
+		return;
+	}
+	QString ip_str = "127.0.0.1";
+	int slot_port = 50061;
+	int signal_port = 50062;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	rpc_slot_srv->set_app(this);
+	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->start();
+	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	rpc_signal_srv->set_app(this);
+	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->start();
+
 	MKO = 1;
 	adr = 4;
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
@@ -107,6 +132,10 @@ LKA05_widg::LKA05_widg()
 	connect(MU2, &QPushButton::clicked, this, &LKA05_widg::choose_dialog);
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
+
+	connect(this, SIGNAL(new_ku(int, int, double)), mbk04_slot_thr.get_mbk04_obj().get(), SLOT(new_ku(int, int, double)), Qt::DirectConnection);
+
 //	choose_dialog();
 	//(1040 2040 2140 2240  3040 3140 3240) в начале все модули имеют основной канал и му1
 	//нужно обработать входящие (первые 4 знака) для таблицы 6, для какого модуля пришло слово
@@ -280,8 +309,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 						{
 							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
 							break;
-						}
-						
+						} 
 					}
 				}
 			}
@@ -305,16 +333,20 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
 							max_ku++;
 						}
+						else
+						{
+							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
+							break;
+						}
 					}
-					else
-					{
-						QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-						break;
-					}
+
 				}
 			}
 		}
-
+		if ((tmp_cwd.subadr >= 2) && (tmp_cwd.subadr <= 8))
+		{
+			mbk04_slot_thr.get_mbk04_obj()->new_message(dt, mko, line, cwd, words, os);
+		}
 	}
 }
 
@@ -381,7 +413,7 @@ void LKA05_widg::set_new_tm()
 	{
 		tm_words << mvmk_modules[i].get_tm();
 	}
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words); 
 }
 
 MU_MODULE::MU_MODULE() : current_dev(MAIN)
@@ -419,4 +451,11 @@ unsigned short MV_MODULE::get_tm()
 	else
 		_word += 0x20 << current_dev;
 	return _word;
+}
+
+void LKA05_widg::new_tm(int tm)
+{
+	QVariantList tm_words;
+	tm_words << tm;
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
