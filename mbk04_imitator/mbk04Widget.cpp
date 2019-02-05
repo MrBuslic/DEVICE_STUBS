@@ -161,27 +161,27 @@ void MainWidget::state_changed()
 	case CURRENT_DEV::MAIN :
 		o_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-		short new_ok0 = 0;
-		short new_ok1 = 1;
+		new_ok0 = 0;
+		new_ok1 = 1;
 		break;
 	case CURRENT_DEV::OFF:
 		o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-		short new_ok0 = 1;
-		short new_ok1 = 0;
+		new_ok0 = 1;
+		new_ok1 = 0;
 		break;
 	case CURRENT_DEV::RESERVE:
 		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 		r_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-		short new_ok0 = 0;
-		short new_ok1 = 0;
+		new_ok0 = 0;
+		 new_ok1 = 0;
 		break;
 
 	default:
 		break;
 	}
-	tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok1 << 0);
-	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok2 << 1);
+	tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok0 << 0);
+	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
 
 	switch (current_rezh)
 	{
@@ -209,9 +209,9 @@ void MainWidget::state_changed()
 	default:
 		break;
 	}
-	tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok3 << 4);
-	tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok2 << 3);
-	tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok1 << 2);
+	tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+	tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+	tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
 
 	emit new_tm(tmp_new_tm);
 }
