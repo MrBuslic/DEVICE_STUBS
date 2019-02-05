@@ -115,12 +115,15 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));
+		disconnect(app, SIGNAL(state_changed_signal()), this, SLOT(state_changed_signal()));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(MainWidget* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(new_tm(int)), this, SLOT(new_tm(int)), Qt::DirectConnection);
 		data_map.insert("new_tm(int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(state_changed_signal()), this, SLOT(state_changed_signal()), Qt::DirectConnection);
+		data_map.insert("state_changed_signal()", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -270,6 +273,26 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_tm finished").arg(objectName()));
+	}
+	void Socket_RPC_SIGNAL_Object::state_changed_signal()
+	{
+		auto& descriptor = *data_map["state_changed_signal()"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("state_changed_signal()");
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal state_changed_signal").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal state_changed_signal sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal state_changed_signal finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

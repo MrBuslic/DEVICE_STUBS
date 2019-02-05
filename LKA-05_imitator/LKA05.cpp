@@ -134,7 +134,7 @@ LKA05_widg::LKA05_widg()
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
 
-	connect(this, SIGNAL(new_ku(int, int, double)), mbk04_slot_thr.get_mbk04_obj().get(), SLOT(new_ku(int, int, double)));
+	connect(this, SIGNAL(new_ku(int, int, double)), mbk04_slot_thr.get_mbk04_obj().get(), SLOT(new_ku(int, int, double)), Qt::DirectConnection);
 
 //	choose_dialog();
 	//(1040 2040 2140 2240  3040 3140 3240) в начале все модули имеют основной канал и му1
@@ -333,12 +333,13 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
 							max_ku++;
 						}
+						else
+						{
+							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
+							break;
+						}
 					}
-					else
-					{
-						QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-						break;
-					}
+
 				}
 			}
 		}

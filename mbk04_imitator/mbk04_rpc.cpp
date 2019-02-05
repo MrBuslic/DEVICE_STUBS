@@ -68,6 +68,11 @@ void RPC_mbk04_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		SRPCSignalClass::Instance().toLog("new_tm connected");
 		emit connect_signal("new_tm(int)", true);
 	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::state_changed_signal)) {
+		SRPCSignalClass::Instance().toLog("state_changed_signal connected");
+		emit connect_signal("state_changed_signal()", true);
+	}
 }
 
 void RPC_mbk04_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -75,6 +80,11 @@ void RPC_mbk04_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::new_tm)) {
 		SRPCSignalClass::Instance().toLog("new_tm disconnected");
 		//emit connect_signal("new_tm(int)", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::state_changed_signal)) {
+		SRPCSignalClass::Instance().toLog("state_changed_signal disconnected");
+		//emit connect_signal("state_changed_signal()", false);
 	}
 }
 
@@ -115,6 +125,19 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 				tmp_stream >> nw;
 				SRPCSignalClass::Instance().toLog("mbk04 " + op_name +" nw = "+RPCSignalClass::QVariantToString(nw));
 				emit new_tm(nw);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name);
+			}
+			if (op_name == "state_changed_signal()")
+			{
+				emit state_changed_signal();
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;

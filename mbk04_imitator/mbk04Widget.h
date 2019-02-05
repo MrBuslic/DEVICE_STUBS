@@ -45,13 +45,14 @@ private:
 	QMap<CURRENT_DEV, MV_DEV> devices;
 	CURRENT_DEV current_dev;
 	REZH_FRAME current_rezh;
+private slots:
 	void state_changed();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_ku(int ku_n, int length, double u);
 signals:
 	void new_tm(int nw);
-
+	void state_changed_signal();
 };
 
 #endif

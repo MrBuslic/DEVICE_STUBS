@@ -36,6 +36,7 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void new_tm(int nw);
+	void state_changed_signal();
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();

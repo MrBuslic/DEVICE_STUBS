@@ -88,7 +88,7 @@ MainWidget::MainWidget()
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
-
+	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
 }
 
 
@@ -104,14 +104,14 @@ void MainWidget::new_ku(int ku_n, int length, double u)
 {
 
 	//реакция на новую КУ
-	//если команда == 17 то зеленым горит основной канал
-	//если команда 18 == то оба горят серым (выключено)
-	//если канал == 19, то горит зеленым резервный
+	//если команда == 16 то зеленым горит основной канал
+	//если команда 17 == то оба горят серым (выключено)
+	//если канал == 18, то горит зеленым резервный
 	switch (ku_n)
 	{
-	case 17: current_dev = CURRENT_DEV::MAIN; state_changed(); break;
-	case 18: current_dev = CURRENT_DEV::OFF; state_changed(); break;
-	case 19:current_dev = CURRENT_DEV::RESERVE; state_changed(); break;
+	case 16: current_dev = CURRENT_DEV::MAIN; emit state_changed_signal(); break;
+	case 17: current_dev = CURRENT_DEV::OFF; emit state_changed_signal(); break;
+	case 18:current_dev = CURRENT_DEV::RESERVE; emit state_changed_signal(); break;
 
 	default:
 		break;
@@ -143,7 +143,7 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		}
 
 	}
-	state_changed();
+	emit state_changed_signal();
 
 
 
@@ -152,7 +152,7 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 
 void MainWidget::state_changed()
 {
-	int tmp_new_tm = 0xFFFF;
+	int tmp_new_tm = 0;
 	short new_ok0;
 	short new_ok1;
 	short new_ok2;
@@ -184,10 +184,11 @@ void MainWidget::state_changed()
 	default:
 		break;
 	}
+	tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok0 << 0);
+	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
 	if (current_dev != CURRENT_DEV::OFF)
 	{
-		tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok0 << 0);
-		tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
+
 
 		switch (current_rezh)
 		{
@@ -216,7 +217,7 @@ void MainWidget::state_changed()
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
 		case REZH_FRAME::OFF_REZH:
-			new_ok2 = 0;
+			new_ok2 = 1;
 			new_ok3 = 1;
 			new_ok4 = 1;
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");

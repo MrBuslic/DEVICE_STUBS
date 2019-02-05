@@ -48,6 +48,7 @@ protected:
 signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void new_tm(int nw);
+	void state_changed_signal();
 };
 
 class RPC_mbk04_SIGNAL_Thread : public RPC_SIGNAL_Thread
