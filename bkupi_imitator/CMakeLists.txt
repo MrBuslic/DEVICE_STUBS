@@ -60,7 +60,7 @@ SET(BKUPI_SOURCES main.cpp bkupi.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MONGO_HOME}/lib)
 
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../../main_server/main_server_rpc.h ${PROJECT_SOURCE_DIR}/../../main_server/main_server_rpc.cpp)
+#SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../../main_server/main_server_rpc.h ${PROJECT_SOURCE_DIR}/../../main_server/main_server_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_executable(bkupi_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES})

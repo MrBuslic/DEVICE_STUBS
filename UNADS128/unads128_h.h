@@ -16,7 +16,7 @@ public:
 	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
 private:
 	rpc_buffer_class();
-}
+};
 
 SINGLETON_DEF(rpc_buffer_class);
 

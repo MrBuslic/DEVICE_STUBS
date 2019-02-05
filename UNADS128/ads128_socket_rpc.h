@@ -1,0 +1,175 @@
+#ifndef ADS128_SOCKET_RPC_H
+#define ADS128_SOCKET_RPC_H
+
+#include <QObject>
+#include <QString>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include "rpc_ads128.h"
+
+#include <QWidget>
+#include <QTextEdit>
+#include <QWaitCondition>
+
+#include "rpc_loger.h"
+struct SignalData
+{
+	SignalData() : signal_needed(false) {}
+	SignalData(const SignalData&) {}
+	QWaitCondition cond;
+	QMutex mutex;
+	QVariantList signal_data;
+	bool signal_needed;
+};
+class Socket_RPC_SIGNAL_Object : public QObject
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SIGNAL_Object();
+	~Socket_RPC_SIGNAL_Object()
+	{
+	}
+	void set_app(RpcADS128Widget* _app);
+
+	void set_socket(QTcpSocket* _rpc_socket);
+signals:
+	void send_signal(QByteArray* _arr);
+public slots:
+	void packet_ready();
+
+	void send_signal_slot(QByteArray* _arr);
+	void read_data();
+	void sock_error(QAbstractSocket::SocketError _err);
+private:
+	void send_signal_func(QByteArray* _arr);
+	QTcpSocket* rpc_socket;
+	QMutex signal_mutex;
+	RpcADS128Widget* app;
+	static int obj_num;
+	QMap<QString, std::shared_ptr<SignalData> > data_map;
+};
+
+
+class Socket_RPC_SIGNAL_Server : public QObject
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
+	void set_app(RpcADS128Widget* _app)
+	{
+		app = _app;
+	}
+public slots:
+	void tcp_slot();
+private:
+	QTcpServer* rpc_server;
+	RpcADS128Widget* app;
+	QList<std::shared_ptr<Socket_RPC_SIGNAL_Object> > rpc_objects;
+};
+
+class Socket_RPC_SIGNAL_Thread : public QThread
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SIGNAL_Thread();
+	void set_app(RpcADS128Widget* _app)
+	{
+		app = _app;
+	}
+	void set_params(QString _conn_ip, int _conn_port)
+	{
+		conn_ip = _conn_ip;
+		conn_port = _conn_port;
+	}
+	void run();
+private:
+	Socket_RPC_SIGNAL_Server* rpc_srv;
+	RpcADS128Widget* app;
+	QString conn_ip;
+	int conn_port;
+};
+
+class Socket_RPC_SLOT_Object : public QObject
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SLOT_Object(RpcADS128Widget* _app, int socketDescriptor);
+	~Socket_RPC_SLOT_Object()
+	{
+	}
+	typedef QVariant (Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
+	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
+public:
+	QVariant QuerySlots(QVariantList& _values);
+	QVariant auto_scroll_clicked(QVariantList& _values);
+	QVariant log_timer_ontimer(QVariantList& _values);
+	QVariant measurement_timer_ontimer(QVariantList& _values);
+	QVariant infin_timer_ontimer(QVariantList& _values);
+	QVariant unads128_start(QVariantList& _values);
+	QVariant unads128_input_trigger(QVariantList& _values);
+	QVariant unads128_sample_width_q(QVariantList& _values);
+	QVariant unads128_read_sample(QVariantList& _values);
+	QVariant unads128_read_packet(QVariantList& _values);
+	QVariant unads128_sample_period(QVariantList& _values);
+	QVariant unads128_mode_cycle(QVariantList& _values);
+	QVariant unads128_num_ready_data(QVariantList& _values);
+	QVariant button_clicked(QVariantList& _values);
+public slots:
+	void read_data();
+	void sock_error(QAbstractSocket::SocketError _err);
+private:
+	OPERATORS_MAP operators_map;
+	QTcpSocket* rpc_socket;
+	RpcADS128Widget* app;
+	bool with_return;
+	static int obj_num;
+};
+
+class Socket_RPC_SLOT_Thread : public QThread
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SLOT_Thread(RpcADS128Widget* _app, int _socketDescriptor);
+	void run();
+	std::shared_ptr<Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
+	private:
+	std::shared_ptr<Socket_RPC_SLOT_Object> rpc_obj;
+	RpcADS128Widget* app;
+	int socketDescriptor;
+};
+
+class Socket_RPC_SLOT_Server : public QTcpServer
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcADS128Widget* _app);
+protected:
+	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
+private:
+	RpcADS128Widget* app;
+	QList<std::shared_ptr<Socket_RPC_SLOT_Thread> > rpc_objects;
+};
+
+class Socket_RPC_SLOT_Server_Thread : public QThread
+{
+	Q_OBJECT
+public:
+	Socket_RPC_SLOT_Server_Thread();
+	void set_app(RpcADS128Widget* _app)
+	{
+		app = _app;
+	}
+	void set_params(QString _conn_ip, int _conn_port)
+	{
+		conn_ip = _conn_ip;
+		conn_port = _conn_port;
+	}
+	void run();
+private:
+	Socket_RPC_SLOT_Server* rpc_srv;
+	RpcADS128Widget* app;
+	QString conn_ip;
+	int conn_port;
+
+};
+#endif
