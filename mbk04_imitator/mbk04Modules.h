@@ -24,8 +24,8 @@ enum REZH_FRAME
 {
 	PI15 = 1,
 	PI8 = 2,
-	VTF = 3,
-	OFF_REZH = 4
+	VTF = 4,
+	OFF_REZH = 7
 
 };
 struct MV_DEV

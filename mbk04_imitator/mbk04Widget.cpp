@@ -125,7 +125,18 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr))
 	{
-
+		if (tmp_cwd.subadr == 2)
+		{
+			switch (words.at(0).toInt())
+			{
+			case 1: current_rezh = REZH_FRAME::PI15; break;
+			case 2: current_rezh = REZH_FRAME::PI8; break;
+			case 4: current_rezh = REZH_FRAME::VTF; break;
+			case 7: current_rezh = REZH_FRAME::OFF_REZH; break;
+			default:
+				break;
+			};
+		}
 
 	}
 	state_changed();
@@ -138,20 +149,69 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 void MainWidget::state_changed()
 {
 	int tmp_new_tm;
+	short new_ok0;
+	short new_ok1;
+	short new_ok2;
+	short new_ok3;
+	short new_ok4;
+	
+	//сделать инверсию "текущего режима"
+	switch (current_dev)
+	{
+	case CURRENT_DEV::MAIN :
+		o_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		short new_ok0 = 0;
+		short new_ok1 = 1;
+		break;
+	case CURRENT_DEV::OFF:
+		o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		short new_ok0 = 1;
+		short new_ok1 = 0;
+		break;
+	case CURRENT_DEV::RESERVE:
+		r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		r_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+		short new_ok0 = 0;
+		short new_ok1 = 0;
+		break;
 
-	o_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	default:
+		break;
+	}
+	tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok1 << 0);
+	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok2 << 1);
 
+	switch (current_rezh)
+	{
+	case REZH_FRAME::VTF :
+		new_ok2 = 0;
+		new_ok3 = 0;
+		new_ok4 = 1;
+		break;
+	case REZH_FRAME::PI8:
+		new_ok2 = 0;
+		new_ok3 = 1;
+		new_ok4 = 0;
+		break;
+	case REZH_FRAME::PI15:
+		new_ok2 = 1;
+		new_ok3 = 0;
+		new_ok4 = 0;
+		break;
+	case REZH_FRAME::OFF_REZH:
+		new_ok2 = 0;
+		new_ok3 = 1;
+		new_ok4 = 1;
+		break;
 
-	o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	default:
+		break;
+	}
+	tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok3 << 4);
+	tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok2 << 3);
+	tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok1 << 2);
 
-
-	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-	r_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-
-	//emit new_tm();
-
-	//сделать изменение цветов тут
 	emit new_tm(tmp_new_tm);
 }
