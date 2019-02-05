@@ -1,7 +1,7 @@
 #include <QTextCodec>
 #include <QApplication>
 #include "mbk04Widget.h"
-
+#include <socket_rpc.h>
 
 #ifdef WIN32
 #include "windows.h"
@@ -16,7 +16,8 @@ int main(int argc, char **argv)
 #endif
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 	QApplication app(argc, argv);	
-
+	LogWidget log_widget;
+	log_widget.show();
 	MainWidget main_widget;
 	main_widget.show();
 

@@ -1,14 +1,14 @@
 #include "mbk04Widget.h"
-#include "MonitorDBController.hpp"
-#include "ProtocolDBController.hpp"
-#include "FrameDBController.hpp"
-w#include "instruments.h"
-
+//#include "MonitorDBController.hpp"
+//#include "ProtocolDBController.hpp"
+//#include "FrameDBController.hpp"
+//#include "instruments.h"
+#include "mbk04_socket_rpc.h"
 //структура командного слова сообщения МКО
 //
-union MkoWord
+union MKOWord
 {
-	quint16 cw;				 // командное слово целиком
+	quint16 com_word;				 // командное слово целиком
 	struct
 	{
 		quint16 count : 5,    // число сл.данных / команда
@@ -66,7 +66,25 @@ MainWidget::MainWidget()
 	main_widg->setCentralWidget(central);
 	v_l->addWidget(main_widg);
 	this->setLayout(v_l);
-		
+	
+	devices.insert(CURRENT_DEV::MAIN, MV_DEV());
+	devices.insert(CURRENT_DEV::RESERVE, MV_DEV());
+
+	current_dev = CURRENT_DEV::OFF;
+	current_rezh = REZH_FRAME::OFF_REZH;
+
+	QString ip_str = "127.0.0.1";
+	int slot_port = 50051;
+	int signal_port = 50052;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	rpc_slot_srv->set_app(this);
+	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->start();
+	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	rpc_signal_srv->set_app(this);
+	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->start();
+
 }
 
 
@@ -77,3 +95,63 @@ MainWidget::~MainWidget()
 }
 
 
+
+void MainWidget::new_ku(int ku_n, int length, double u)
+{
+
+	//реакция на новую КУ
+	//если команда == 17 то зеленым горит основной канал
+	//если команда 18 == то оба горят серым (выключено)
+	//если канал == 19, то горит зеленым резервный
+	switch (ku_n)
+	{
+	case 17: current_dev = CURRENT_DEV::MAIN; state_changed(); break;
+	case 18: current_dev = CURRENT_DEV::OFF; state_changed(); break;
+	case 19:current_dev = CURRENT_DEV::RESERVE; state_changed(); break;
+
+	default:
+		break;
+	};
+	
+
+}
+
+
+void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+{
+	MKOWord tmp_cwd;
+	tmp_cwd.com_word = cwd;
+	if (os == -1)
+		return;
+	if ((mko == MKO) && (tmp_cwd.adr == adr))
+	{
+
+
+	}
+	state_changed();
+
+
+
+
+}
+
+void MainWidget::state_changed()
+{
+	int tmp_new_tm;
+
+	o_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+
+
+	o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+
+
+	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+	r_rez_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+
+	//emit new_tm();
+
+	//сделать изменение цветов тут
+	emit new_tm(tmp_new_tm);
+}

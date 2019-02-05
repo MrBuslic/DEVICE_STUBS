@@ -5,21 +5,12 @@ set(CMAKE_AUTOMOC ON)
 SET (CMAKE_AUTOUIC ON)
 enable_language(CXX)
 	
-set(Boost_USE_STATIC_LIBS   ON)
-set(Boost_USE_MULTITHREADED ON)
-set(BOOST_LIBRARYDIR $ENV{BOOST_ROOT}/stage/lib/)
-	
-find_package (Boost 1.55.0 REQUIRED)
-if(NOT DEFINED WIN32)
-  find_package(Boost 1.55.0 COMPONENTS thread filesystem system regex REQUIRED)
- endif()
 find_package(Qt5Core)
 find_package (Qt5Gui)
 find_package(Qt5Widgets)
 find_package(Qt5Network)
 
 
-add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -32,14 +23,7 @@ include_directories(${Qt5Gui_INCLUDES})
 include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories($ENV{MONGO_HOME}/include)
-include_directories($ENV{LOKI_HOME}/include)
-include_directories("../../../vendor/libgit2/include")
-include_directories("../../../lib/my_git")
-include_directories("../../../lib/common_functions")
-include_directories("../../../lib/db_ctrl")
-include_directories("../../../lib/mongo_ctrl")
-include_directories("../../../lib/socket_rpc/include")
+include_directories("../../lib/socket_rpc/include")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
@@ -54,20 +38,17 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(MBK04_HEADERS mbk04Widget.h)
-SET(MBK04_SOURCES main.cpp  mbk04Widget.cpp)
+SET(BKUPI_HEADERS mbk04Widget.h)
+SET(BKUPI_SOURCES main.cpp mbk04Widget.cpp)
 
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-
-
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MONGO_HOME}/lib)
-
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../../../main_server/main_server_rpc.h ${PROJECT_SOURCE_DIR}/../../../main_server/main_server_rpc.cpp)
+SET(RPC_SOURCES mbk04_socket_rpc.h mbk04_socket_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(mbk04_imitator ${MY_WIN_FLAG} ${MBK04_HEADERS} ${MBK04_SOURCES} ${RPC_SOURCES})
+add_executable(mbk04_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES})
 target_link_libraries (mbk04_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} git2 my_git common_functions  mongo_controller db_ctrl socket_rpc) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
 if(WIN32)
   qt5_use_modules(mbk04_imitator Core Widgets Network Gui)
@@ -76,7 +57,10 @@ endif()
 
 
 
-
+ADD_CUSTOM_COMMAND(TARGET mbk04_imitator
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/mbk04Widget.h ${PROJECT_SOURCE_DIR} mbk04
+)
 
 
 
