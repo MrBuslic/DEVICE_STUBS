@@ -134,28 +134,28 @@ void RPC_mn8i_SLOT_Object::auto_scroll_clicked(int _state)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call auto_scroll_clicked");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("auto_scroll_clicked(int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished auto_scroll_clicked");
 }
 void RPC_mn8i_SLOT_Object::log_timer_ontimer()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call log_timer_ontimer");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("log_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished log_timer_ontimer");
 }
 void RPC_mn8i_SLOT_Object::measurement_timer_ontimer()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call measurement_timer_ontimer");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call measurement_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("measurement_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished measurement_timer_ontimer");
 }
 void RPC_mn8i_SLOT_Object::infin_timer_ontimer()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call infin_timer_ontimer");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call infin_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("infin_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished infin_timer_ontimer");
 }
@@ -163,108 +163,134 @@ int RPC_mn8i_SLOT_Object::unmn8i_start()
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_start");
+	QString tmp_ret_params;
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_start %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_start()", tmp_list);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_start");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_start %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_input_trigger(bool state)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(state);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_input_trigger");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_input_trigger %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_input_trigger(bool)", tmp_list);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_input_trigger");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_input_trigger %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_sample_width_q(uint& frame_width, uint& width_in_bytes)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(frame_width);
 	tmp_list << QVariant(width_in_bytes);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_sample_width_q");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_sample_width_q %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_sample_width_q(uint&, uint&)", tmp_list);
 	frame_width = tmp_list.at(0).toUInt();
+	tmp_ret_params += " frame_width="+RPCSignalClass::QVariantToString(tmp_list.at(0));
 	width_in_bytes = tmp_list.at(1).toUInt();
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_sample_width_q");
+	tmp_ret_params += " width_in_bytes="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_sample_width_q %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(_buf);
 	tmp_list << QVariant(_firstTime);
 	tmp_list << QVariant(_thisTime);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_read_sample");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_read_sample %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_read_sample(uint&, uint&, uint&)", tmp_list);
 	_buf = tmp_list.at(0).toUInt();
+	tmp_ret_params += " _buf="+RPCSignalClass::QVariantToString(tmp_list.at(0));
 	_firstTime = tmp_list.at(1).toUInt();
+	tmp_ret_params += " _firstTime="+RPCSignalClass::QVariantToString(tmp_list.at(1));
 	_thisTime = tmp_list.at(2).toUInt();
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_read_sample");
+	tmp_ret_params += " _thisTime="+RPCSignalClass::QVariantToString(tmp_list.at(2));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_read_sample %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(isHot);
 	tmp_list << QVariant(numSamples);
 	tmp_list << QVariant(buf);
 	tmp_list << QVariant(realNumSamples);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_read_packet");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_read_packet %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_read_packet(bool, uint, QVariantList&, uint&)", tmp_list);
 	buf = tmp_list.at(2).toList();
+	tmp_ret_params += " buf="+RPCSignalClass::QVariantToString(tmp_list.at(2));
 	realNumSamples = tmp_list.at(3).toUInt();
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_read_packet");
+	tmp_ret_params += " realNumSamples="+RPCSignalClass::QVariantToString(tmp_list.at(3));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_read_packet %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_sample_period(double _periodS)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(_periodS);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_sample_period");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_sample_period %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_sample_period(double)", tmp_list);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_sample_period");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_sample_period %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_mode_cycle(uint _size)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(_size);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_mode_cycle");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_mode_cycle %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_mode_cycle(uint)", tmp_list);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_mode_cycle");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_mode_cycle %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_num_ready_data(uint& _num)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(_num);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_num_ready_data");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_num_ready_data %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_num_ready_data(uint&)", tmp_list);
 	_num = tmp_list.at(0).toUInt();
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_num_ready_data");
+	tmp_ret_params += " _num="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_num_ready_data %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_mn8i_SLOT_Object::unmn8i_stop()
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call unmn8i_stop");
+	QString tmp_ret_params;
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call unmn8i_stop %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unmn8i_stop()", tmp_list);
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished unmn8i_stop");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call finished unmn8i_stop %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 void RPC_mn8i_SLOT_Object::button_clicked()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("mn8i dynamic_call button_clicked");
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call button_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("button_clicked()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished button_clicked");
 }

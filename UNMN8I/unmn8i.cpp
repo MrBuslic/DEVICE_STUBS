@@ -293,4 +293,5 @@ ViStatus _VI_FUNC unmn8i_resetCoeff(ViSession mvi){ return 0; }
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 }
+
 #endif
