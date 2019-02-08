@@ -16,26 +16,13 @@ union MKOWord
 
 MBK07_widg::MBK07_widg()
 {
-	/*for (int i = 0; i < 3; i++)
-	{
-		mvku_modules << MV_MODULE(2, i);
-		mvmk_modules << MV_MODULE(3, i);
-	}*/
 	widg = new QWidget(this);
 //	this->setFixedSize(1910, 1130);
 	setWindowTitle("МБК-07");
-/*	MU1 = new QPushButton("МУ 1", this);
-	MU1 -> setFixedSize(300,100);
+/*	MU1 -> setFixedSize(300,100);
 	MU1->setProperty("type", 1);
-	MU2 = new QPushButton("МУ 2", this);
 	MU2->setFixedSize(300, 100);
-	MU2->setProperty("type", 2);
-	MVKU0_gb = new QGroupBox("МВКУ 0", this);
-	MVKU1_gb = new QGroupBox("МВКУ 1", this);
-	MVKU2_gb = new QGroupBox("МВКУ 2", this);
-	MVMK0_gb = new QGroupBox("МВМК 0", this);
-	MVMK1_gb = new QGroupBox("МВМК 1", this);
-	MVMK2_gb = new QGroupBox("МВМК 2", this);*/
+	MU2->setProperty("type", 2);*/
 	FSMU_gb = new QGroupBox("ФСМУ", this);
 	FSVU_gb = new QGroupBox("ФСВУ", this);
 	for (int i = 0; i < 3; i++)
@@ -43,10 +30,6 @@ MBK07_widg::MBK07_widg()
 		QString numb = QString::number(i);
 		FSMU_blocks << new QPushButton(numb, this);
 		FSVU_canals << new QPushButton(numb, this);
-		/*main_MVKU << new QPushButton("Основной", this);
-		reserve_MVKU << new QPushButton("Резервный", this);
-		main_MVMK << new QPushButton("Основной", this);
-		reserve_MVMK << new QPushButton("Резервный", this);*/
 	}
 	All_vblayout = new QHBoxLayout();
 	FSMUFSVU_vblayout = new QVBoxLayout();
@@ -59,8 +42,8 @@ MBK07_widg::MBK07_widg()
 	FSMUFSVU_vblayout->addLayout(FSVU_hblayout);
 	for (int i = 0; i < 3; i++)
 	{
-		FSMU_hblayout->addWidget(FSMU_blocks[0]);
-		FSVU_hblayout->addWidget(FSVU_canals[0]);
+		FSMU_hblayout->addWidget(FSMU_blocks[i]);
+		FSVU_hblayout->addWidget(FSVU_canals[i]);
 	}
 	QLabel* Mode_lb;
 	Mode_lb->text = ("Режим");
@@ -70,16 +53,16 @@ MBK07_widg::MBK07_widg()
 	Stab_lb->text = ("Стабильность");
 	QLabel* Ann_lb;
 	Ann_lb->text = ("Антенна");
-	QLabel* submode;
-	submode->text = ("ИМ");
+	//QLabel submode("ИМ");
+	//submode->text = ("ИМ");
 	QList<QLabel*> sub_lb_list;
 	sub_lb_list << Mode_lb;
 	sub_lb_list << Lit_lb;
 	sub_lb_list << Stab_lb;
 	sub_lb_list << Ann_lb;
-	sub_lb_list << submode;
+	//sub_lb_list << submode;
 	QList<QLabel*> submodepi8;
-	for (int i = 0; i < 4; i++)
+	for (int i = 1; i < 5; i++)
 	{
 		QString numb = QString::number(i);
 		submodepi8 << new QLabel("ПСП-" + numb);
@@ -97,62 +80,13 @@ MBK07_widg::MBK07_widg()
 	sub_le_list << Lit_le;
 	sub_le_list << Stab_le;
 	sub_le_list << Ann_le;
-	QList<Sub_tmp*> Sub_wid;
-	for (int i = 0; i < 3; i++)
-	{
-		Sub_tmp tmp_obj;
-		tmp_obj.set_lab(sub_lb_list[i]);
-		tmp
-	}
-
-	//SubGrid_glayout->addWidget();
-	//Logs = new QPlainTextEdit();
-	//Logs->setReadOnly(true);
-
-
-
-	/*QHBoxLayout *MVKU0_hlayout = new QHBoxLayout();
-	MVKU0_hlayout->addWidget(main_MVKU[0]);
-	MVKU0_hlayout->addWidget(reserve_MVKU[0]);
-	MVKU0_gb->setLayout(MVKU0_hlayout);
-	QHBoxLayout *MVKU1_hlayout = new QHBoxLayout();
-	MVKU1_hlayout->addWidget(main_MVKU[1]);
-	MVKU1_hlayout->addWidget(reserve_MVKU[1]);
-	MVKU1_gb->setLayout(MVKU1_hlayout);
-	QHBoxLayout *MVKU2_hlayout = new QHBoxLayout();
-	MVKU2_hlayout->addWidget(main_MVKU[2]);
-	MVKU2_hlayout->addWidget(reserve_MVKU[2]);
-	MVKU2_gb->setLayout(MVKU2_hlayout);
-	QHBoxLayout *MVMK0_hlayout = new QHBoxLayout();
-	MVMK0_hlayout->addWidget(main_MVMK[0]);
-	MVMK0_hlayout->addWidget(reserve_MVMK[0]);
-	MVMK0_gb->setLayout(MVMK0_hlayout);
-	QHBoxLayout *MVMK1_hlayout = new QHBoxLayout();
-	MVMK1_hlayout->addWidget(main_MVMK[1]);
-	MVMK1_hlayout->addWidget(reserve_MVMK[1]);
-	MVMK1_gb->setLayout(MVMK1_hlayout);
-	QHBoxLayout *MVMK2_hlayout = new QHBoxLayout();
-	MVMK2_hlayout->addWidget(main_MVMK[2]);
-	MVMK2_hlayout->addWidget(reserve_MVMK[2]);
-	MVMK2_gb->setLayout(MVMK2_hlayout);
-
-	QHBoxLayout * h_layout_MU = new QHBoxLayout();
-	h_layout_MU->addWidget(MU1);
-	h_layout_MU->addWidget(MU2);
-
-	MU_glayout = new QGridLayout;
-//	MU_glayout->addWidget(MU1,0,0);
-//	MU_glayout->addWidget(MU2, 0, 1);
-	MU_glayout->addWidget(MVKU0_gb, 1, 0);
-	MU_glayout->addWidget(MVKU1_gb, 1, 1);
-	MU_glayout->addWidget(MVKU2_gb, 1, 2);
-	MU_glayout->addWidget(MVMK0_gb, 2, 0);
-	MU_glayout->addWidget(MVMK1_gb, 2, 1);
-	MU_glayout->addWidget(MVMK2_gb, 2, 2);
-
-	QVBoxLayout* v_l = new QVBoxLayout(this);
-	v_l->addLayout(h_layout_MU);
-	v_l->addLayout(MU_glayout);*/
+		for (int i = 0; i < 3; i++)
+		{
+			SubGrid_glayout->addWidget(sub_lb_list[i], i, 0);
+			SubGrid_glayout->addWidget(sub_le_list[i], i, 1);
+		}
+	Logs = new QPlainTextEdit();
+	Logs->setReadOnly(true);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", 50001);
@@ -171,8 +105,8 @@ MBK07_widg::MBK07_widg()
 	adr = 4;
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
-	connect(MU1, &QPushButton::clicked, this, &MBK07_widg::choose_dialog);
-	connect(MU2, &QPushButton::clicked, this, &MBK07_widg::choose_dialog);
+	//connect(MU1, &QPushButton::clicked, this, &MBK07_widg::choose_dialog);
+	//connect(MU2, &QPushButton::clicked, this, &MBK07_widg::choose_dialog);
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 //	choose_dialog();
@@ -190,20 +124,20 @@ MBK07_widg::MBK07_widg()
 
 
 
-void MBK07_widg::choose_dialog()
-{
+//void MBK07_widg::choose_dialog()
+//{
 	
 //	emit btnClicked(ind);
 //	QLabel *label_1;
 //	QCheckBox *check_1;
-	dlg = new QDialog(this, /*Qt::WindowSystemMenuHint |*/ Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
+//	dlg = new QDialog(this, /*Qt::WindowSystemMenuHint |*/ Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
 //	QPushButton * okBut;
-	QPushButton *clBut;
+//	QPushButton *clBut;
 	//	okBut.setFlat(true);
-	MU1_set(words);
+//	MU1_set(words);
 	
 
-	QVBoxLayout* v_lay = new QVBoxLayout(dlg);
+	/*QVBoxLayout* v_lay = new QVBoxLayout(dlg);
 	okBut = new QPushButton("ok", dlg);
 	clBut = new QPushButton("close", dlg);
 	QHBoxLayout* h_lay = new QHBoxLayout;
@@ -451,7 +385,7 @@ void MBK07_widg::paint_buttons()
 		tm_words << mvmk_modules[i].get_tm();
 	}
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
-}*/
+}
 
 MU_MODULE::MU_MODULE() : current_dev(MAIN)
 {
@@ -487,5 +421,5 @@ unsigned short MV_MODULE::get_tm()
 		_word += 0xC0;
 	else
 		_word += 0x20 << current_dev;
-	return _word;
-}
+	return _word;*/
+//}

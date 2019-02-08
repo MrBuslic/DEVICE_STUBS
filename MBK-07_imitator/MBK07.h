@@ -146,7 +146,7 @@ private:
 	int nim;
 };
 */
-class Sub_tmp
+/*class Sub_tmp
 {
 public:
 	void set_lab(QLabel* lab)
@@ -166,7 +166,7 @@ private:
 	QLabel* sub_lab;
 	QLineEdit* sub_lined;
 	QVBoxLayout* sub_just = new QVBoxLayout();
-};
+};*/
 class MBK07_widg : public QWidget
 {
     Q_OBJECT
