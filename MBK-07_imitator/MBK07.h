@@ -14,46 +14,50 @@
 #include <qplaintextedit.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
-//Стабильность
-enum BK_stability
+
+enum FSMU_numbB
 {
-	High = 1,//Высокая
-	KG_1 = 2,//Низкая, аключен КГ1
-	KG_2 = 3//Низкая, включен КГ2
+	FSMU_One = 1,
+	FSMU_Two = 2,
+	FSMU_Three = 3
 };
-//Режим
-enum Mode
+enum FSVU_numbB
 {
-	PI15,
-	PI8FM_1,//ПИ8ФМ15
-	PI8FM_0,//ПИ8ФМ1,5
-	WTF8,
-	IMFM,
-	IM,
-	IM1
+	FSVU_One = 1,
+	FSVU_Two = 2,
+	FSVU_Three = 3
 };
-//Литера
-int lit;
-//Подрежимы ПИ-8
-enum SubmodePI8
+enum IM
 {
-	PSP_1,
-	PSP_2,
-	PSP_3,
-	PSP_4	
+	IM_ON = 1,
+	IM_OFF = 2
 };
-//Обшие подрежимы
-enum Submode
+enum full_mode
 {
-	Off,
-	On
+	ERR = 0,
+	PI15 = 1,
+	PI8 = 2,
+	WTF8 = 4,
 };
-//Антена
-enum Antenna
+enum PSP
 {
-	OHA,
-	MHA0Y,
-	MHA1Y
+	PSP_OFF = 0,
+	PSP1 = 1,
+	PSP2 = 2,
+	PSP3 = 3,
+	PSP4 = 4
+};
+
+enum LITERA
+{
+	LIT1 = 1,
+	LIT2 = 2,
+	LIT3 = 4,
+	LIT4 = 8,
+	LIT5 = 16,
+	LIT6 = 32,
+	LIT7 = 64,
+	LIT8 = 128
 };
 /*class MU_MODULE
 {
@@ -173,14 +177,24 @@ class MBK07_widg : public QWidget
 
 public:
 //	explicit LKA05_widg(QWidget *parent = 0);
-	MBK07_widg();
+	MBK07_widg(QWidget *parent = 0);
 	//~MBK07_widg();
-	//void set_new_tm();
+	
 
 private:
 	QWidget* widg;
 	/// -- Главное окно;
 	QMainWindow* main_widg;
+	//Литера
+	int current_lit;
+
+	full_mode current_mode = ERR;
+
+	PSP current_PSP = PSP_OFF;
+
+	bool IM = false;
+
+	bool pi8_fast = false;
 
 	QList<QPushButton*> FSMU_blocks;
 	QList<QPushButton*> FSVU_canals;
@@ -189,8 +203,8 @@ private:
 
 	QGroupBox *FSMU_gb;
 	QGroupBox *FSVU_gb;
-	int MKO;
-	int adr;
+	const int MKO = 1;
+	const int adr = 7;
 	QVariantList words;
 	QGridLayout *SubGrid_glayout;
 	QVBoxLayout *FSMUFSVU_vblayout;
@@ -198,34 +212,46 @@ private:
 	QHBoxLayout *FSMU_hblayout;
 	QHBoxLayout *All_vblayout;
 	bool flag;
-	//// window choose settings
 	QPushButton * okBut;
 	QDialog *dlg;
-	//void MU1_set(QVariantList words);
-	//QGroupBox* CheckButtonsBox;
-	//QCheckBox* add_set(QString name, QString data, bool is_main = true);
-	void choose_dialog();
-	//QCheckBox cb;
+
 	QList<QCheckBox*> set_list;
 	QList<QCheckBox*> set_list_mu2;
+	QList<QLineEdit*> sub_le_list;
 
 	void paint_buttons();
+	void write_words();
+	void set_new_tm();
 protected:
 	
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+
+	void auto_scroll_clicked(int _state);
+	void log_timer_ontimer();
 //	void mbk04(const QString& new_text);
-	void save_choose_set();
-signals:
-	void new_ku(int ku_n, int length, double u);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+//	void save_choose_set();
 private:
 //	MU_MODULE mu_module;
 //	QList<MV_MODULE> mvku_modules;
 //	QList<MV_MODULE> mvmk_modules;
 
+	QTextEdit* edit;
+	QScrollBar* _scroll_bar;
+	QTextDocument* _doc;
+	QTextCursor* _cursor;
+	QString log_filename;
+	QCheckBox* auto_scroll_box;
+	bool auto_scroll;
+	QTimer log_timer;
+	QStringList log_buffer;
+	QMutex log_mutex;
+	void msg_to_log(const QString& _msg);
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
+
+	QMap<int, QString> mode_names;
+	QMap<int, LITERA> lit_map;
 };
 
 #endif // MBK07_H

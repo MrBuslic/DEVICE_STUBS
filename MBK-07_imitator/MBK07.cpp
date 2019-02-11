@@ -14,45 +14,65 @@ union MKOWord
 	};
 };
 
-MBK07_widg::MBK07_widg()
+MBK07_widg::MBK07_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
-//	this->setFixedSize(1910, 1130);
+	//	this->setFixedSize(1910, 1130);
 	setWindowTitle("МБК-07");
-/*	MU1 -> setFixedSize(300,100);
-	MU1->setProperty("type", 1);
-	MU2->setFixedSize(300, 100);
-	MU2->setProperty("type", 2);*/
+	/*	MU1 -> setFixedSize(300,100);
+		MU1->setProperty("type", 1);
+		MU2->setFixedSize(300, 100);
+		MU2->setProperty("type", 2);*/
 	FSMU_gb = new QGroupBox("ФСМУ", this);
 	FSVU_gb = new QGroupBox("ФСВУ", this);
+
+	mode_names.insert(full_mode::PI15, "ПИ15");
+	mode_names.insert(full_mode::PI8, "ПИ8");
+	mode_names.insert(full_mode::WTF8, "ВТФ8");
+
+	for (int i = 0; i < 8; i++)
+	{
+		int tmp_d = pow(2, i);
+		lit_map.insert(i + 1, LITERA(tmp_d));
+	}
+	//lit_map.insert(1, LITERA::LIT1);
+	//lit_map.insert(2, LITERA::LIT2);
+	//lit_map.insert(3, LITERA::LIT3);
+	//lit_map.insert(4, LITERA::LIT4);
+	//lit_map.insert(5, LITERA::LIT5);
+	//lit_map.insert(6, LITERA::LIT6);
+	//lit_map.insert(7, LITERA::LIT7);
+	//lit_map.insert(8, LITERA::LIT8);
+
+
 	for (int i = 0; i < 3; i++)
-	{	
+	{
 		QString numb = QString::number(i);
 		FSMU_blocks << new QPushButton(numb, this);
 		FSVU_canals << new QPushButton(numb, this);
 	}
 	All_vblayout = new QHBoxLayout();
+	QVBoxLayout *logs_lay = new QVBoxLayout(this);
 	FSMUFSVU_vblayout = new QVBoxLayout();
-	FSMU_hblayout = new QHBoxLayout();
-	FSVU_hblayout = new QHBoxLayout();
+	FSMU_hblayout = new QHBoxLayout(FSMU_gb);
+	FSVU_hblayout = new QHBoxLayout(FSVU_gb);
 	SubGrid_glayout = new QGridLayout();
+	logs_lay->addLayout(All_vblayout);
 	All_vblayout->addLayout(FSMUFSVU_vblayout);
 	All_vblayout->addLayout(SubGrid_glayout);
-	FSMUFSVU_vblayout->addLayout(FSMU_hblayout);
-	FSMUFSVU_vblayout->addLayout(FSVU_hblayout);
+	FSMUFSVU_vblayout->addWidget(FSMU_gb);
+	FSMUFSVU_vblayout->addWidget(FSVU_gb);
+	FSMU_gb->setAlignment(Qt::AlignHCenter);
+	FSVU_gb->setAlignment(Qt::AlignHCenter);
 	for (int i = 0; i < 3; i++)
 	{
 		FSMU_hblayout->addWidget(FSMU_blocks[i]);
 		FSVU_hblayout->addWidget(FSVU_canals[i]);
 	}
-	QLabel* Mode_lb;
-	Mode_lb->text = ("Режим");
-	QLabel* Lit_lb;
-	Lit_lb->text = ("Литера");
-	QLabel* Stab_lb;
-	Stab_lb->text = ("Стабильность");
-	QLabel* Ann_lb;
-	Ann_lb->text = ("Антенна");
+	QLabel* Mode_lb = new QLabel("Режим");
+	QLabel* Lit_lb = new QLabel("Литера");
+	QLabel* Stab_lb = new QLabel("Стабильность");
+	QLabel* Ann_lb = new QLabel("Антенна");
 	//QLabel submode("ИМ");
 	//submode->text = ("ИМ");
 	QList<QLabel*> sub_lb_list;
@@ -60,13 +80,7 @@ MBK07_widg::MBK07_widg()
 	sub_lb_list << Lit_lb;
 	sub_lb_list << Stab_lb;
 	sub_lb_list << Ann_lb;
-	//sub_lb_list << submode;
-	QList<QLabel*> submodepi8;
-	for (int i = 1; i < 5; i++)
-	{
-		QString numb = QString::number(i);
-		submodepi8 << new QLabel("ПСП-" + numb);
-	}
+
 	QLineEdit* Mode_le = new QLineEdit(this);
 	Mode_le->setReadOnly(true);
 	QLineEdit* Lit_le = new QLineEdit(this);
@@ -75,18 +89,34 @@ MBK07_widg::MBK07_widg()
 	Stab_le->setReadOnly(true);
 	QLineEdit* Ann_le = new QLineEdit(this);
 	Ann_le->setReadOnly(true);
-	QList<QLineEdit*> sub_le_list;
+
 	sub_le_list << Mode_le;
 	sub_le_list << Lit_le;
 	sub_le_list << Stab_le;
 	sub_le_list << Ann_le;
-		for (int i = 0; i < 3; i++)
-		{
-			SubGrid_glayout->addWidget(sub_lb_list[i], i, 0);
-			SubGrid_glayout->addWidget(sub_le_list[i], i, 1);
-		}
-	Logs = new QPlainTextEdit();
-	Logs->setReadOnly(true);
+	for (int i = 0; i < 4; i++)
+	{
+		SubGrid_glayout->addWidget(sub_lb_list[i], i, 0);
+		SubGrid_glayout->addWidget(sub_le_list[i], i, 1);
+	}
+
+	edit = new QTextEdit(this);
+	_scroll_bar = edit->verticalScrollBar();
+	_doc = new QTextDocument();
+	_cursor = new QTextCursor(_doc);
+	edit->setDocument(_doc);
+	edit->setReadOnly(true);
+	_doc->setMaximumBlockCount(1000);
+	setMinimumSize(490, 300);
+	auto_scroll_box = new QCheckBox(this);
+	auto_scroll_box->setText("Автопрокрутка");
+	auto_scroll_box->setChecked(true);
+	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK07_widg::auto_scroll_clicked);
+	logs_lay->addWidget(edit);
+	logs_lay->addWidget(auto_scroll_box);
+	//logs_lay->addWidget(Logs);
+
+
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", 50001);
@@ -101,20 +131,23 @@ MBK07_widg::MBK07_widg()
 		this->deleteLater();
 		return;
 	}
-	MKO = 1;
-	adr = 4;
+
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
-	//connect(MU1, &QPushButton::clicked, this, &MBK07_widg::choose_dialog);
-	//connect(MU2, &QPushButton::clicked, this, &MBK07_widg::choose_dialog);
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-//	choose_dialog();
-	//(1040 2040 2140 2240  3040 3140 3240) в начале все модули имеют основной канал и му1
-	//нужно обработать входящие (первые 4 знака) для таблицы 6, для какого модуля пришло слово
-	
+
+
+	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
+	QDir dir("d:/logs");
+	if (!dir.exists())
+		QDir().mkdir("d:/logs");
+	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
+	log_timer.start(200);
+
+	//msg_to_log("рпп");
 	paint_buttons();
-	//set_new_tm();
+	set_new_tm();
 }
 
 //LKA05_widg::~LKA05_widg()
@@ -123,102 +156,40 @@ MBK07_widg::MBK07_widg()
 //}
 
 
-
-//void MBK07_widg::choose_dialog()
-//{
-	
-//	emit btnClicked(ind);
-//	QLabel *label_1;
-//	QCheckBox *check_1;
-//	dlg = new QDialog(this, /*Qt::WindowSystemMenuHint |*/ Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-//	QPushButton * okBut;
-//	QPushButton *clBut;
-	//	okBut.setFlat(true);
-//	MU1_set(words);
-	
-
-	/*QVBoxLayout* v_lay = new QVBoxLayout(dlg);
-	okBut = new QPushButton("ok", dlg);
-	clBut = new QPushButton("close", dlg);
-	QHBoxLayout* h_lay = new QHBoxLayout;
-	h_lay->addWidget(CheckButtonsBox);
-	v_lay->addLayout(h_lay);
-	QHBoxLayout* h_lay2 = new QHBoxLayout;
-	h_lay2->addWidget(okBut, 0, Qt::AlignLeft);
-	h_lay2->addWidget(clBut, 0, Qt::AlignRight);
-	v_lay->addLayout(h_lay2);
-//	connect(okBut, SIGNAL(clicked()), dlg, SLOT(save_choose_set()));
-	connect(clBut, SIGNAL(clicked()), dlg, SLOT(reject()));
-	connect(okBut, SIGNAL(clicked()), dlg, SLOT(accept()));
-	connect(okBut, &QPushButton::clicked, this, &MBK07_widg::save_choose_set);
-	dlg->show();
-}
-
-QCheckBox* MBK07_widg::add_set(QString name, QString data, bool is_main)
+void MBK07_widg::msg_to_log(const QString& _msg)
 {
-	QCheckBox* cb = new QCheckBox(this);
-	cb->setText(name);
-	cb->setProperty("ind", set_list.count());
-	cb->setProperty("name", data);
-	cb->setProperty("is_main", is_main);
-	set_list.push_back(cb);
-	return cb;
-}
-
-
-void MBK07_widg::MU1_set(QVariantList words)
-{
-	QVBoxLayout *vbox = new QVBoxLayout;
-	CheckButtonsBox = new QGroupBox(dlg);
-	CheckButtonsBox->setTitle("Settings:");
-	CheckButtonsBox->setFlat(true);
-//	set_list.clear();
-	int ind = static_cast<QPushButton*>(sender())->property("type").toInt();
-	if (ind == 1)
 	{
-		if (flag == true)
-		{
-			flag = false;
-			add_set("Неисправн №1", "1");
-	//		words[0] = 0x1080;
-//			QVBoxLayout *vbox = new QVBoxLayout;
-			foreach(QCheckBox* cb, set_list)
-				vbox->addWidget(cb);
-		}
+		QMutexLocker lock(&log_mutex);
+		log_buffer << _msg;
 	}
-	if (ind == 2)
-	{
-		add_set("Неисправн №2", "2");
-		add_set("Неисправн №3", "3");
-//		QVBoxLayout *vbox = new QVBoxLayout;
-		foreach(QCheckBox* cb, set_list)
-			vbox->addWidget(cb);
-	}
-
-//	QVBoxLayout *vbox = new QVBoxLayout;
-//	foreach(QCheckBox* cb, set_list)
-//		vbox->addWidget(cb);
-
-	vbox->addStretch(1);
-	CheckButtonsBox->setLayout(vbox);
-//	test(MKO, adr, words);
-
+	_cursor->insertText(_msg + "\n");
+	if (auto_scroll)
+		_scroll_bar->setValue(_scroll_bar->maximum());
 }
 
-void MBK07_widg::save_choose_set()
+void MBK07_widg::auto_scroll_clicked(int _state)
 {
-	foreach(QCheckBox* cb, set_list)
-		{
-			if (cb->isChecked())
-			{
-				words[0] = 0x1080;
-			}
-		}
-
-	//test(MKO, adr, words);
-		
-	
+	auto_scroll = (_state != 0);
 }
+
+void MBK07_widg::log_timer_ontimer()
+{
+	QStringList tmp_buffer;
+	{
+		QMutexLocker lock(&log_mutex);
+		tmp_buffer = log_buffer;
+		log_buffer.clear();
+	}
+	if (tmp_buffer.isEmpty())
+		return;
+	QFile log_file(log_filename);
+	QTextStream log_stream(&log_file);
+	log_file.open(QIODevice::Append);
+	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
+		log_stream << *itr << "\n";
+	log_file.close();
+}
+
 void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	MKOWord tmp_cwd;
@@ -227,166 +198,135 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr))
 	{
-		if (tmp_cwd.subadr == 17)
-		{
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-			{
-				int switch_dev = (itr->toInt() & 0xC0) >> 6;
-				int com = (itr->toInt() & 0x3000) >> 12;
-				int nim = (itr->toInt() & 0x0300) >> 8;
-				switch (com)
-				{
-				case 1:
-					continue;
-				case 2:
-					if (switch_dev)
-						mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-					break;
-				case 3:
-					if (switch_dev)
-						mvmk_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-					break;
-				};
-			}
-			paint_buttons();
-			//set_new_tm();
-		}
-		if (tmp_cwd.subadr == 28) //MK
-		{
-			int max_p;
-			max_p = 0;
-			int num_vertic;
-			//QVariantList pshm_list;
-			
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-			{
-				int mshm = (itr->toInt()) >> 12;
-				if (mshm >=12)
-				{
-					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
-					break;
-				}
-				MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
-				for (int pshm = 0; pshm <= 11; pshm++)
-				{
-					num_vertic = (itr->toInt()&(1<<pshm));
-					if (num_vertic != 0)
-					{
-						if (max_p <= 4)
-						{
-							//pshm_list << pshm;
-							MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
-							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_mshm.dt_kom-param_pshm.dt_kom));
-							max_p++;
-						}
-						else 
-						{
-							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-							break;
-						}
-						
-					}
-				}
-			}
-		}
-		if (tmp_cwd.subadr == 29) //KU
-		{
-			int ku;
-			int max_ku;
-			max_ku = 0;
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-			{
-				int nim = (itr->toInt() & 0x0700) >> 8;
-				for (int num_ku = 0; num_ku <= 7; num_ku++)
-				{
-					ku = (itr->toInt()&(1 << num_ku));
-					if (ku != 0)
-					{
-						if (max_ku <= 4)
-						{
-							MV_DEV& param_ku = mvku_modules[nim].get_settings();
-							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
-							max_ku++;
-						}
-					}
-					else
-					{
-						QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-						break;
-					}
-				}
-			}
-		}
+		QString _msg = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
+		msg_to_log(_msg);
 
+		int tmp_word = words[0].toInt();
+		switch (tmp_cwd.subadr)
+		{
+		case 2:
+
+			char rezh;
+			rezh = tmp_word & 7;
+
+
+
+			QMap<int, QString>::iterator mode_itr = mode_names.find(rezh);
+			if (mode_itr == mode_names.end())
+			{
+				current_mode = ERR;
+				break;
+			}
+			current_mode = mode_itr.key;
+
+			pi8_fast = ((tmp_word & 0x40) != 0);
+
+			IM = ((tmp_word & 0x10) != 0);
+
+			break;
+		case 3:
+
+			char liter = tmp_word & 0xFF;
+			QMap<int, LITERA>::iterator lit_itr = lit_map.find(liter);
+			current_lit = lit_itr.key;
+			break;
+		case 4:
+
+			char psp_ch = tmp_word & 3;
+
+			current_PSP = PSP(psp_ch + 1);
+
+			break;
+		};
+		write_words();
 	}
 }
+void MBK07_widg::write_words()
+{
+	QString res_mode;
+	if (mode_names.contains(current_mode))
+	{
+		res_mode = mode_names[current_mode];
+		if (current_mode == PI8)
+		{
+			res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
+			//?все что перед - если, : -все что перед иначе.
+		}
+		if (IM = true)
+			res_mode += " ИМ";
+	}
 
+	sub_le_list[0]->setText(res_mode);
+	QString lit_num = QString::number(current_lit);
+	sub_le_list[1]->setText(lit_num);
+}
 void MBK07_widg::paint_buttons()
 {
-	if (mu_module.get_current_dev() == MAIN)
-	{
-		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
-		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
-	}
-	else
-	{
-		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
-		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
-	}
-	for (int i = 0; i < 3; i++)
-	{
-		switch (mvku_modules[i].get_current_dev())
-		{
-		case OFF: 
-			main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-		case MAIN:
-			main_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-			reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-		case RESERVE:
-			main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			reserve_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-			break;
 
-		};
+	//if (mu_module.get_current_dev() == MAIN)
+	//{
+	//	MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//	MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//}
+	//else
+	//{
+	//	MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//}
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	switch (mvku_modules[i].get_current_dev())
+	//	{
+	//	case OFF: 
+	//		main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		break;
+	//	case MAIN:
+	//		main_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//		reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		break;
+	//	case RESERVE:
+	//		main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		reserve_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//		break;
 
-		switch (mvmk_modules[i].get_current_dev())
-		{
-		case OFF:
-			main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-		case MAIN:
-			main_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-			reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-		case RESERVE:
-			main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-			reserve_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-			break;
+	//	};
 
-		};
+	//	switch (mvmk_modules[i].get_current_dev())
+	//	{
+	//	case OFF:
+	//		main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		break;
+	//	case MAIN:
+	//		main_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//		reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		break;
+	//	case RESERVE:
+	//		main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//		reserve_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//		break;
 
-	}
+	//	};
+
+	//}
 }
 
-/*void MBK07_widg::set_new_tm()
+void MBK07_widg::set_new_tm()
 {
 	QVariantList tm_words;
-	tm_words << mu_module.get_tm();
-	for (int i = 0; i < 3; i++)
-	{
-		tm_words << mvku_modules[i].get_tm();
-	}
-	for (int i = 0; i < 3; i++)
-	{
-		tm_words << mvmk_modules[i].get_tm();
-	}
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
+	//tm_words << mu_module.get_tm();
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	tm_words << mvku_modules[i].get_tm();
+	//}
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	tm_words << mvmk_modules[i].get_tm();
+	//}
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 2, tm_words);
 }
-
+/*
 MU_MODULE::MU_MODULE() : current_dev(MAIN)
 {
 	working.insert(MAIN, true);
@@ -422,4 +362,4 @@ unsigned short MV_MODULE::get_tm()
 	else
 		_word += 0x20 << current_dev;
 	return _word;*/
-//}
+	//}
