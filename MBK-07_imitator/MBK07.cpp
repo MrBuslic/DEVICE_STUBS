@@ -30,10 +30,11 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	mode_names.insert(full_mode::PI8, "ПИ8");
 	mode_names.insert(full_mode::WTF8, "ВТФ8");
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 9; i++)
 	{
-		int tmp_d = pow(2, i);
-		lit_map.insert(i + 1, LITERA(tmp_d));
+		int tmp_d = 1 << i;
+		//lit_map.insert(i + 1, LITERA(tmp_d));
+		lit_map.insert(tmp_d, LITERA(i + 1));
 	}
 	//lit_map.insert(1, LITERA::LIT1);
 	//lit_map.insert(2, LITERA::LIT2);
@@ -132,10 +133,26 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 		return;
 	}
 
+	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
+	lka05_slot_thr.start(); // вот тут падает
+
+	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
+	lka05_signal_thr.start(); // вот тут падает
+
+	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		this->deleteLater();
+		return;
+	}
+
+	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+
+
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
 
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -154,6 +171,35 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 //{
 
 //}
+//void MBK07_widg::current_com(int mshm_numb, int pshm_numb)
+//{
+//	
+//}
+void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+{
+	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+	msg_to_log(_msg);
+//Странные штуки
+	int tmp_mshm = pshm;
+	int tmp_pshm = mshm;
+
+	switch (tmp_mshm)
+	{
+	case 0:
+		current_FSMU = FSMU_numbB(tmp_pshm);
+		break;
+	case 1:
+		current_stab = STAB(tmp_pshm);
+		break;
+	case 2:
+		current_FSVU = FSVU_numbB(tmp_pshm); 
+		break;
+	case 3:
+		current_antenna = ANTENNA(tmp_pshm); 
+		break;
+	}
+	write_words();
+}
 
 
 void MBK07_widg::msg_to_log(const QString& _msg)
@@ -202,33 +248,47 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		msg_to_log(_msg);
 
 		int tmp_word = words[0].toInt();
+		QMap<int, QString>::iterator mode_itr;
+		QMap<int, LITERA>::iterator lit_itr;
 		switch (tmp_cwd.subadr)
 		{
 		case 2:
+
 
 			char rezh;
 			rezh = tmp_word & 7;
 
 
 
-			QMap<int, QString>::iterator mode_itr = mode_names.find(rezh);
+			mode_itr = mode_names.find(rezh);
 			if (mode_itr == mode_names.end())
 			{
 				current_mode = ERR;
 				break;
 			}
-			current_mode = mode_itr.key;
+			current_mode = full_mode(mode_itr.key());
+
+			if (current_mode == PI8)
+			{
+				current_PSP = PSP(PSP_OFF);
+			}
 
 			pi8_fast = ((tmp_word & 0x40) != 0);
 
 			IM = ((tmp_word & 0x10) != 0);
-
 			break;
 		case 3:
 
-			char liter = tmp_word & 0xFF;
-			QMap<int, LITERA>::iterator lit_itr = lit_map.find(liter);
-			current_lit = lit_itr.key;
+			byte liter;
+			liter = tmp_word & 0xFF;
+			lit_itr = lit_map.find(liter);
+			if (lit_itr == lit_map.end())
+			{
+				current_lit = 0;
+				break;
+			}
+
+			current_lit = LITERA(lit_itr.value());
 			break;
 		case 4:
 
@@ -252,13 +312,15 @@ void MBK07_widg::write_words()
 			res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
 			//?все что перед - если, : -все что перед иначе.
 		}
-		if (IM = true)
+		if (IM == true)
 			res_mode += " ИМ";
 	}
 
 	sub_le_list[0]->setText(res_mode);
 	QString lit_num = QString::number(current_lit);
 	sub_le_list[1]->setText(lit_num);
+	QString tmp_stab = QString::number(current_stab);
+	sub_le_list[2]->setText(tmp_stab);
 }
 void MBK07_widg::paint_buttons()
 {

@@ -14,23 +14,34 @@
 #include <qplaintextedit.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
+#include "../LKA-05_imitator/lka05_rpc.h"
 
 enum FSMU_numbB
 {
-	FSMU_One = 1,
-	FSMU_Two = 2,
-	FSMU_Three = 3
+	FSMU_One = 8,
+	FSMU_Two = 9,
+	FSMU_Three = 10,
+	FSMU_OFF = 11
 };
 enum FSVU_numbB
 {
-	FSVU_One = 1,
-	FSVU_Two = 2,
-	FSVU_Three = 3
+	FSVU_One = 8,
+	FSVU_Two = 9,
+	FSVU_Three = 10,
+	FSVU_OFF = 11
 };
-enum IM
+enum STAB
 {
-	IM_ON = 1,
-	IM_OFF = 2
+	LOW_STAB = 8,
+	HIGH_STAB = 9,
+	KG1_STAB = 10,
+	KG2_STAB = 11
+};
+enum ANTENNA
+{
+	OHA = 8,
+	MHA1Y = 9,
+	MHA0Y = 10
 };
 enum full_mode
 {
@@ -50,15 +61,17 @@ enum PSP
 
 enum LITERA
 {
+	LIT0 = 0,
 	LIT1 = 1,
 	LIT2 = 2,
-	LIT3 = 4,
-	LIT4 = 8,
-	LIT5 = 16,
-	LIT6 = 32,
-	LIT7 = 64,
-	LIT8 = 128
+	LIT3 = 3,
+	LIT4 = 4,
+	LIT5 = 5,
+	LIT6 = 6,
+	LIT7 = 7,
+	LIT8 = 8
 };
+
 /*class MU_MODULE
 {
 public:
@@ -185,12 +198,15 @@ private:
 	QWidget* widg;
 	/// -- Главное окно;
 	QMainWindow* main_widg;
-	//Литера
-	int current_lit;
-
+	//Хранимые текущие
+	int current_lit = 0;
 	full_mode current_mode = ERR;
-
 	PSP current_PSP = PSP_OFF;
+	FSMU_numbB current_FSMU = FSMU_OFF;
+	FSVU_numbB current_FSVU = FSVU_OFF;
+	STAB current_stab;
+	ANTENNA current_antenna;
+
 
 	bool IM = false;
 
@@ -227,6 +243,9 @@ protected:
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+
+//	void current_kom(int mshm_numb, int pshm_numb);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 //	void mbk04(const QString& new_text);
@@ -247,8 +266,13 @@ private:
 	QStringList log_buffer;
 	QMutex log_mutex;
 	void msg_to_log(const QString& _msg);
+
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
+
+	RPC_lka05_SLOT_Thread lka05_slot_thr;
+	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+
 
 	QMap<int, QString> mode_names;
 	QMap<int, LITERA> lit_map;
