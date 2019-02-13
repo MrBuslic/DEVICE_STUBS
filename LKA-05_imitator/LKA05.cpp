@@ -20,22 +20,32 @@ LKA05_widg::LKA05_widg()
 	{
 		mvku_modules << MV_MODULE(2, i);
 		mvmk_modules << MV_MODULE(3, i);
+//		mpvn_modules << MV_MODULE(5, 0);
 	}
+//	for (int i = 0; i < 1; i++)
+//	{
+		mpvn_modules << MV_MODULE(5, 0);
+//	}
 	widg = new QWidget(this);
-//	this->setFixedSize(1910, 1130);
+	this->setFixedSize(572, 200);
 	setWindowTitle("ЛКА-05");
 	MU1 = new QPushButton("МУ 1", this);
-	MU1 -> setFixedSize(300,100);
+	MU1 -> setFixedSize(180,50);
 	MU1->setProperty("type", 1);
 	MU2 = new QPushButton("МУ 2", this);
-	MU2->setFixedSize(300, 100);
+	MU2->setFixedSize(180, 50);
 	MU2->setProperty("type", 2);
+	main_MPVN = new QPushButton("Основной", this);
+//	main_MPBN->setFixedSize(300, 100);
+	reserve_MPVN = new QPushButton("Резервный", this);
+//	reserve_MPBN->setFixedSize(300, 100);
 	MVKU0_gb = new QGroupBox("МВКУ 0", this);
 	MVKU1_gb = new QGroupBox("МВКУ 1", this);
 	MVKU2_gb = new QGroupBox("МВКУ 2", this);
 	MVMK0_gb = new QGroupBox("МВМК 0", this);
 	MVMK1_gb = new QGroupBox("МВМК 1", this);
 	MVMK2_gb = new QGroupBox("МВМК 2", this);
+	MPVN_gb = new QGroupBox("МПВН", this);
 	for (int i = 0; i < 3; i++)
 	{
 		main_MVKU << new QPushButton("Основной", this);
@@ -67,10 +77,14 @@ LKA05_widg::LKA05_widg()
 	MVMK2_hlayout->addWidget(main_MVMK[2]);
 	MVMK2_hlayout->addWidget(reserve_MVMK[2]);
 	MVMK2_gb->setLayout(MVMK2_hlayout);
-
+	QHBoxLayout *MPVN_hlayout = new QHBoxLayout();
+	MPVN_hlayout->addWidget(main_MPVN);
+	MPVN_hlayout->addWidget(reserve_MPVN);
+	MPVN_gb->setLayout(MPVN_hlayout);
 	QHBoxLayout * h_layout_MU = new QHBoxLayout();
 	h_layout_MU->addWidget(MU1);
 	h_layout_MU->addWidget(MU2);
+	h_layout_MU->addWidget(MPVN_gb);
 
 	MU_glayout = new QGridLayout;
 //	MU_glayout->addWidget(MU1,0,0);
@@ -81,6 +95,9 @@ LKA05_widg::LKA05_widg()
 	MU_glayout->addWidget(MVMK0_gb, 2, 0);
 	MU_glayout->addWidget(MVMK1_gb, 2, 1);
 	MU_glayout->addWidget(MVMK2_gb, 2, 2);
+//	MU_glayout->addWidget(MPVN_gb, 3, 1);
+//	MPVN_glayout = new QGridLayout;
+//	MPVN_glayout->addWidget(MPVN_gb, 3, 1);
 
 	QVBoxLayout* v_l = new QVBoxLayout(this);
 	v_l->addLayout(h_layout_MU);
@@ -135,7 +152,7 @@ LKA05_widg::LKA05_widg()
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
 
 	connect(this, SIGNAL(new_ku(int, int, double)), mbk04_slot_thr.get_mbk04_obj().get(), SLOT(new_ku(int, int, double)), Qt::DirectConnection);
-
+//	connect(this, SIGNAL(new_data(int, int, int, QVariantList)), slot_thr.get_omnibus_obj().get(), SLOT(set_new_data(int, int, int, QVariantList))); 
 //	choose_dialog();
 	//(1040 2040 2140 2240  3040 3140 3240) в начале все модули имеют основной канал и му1
 	//нужно обработать входящие (первые 4 знака) для таблицы 6, для какого модуля пришло слово
@@ -258,7 +275,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
 				int switch_dev = (itr->toInt() & 0xC0) >> 6;
-				int com = (itr->toInt() & 0x3000) >> 12;
+				int com = (itr->toInt() & 0x7000) >> 12; //меняю с 0х3000 на 011100...
 				int nim = (itr->toInt() & 0x0300) >> 8;
 				switch (com)
 				{
@@ -272,6 +289,9 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					if (switch_dev)
 						mvmk_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
 					break;
+				case 5:
+					if (switch_dev)
+						mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
 				};
 			}
 			paint_buttons();
@@ -286,23 +306,24 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
-				int mshm = (itr->toInt()) >> 12;
-				if (mshm >=12)
+				int pshm = (itr->toInt()) >> 12;
+				if (pshm >=12)
 				{
 					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
 					break;
 				}
-				MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
-				for (int pshm = 0; pshm <= 11; pshm++)
+				MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
+				for (int mshm = 0; mshm <= 11; mshm++)
 				{
-					num_vertic = (itr->toInt()&(1<<pshm));
+					num_vertic = (itr->toInt()&(1<<mshm));
 					if (num_vertic != 0)
 					{
 						if (max_p <= 4)
 						{
-							//pshm_list << pshm;
-							MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
-							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_mshm.dt_kom-param_pshm.dt_kom));
+							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
+							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
+							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
+							emit new_mk(pshm, mshm, param_pshm.length_kom, param_mshm.length_kom, param_pshm.u_kom, param_mshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom));
 							max_p++;
 						}
 						else 
@@ -313,6 +334,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					}
 				}
 			}
+			new_data_mv(tmp_cwd.subadr);
 		}
 		if (tmp_cwd.subadr == 29) //KU
 		{
@@ -322,7 +344,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
 				int nim = (itr->toInt() & 0x0700) >> 8;
-				for (int num_ku = 0; num_ku <= 7; num_ku++)
+				for (num_ku = 0; num_ku <= 7; num_ku++)
 				{
 					ku = (itr->toInt()&(1 << num_ku));
 					if (ku != 0)
@@ -330,6 +352,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 						if (max_ku <= 4)
 						{
 							MV_DEV& param_ku = mvku_modules[nim].get_settings();
+							mvku_modules[nim].set_ku_p(num_ku);
 							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
 							max_ku++;
 						}
@@ -342,13 +365,20 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 
 				}
 			}
+			new_data_mv(tmp_cwd.subadr);
+		}
+		if (tmp_cwd.subadr == 26) 
+		{
+
 		}
 		if ((tmp_cwd.subadr >= 2) && (tmp_cwd.subadr <= 8))
 		{
 			mbk04_slot_thr.get_mbk04_obj()->new_message(dt, mko, line, cwd, words, os);
 		}
+		//new_data(mko,addr, subadr, words);
 	}
 }
+
 
 void LKA05_widg::paint_buttons()
 {
@@ -397,8 +427,26 @@ void LKA05_widg::paint_buttons()
 			break;
 
 		};
-
+	
 	}
+//	for (int i = 0; i < 1; i++)
+//	{
+		switch (mpvn_modules[0].get_current_dev())
+		{
+		case OFF:
+			main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
+			reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
+			break;
+		case MAIN:
+			main_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
+			reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
+			break;
+		case RESERVE:
+			main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
+			reserve_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
+			break;
+		};
+//	}
 }
 
 void LKA05_widg::set_new_tm()
@@ -413,7 +461,49 @@ void LKA05_widg::set_new_tm()
 	{
 		tm_words << mvmk_modules[i].get_tm();
 	}
+	tm_words << mpvn_modules[0].get_tm(); //МПВН нужен ли?
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words); 
+}
+
+void LKA05_widg::new_data_mv(int saddr)
+{
+	QVariantList new_words;
+	if (saddr == 29)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			unsigned short _word = mvku_modules[i].get_data_mvku();
+			new_words << _word;
+			new_words << _word;
+		}
+	}
+	else {
+		for (int i = 0; i < 3; i++)
+		{
+			unsigned short _word = mvmk_modules[i].get_data_mvmk();
+			new_words << _word;
+			new_words << _word;
+		}
+	}
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, saddr, new_words);
+}
+
+unsigned short MV_MODULE::get_data_mvku()
+{
+	unsigned short _word = (0 << 12) + (nim << 8);
+	if (!get_working())
+		_word += 0x1000;
+	_word += 1 << ku_p;
+	return _word;
+}
+unsigned short MV_MODULE::get_data_mvmk()
+{
+	unsigned short _word = (0 << 12) + (nim << 8);
+	if (!get_working())
+		_word += 0x1000;
+	_word += 1 << ku_p;
+	_word += 1 << ku_m;
+	return _word;
 }
 
 MU_MODULE::MU_MODULE() : current_dev(MAIN)
