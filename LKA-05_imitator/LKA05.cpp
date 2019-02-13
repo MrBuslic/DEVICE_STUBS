@@ -323,7 +323,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
 							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
 							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
-							emit new_mk(pshm, mshm, param_pshm.length_kom, param_mshm.length_kom, param_pshm.u_kom, param_mshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom));
+							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom));
 							max_p++;
 						}
 						else 
