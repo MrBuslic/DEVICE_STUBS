@@ -18,37 +18,37 @@
 
 enum FSMU_numbB
 {
-	FSMU_One = 8,
-	FSMU_Two = 9,
-	FSMU_Three = 10,
-	FSMU_OFF = 11
+	FSMU_One = 0,
+	FSMU_Two = 1,
+	FSMU_Three = 2,
+	FSMU_OFF = 3
 };
 enum FSVU_numbB
 {
-	FSVU_One = 8,
-	FSVU_Two = 9,
-	FSVU_Three = 10,
-	FSVU_OFF = 11
+	FSVU_One = 0,
+	FSVU_Two = 1,
+	FSVU_Three = 2,
+	FSVU_OFF = 3
 };
 enum STAB
 {
-	LOW_STAB = 8,
-	HIGH_STAB = 9,
-	KG1_STAB = 10,
-	KG2_STAB = 11
+	LOW_STAB = 0,
+	HIGH_STAB = 1,
+	KG1_STAB = 2,
+	KG2_STAB = 3
 };
 enum ANTENNA
 {
-	OHA = 8,
-	MHA1Y = 9,
-	MHA0Y = 10
+	OHA = 0,
+	MHA1Y = 1,
+	MHA0Y = 2
 };
 enum full_mode
 {
 	ERR = 0,
 	PI15 = 1,
 	PI8 = 2,
-	WTF8 = 4,
+	WTF8 = 3	
 };
 enum PSP
 {
@@ -199,6 +199,7 @@ private:
 	/// -- Главное окно;
 	QMainWindow* main_widg;
 	//Хранимые текущие
+
 	int current_lit = 0;
 	full_mode current_mode = ERR;
 	PSP current_PSP = PSP_OFF;
@@ -276,6 +277,9 @@ private:
 
 	QMap<int, QString> mode_names;
 	QMap<int, LITERA> lit_map;
+	QMap<int, QString> stab_names;
+	QMap<int, QString> ant_names;
+	bool ab_state = true;
 };
 
 #endif // MBK07_H
