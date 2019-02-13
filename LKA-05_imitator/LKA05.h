@@ -24,14 +24,15 @@ public:
 	LKA05_widg();
 	~LKA05_widg();
 	void set_new_tm();
-	
+	void new_data(int mko, int addr, int saddr, QVariantList words);
 private:
 	QWidget* widg;
 	/// -- Главное окно;
 	QMainWindow* main_widg;
 	QPushButton *MU1;
 	QPushButton *MU2;
-
+	QPushButton *main_MPVN;
+	QPushButton *reserve_MPVN;
 
 	QList<QPushButton*> main_MVKU;
 	QList<QPushButton*> reserve_MVKU;
@@ -44,11 +45,14 @@ private:
 	QGroupBox *MVMK0_gb;
 	QGroupBox *MVMK1_gb;
 	QGroupBox *MVMK2_gb;
+	QGroupBox *MPVN_gb;
 	int MKO;
 	int adr;
+	int num_ku;
 	QVariantList words;
 	QGridLayout *MB_glayout;
 	QGridLayout *MU_glayout;
+	QGridLayout *MPVN_glayout;
 	bool flag;
 	//// window choose settings
 	QPushButton * okBut;
@@ -62,19 +66,23 @@ private:
 	QList<QCheckBox*> set_list_mu2;
 
 	void paint_buttons();
+	void new_data_mv (int saddr);
+
+	//int switch_dev;
 
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
-
 	void save_choose_set();
 	void new_tm(int tm); 
 signals:
 	void new_ku(int ku_n, int length, double u);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	
 private:
 	MU_MODULE mu_module;
 	QList<MV_MODULE> mvku_modules;
 	QList<MV_MODULE> mvmk_modules;
+	QList<MV_MODULE> mpvn_modules;
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;

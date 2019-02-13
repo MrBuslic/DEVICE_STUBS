@@ -82,6 +82,8 @@ class MV_MODULE : public LKA05_MODULE
 public:
 	MV_MODULE(int _com, int _nim);
 	virtual unsigned short get_tm();
+	virtual unsigned short get_data_mvku();
+	virtual unsigned short get_data_mvmk();
 	bool get_working()
 	{
 		return devices[current_dev].working;
@@ -108,12 +110,23 @@ public:
 //	void set_settings()
 //	{	
 //	}
+	void set_ku_m(int n)
+	{
+		ku_m = n;
+	}
+	void set_ku_p(int n)
+	{
+		ku_p = n;
+	}
 
 private:
 	QMap<CURRENT_DEV, MV_DEV> devices;
 	CURRENT_DEV current_dev;
 	int com;
 	int nim;
+
+	int ku_m = 0;
+	int ku_p = 0;
 };
 
 #endif // LKA05_H
