@@ -274,6 +274,9 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		{
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
+				int kor_zam = (itr->toInt() & 0xC);
+//				int read_input = (itr->toInt() & 0x1);
+
 				int switch_dev = (itr->toInt() & 0xC0) >> 6;
 				int com = (itr->toInt() & 0x7000) >> 12; //меняю с 0х3000 на 011100...
 				int nim = (itr->toInt() & 0x0300) >> 8;
@@ -284,14 +287,37 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				case 2:
 					if (switch_dev)
 						mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+					if (kor_zam)
+						mvku_modules[nim].set_ku_p(0);
 					break;
 				case 3:
 					if (switch_dev)
-						mvmk_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+					{
+						switch (nim)
+						{
+						case 0:
+							mvmk_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+							break;
+						case 1:
+							mvmk_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+							mvmk_modules[nim+1].switch_cur_dev(CURRENT_DEV(switch_dev));
+							break;
+						case 2:
+							mvmk_modules[nim-1].switch_cur_dev(CURRENT_DEV(switch_dev));
+							mvmk_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+							break;
+						}
+					}
+					if (kor_zam)
+					{
+						mvmk_modules[nim].set_ku_p(0);
+						mvmk_modules[nim].set_ku_m(0);
+					}
 					break;
 				case 5:
 					if (switch_dev)
 						mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+						break;
 				};
 			}
 			paint_buttons();
