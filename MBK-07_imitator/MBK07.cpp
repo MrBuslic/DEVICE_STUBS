@@ -30,25 +30,25 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	mode_names.insert(full_mode::PI8, "ПИ8");
 	mode_names.insert(full_mode::WTF8, "ВТФ8");
 
+	stab_names.insert(STAB::LOW_STAB, "НС");
+	stab_names.insert(STAB::HIGH_STAB, "ВС");
+	stab_names.insert(STAB::KG1_STAB, "КГ 1");
+	stab_names.insert(STAB::KG2_STAB, "КГ 2");
+
+	ant_names.insert(ANTENNA::OHA, "OHA");
+	ant_names.insert(ANTENNA::MHA1Y, "MHA+Y");
+	ant_names.insert(ANTENNA::MHA0Y, "MHA-Y");
+
 	for (int i = 0; i < 9; i++)
 	{
 		int tmp_d = 1 << i;
 		//lit_map.insert(i + 1, LITERA(tmp_d));
 		lit_map.insert(tmp_d, LITERA(i + 1));
 	}
-	//lit_map.insert(1, LITERA::LIT1);
-	//lit_map.insert(2, LITERA::LIT2);
-	//lit_map.insert(3, LITERA::LIT3);
-	//lit_map.insert(4, LITERA::LIT4);
-	//lit_map.insert(5, LITERA::LIT5);
-	//lit_map.insert(6, LITERA::LIT6);
-	//lit_map.insert(7, LITERA::LIT7);
-	//lit_map.insert(8, LITERA::LIT8);
-
 
 	for (int i = 0; i < 3; i++)
 	{
-		QString numb = QString::number(i);
+		QString numb = QString::number(i + 1);
 		FSMU_blocks << new QPushButton(numb, this);
 		FSVU_canals << new QPushButton(numb, this);
 	}
@@ -163,7 +163,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	log_timer.start(200);
 
 	//msg_to_log("рпп");
-	paint_buttons();
+	//paint_buttons();
 	set_new_tm();
 }
 
@@ -180,8 +180,8 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	msg_to_log(_msg);
 //Странные штуки
-	int tmp_mshm = pshm;
-	int tmp_pshm = mshm;
+	int tmp_mshm = mshm;
+	int tmp_pshm = pshm - 8;
 
 	switch (tmp_mshm)
 	{
@@ -199,6 +199,8 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 		break;
 	}
 	write_words();
+	paint_buttons();
+	set_new_tm();
 }
 
 
@@ -250,6 +252,9 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		int tmp_word = words[0].toInt();
 		QMap<int, QString>::iterator mode_itr;
 		QMap<int, LITERA>::iterator lit_itr;
+		QMap<int, QString>::iterator stab_itr;
+		QMap<int, QString>::iterator ant_intr;
+
 		switch (tmp_cwd.subadr)
 		{
 		case 2:
@@ -299,6 +304,7 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			break;
 		};
 		write_words();
+		set_new_tm();
 	}
 }
 void MBK07_widg::write_words()
@@ -319,74 +325,104 @@ void MBK07_widg::write_words()
 	sub_le_list[0]->setText(res_mode);
 	QString lit_num = QString::number(current_lit);
 	sub_le_list[1]->setText(lit_num);
-	QString tmp_stab = QString::number(current_stab);
-	sub_le_list[2]->setText(tmp_stab);
+//	QString tmp_stab = QString::number(current_stab);
+	sub_le_list[2]->setText(stab_names[current_stab]);
+	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
 void MBK07_widg::paint_buttons()
 {
-
-	//if (mu_module.get_current_dev() == MAIN)
-	//{
-	//	MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//	MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//}
-	//else
-	//{
-	//	MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	switch (mvku_modules[i].get_current_dev())
-	//	{
-	//	case OFF: 
-	//		main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		break;
-	//	case MAIN:
-	//		main_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//		reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		break;
-	//	case RESERVE:
-	//		main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		reserve_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//		break;
-
-	//	};
-
-	//	switch (mvmk_modules[i].get_current_dev())
-	//	{
-	//	case OFF:
-	//		main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		break;
-	//	case MAIN:
-	//		main_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//		reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		break;
-	//	case RESERVE:
-	//		main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//		reserve_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//		break;
-
-	//	};
-
-	//}
+	for (int i = 0; i < 3; i++)
+	{
+		FSMU_blocks[i]->setStyleSheet("background - color: rgb(204, 204, 204);");
+		if (current_FSMU == i)
+			FSMU_blocks[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		FSVU_canals[i]->setStyleSheet("background - color: rgb(204, 204, 204);");
+		if (current_FSVU == i)
+			FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	}
 }
 
 void MBK07_widg::set_new_tm()
 {
+	if ((current_FSMU == FSMU_OFF) || (current_stab == LOW_STAB))
+	{
+		if (ab_state)
+		{
+			ab_state = false;
+			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+		}
+		return;
+	}
+	else
+	{
+		if (!ab_state)
+		{
+			ab_state = true;
+			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+		}
+	}
+
 	QVariantList tm_words;
-	//tm_words << mu_module.get_tm();
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	tm_words << mvku_modules[i].get_tm();
-	//}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	tm_words << mvmk_modules[i].get_tm();
-	//}
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 2, tm_words);
+	unsigned short f_word = 0;
+	unsigned short s_word = 0;
+	if (current_FSVU != FSVU_OFF)
+		switch (current_FSVU)
+		{
+		case FSVU_One:
+			f_word += 0x3000;
+			break;
+		case FSVU_Two:
+			f_word += 0x2800;
+			break;
+		case FSVU_Three:
+			f_word += 0x1800;
+			break;
+		}
+	switch (current_FSMU)
+	{
+	case FSMU_One:
+		f_word += 0x600;
+		break;
+	case FSMU_Two:
+		f_word += 0x500;
+		break;
+	case FSMU_Three:
+		f_word += 0x300;
+		break;
+	}
+	//шта?
+	if (!pi8_fast)
+		f_word += 0x40;
+	if (IM)
+		f_word += 0x10;
+	if (current_mode != ERR)
+		f_word += 1 << full_mode(current_mode) - 1;
+	tm_words.push_back(f_word);
+
+
+	if (current_lit != 0)
+		s_word += 0x100 << current_lit - 1;
+	s_word += 0x20 << STAB(current_stab) - 1;
+	if (current_PSP != PSP_OFF)
+		s_word += PSP(current_PSP) - 1;
+	switch (current_antenna)
+	{
+	case OHA:
+		s_word += 0xC;
+		break;
+	case MHA1Y:
+		s_word += 0x14;
+		break;
+	case MHA0Y:
+		s_word += 0x18;
+		break;
+	}
+	tm_words.push_back(s_word);
+	//Отправка
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
 /*
 MU_MODULE::MU_MODULE() : current_dev(MAIN)
