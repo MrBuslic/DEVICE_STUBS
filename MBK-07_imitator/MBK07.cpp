@@ -421,17 +421,6 @@ void MBK07_widg::set_new_tm()
 		break;
 	}
 	tm_words.push_back(s_word);
-	//unsigned short _word = (0 << 12) + (nim << 8);
-	//tm_words << mu_module.get_tm();
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	tm_words << mvku_modules[i].get_tm();
-	//}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	tm_words << mvmk_modules[i].get_tm();
-	//}
-
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
 /*
