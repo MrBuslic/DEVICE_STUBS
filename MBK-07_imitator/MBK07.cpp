@@ -421,6 +421,7 @@ void MBK07_widg::set_new_tm()
 		break;
 	}
 	tm_words.push_back(s_word);
+	//Отправка
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
 /*
