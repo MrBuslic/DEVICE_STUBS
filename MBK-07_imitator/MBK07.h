@@ -33,9 +33,10 @@ enum FSVU_numbB
 enum STAB
 {
 	LOW_STAB = 0,
-	HIGH_STAB = 1,
-	KG1_STAB = 2,
-	KG2_STAB = 3
+	KG1_STAB = 1,
+	KG2_STAB = 2,
+	HIGH_STAB = 3,
+
 };
 enum ANTENNA
 {

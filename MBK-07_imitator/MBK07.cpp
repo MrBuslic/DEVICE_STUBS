@@ -394,7 +394,7 @@ void MBK07_widg::set_new_tm()
 		break;
 	}
 	//шта?
-	if (!pi8_fast)
+	if (pi8_fast)
 		f_word += 0x40;
 	if (IM)
 		f_word += 0x10;
@@ -405,7 +405,7 @@ void MBK07_widg::set_new_tm()
 
 	if (current_lit != 0)
 		s_word += 0x100 << current_lit - 1;
-	s_word += 0x20 << STAB(current_stab) - 1;
+	s_word += 0x80 << STAB(current_stab) - 1;
 	if (current_PSP != PSP_OFF)
 		s_word += PSP(current_PSP) - 1;
 	switch (current_antenna)
@@ -421,7 +421,7 @@ void MBK07_widg::set_new_tm()
 		break;
 	}
 	tm_words.push_back(s_word);
-	//Отправка
+	//Отправка 
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
 /*
