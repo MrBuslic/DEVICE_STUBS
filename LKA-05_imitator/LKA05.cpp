@@ -268,13 +268,15 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr))
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		if (tmp_cwd.subadr == 17)
 		{
+			bool need_mvku_renew = false;
+			bool need_mvmk_renew = false;
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
-				int kor_zam = (itr->toInt() & 0xC);
+				int bus_reset = (itr->toInt() & 0x3);
 //				int read_input = (itr->toInt() & 0x1);
 
 				int switch_dev = (itr->toInt() & 0xC0) >> 6;
@@ -287,8 +289,11 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				case 2:
 					if (switch_dev)
 						mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-					if (kor_zam)
-						mvku_modules[nim].set_ku_p(0);
+					if (bus_reset)
+					{
+						mvku_modules[nim].set_ku_p(-1);
+						need_mvku_renew = true;
+					}
 					break;
 				case 3:
 					if (switch_dev)
@@ -308,11 +313,13 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							break;
 						}
 					}
-					if (kor_zam)
+					if (bus_reset)
 					{
-						mvmk_modules[nim].set_ku_p(0);
-						mvmk_modules[nim].set_ku_m(0);
+						mvmk_modules[nim].set_ku_p(-1);
+						mvmk_modules[nim].set_ku_m(-1);
+						need_mvmk_renew = true;
 					}
+
 					break;
 				case 5:
 					if (switch_dev)
@@ -322,6 +329,12 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			}
 			paint_buttons();
 			set_new_tm();
+			if (need_mvku_renew)
+				new_data_mv(29);
+
+			if (need_mvmk_renew)
+				new_data_mv(28);
+
 		}
 		if (tmp_cwd.subadr == 28) //MK
 		{
@@ -519,7 +532,8 @@ unsigned short MV_MODULE::get_data_mvku()
 	unsigned short _word = (0 << 12) + (nim << 8);
 	if (!get_working())
 		_word += 0x1000;
-	_word += 1 << ku_p;
+	if (ku_p!= -1)
+		_word += 1 << ku_p;
 	return _word;
 }
 unsigned short MV_MODULE::get_data_mvmk()
@@ -527,8 +541,10 @@ unsigned short MV_MODULE::get_data_mvmk()
 	unsigned short _word = (0 << 12) + (nim << 8);
 	if (!get_working())
 		_word += 0x1000;
-	_word += 1 << ku_p;
-	_word += 1 << ku_m;
+	if (ku_p != -1)
+		_word += 1 << (ku_p+4);
+	if (ku_m != -1)
+		_word += 1 << ku_m;
 	return _word;
 }
 

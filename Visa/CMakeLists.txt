@@ -31,4 +31,6 @@ set(SOURCES Visa.cpp)
 include_directories($ENV{VISA_HOME}/include)
 
 add_library(visa32 SHARED ${HEADERS} ${SOURCES} export.def)
-target_link_libraries(visa32 socket_rpc)
+target_link_libraries(visa32 socket_rpc ${QT_LIBRARIES} )
+
+qt5_use_modules(visa32 Core Network)

@@ -12,7 +12,7 @@
 #include <socket_rpc.h>
 #include <Visa.h>
 #include <windows.h>
-
+#include <qcoreapplication.h>
 
 #if defined(__cplusplus) || defined(__cplusplus__)
    extern "C" {
@@ -20,7 +20,12 @@
 
 /*- Resource Manager Functions and Operations -------------------------------*/
 
-ViStatus _VI_FUNC  viOpenDefaultRM (ViPSession vi){ return 0; }
+ViStatus _VI_FUNC  viOpenDefaultRM (ViPSession vi)
+{
+
+	QString tt = QCoreApplication::applicationName();
+	return 0;
+}
 
 ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList vi,
 	ViPUInt32 retCnt, ViChar _VI_FAR desc[])
@@ -62,8 +67,8 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		case VI_ATTR_MODEL_CODE:
 		{
 			int* tmp_res = (int*)attrValue;
-			//*tmp_res = 0x10B;// FOI
-			*tmp_res = 0x010D;//MBASE
+			*tmp_res = 0x10B;// FOI
+			//*tmp_res = 0x010D;//MBASE
 			break;
 		}
 		case VI_ATTR_SLOT:

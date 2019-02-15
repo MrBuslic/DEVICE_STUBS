@@ -125,8 +125,8 @@ private:
 	int com;
 	int nim;
 
-	int ku_m = 0;
-	int ku_p = 0;
+	int ku_m = -1;
+	int ku_p = -1;
 };
 
 #endif // LKA05_H
