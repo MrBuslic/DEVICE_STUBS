@@ -3,7 +3,9 @@
 #include <windows.h>
 #include "mfsk24_rpc.h"
 
+#ifndef SINGLETON_DEF
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#endif
 int mfsk_count = 0;
 class rpc_buffer_class
 {

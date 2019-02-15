@@ -1,4 +1,4 @@
-project(UNKP50)
+project(AG7972)
 cmake_minimum_required(VERSION 2.8)
 
 #enable_language(C)
@@ -13,7 +13,6 @@ include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})
 include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
-include_directories(${UNKP50_SOURCE_DIR}/../../../lib/socket_rpc/include)
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -27,19 +26,10 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNKP50_SOURCES unkp50.cpp kp50_rpc.h kp50_rpc.cpp)
+set(AG7972_SOURCES main.cpp AG7972.h AG7972.cpp)
 include_directories($ENV{VISA_HOME}include)
 
-add_library(unkp50_32 SHARED ${UNKP50_HEADERS} ${UNKP50_SOURCES} export.def)
-target_link_libraries(unkp50_32 socket_rpc)
-
-set(RPC_KP50_SOURCES rpc_kp50.h rpc_kp50.cpp kp50_main.cpp kp50_socket_rpc.h kp50_socket_rpc.cpp)
-add_executable(rpc_kp50 WIN32 ${RPC_KP50_SOURCES})
-set_target_properties(rpc_kp50 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
-target_link_libraries(rpc_kp50 ${QT_LIBRARIES} socket_rpc)
-qt5_use_modules(rpc_kp50 Core Widgets Gui Network)
-
-ADD_CUSTOM_COMMAND(TARGET rpc_kp50
-	PRE_BUILD
-	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/rpc_kp50.h ${PROJECT_SOURCE_DIR} kp50
-)
+add_executable(ag7972 WIN32 ${AG7972_SOURCES})
+set_target_properties(ag7972 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
+target_link_libraries(ag7972 ${QT_LIBRARIES})
+qt5_use_modules(ag7972 Core Widgets Gui Network)

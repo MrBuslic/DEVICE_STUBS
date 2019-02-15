@@ -11,6 +11,7 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1})
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2}/stubs)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 
+add_subdirectory(AG7972)
 add_subdirectory(HPE1472)
 add_subdirectory(OMNIBUSBOX)
 add_subdirectory(UNADS128)

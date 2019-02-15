@@ -9,6 +9,42 @@ extern "C" {
 #include <windows.h>
 #include "mds32_rpc.h"
 
+#ifndef SINGLETON_DEF
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#endif
+int mds_count = 0;
+class rpc_buffer_class
+{
+public:
+	QList<RPC_mds32_SLOT_Thread*> mds32_slot_thr;
+	QList<RPC_mds32_SIGNAL_Thread*> mds32_signal_thr;
+	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+private:
+	rpc_buffer_class()
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			RPC_mds32_SLOT_Thread* slot_thr = new RPC_mds32_SLOT_Thread;
+			slot_thr->set_connection_params("127.0.0.1", 30020+i);
+			slot_thr->start();
+			//if (!slot_thr.wait_connected(3))
+			//	return false;
+			RPC_mds32_SIGNAL_Thread* signal_thr = new RPC_mds32_SIGNAL_Thread;
+			signal_thr->set_connection_params("127.0.0.1", 30025+i);
+			signal_thr->start();
+			//if (!signal_thr.wait_connected(3))
+			//	return false;
+
+			mds32_slot_thr.push_back(slot_thr);
+			mds32_signal_thr.push_back(signal_thr);
+		}
+	}
+};
+
+SINGLETON_DEF(rpc_buffer_class);
+
+#include "mds32_rpc.h"
+
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 int mds_count = 0;
 class rpc_buffer_class

@@ -173,11 +173,12 @@ ViStatus _VI_FUNC unmt8k4l_numReadyData (ViSession arg0, ViUInt32 *arg1){return 
 //--------------------- Read one sample --------------------------
 ViStatus _VI_FUNC unmt8k4l_read_sample (ViSession mvi, ViPReal64 buf, 
 					ViPUInt32 firstTime,ViPUInt32 thisTime){
-	uint  tmp_buf;
+	QVariantList  tmp_buf;
 	uint _firstTime;
 	uint _thisTime;
 	Srpc_buffer_class::Instance().mt8k4l_slot_thr[mvi - 1]->get_mt8k4l_obj()->unmt8k4l_read_sample(tmp_buf, _firstTime, _thisTime);
-	*buf = tmp_buf;
+	for (int i = 0; i < 8; i++)
+		buf[i] = tmp_buf.at(i).toDouble();
 	*firstTime = _firstTime;
 	*thisTime = _thisTime;
 	return 0;
