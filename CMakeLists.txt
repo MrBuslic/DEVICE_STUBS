@@ -45,6 +45,7 @@ add_subdirectory(tpo_imitator)
 add_subdirectory(mbk04_imitator)
 add_subdirectory(LKA-05_imitator)
 add_subdirectory(MBK-07_imitator)
+add_subdirectory(BECH_imitator)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})

@@ -1,5 +1,5 @@
-#ifndef MBK07_H
-#define MBK07_H
+#ifndef BECH_H
+#define BECH_H
 
 #include <QDialog>
 #include <QMap>
@@ -16,70 +16,45 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../LKA-05_imitator/lka05_rpc.h"
 
-enum FSMU_numbB
+enum LKA
 {
-	FSMU_One = 0,
-	FSMU_Two = 1,
-	FSMU_Three = 2,
-	FSMU_OFF = 3
+	LKA_1 = 1,
+	LKA_2 = 2,
+	LKA_OFF = 0
 };
-enum FSVU_numbB
+enum OG
 {
-	FSVU_One = 0,
-	FSVU_Two = 1,
-	FSVU_Three = 2,
-	FSVU_OFF = 3
+	OG_1 = 0,
+	OG_2 = 1,
+	OG_3 = 2,
+	OG_ERR = 3
 };
-enum STAB
+enum FINIK
 {
-	LOW_STAB = 0,
-	KG1_STAB = 1,
-	KG2_STAB = 2,
-	HIGH_STAB = 3,
-
+	FINIK_1 = 0,
+	FINIK_2 = 1,
+	FINIK_3 = 2,
+	FINIK_ERR = 3
 };
-enum ANTENNA
+enum FINIK_REZH
 {
-	OHA = 0,
-	MHA1Y = 1,
-	MHA0Y = 2
+	FINIK_REZH_PI15 = 0,
+	FINIK_REZH_PI8 = 1,
+	FINIK_ERR = 3
 };
-enum full_mode
+enum KP
 {
-	ERR = 0,
-	PI15 = 1,
-	PI8 = 2,
-	WTF8 = 3	
+	KP_1 = 0,
+	KP_2 = 1,
+	KP_OFF = 3
 };
-enum PSP
-{
-	PSP_OFF = 0,
-	PSP1 = 1,
-	PSP2 = 2,
-	PSP3 = 3,
-	PSP4 = 4
-};
-
-enum LITERA
-{
-	LIT0 = 0,
-	LIT1 = 1,
-	LIT2 = 2,
-	LIT3 = 3,
-	LIT4 = 4,
-	LIT5 = 5,
-	LIT6 = 6,
-	LIT7 = 7,
-	LIT8 = 8
-};
-
-class MBK07_widg : public QWidget
+class BECH_widg : public QWidget
 {
     Q_OBJECT
 
 public:
 //	explicit LKA05_widg(QWidget *parent = 0);
-	MBK07_widg(QWidget *parent = 0);
+	BECH_widg(QWidget *parent = 0);
 	//~MBK07_widg();
 	
 
@@ -89,45 +64,41 @@ private:
 	QMainWindow* main_widg;
 	//Хранимые текущие
 
-	int current_lit = 0;
-	full_mode current_mode = ERR;
-	PSP current_PSP = PSP_OFF;
-	FSMU_numbB current_FSMU = FSMU_OFF;
-	FSVU_numbB current_FSVU = FSVU_OFF;
-	STAB current_stab;
-	ANTENNA current_antenna;
+	OG current_OG = OG_1;
+	FINIK current_FINIK = FINIK_1;
+	FINIK_REZH current_FINIK_REZH = FINIK_REZH_PI8;
+	KP current_KP = KP_OFF;
+	LKA current_LKA = LKA_OFF;
 
+	QList<QPushButton*> LKA_pbut;
+	QList<QPushButton*> OG_pbut;
+	QList<QPushButton*> FINIK_pbut;
+	QList<QPushButton*> KP_pbut;
 
-	bool IM = false;
+	QVBoxLayout *All_vblay;
+	QHBoxLayout *LKA_hlay;
+	QHBoxLayout *FINIK_hlay;
+	QHBoxLayout *OG_hlay;
+	QHBoxLayout *KP_hlay;
+	QVBoxLayout *FINIK_REZH_vlay;
 
-	bool pi8_fast = false;
-
-	QList<QPushButton*> FSMU_blocks;
-	QList<QPushButton*> FSVU_canals;
+	QGroupBox *LKA_gb;
+	QHBoxLayout *FINIK_gb;
+	QHBoxLayout *KP_gb;
+	QHBoxLayout *OG_gb;
 
 	QPlainTextEdit* Logs;
 
-	QGroupBox *FSMU_gb;
-	QGroupBox *FSVU_gb;
 	const int MKO = 1;
 	const int adr = 7;
-	QVariantList words;
-	QGridLayout *SubGrid_glayout;
-	QVBoxLayout *FSMUFSVU_vblayout;
-	QHBoxLayout *FSVU_hblayout;
-	QHBoxLayout *FSMU_hblayout;
-	QHBoxLayout *All_vblayout;
-	bool flag;
 	QPushButton * okBut;
 	QDialog *dlg;
 
-	QList<QCheckBox*> set_list;
-	QList<QCheckBox*> set_list_mu2;
 	QList<QLineEdit*> sub_le_list;
 
-	void paint_buttons();
-	void write_words();
-	void set_new_tm();
+	//void paint_buttons();
+	//void write_words();
+	//void set_new_tm();
 protected:
 	
 public slots:
@@ -165,11 +136,8 @@ private:
 
 
 	QMap<int, QString> mode_names;
-	QMap<int, LITERA> lit_map;
-	QMap<int, QString> stab_names;
-	QMap<int, QString> ant_names;
-	bool ab_state = true;
+//	bool ab_state = true;
 };
 
-#endif // MBK07_H
+#endif // BECH_H
 
