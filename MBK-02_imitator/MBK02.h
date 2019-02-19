@@ -1,5 +1,5 @@
-#ifndef BECH_H
-#define BECH_H
+#ifndef MBK02_H
+#define MBK02_H
 
 #include <QDialog>
 #include <QMap>
@@ -16,46 +16,33 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../LKA-05_imitator/lka05_rpc.h"
 
-enum LKA
+enum CHANEL
 {
-	LKA_1 = 0,
-	LKA_2 = 1,
-	LKA_OFF = 3
+	CHANEL_1 = 0,
+	CHANEL_2 = 1,
+	CHANEL_OFF = 2,
+	CHANEL_ERR = 3
 };
-enum OG
+enum ANTENNA_CH1
 {
-	OG_1 = 0,
-	OG_2 = 1,
-	OG_3 = 2,
-	OG_ERR = 3
+	MHA1PY = 0,
+	MHA1MY = 1,
+	MHA1ERR = 3
 };
-enum FINIK
+enum ANTENNA_CH2
 {
-	FINIK_1 = 0,
-	FINIK_2 = 1,
-	FINIK_3 = 2,
-	FINIK_ERR = 3
+	MHA2PY = 0,
+	MHA2MY = 1,
+	MHA2ERR = 3
 };
-enum FINIK_REZH
-{
-	FINIK_REZH_PI15 = 0,
-	FINIK_REZH_PI8 = 1,
-	FINIK_REZH_ERR = 2
-};
-enum KP
-{
-	KP_1 = 0,
-	KP_2 = 1,
-	KP_OFF = 3
-};
-class BECH_widg : public QWidget
+class MBK02_widg : public QWidget
 {
     Q_OBJECT
 
 public:
 //	explicit LKA05_widg(QWidget *parent = 0);
-	BECH_widg(QWidget *parent = 0);
-	//~MBK07_widg();
+	MBK02_widg(QWidget *parent = 0);
+	//~MBK02_widg();
 	
 
 private:
@@ -64,36 +51,25 @@ private:
 	QMainWindow* main_widg;
 	//Хранимые текущие
 
-	OG current_OG = OG_1;
-	FINIK current_FINIK = FINIK_1;
-	FINIK_REZH current_FINIK_REZH = FINIK_REZH_PI8;
-	KP current_KP = KP_OFF;
-	LKA current_LKA = LKA_OFF;
-
-	QList<QPushButton*> LKA_pbut;
-	QList<QPushButton*> OG_pbut;
-	QList<QPushButton*> FINIK_pbut;
-	QList<QPushButton*> KP_pbut;
-
-	QVBoxLayout *All_vblay;
-	QHBoxLayout *LKA_hlay;
-	QHBoxLayout *FINIK_hlay;
-	QHBoxLayout *OG_hlay;
-	QHBoxLayout *KP_hlay;
-	QHBoxLayout *FINIK_REZH_hlay;
-
-	QGroupBox *LKA_gb;
-	QGroupBox *FINIK_gb;
-	QGroupBox *KP_gb;
-	QGroupBox *OG_gb;
+	int current_lit = 0;
 
 	QPlainTextEdit* Logs;
-	QLineEdit* Mode_le;
+
 	const int MKO = 1;
-	const int adr = 5;
+	const int adr = 2;
+	QVariantList words;
+	QGridLayout *SubGrid_glayout;
+	QVBoxLayout *FSMUFSVU_vblayout;
+	QHBoxLayout *FSVU_hblayout;
+	QHBoxLayout *FSMU_hblayout;
+	QHBoxLayout *All_vblayout;
+	bool flag;
 	QPushButton * okBut;
 	QDialog *dlg;
-	bool flag;
+
+	QList<QCheckBox*> set_list;
+	QList<QCheckBox*> set_list_mu2;
+	QList<QLineEdit*> sub_le_list;
 
 	void paint_buttons();
 	void write_words();
@@ -135,10 +111,11 @@ private:
 
 
 	QMap<int, QString> mode_names;
-	QMap<int, FINIK> finik_list;
-	QMap<int, FINIK_REZH> finik_rezh_list;
-//	bool ab_state = true;
+	QMap<int, LITERA> lit_map;
+	QMap<int, QString> stab_names;
+	QMap<int, QString> ant_names;
+	bool ab_state = true;
 };
 
-#endif // BECH_H
+#endif // MBK02_H
 

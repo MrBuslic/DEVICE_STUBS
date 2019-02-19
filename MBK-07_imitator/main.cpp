@@ -1,4 +1,4 @@
-#include "BECH.h"
+#include "MBK07.h"
 #include <QApplication>
 #include <QTextCodec>
 #include "rpc_loger.h"

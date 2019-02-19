@@ -1,4 +1,4 @@
-#include "MBK07.h"
+#include "MBK02.h"
 
 #include <QMessageBox>
 
@@ -14,11 +14,11 @@ union MKOWord
 	};
 };
 
-MBK07_widg::MBK07_widg(QWidget *parent)
+MBK02_widg::MBK02_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
 	//	this->setFixedSize(1910, 1130);
-	setWindowTitle("МБК-07");
+	setWindowTitle("МБК-02");
 	/*	MU1 -> setFixedSize(300,100);
 		MU1->setProperty("type", 1);
 		MU2->setFixedSize(300, 100);
@@ -36,8 +36,8 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	stab_names.insert(STAB::KG2_STAB, "КГ 2");
 
 	ant_names.insert(ANTENNA::OHA, "OHA");
-	ant_names.insert(ANTENNA::MHAPY, "MHA+Y");
-	ant_names.insert(ANTENNA::MHAMY, "MHA-Y");
+	ant_names.insert(ANTENNA::MHA1Y, "MHA+Y");
+	ant_names.insert(ANTENNA::MHA0Y, "MHA-Y");
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -117,7 +117,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK07_widg::auto_scroll_clicked);
+	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK02_widg::auto_scroll_clicked);
 	logs_lay->addWidget(edit);
 	logs_lay->addWidget(auto_scroll_box);
 	//logs_lay->addWidget(Logs);
@@ -164,7 +164,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	QDir dir("d:/logs");
 	if (!dir.exists())
 		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
+	connect(&log_timer, &QTimer::timeout, this, &MBK02_widg::log_timer_ontimer);
 	log_timer.start(200);
 
 	//msg_to_log("рпп");
@@ -176,11 +176,11 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 //{
 
 //}
-//void MBK07_widg::current_com(int mshm_numb, int pshm_numb)
+//void MBK02_widg::current_com(int mshm_numb, int pshm_numb)
 //{
 //	
 //}
-void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	msg_to_log(_msg);
@@ -209,7 +209,7 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 }
 
 
-void MBK07_widg::msg_to_log(const QString& _msg)
+void MBK02_widg::msg_to_log(const QString& _msg)
 {
 	{
 		QMutexLocker lock(&log_mutex);
@@ -220,12 +220,12 @@ void MBK07_widg::msg_to_log(const QString& _msg)
 		_scroll_bar->setValue(_scroll_bar->maximum());
 }
 
-void MBK07_widg::auto_scroll_clicked(int _state)
+void MBK02_widg::auto_scroll_clicked(int _state)
 {
 	auto_scroll = (_state != 0);
 }
 
-void MBK07_widg::log_timer_ontimer()
+void MBK02_widg::log_timer_ontimer()
 {
 	QStringList tmp_buffer;
 	{
@@ -243,7 +243,7 @@ void MBK07_widg::log_timer_ontimer()
 	log_file.close();
 }
 
-void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	MKOWord tmp_cwd;
 	tmp_cwd.com_word = cwd;
@@ -312,7 +312,7 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		set_new_tm();
 	}
 }
-void MBK07_widg::write_words()
+void MBK02_widg::write_words()
 {
 	QString res_mode;
 	if (mode_names.contains(current_mode))
@@ -334,7 +334,7 @@ void MBK07_widg::write_words()
 	sub_le_list[2]->setText(stab_names[current_stab]);
 	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
-void MBK07_widg::paint_buttons()
+void MBK02_widg::paint_buttons()
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -350,7 +350,7 @@ void MBK07_widg::paint_buttons()
 	}
 }
 
-void MBK07_widg::set_new_tm()
+void MBK02_widg::set_new_tm()
 {
 	if ((current_FSMU == FSMU_OFF) || (current_stab == LOW_STAB))
 	{
@@ -418,10 +418,10 @@ void MBK07_widg::set_new_tm()
 	case OHA:
 		s_word += 0xC;
 		break;
-	case MHAPY:
+	case MHA1Y:
 		s_word += 0x14;
 		break;
-	case MHAMY:
+	case MHA0Y:
 		s_word += 0x18;
 		break;
 	}

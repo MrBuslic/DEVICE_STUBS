@@ -1,4 +1,4 @@
-project(BECH_imitator)
+project(MBK-02_imitator)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_AUTOMOC ON)
@@ -38,8 +38,8 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(BKUPI_HEADERS BECH.h)
-SET(BKUPI_SOURCES main.cpp BECH.cpp)
+SET(BKUPI_HEADERS MBK02.h)
+SET(BKUPI_SOURCES main.cpp MBK02.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
@@ -47,13 +47,13 @@ SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOUR
 SET(LKA05_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../LKA-05_imitator/lka05_rpc.h ${PROJECT_SOURCE_DIR}/../LKA-05_imitator/lka05_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(BECH_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} ${LKA05_RPC_SOURCES})
-target_link_libraries (BECH_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+add_executable(MBK-02_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} ${LKA05_RPC_SOURCES})
+target_link_libraries (MBK-02_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
 if(WIN32)
-  qt5_use_modules(BECH_imitator Core Widgets Network Gui)
- # SET_TARGET_PROPERTIES(BECH_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+  qt5_use_modules(MBK-02_imitator Core Widgets Network Gui)
+ # SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
 
 

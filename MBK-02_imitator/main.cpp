@@ -1,4 +1,4 @@
-#include "BECH.h"
+#include "MBK02.h"
 #include <QApplication>
 #include <QTextCodec>
 #include "rpc_loger.h"
@@ -19,8 +19,8 @@ int main(int argc, char **argv)
 //	LogWidget log_w;
 //	log_w.show();
 
-	BECH_widg BECH_widget;
-	BECH_widget.show();
+	MBK02_widg mbk02_widget;
+	mbk02_widget.show();
 
     return app.exec();
 }

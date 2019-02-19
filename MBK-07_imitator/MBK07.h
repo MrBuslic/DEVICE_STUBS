@@ -41,8 +41,8 @@ enum STAB
 enum ANTENNA
 {
 	OHA = 0,
-	MHA1Y = 1,
-	MHA0Y = 2
+	MHAPY = 1,
+	MHAMY = 2
 };
 enum full_mode
 {
