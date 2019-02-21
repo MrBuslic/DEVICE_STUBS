@@ -25,12 +25,8 @@ public slots:
 	RPC_foi_SLOT_Thread* get_slot_int_thread() { return slot_int_thread; };
 	RPC_foi_SIGNAL_Thread* get_signal_int_thread() { return signal_int_thread; };
 	void get_inter_from_server(int _n, short _chan, double _u, double _t);
-//void slot_interrupt_1();
-//void slot_interrupt_5();
-//void slot_interrupt_13();
-//void slot_unknown_interrupt();
-//signals:
-//void signal_send_request();
+signals:
+	void need_handle_interrupt();
 private:
 	QMutex m_mutex;
 	RPC_foi_SLOT_Thread* slot_int_thread;

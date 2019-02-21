@@ -100,8 +100,16 @@ void Interrupt_Object::get_inter_from_server(int _n, short _chan, double _u, dou
 void Interrupt_Object::add_inter_to_stack(int _n)
 {
 	m_mutex.lock();
-	stack_of_interrupts.append(_n);
-	m_mutex.lock(); 
+	if (stack_of_interrupts.isEmpty())
+	{
+		emit need_handle_interrupt();
+		stack_of_interrupts.append(_n);
+	}
+	else
+	{
+		stack_of_interrupts.append(_n);
+	}
+	m_mutex.unlock(); 
 	return;
 }
 

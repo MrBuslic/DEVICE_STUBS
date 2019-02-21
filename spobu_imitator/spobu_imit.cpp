@@ -144,6 +144,7 @@ SPOBU_Widget::SPOBU_Widget() :QWidget()
 	QObject::connect(read_file, SIGNAL(clicked()), this, SLOT(read_settings()));
 	QObject::connect(start, SIGNAL(clicked()), this, SLOT(main_cycle()));
 	QObject::connect(stop, SIGNAL(clicked()), this, SLOT(stop_main_programm()));
+	QObject::connect(inter_imit, SIGNAL(need_handle_interrupt()), this, SLOT(handle_interrupt()), Qt::DirectConnection);
 	QObject::connect(inter_imit->get_rpc_foi_signal_thread()->get_obj().get(), SIGNAL(foi_interrupt(int, short, double, double)), inter_imit, SLOT(get_inter_from_server(int, short, double, double)), Qt::QueuedConnection);
 	QObject::connect(mko_imit, SIGNAL(signal_send_msg_mko(int, int, int, QVariantList&, int&)), mko_imit->get_mko_slot_thread()->get_obj().get(), SLOT(send_msg(int, int, int, QVariantList&, int&)), Qt::DirectConnection);
 	QObject::connect(this, SIGNAL(signal_send_msg_def_mko(int, int, int, int, QVariantList&)), mko_imit, SLOT(slot_send_msg_def_mko(int, int, int, int, QVariantList&)), Qt::DirectConnection);
@@ -241,7 +242,6 @@ void SPOBU_Widget::main_programm()
 	QString str = QString("Current BT = %1").arg(board_time);
 	edit->append(str);
 	//create_moc();
-	handle_interrupt();
 }
 
 void SPOBU_Widget::stop_main_programm()
@@ -252,37 +252,29 @@ void SPOBU_Widget::stop_main_programm()
 
 void SPOBU_Widget::handle_interrupt()
 {
+	mutex.lock();
 	QVector<int> buffer;
-	if (inter_imit->check_inter_stack())
+	buffer = inter_imit->get_interrupts();
+	inter_imit->clear_inter_stack();
+	for (int i = 0; i < buffer.size(); i++)
 	{
-		buffer = inter_imit->get_interrupts();
-		inter_imit->clear_inter_stack();
-		QString str = QString("Find %1 interrupts in buffer! Begin to handle its!").arg(buffer.size());
-		edit->append(str);
-		for (int i = 0; i < buffer.size(); i++)
+		switch (buffer[i])
 		{
-			switch (buffer[i])
-			{
-			case 1:
-				handle_inter_1();
-				break;
-			case 5:
-				handle_inter_5();
-				break;
-			case 13:
-				handle_inter_13();
-				break;
-			default:
-				handle_unknown_inter();
-				break;
-			}
+		case 1:
+			handle_inter_1();
+			break;
+		case 5:
+			handle_inter_5();
+			break;
+		case 13:
+			handle_inter_13();
+			break;
+		default:
+			handle_unknown_inter();
+			break;
 		}
 	}
-	else
-	{
-		QString str = QString("Don't find interrupts in buffer!");
-		edit->append(str);
-	}
+	mutex.unlock();
 }
 
 void SPOBU_Widget::create_moc()
@@ -295,6 +287,7 @@ void SPOBU_Widget::create_moc()
 	QVariantList words;
 	for (int i = 0; i < settings.size(); i++)
 	{
+		mutex.lock();
 		words.clear();
 		tmp_moc_struct = settings[i];
 		if ((tmp_moc_struct.adr == 2) && (tmp_moc_struct.subadr == 4))
@@ -375,6 +368,7 @@ void SPOBU_Widget::create_moc()
 				words_pos++;
 			}
 		}
+		mutex.unlock();
 	}
 	is_ready = true;
 	emit moc_is_ready();
@@ -546,8 +540,6 @@ int SPOBU_Widget::get_asn_data()
 
 void SPOBU_Widget::handle_inter_1()
 {
-	QString str = QString("Handle interrupt - 1!");
-	edit->append(str);
 	MKOCOMWORD CWD;
 	int os = 1;
 	CWD.adr = 1;
@@ -562,8 +554,6 @@ void SPOBU_Widget::handle_inter_1()
 	emit signal_send_msg_mko(1, 1, CWD.com_word, words, os);
 	if (os == -1)
 	{
-		str = QString("Get response word with code - 0x%1").arg(os, 4, 16, QChar('0'));
-		edit->append(str);
 	}
 	else
 	{
@@ -603,8 +593,6 @@ void SPOBU_Widget::handle_inter_1()
 		}
 		default:
 		{
-			QString str = QString("Get command with wrong code - 0x%1! Command won't be handled!").arg(words[0].toInt(), 4, 16, QChar('0'));
-			edit->append(str);
 			break;
 		}
 		}
@@ -613,36 +601,32 @@ void SPOBU_Widget::handle_inter_1()
 
 void SPOBU_Widget::handle_inter_5()
 {
-	QString str = QString("Handle interrupt - 5!");
-	edit->append(str);
+	/*QString str = QString("Handle interrupt - 5!");
+	edit->append(str);*/
 }
 
 void SPOBU_Widget::handle_inter_13()
 {
-	QString str = QString("Handle interrupt - 13!");
-	edit->append(str);
+	/*QString str = QString("Handle interrupt - 13!");
+	edit->append(str);*/
 }
 
 void SPOBU_Widget::handle_unknown_inter()
 {
-	QString str = QString("Get unknown interrupt!");
-	edit->append(str);
+	/*QString str = QString("Get unknown interrupt!");
+	edit->append(str);*/
 }
 
 void SPOBU_Widget::emergency_shutdown_mca()
 {
-	QString str = QString("Get signal to shutdown mca!");
-	edit->append(str);
+	/*QString str = QString("Get signal to shutdown mca!");
+	edit->append(str);*/
 }
 
 void SPOBU_Widget::pause_BT()
 {
 	main_discret->stop();
 	bt_pause = true;
-	while (bt_pause)
-	{
-		handle_interrupt();
-	}
 	return;
 }
 
@@ -672,8 +656,8 @@ void SPOBU_Widget::perform_CPI()
 	emit signal_send_msg_mko(1, 1, CWD.com_word, words, os);
 	if (os == -1)
 	{
-		str = QString("Get response word with code - 0x%1").arg(os, 4, 16, QChar('0'));
-		edit->append(str);
+		/*str = QString("Get response word with code - 0x%1").arg(os, 4, 16, QChar('0'));
+		edit->append(str);*/
 		answer = 0xFF00;
 		wait_info_word = false;
 		buf_size = 0;
@@ -725,8 +709,8 @@ void SPOBU_Widget::get_cmd()
 	emit signal_send_msg_mko(1, 1, CWD.com_word, words, os);
 	if (os == -1)
 	{
-		str = QString("Get response word with code - 0x%1").arg(os, 4, 16, QChar('0'));
-		edit->append(str);
+		/*str = QString("Get response word with code - 0x%1").arg(os, 4, 16, QChar('0'));
+		edit->append(str);*/
 		send_receipt(1, 5, answer, os);
 	}
 	else
@@ -752,8 +736,8 @@ void SPOBU_Widget::get_cmd()
 		default:
 			answer = 0xFF00;
 			send_receipt(1, 5, answer, os);
-			str = QString("Get unknown command - 0x%1").arg(SKWORD.sk_code, 4, 16, QChar('0'));
-			edit->append(str);
+			/*str = QString("Get unknown command - 0x%1").arg(SKWORD.sk_code, 4, 16, QChar('0'));
+			edit->append(str);*/
 			break;
 		}
 	}

@@ -44,6 +44,7 @@ private:
 	QPushButton* start;
 	QPushButton* stop;
 	QTimer* main_discret;
+	QMutex mutex;
 	MKO_IMIT_Object* mko_imit;
 	Interrupt_Object* inter_imit;
 	
