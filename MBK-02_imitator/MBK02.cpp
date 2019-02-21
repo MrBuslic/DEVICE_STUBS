@@ -17,94 +17,52 @@ union MKOWord
 MBK02_widg::MBK02_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
-	//	this->setFixedSize(1910, 1130);
 	setWindowTitle("МБК-02");
-	/*	MU1 -> setFixedSize(300,100);
-		MU1->setProperty("type", 1);
-		MU2->setFixedSize(300, 100);
-		MU2->setProperty("type", 2);*/
-	FSMU_gb = new QGroupBox("ФСМУ", this);
-	FSVU_gb = new QGroupBox("ФСВУ", this);
 
-	mode_names.insert(full_mode::PI15, "ПИ15");
-	mode_names.insert(full_mode::PI8, "ПИ8");
-	mode_names.insert(full_mode::WTF8, "ВТФ8");
+	Chan1_pbut = new QPushButton("1", this);
+	Chan2_pbut = new QPushButton("2", this);
+	Ant_pbut = new QPushButton("Ykrali", this);
+	Chan1_pbut->setMinimumWidth(165);
+	Chan2_pbut->setMinimumWidth(165);
 
-	stab_names.insert(STAB::LOW_STAB, "НС");
-	stab_names.insert(STAB::HIGH_STAB, "ВС");
-	stab_names.insert(STAB::KG1_STAB, "КГ 1");
-	stab_names.insert(STAB::KG2_STAB, "КГ 2");
-
-	ant_names.insert(ANTENNA::OHA, "OHA");
-	ant_names.insert(ANTENNA::MHA1Y, "MHA+Y");
-	ant_names.insert(ANTENNA::MHA0Y, "MHA-Y");
-
-	for (int i = 0; i < 9; i++)
-	{
-		int tmp_d = 1 << i;
-		//lit_map.insert(i + 1, LITERA(tmp_d));
-		lit_map.insert(tmp_d, LITERA(i + 1));
-	}
-
-	for (int i = 0; i < 3; i++)
-	{
-		QString numb = QString::number(i + 1);
-		FSMU_blocks << new QPushButton(numb, this);
-		FSVU_canals << new QPushButton(numb, this);
-	}
-	All_vblayout = new QHBoxLayout();
-	QVBoxLayout *logs_lay = new QVBoxLayout(this);
-	FSMUFSVU_vblayout = new QVBoxLayout();
-	FSMU_hblayout = new QHBoxLayout(FSMU_gb);
-	FSVU_hblayout = new QHBoxLayout(FSVU_gb);
-	SubGrid_glayout = new QGridLayout();
-	logs_lay->addLayout(All_vblayout);
-	All_vblayout->addLayout(FSMUFSVU_vblayout);
-	All_vblayout->addLayout(SubGrid_glayout);
-	FSMUFSVU_vblayout->addWidget(FSMU_gb);
-	FSMUFSVU_vblayout->addWidget(FSVU_gb);
-	FSMU_gb->setAlignment(Qt::AlignHCenter);
-	FSVU_gb->setAlignment(Qt::AlignHCenter);
-	for (int i = 0; i < 3; i++)
-	{
-		FSMU_hblayout->addWidget(FSMU_blocks[i]);
-		FSVU_hblayout->addWidget(FSVU_canals[i]);
-	}
-	for (int i = 0; i < 3; i++)
-	{
-		FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-		FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	}
-	QLabel* Mode_lb = new QLabel("Режим");
+	QLabel* Chan_lb = new QLabel("Каналы");
+	//	QLabel* Chan1_lb = new QLabel("Канал 1");
+	//	QLabel* Chan2_lb = new QLabel("Канал 2");
 	QLabel* Lit_lb = new QLabel("Литера");
-	QLabel* Stab_lb = new QLabel("Стабильность");
-	QLabel* Ann_lb = new QLabel("Антенна");
-	//QLabel submode("ИМ");
-	//submode->text = ("ИМ");
-	QList<QLabel*> sub_lb_list;
-	sub_lb_list << Mode_lb;
-	sub_lb_list << Lit_lb;
-	sub_lb_list << Stab_lb;
-	sub_lb_list << Ann_lb;
+	QLabel* Ant_lb = new QLabel("Антенна");
 
-	QLineEdit* Mode_le = new QLineEdit(this);
-	Mode_le->setReadOnly(true);
-	QLineEdit* Lit_le = new QLineEdit(this);
-	Lit_le->setReadOnly(true);
-	QLineEdit* Stab_le = new QLineEdit(this);
-	Stab_le->setReadOnly(true);
-	QLineEdit* Ann_le = new QLineEdit(this);
-	Ann_le->setReadOnly(true);
+	All_vblayout = new QVBoxLayout(this);
+	All_glayout = new QGridLayout();
+	Chan1_vblayout = new QVBoxLayout();
+	Chan2_vblayout = new QVBoxLayout();
+	Ant_vblayout = new QVBoxLayout();
+	Lit_vblayout = new QVBoxLayout();
+	Lit_le = new QLineEdit(this);
 
-	sub_le_list << Mode_le;
-	sub_le_list << Lit_le;
-	sub_le_list << Stab_le;
-	sub_le_list << Ann_le;
-	for (int i = 0; i < 4; i++)
-	{
-		SubGrid_glayout->addWidget(sub_lb_list[i], i, 0);
-		SubGrid_glayout->addWidget(sub_le_list[i], i, 1);
-	}
+	All_vblayout->addWidget(Chan_lb, 0, Qt::AlignHCenter);
+	All_vblayout->addLayout(All_glayout);
+	All_glayout->addLayout(Chan1_vblayout, 0, 0);
+	All_glayout->addLayout(Chan2_vblayout, 0, 1);
+	All_glayout->addLayout(Ant_vblayout, 1, 0);
+	All_glayout->addLayout(Lit_vblayout, 1, 1);
+
+	//	Chan1_vblayout->addWidget(Chan1_lb, 0, Qt::AlignHCenter);
+	Chan1_vblayout->addWidget(Chan1_pbut);
+	//	Chan2_vblayout->addWidget(Chan2_lb, 0, Qt::AlignHCenter);
+	Chan2_vblayout->addWidget(Chan2_pbut);
+	Ant_vblayout->addWidget(Ant_lb, 0, Qt::AlignHCenter);
+	Ant_vblayout->addWidget(Ant_pbut);
+	Lit_vblayout->addWidget(Lit_lb, 0, Qt::AlignHCenter);
+	Lit_vblayout->addWidget(Lit_le);
+
+	Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+	Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+	Ant_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+
+	ant_names.insert(ANTENNA::MHA1MY, "MHA1-Y");
+	ant_names.insert(ANTENNA::MHA1PY, "MHA1+Y");
+	ant_names.insert(ANTENNA::MHA2MY, "MHA2-Y");
+	ant_names.insert(ANTENNA::MHA2PY, "MHA2+Y");
 
 	edit = new QTextEdit(this);
 	_scroll_bar = edit->verticalScrollBar();
@@ -113,14 +71,13 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	edit->setDocument(_doc);
 	edit->setReadOnly(true);
 	_doc->setMaximumBlockCount(1000);
-	setMinimumSize(490, 300);
+	setMinimumSize(360, 300);
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK02_widg::auto_scroll_clicked);
-	logs_lay->addWidget(edit);
-	logs_lay->addWidget(auto_scroll_box);
-	//logs_lay->addWidget(Logs);
+	All_vblayout->addWidget(edit);
+	All_vblayout->addWidget(auto_scroll_box);
 
 
 
@@ -172,40 +129,32 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	set_new_tm();
 }
 
-//LKA05_widg::~LKA05_widg()
-//{
-
-//}
-//void MBK02_widg::current_com(int mshm_numb, int pshm_numb)
-//{
-//	
-//}
 void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
-	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-	msg_to_log(_msg);
-//Странные штуки
-	int tmp_mshm = mshm;
-	int tmp_pshm = pshm - 8;
-
-	switch (tmp_mshm)
-	{
-	case 0:
-		current_FSMU = FSMU_numbB(tmp_pshm);
-		break;
-	case 1:
-		current_stab = STAB(tmp_pshm);
-		break;
-	case 2:
-		current_FSVU = FSVU_numbB(tmp_pshm); 
-		break;
-	case 3:
-		current_antenna = ANTENNA(tmp_pshm); 
-		break;
-	}
-	write_words();
-	paint_buttons();
-	set_new_tm();
+	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+	//	msg_to_log(_msg);
+	////Странные штуки
+	//	int tmp_mshm = mshm;
+	//	int tmp_pshm = pshm - 8;
+	//
+	//	switch (tmp_mshm)
+	//	{
+	//	case 0:
+	//		current_FSMU = FSMU_numbB(tmp_pshm);
+	//		break;
+	//	case 1:
+	//		current_stab = STAB(tmp_pshm);
+	//		break;
+	//	case 2:
+	//		current_FSVU = FSVU_numbB(tmp_pshm); 
+	//		break;
+	//	case 3:
+	//		current_antenna = ANTENNA(tmp_pshm); 
+	//		break;
+	//	}
+	//	write_words();
+	//	paint_buttons();
+	//	set_new_tm();
 }
 
 
@@ -222,7 +171,7 @@ void MBK02_widg::msg_to_log(const QString& _msg)
 
 void MBK02_widg::auto_scroll_clicked(int _state)
 {
-	auto_scroll = (_state != 0);
+	//auto_scroll = (_state != 0);
 }
 
 void MBK02_widg::log_timer_ontimer()
@@ -251,218 +200,190 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr))
 	{
-		QString _msg = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
-		msg_to_log(_msg);
+		//QString _msg = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
+		//msg_to_log(_msg);
 
 		int tmp_word = words[0].toInt();
-		QMap<int, QString>::iterator mode_itr;
-		QMap<int, LITERA>::iterator lit_itr;
-		QMap<int, QString>::iterator stab_itr;
-		QMap<int, QString>::iterator ant_intr;
-
 		switch (tmp_cwd.subadr)
 		{
 		case 2:
-
-
-			char rezh;
-			rezh = tmp_word & 7;
-
-
-
-			mode_itr = mode_names.find(rezh);
-			if (mode_itr == mode_names.end())
-			{
-				current_mode = ERR;
-				break;
-			}
-			current_mode = full_mode(mode_itr.key());
-
-			if (current_mode == PI8)
-			{
-				current_PSP = PSP(PSP_OFF);
-			}
-
-			pi8_fast = ((tmp_word & 0x40) != 0);
-
-			IM = ((tmp_word & 0x10) != 0);
 			break;
 		case 3:
-
-			byte liter;
-			liter = tmp_word & 0xFF;
-			lit_itr = lit_map.find(liter);
-			if (lit_itr == lit_map.end())
+			if (tmp_word == 0)
 			{
-				current_lit = 0;
+				switch (current_chan)
+				{
+				case CHANEL_1:
+					if (current_ant == MHA1MY)
+						current_ant = MHA1PY;
+					else
+						current_ant = MHA1MY;
+					break;
+				case CHANEL_2:
+					if (current_ant == MHA2MY)
+						current_ant = MHA2PY;
+					else
+						current_ant = MHA2MY;
+					break;
+				}
 				break;
 			}
-
-			current_lit = LITERA(lit_itr.value());
-			break;
-		case 4:
-
-			char psp_ch = tmp_word & 3;
-
-			current_PSP = PSP(psp_ch + 1);
-
+		case 29:
+			char chan_chk;
+			chan_chk = tmp_word & 7;
+			if (current_chan != CHANEL(chan_chk) - 1)
+				current_ant = MHAOFF;
+			current_chan = CHANEL(chan_chk - 1);
 			break;
 		};
 		write_words();
 		set_new_tm();
+		paint_buttons();
 	}
 }
 void MBK02_widg::write_words()
 {
-	QString res_mode;
-	if (mode_names.contains(current_mode))
-	{
-		res_mode = mode_names[current_mode];
-		if (current_mode == PI8)
-		{
-			res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
-			//?все что перед - если, : -все что перед иначе.
-		}
-		if (IM == true)
-			res_mode += " ИМ";
-	}
-
-	sub_le_list[0]->setText(res_mode);
-	QString lit_num = QString::number(current_lit);
-	sub_le_list[1]->setText(lit_num);
-//	QString tmp_stab = QString::number(current_stab);
-	sub_le_list[2]->setText(stab_names[current_stab]);
-	sub_le_list[3]->setText(ant_names[current_antenna]);
+	//	QString res_mode;
+	//	if (mode_names.contains(current_mode))
+	//	{
+	//		res_mode = mode_names[current_mode];
+	//		if (current_mode == PI8)
+	//		{
+	//			res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
+	//			//?все что перед - если, : -все что перед иначе.
+	//		}
+	//		if (IM == true)
+	//			res_mode += " ИМ";
+	//	}
+	//
+	//	sub_le_list[0]->setText(res_mode);
+	//	QString lit_num = QString::number(current_lit);
+	//	sub_le_list[1]->setText(lit_num);
+	////	QString tmp_stab = QString::number(current_stab);
+	//	sub_le_list[2]->setText(stab_names[current_stab]);
+	//	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
 void MBK02_widg::paint_buttons()
 {
-	for (int i = 0; i < 3; i++)
+	if ((current_chan != CHANEL_OFF) || (current_chan != CHANEL_ERR))
 	{
-		FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-		if (current_FSMU == i)
-			FSMU_blocks[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		switch (current_chan)
+		{
+		case CHANEL_1:
+			Chan1_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
+			Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+			break;
+		case CHANEL_2:
+			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+			Chan2_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
+			break;
+		}
+		if (current_chan == CHANEL_OFF)
+		{
+			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+			Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+		}
 	}
-	for (int i = 0; i < 3; i++)
+	if (current_ant != MHAOFF)
 	{
-		FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-		if (current_FSVU == i)
-			FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		Ant_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
+		Ant_pbut->setText(ant_names[ANTENNA(current_ant)]);
 	}
+	else
+	{
+		Ant_pbut->setText("");
+		Ant_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+	}
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	if (current_FSMU == i)
+	//		FSMU_blocks[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//}
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	if (current_FSVU == i)
+	//		FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//}
 }
 
 void MBK02_widg::set_new_tm()
 {
-	if ((current_FSMU == FSMU_OFF) || (current_stab == LOW_STAB))
-	{
-		if (ab_state)
-		{
-			ab_state = false;
-			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-		}
-		return;
-	}
-	else
-	{
-		if (!ab_state)
-		{
-			ab_state = true;
-			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-		}
-	}
-
-	QVariantList tm_words;
-	unsigned short f_word = 0;
-	unsigned short s_word = 0;
-	if (current_FSVU != FSVU_OFF)
-		switch (current_FSVU)
-		{
-		case FSVU_One:
-			f_word += 0x3000;
-			break;
-		case FSVU_Two:
-			f_word += 0x2800;
-			break;
-		case FSVU_Three:
-			f_word += 0x1800;
-			break;
-		}
-	switch (current_FSMU)
-	{
-	case FSMU_One:
-		f_word += 0x600;
-		break;
-	case FSMU_Two:
-		f_word += 0x500;
-		break;
-	case FSMU_Three:
-		f_word += 0x300;
-		break;
-	}
-	//шта?
-	if (pi8_fast)
-		f_word += 0x40;
-	if (IM)
-		f_word += 0x10;
-	if (current_mode != ERR)
-		f_word += 1 << full_mode(current_mode) - 1;
-	tm_words.push_back(f_word);
-
-
-	if (current_lit != 0)
-		s_word += 0x100 << current_lit - 1;
-	s_word += 0x80 << STAB(current_stab) - 1;
-	if (current_PSP != PSP_OFF)
-		s_word += PSP(current_PSP) - 1;
-	switch (current_antenna)
-	{
-	case OHA:
-		s_word += 0xC;
-		break;
-	case MHA1Y:
-		s_word += 0x14;
-		break;
-	case MHA0Y:
-		s_word += 0x18;
-		break;
-	}
-	tm_words.push_back(s_word);
-	//Отправка 
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
-}
-/*
-MU_MODULE::MU_MODULE() : current_dev(MAIN)
-{
-	working.insert(MAIN, true);
-	working.insert(RESERVE, true);
-
-	ab_working.insert(MAIN, true);
-	ab_working.insert(RESERVE, true);
-
-}
-
-MV_MODULE::MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(MAIN)
-{
-	devices.insert(MAIN, MV_DEV());
-	devices.insert(RESERVE, MV_DEV());
-}
-
-unsigned short MU_MODULE::get_tm()
-{
-	unsigned short _word = 0x1000;
-	if (!get_working())
-		_word += 4;
-	_word += 0x20 << current_dev;
-	return _word;
-}
-
-unsigned short MV_MODULE::get_tm()
-{
-	unsigned short _word = (com << 12) + (nim << 8);
-	if (!get_working())
-		_word += 2 << current_dev;
-	if (current_dev == OFF)
-		_word += 0xC0;
-	else
-		_word += 0x20 << current_dev;
-	return _word;*/
+	//if ((current_FSMU == FSMU_OFF) || (current_stab == LOW_STAB))
+	//{
+	//	if (ab_state)
+	//	{
+	//		ab_state = false;
+	//		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	//	}
+	//	return;
 	//}
+	//else
+	//{
+	//	if (!ab_state)
+	//	{
+	//		ab_state = true;
+	//		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	//	}
+	//}
+
+	//QVariantList tm_words;
+	//unsigned short f_word = 0;
+	//unsigned short s_word = 0;
+	//if (current_FSVU != FSVU_OFF)
+	//	switch (current_FSVU)
+	//	{
+	//	case FSVU_One:
+	//		f_word += 0x3000;
+	//		break;
+	//	case FSVU_Two:
+	//		f_word += 0x2800;
+	//		break;
+	//	case FSVU_Three:
+	//		f_word += 0x1800;
+	//		break;
+	//	}
+	//switch (current_FSMU)
+	//{
+	//case FSMU_One:
+	//	f_word += 0x600;
+	//	break;
+	//case FSMU_Two:
+	//	f_word += 0x500;
+	//	break;
+	//case FSMU_Three:
+	//	f_word += 0x300;
+	//	break;
+	//}
+	////шта?
+	//if (pi8_fast)
+	//	f_word += 0x40;
+	//if (IM)
+	//	f_word += 0x10;
+	//if (current_mode != ERR)
+	//	f_word += 1 << full_mode(current_mode) - 1;
+	//tm_words.push_back(f_word);
+
+
+	//if (current_lit != 0)
+	//	s_word += 0x100 << current_lit - 1;
+	//s_word += 0x80 << STAB(current_stab) - 1;
+	//if (current_PSP != PSP_OFF)
+	//	s_word += PSP(current_PSP) - 1;
+	//switch (current_antenna)
+	//{
+	//case OHA:
+	//	s_word += 0xC;
+	//	break;
+	//case MHA1Y:
+	//	s_word += 0x14;
+	//	break;
+	//case MHA0Y:
+	//	s_word += 0x18;
+	//	break;
+	//}
+	//tm_words.push_back(s_word);
+	////Отправка 
+	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+}

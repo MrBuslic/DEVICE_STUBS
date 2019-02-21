@@ -17,7 +17,6 @@ union MKOWord
 BECH_widg::BECH_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
-	//	this->setFixedSize(1910, 1130);
 	setWindowTitle("БЭЧ");
 
 	mode_names.insert(0, "ПИ-15");
@@ -99,7 +98,6 @@ BECH_widg::BECH_widg(QWidget *parent)
 	//logs_lay->addWidget(auto_scroll_box);
 
 
-
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", 50001);
 	slot_thr.start(); // вот тут падает
@@ -143,23 +141,16 @@ BECH_widg::BECH_widg(QWidget *parent)
 	connect(&log_timer, &QTimer::timeout, this, &BECH_widg::log_timer_ontimer);
 	log_timer.start(200);
 
-	//msg_to_log("рпп");
-	//paint_buttons();
 	//set_new_tm();
 }
 
-//}
-//void BECH_widg::current_com(int mshm_numb, int pshm_numb)
-//{
-//	
-//}
+
 void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
 
 	int uu = 0;
 	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	//	msg_to_log(_msg);
-	////Странные штуки
 		int tmp_mshm = mshm;
 		int tmp_pshm = pshm;
 	
@@ -258,54 +249,6 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			current_FINIK = FINIK_1;
 			current_FINIK_REZH = FINIK_REZH_PI8;
 		}
-		//	switch (tmp_cwd.subadr)
-		//	{
-		//	case 2:
-
-
-		//		char rezh;
-		//		rezh = tmp_word & 7;
-
-
-
-		//		mode_itr = mode_names.find(rezh);
-		//		if (mode_itr == mode_names.end())
-		//		{
-		//			current_mode = ERR;
-		//			break;
-		//		}
-		//		current_mode = full_mode(mode_itr.key());
-
-		//		if (current_mode == PI8)
-		//		{
-		//			current_PSP = PSP(PSP_OFF);
-		//		}
-
-		//		pi8_fast = ((tmp_word & 0x40) != 0);
-
-		//		IM = ((tmp_word & 0x10) != 0);
-		//		break;
-		//	case 3:
-
-		//		byte liter;
-		//		liter = tmp_word & 0xFF;
-		//		lit_itr = lit_map.find(liter);
-		//		if (lit_itr == lit_map.end())
-		//		{
-		//			current_lit = 0;
-		//			break;
-		//		}
-
-		//		current_lit = LITERA(lit_itr.value());
-		//		break;
-		//	case 4:
-
-		//		char psp_ch = tmp_word & 3;
-
-		//		current_PSP = PSP(psp_ch + 1);
-
-		//		break;
-		//	};
 			write_words();
 			paint_buttons();
 		//	set_new_tm();
@@ -338,18 +281,6 @@ void BECH_widg::paint_buttons()
 				KP_pbut[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 		}
 	}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	FSMU_blocks[i]->setStyleSheet("background - color: rgb(204, 204, 204);");
-	//	if (current_FSMU == i)
-	//		FSMU_blocks[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	FSVU_canals[i]->setStyleSheet("background - color: rgb(204, 204, 204);");
-	//	if (current_FSVU == i)
-	//		FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//}
 }
 
 void BECH_widg::set_new_tm()
@@ -431,40 +362,3 @@ void BECH_widg::set_new_tm()
 	////Отправка 
 	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
-/*
-MU_MODULE::MU_MODULE() : current_dev(MAIN)
-{
-	working.insert(MAIN, true);
-	working.insert(RESERVE, true);
-
-	ab_working.insert(MAIN, true);
-	ab_working.insert(RESERVE, true);
-
-}
-
-MV_MODULE::MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(MAIN)
-{
-	devices.insert(MAIN, MV_DEV());
-	devices.insert(RESERVE, MV_DEV());
-}
-
-unsigned short MU_MODULE::get_tm()
-{
-	unsigned short _word = 0x1000;
-	if (!get_working())
-		_word += 4;
-	_word += 0x20 << current_dev;
-	return _word;
-}
-
-unsigned short MV_MODULE::get_tm()
-{
-	unsigned short _word = (com << 12) + (nim << 8);
-	if (!get_working())
-		_word += 2 << current_dev;
-	if (current_dev == OFF)
-		_word += 0xC0;
-	else
-		_word += 0x20 << current_dev;
-	return _word;*/
-	//}
