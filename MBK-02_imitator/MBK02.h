@@ -23,18 +23,6 @@ enum CHANEL
 	CHANEL_ERR = 2,
 	CHANEL_OFF = 3
 };
-//enum ANTENNA_CH1
-//{
-//	MHA1PY = 0,
-//	MHA1MY = 1,
-//	MHA1OFF = 3
-//};
-//enum ANTENNA_CH2
-//{
-//	MHA2PY = 0,
-//	MHA2MY = 1,
-//	MHA2OFF = 3
-//};
 enum ANTENNA
 {
 	MHA1PY = 0,
@@ -61,8 +49,6 @@ private:
 
 	int current_lit = 0;
 	CHANEL current_chan = CHANEL_OFF;
-//	ANTENNA_CH1 current_ant_ch1 = MHA1OFF;
-//	ANTENNA_CH2 current_ant_ch2 = MHA2OFF;
 	ANTENNA current_ant = MHAOFF;
 
 	const int MKO = 1;
@@ -72,15 +58,20 @@ private:
 	QPushButton * okBut;
 	QDialog *dlg;
 
-	QVBoxLayout *All_vblayout;
-	QGridLayout *All_glayout;
-	QVBoxLayout *Chan1_vblayout;
-	QVBoxLayout *Chan2_vblayout;
-	QVBoxLayout *Ant_vblayout;
-	QVBoxLayout *Lit_vblayout;
+	QVBoxLayout *All_vblay;
+	QGridLayout *All_glay;
+	QHBoxLayout *Chan_hblay;
+	QHBoxLayout *Sig_hblay;
+	QVBoxLayout *Ant_vblay;
+	QVBoxLayout *Lit_vblay;
+	QGroupBox *Channels_gbox;
+	QGroupBox *Signal_gbox;
+	QGroupBox *Sup_gbox;
 
 	QPushButton *Chan1_pbut;
 	QPushButton *Chan2_pbut;
+	QPushButton *Sig1_pbut;
+	QPushButton *Sig2_pbut;
 	QPushButton *Ant_pbut;
 	QLineEdit* Lit_le;
 
