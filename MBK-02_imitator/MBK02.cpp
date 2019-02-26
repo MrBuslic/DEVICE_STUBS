@@ -22,39 +22,49 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	Chan1_pbut = new QPushButton("1", this);
 	Chan2_pbut = new QPushButton("2", this);
 	Ant_pbut = new QPushButton("Ykrali", this);
+	Ant_pbut->setMinimumWidth(165);
 	Chan1_pbut->setMinimumWidth(165);
 	Chan2_pbut->setMinimumWidth(165);
 
-	QLabel* Chan_lb = new QLabel("Каналы");
-	//	QLabel* Chan1_lb = new QLabel("Канал 1");
-	//	QLabel* Chan2_lb = new QLabel("Канал 2");
+	Sig1_pbut = new QPushButton("Основной", this);
+	Sig2_pbut = new QPushButton("Резервный", this);
+	Sig1_pbut->setMinimumWidth(165);
+	Sig2_pbut->setMinimumWidth(165);
+
 	QLabel* Lit_lb = new QLabel("Литера");
 	QLabel* Ant_lb = new QLabel("Антенна");
 
-	All_vblayout = new QVBoxLayout(this);
-	All_glayout = new QGridLayout();
-	Chan1_vblayout = new QVBoxLayout();
-	Chan2_vblayout = new QVBoxLayout();
-	Ant_vblayout = new QVBoxLayout();
-	Lit_vblayout = new QVBoxLayout();
+	Signal_gbox = new QGroupBox("Сигнал",this);
+	Channels_gbox = new QGroupBox("Каналы",this);
+	Sup_gbox = new QGroupBox("", this);
+	Signal_gbox->setAlignment(Qt::AlignHCenter);
+	Channels_gbox->setAlignment(Qt::AlignHCenter);
+
+	All_vblay = new QVBoxLayout(this);
+	All_glay = new QGridLayout(Sup_gbox);
+	Chan_hblay = new QHBoxLayout(Channels_gbox);
+	Sig_hblay = new QHBoxLayout(Signal_gbox);
+	Ant_vblay = new QVBoxLayout();
+	Lit_vblay = new QVBoxLayout();
 	Lit_le = new QLineEdit(this);
 
-	All_vblayout->addWidget(Chan_lb, 0, Qt::AlignHCenter);
-	All_vblayout->addLayout(All_glayout);
-	All_glayout->addLayout(Chan1_vblayout, 0, 0);
-	All_glayout->addLayout(Chan2_vblayout, 0, 1);
-	All_glayout->addLayout(Ant_vblayout, 1, 0);
-	All_glayout->addLayout(Lit_vblayout, 1, 1);
+	All_vblay->addWidget(Channels_gbox);
+	All_vblay->addWidget(Signal_gbox);
+	All_vblay->addWidget(Sup_gbox);
+	All_glay->addLayout(Ant_vblay,0, 0);
+	All_glay->addLayout(Lit_vblay, 0, 1);
 
-	//	Chan1_vblayout->addWidget(Chan1_lb, 0, Qt::AlignHCenter);
-	Chan1_vblayout->addWidget(Chan1_pbut);
-	//	Chan2_vblayout->addWidget(Chan2_lb, 0, Qt::AlignHCenter);
-	Chan2_vblayout->addWidget(Chan2_pbut);
-	Ant_vblayout->addWidget(Ant_lb, 0, Qt::AlignHCenter);
-	Ant_vblayout->addWidget(Ant_pbut);
-	Lit_vblayout->addWidget(Lit_lb, 0, Qt::AlignHCenter);
-	Lit_vblayout->addWidget(Lit_le);
+	Chan_hblay->addWidget(Chan1_pbut);
+	Chan_hblay->addWidget(Chan2_pbut);
+	Sig_hblay->addWidget(Sig1_pbut);
+	Sig_hblay->addWidget(Sig2_pbut);
+	Ant_vblay->addWidget(Ant_lb, 0, Qt::AlignHCenter);
+	Ant_vblay->addWidget(Ant_pbut);
+	Lit_vblay->addWidget(Lit_lb, 0, Qt::AlignHCenter);
+	Lit_vblay->addWidget(Lit_le);
 
+	Sig1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+	Sig2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	Ant_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -76,10 +86,8 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK02_widg::auto_scroll_clicked);
-	All_vblayout->addWidget(edit);
-	All_vblayout->addWidget(auto_scroll_box);
-
-
+	All_vblay->addWidget(edit);
+	All_vblay->addWidget(auto_scroll_box);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", 50001);
@@ -207,6 +215,24 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		switch (tmp_cwd.subadr)
 		{
 		case 2:
+			unsigned char first_byte;
+			first_byte = tmp_word & 0xFF;
+			unsigned char second_byte;
+			second_byte = (tmp_word & 0xFF00) >> 8;
+			if (first_byte == second_byte)
+			{
+				switch (first_byte)
+				{
+				case 0x20: current_lit = 1; break;
+				case 0x28: current_lit = 2; break;
+				case 0x30: current_lit = 3; break;
+				case 0x38: current_lit = 4; break;
+				case 0x40: current_lit = 5; break;
+				case 0x48: current_lit = 6; break;
+				case 0x50: current_lit = 7; break;
+				case 0x58: current_lit = 8; break;
+				}
+			}
 			break;
 		case 3:
 			if (tmp_word == 0)
@@ -232,7 +258,13 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			char chan_chk;
 			chan_chk = tmp_word & 7;
 			if (current_chan != CHANEL(chan_chk) - 1)
-				current_ant = MHAOFF;
+			{
+				switch (CHANEL(chan_chk) - 1)
+				{
+				case CHANEL_1: current_ant = MHA1MY; break;
+				case CHANEL_2: current_ant = MHA2MY; break;
+				}
+			}
 			current_chan = CHANEL(chan_chk - 1);
 			break;
 		};
@@ -243,6 +275,7 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 }
 void MBK02_widg::write_words()
 {
+	Lit_le->setText(QString::number(current_lit));
 	//	QString res_mode;
 	//	if (mode_names.contains(current_mode))
 	//	{
