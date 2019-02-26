@@ -13,10 +13,32 @@
 #include <Visa.h>
 #include <windows.h>
 #include <qcoreapplication.h>
+#include "XMLClass.h"
 
 #if defined(__cplusplus) || defined(__cplusplus__)
    extern "C" {
 #endif
+
+
+QList<mezanin_struct> mezanin_list;
+int mezanin_list_poiner = 0;
+
+/*	char desc[50];
+	int slot = 0;
+	int type = 0;
+	int model = 0;
+	int commapp = 0;*/
+
+void mezanin_list_add(QString desc, int type, int model, int slot, int commapp)
+{
+	mezanin_struct mez;
+	strcpy(mez.desc, desc.toLocal8Bit().data());
+	mez.type = VI_INTF_VXI;
+	mez.model = model; 
+	mez.slot = 1;
+	mez.commapp = commapp;
+	mezanin_list.push_back(mez);
+}
 
 /*- Resource Manager Functions and Operations -------------------------------*/
 
@@ -30,12 +52,69 @@ ViStatus _VI_FUNC  viOpenDefaultRM (ViPSession vi)
 ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList vi,
 	ViPUInt32 retCnt, ViChar _VI_FAR desc[])
 	{
-		strcpy(desc, "VXI::1::INSTR");
-		*retCnt = 1;
+		QString commapp = QCoreApplication::applicationName();
+		QString mez = "";
+		if(commapp == "comapp1")
+		{
+			mezanin_list_poiner = 0;
+			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0168, 2, 1);
+			mezanin_list_add("VXI::2::INSTR", VI_INTF_VXI, 0xF10B, 4, 1);
+			mezanin_list_add("VXI::3::INSTR", VI_INTF_VXI, 0xF174, 5, 1);
+			mezanin_list_add("VXI::4::INSTR", VI_INTF_VXI, 0x0168, 8, 1);
+			mezanin_list_add("VXI::5::INSTR", VI_INTF_VXI, 0x0168, 9, 1);
+			mezanin_list_add("VXI::6::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
+			mezanin_list_add("VXI::7::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
+			mezanin_list_add("VXI::8::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
+			mezanin_list_add("VXI::9::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mezanin_list_add("VXI::10::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mezanin_list_add("VXI::11::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mez = "comapp1";
+		}
+
+		if (commapp == "comapp2")
+		{
+			mezanin_list_add("VXI::12::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
+			mezanin_list_add("VXI::13::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
+			mezanin_list_add("VXI::14::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
+			mezanin_list_add("VXI::15::INSTR", VI_INTF_VXI, 0x0171, 3, 2);
+			mezanin_list_add("VXI::16::INSTR", VI_INTF_VXI, 0x0169, 4, 2);
+			mezanin_list_add("VXI::17::INSTR", VI_INTF_VXI, 0x0172, 5, 2);
+			mezanin_list_add("VXI::18::INSTR", VI_INTF_VXI, 0xF14A, 6, 2);
+			mezanin_list_add("VXI::19::INSTR", VI_INTF_VXI, 0xF14A, 7, 2);
+			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0x0168, 10, 2);
+			mezanin_list_add("VXI::21::INSTR", VI_INTF_VXI, 0x0168, 11, 2);
+			mezanin_list_add("VXI::22::INSTR", VI_INTF_VXI, 0xF173, 12, 2);
+			mez = "comapp2";
+		}
+
+		QString app_path = QCoreApplication::applicationDirPath();
+		QFile file(app_path + QString("/%1_mezanins.xml").arg(mez));
+		if (!file.open(QFile::WriteOnly | QFile::Text))
+			return 1;
+
+		XMLClass xml;
+		xml.writeXML(&file, mezanin_list);
+		file.close();
+
+		if (!file.open(QFile::ReadOnly | QFile::Text))
+			return 1;
+		if (!xml.read(&file, mezanin_list))
+			return 1;
+
+		*retCnt = mezanin_list.size();
+		if(!mezanin_list.empty())
+			strcpy(desc, mezanin_list.at(0).desc);
+		else 
+			return 1;
 		return 0;
 	}
 
-ViStatus _VI_FUNC  viFindNext      (ViFindList vi, ViChar _VI_FAR desc[]){ return 0; }
+ViStatus _VI_FUNC  viFindNext      (ViFindList vi, ViChar _VI_FAR desc[])
+{
+	mezanin_list_poiner++;
+	strcpy(desc, mezanin_list.at(mezanin_list_poiner).desc);
+	return 0; 
+}
 
 ViStatus _VI_FUNC  viParseRsrc     (ViSession rmSesn, ViRsrc rsrcName,
                                     ViPUInt16 intfType, ViPUInt16 intfNum){ return 0; }
@@ -67,14 +146,17 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		case VI_ATTR_MODEL_CODE:
 		{
 			int* tmp_res = (int*)attrValue;
-			*tmp_res = 0x10B;// FOI
+			//*tmp_res = 0x10B;// FOI
+			*tmp_res = mezanin_list.at(mezanin_list_poiner).model;// FOI
+
 			//*tmp_res = 0x010D;//MBASE
 			break;
 		}
 		case VI_ATTR_SLOT:
 		{
 			int* tmp_res = (int*)attrValue;
-			*tmp_res = 2;
+			//*tmp_res = 2;
+			*tmp_res = mezanin_list.at(mezanin_list_poiner).slot;
 			break;
 		}
 	};
