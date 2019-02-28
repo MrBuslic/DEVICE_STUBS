@@ -18,6 +18,7 @@
 #include <memory>
 #include <qlayout.h>
 #include <loki/Singleton.h>
+#include "../LKA-05_imitator/lka05_rpc.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -32,6 +33,9 @@ public slots:
 	void log_timer_ontimer();
 	void measurement_timer_ontimer();
 	void infin_timer_ontimer();
+
+	void new_ku(int ku_n, int length, double u);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt); 
 
 	int unmn8i_start();
 	int unmn8i_input_trigger(bool state);
@@ -71,6 +75,11 @@ private:
 	QVariantList buffer;
 	QMap<QObject*, int> buttons;
 	double impulse_length;
+
+	RPC_lka05_SLOT_Thread lka05_slot_thr;
+	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+
+	void form_impulse(int chan, double length, double u);
 signals:
 	void packet_ready();
 };

@@ -15,6 +15,8 @@ public slots:
 	void log_timer_ontimer();
 	void measurement_timer_ontimer();
 	void infin_timer_ontimer();
+	void new_ku(int ku_n, int length, double u);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
 	int unmn8i_start();
 	int unmn8i_input_trigger(bool state);
 	int unmn8i_sample_width_q(uint& frame_width, uint& width_in_bytes);

@@ -27,7 +27,7 @@ rpc_buffer_class::rpc_buffer_class()
 	}
 }
 
-// Объявляем функцию DllMain
+// Объявляем функцию DllMain  
 
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	DWORD fdwReason, LPVOID lpvReserved)
@@ -94,7 +94,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 	ViStatus _VI_FUNC unads128_start (ViSession vi)
 	{
-		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->unads128_start();
+	Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_start();
 		return 0;
 	}
 
@@ -105,6 +105,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 	ViStatus _VI_FUNC unads128_stop (ViSession vi) 
 	{
+		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_stop();
 		return 0;
 	}
 
@@ -133,6 +134,8 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	ViStatus _VI_FUNC unads128_install_handler (ViSession vi,
 		ViAddr user_handler)
 	{
+
+
 		return 0;
 	}
 
@@ -140,6 +143,14 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		ViUInt16 _VI_FAR thisBuiff[],
 		ViUInt16 _VI_FAR firstBuff[]) 
 	{
+
+		QVariantList thisbuf;
+
+		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_read_data(thisbuf, QVariantList());
+
+		for (int i = 0; i < 16; i++)
+				thisBuiff[i] = thisbuf[i].toUInt();
+			
 		return 0;
 	}
 

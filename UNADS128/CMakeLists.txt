@@ -38,7 +38,9 @@ add_library(unads128 SHARED ${UNADS128_HEADERS} ${UNADS128_SOURCES} export.def)
 
 target_link_libraries(unads128 socket_rpc)
 
-set(RPC_ADS128_SOURCES rpc_ads128.h rpc_ads128.cpp ads128_main.cpp ads128_socket_rpc.h ads128_socket_rpc.cpp)
+set(RPC_ADS128_SOURCES rpc_ads128.h rpc_ads128.cpp 
+../LKA-05_imitator/lka05_rpc.h ../LKA-05_imitator/lka05_rpc.cpp
+ads128_main.cpp ads128_socket_rpc.h ads128_socket_rpc.cpp)
 
 add_executable(rpc_ads128 WIN32 ${RPC_ADS128_SOURCES})
 set_target_properties(rpc_ads128 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
