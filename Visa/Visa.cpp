@@ -35,7 +35,7 @@ void mezanin_list_add(QString desc, int type, int model, int slot, int commapp)
 	strcpy(mez.desc, desc.toLocal8Bit().data());
 	mez.type = VI_INTF_VXI;
 	mez.model = model; 
-	mez.slot = 1;
+	mez.slot = slot;
 	mez.commapp = commapp;
 	mezanin_list.push_back(mez);
 }
@@ -58,35 +58,41 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 		{
 			mezanin_list_poiner = 0;
 			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0168, 2, 1);
-			mezanin_list_add("VXI::2::INSTR", VI_INTF_VXI, 0xF10B, 4, 1);
-			mezanin_list_add("VXI::3::INSTR", VI_INTF_VXI, 0xF174, 5, 1);
-			mezanin_list_add("VXI::4::INSTR", VI_INTF_VXI, 0x0168, 8, 1);
-			mezanin_list_add("VXI::5::INSTR", VI_INTF_VXI, 0x0168, 9, 1);
-			mezanin_list_add("VXI::6::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
-			mezanin_list_add("VXI::7::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
-			mezanin_list_add("VXI::8::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
-			mezanin_list_add("VXI::9::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
-			mezanin_list_add("VXI::10::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
-			mezanin_list_add("VXI::11::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mezanin_list_add("VXI::5::INSTR", VI_INTF_VXI, 0x0155, 3, 1);
+			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0xF10B, 4, 1);
+			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0xF174, 5, 1);
+			mezanin_list_add("VXI::35::INSTR", VI_INTF_VXI, 0x010D, 6, 1);
+			mezanin_list_add("VXI::37::INSTR", VI_INTF_VXI, 0x010D, 7, 1);
+			mezanin_list_add("VXI::40::INSTR", VI_INTF_VXI, 0x0168, 8, 1);
+			mezanin_list_add("VXI::50::INSTR", VI_INTF_VXI, 0x0168, 9, 1);
+			mezanin_list_add("VXI::60::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
+			mezanin_list_add("VXI::70::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
+			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
+			mezanin_list_add("VXI::90::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mezanin_list_add("VXI::110::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mezanin_list_add("VXI::120::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
+			mezanin_list_add("VXI::130::INSTR", VI_INTF_VXI, 0x010D, 12, 1);
 			mez = "comapp1";
 		}
 
 		if (commapp == "comapp2")
 		{
-			mezanin_list_add("VXI::12::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
-			mezanin_list_add("VXI::13::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
-			mezanin_list_add("VXI::14::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
-			mezanin_list_add("VXI::15::INSTR", VI_INTF_VXI, 0x0171, 3, 2);
-			mezanin_list_add("VXI::16::INSTR", VI_INTF_VXI, 0x0169, 4, 2);
-			mezanin_list_add("VXI::17::INSTR", VI_INTF_VXI, 0x0172, 5, 2);
-			mezanin_list_add("VXI::18::INSTR", VI_INTF_VXI, 0xF14A, 6, 2);
-			mezanin_list_add("VXI::19::INSTR", VI_INTF_VXI, 0xF14A, 7, 2);
-			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0x0168, 10, 2);
-			mezanin_list_add("VXI::21::INSTR", VI_INTF_VXI, 0x0168, 11, 2);
-			mezanin_list_add("VXI::22::INSTR", VI_INTF_VXI, 0xF173, 12, 2);
+			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
+			mezanin_list_add("VXI::10::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
+			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
+			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0x0171, 3, 2);
+			mezanin_list_add("VXI::40::INSTR", VI_INTF_VXI, 0x0169, 4, 2);
+			mezanin_list_add("VXI::50::INSTR", VI_INTF_VXI, 0x0172, 5, 2);
+			mezanin_list_add("VXI::60::INSTR", VI_INTF_VXI, 0xF14A, 6, 2);
+			mezanin_list_add("VXI::70::INSTR", VI_INTF_VXI, 0xF14A, 7, 2);
+			mezanin_list_add("VXI::75::INSTR", VI_INTF_VXI, 0x010D, 8, 1);
+			mezanin_list_add("VXI::77::INSTR", VI_INTF_VXI, 0x010D, 9, 1);
+			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0168, 10, 2);
+			mezanin_list_add("VXI::90::INSTR", VI_INTF_VXI, 0x0168, 11, 2);
+			mezanin_list_add("VXI::100::INSTR", VI_INTF_VXI, 0xF173, 12, 2);
 			mez = "comapp2";
 		}
-
+		/*
 		QString app_path = QCoreApplication::applicationDirPath();
 		QFile file(app_path + QString("/%1_mezanins.xml").arg(mez));
 		if (!file.open(QFile::WriteOnly | QFile::Text))
@@ -100,7 +106,7 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 			return 1;
 		if (!xml.read(&file, mezanin_list))
 			return 1;
-
+		*/
 		*retCnt = mezanin_list.size();
 		if(!mezanin_list.empty())
 			strcpy(desc, mezanin_list.at(0).desc);
@@ -147,7 +153,7 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		{
 			int* tmp_res = (int*)attrValue;
 			//*tmp_res = 0x10B;// FOI
-			*tmp_res = mezanin_list.at(mezanin_list_poiner).model;// FOI
+			*tmp_res = mezanin_list.at(mezanin_list_poiner).model;
 
 			//*tmp_res = 0x010D;//MBASE
 			break;
