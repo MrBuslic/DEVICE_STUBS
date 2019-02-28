@@ -13,17 +13,12 @@ public:
 public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
-	void measurement_timer_ontimer();
-	void infin_timer_ontimer();
-	int unads128_start();
-	int unads128_input_trigger(bool state);
-	int unads128_sample_width_q(uint& frame_width, uint& width_in_bytes);
-	int unads128_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime);
-	int unads128_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples);
-	int unads128_sample_period(double _periodS);
-	int unads128_mode_cycle(uint _size);
-	int unads128_num_ready_data(uint& _num);
-	void button_clicked();
+	void ads_timer_ontimer();
+	void new_ku(int ku_n, int length, double u);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	int ads128_start();
+	int ads128_read_data(QVariantList thisbuf, QVariantList firstbuf);
+	int ads128_stop();
 	////////////////////////////////////
 };
 
@@ -58,7 +53,6 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
-	void packet_ready();
 };
 
 class RPC_ads128_SIGNAL_Thread : public RPC_SIGNAL_Thread
