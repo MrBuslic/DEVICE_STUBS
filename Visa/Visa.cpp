@@ -57,42 +57,43 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 		if(commapp == "comapp1")
 		{
 			mezanin_list_poiner = 0;
-			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0168, 2, 1);
-			mezanin_list_add("VXI::5::INSTR", VI_INTF_VXI, 0x0155, 3, 1);
-			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0xF10B, 4, 1);
-			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0xF174, 5, 1);
-			mezanin_list_add("VXI::35::INSTR", VI_INTF_VXI, 0x010D, 6, 1);
-			mezanin_list_add("VXI::37::INSTR", VI_INTF_VXI, 0x010D, 7, 1);
-			mezanin_list_add("VXI::40::INSTR", VI_INTF_VXI, 0x0168, 8, 1);
-			mezanin_list_add("VXI::50::INSTR", VI_INTF_VXI, 0x0168, 9, 1);
-			mezanin_list_add("VXI::60::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
-			mezanin_list_add("VXI::70::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
-			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0105, 10, 1);
-			mezanin_list_add("VXI::90::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
-			mezanin_list_add("VXI::110::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
-			mezanin_list_add("VXI::120::INSTR", VI_INTF_VXI, 0x0105, 11, 1);
-			mezanin_list_add("VXI::130::INSTR", VI_INTF_VXI, 0x010D, 12, 1);
+			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0168, 2, 1);		// ŒÀ—
+			mezanin_list_add("VXI::5::INSTR", VI_INTF_VXI, 0x0155, 3, 1);		// ÕÃ”
+			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0xF10B, 4, 1);		// ‘Œ»
+			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0xF174, 5, 1);		// RF Sitch VXI
+			mezanin_list_add("VXI::35::INSTR", VI_INTF_VXI, 0x010D, 6, 1);		// ÕÃ
+			mezanin_list_add("VXI::37::INSTR", VI_INTF_VXI, 0x010D, 7, 1);		// ÕÃ
+			mezanin_list_add("VXI::40::INSTR", VI_INTF_VXI, 0x0168, 8, 1);		// ŒÀ—
+			mezanin_list_add("VXI::50::INSTR", VI_INTF_VXI, 0x0168, 9, 1);		// ŒÀ—
+			mezanin_list_add("VXI::60::INSTR", VI_INTF_VXI, 0x0105, 10, 1);		// VM6068
+			mezanin_list_add("VXI::70::INSTR", VI_INTF_VXI, 0x0105, 10, 1);		// VM6068
+			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0105, 10, 1);		// VM6068
+			mezanin_list_add("VXI::90::INSTR", VI_INTF_VXI, 0x0105, 11, 1);		// VM6068
+			mezanin_list_add("VXI::110::INSTR", VI_INTF_VXI, 0x0105, 11, 1);	// VM6068
+			mezanin_list_add("VXI::120::INSTR", VI_INTF_VXI, 0x0105, 11, 1);	// VM6068
+			mezanin_list_add("VXI::130::INSTR", VI_INTF_VXI, 0x010D, 12, 1);	// ÕÃ
 			mez = "comapp1";
 		}
 
 		if (commapp == "comapp2")
 		{
-			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
-			mezanin_list_add("VXI::10::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
-			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0x0105, 2, 2);
-			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0x0171, 3, 2);
-			mezanin_list_add("VXI::40::INSTR", VI_INTF_VXI, 0x0169, 4, 2);
-			mezanin_list_add("VXI::50::INSTR", VI_INTF_VXI, 0x0172, 5, 2);
-			mezanin_list_add("VXI::60::INSTR", VI_INTF_VXI, 0xF14A, 6, 2);
-			mezanin_list_add("VXI::70::INSTR", VI_INTF_VXI, 0xF14A, 7, 2);
-			mezanin_list_add("VXI::75::INSTR", VI_INTF_VXI, 0x010D, 8, 1);
-			mezanin_list_add("VXI::77::INSTR", VI_INTF_VXI, 0x010D, 9, 1);
-			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0168, 10, 2);
-			mezanin_list_add("VXI::90::INSTR", VI_INTF_VXI, 0x0168, 11, 2);
-			mezanin_list_add("VXI::100::INSTR", VI_INTF_VXI, 0xF173, 12, 2);
+			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0105, 2, 2);		// VM6068
+			mezanin_list_add("VXI::10::INSTR", VI_INTF_VXI, 0x0105, 2, 2);		// VM6068
+			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0x0105, 2, 2);		// VM6068
+			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0x0171, 3, 2);		//  œ100-30
+			mezanin_list_add("VXI::40::INSTR", VI_INTF_VXI, 0x0169, 4, 2);		// ¬¬ 5
+			mezanin_list_add("VXI::50::INSTR", VI_INTF_VXI, 0x0172, 5, 2);		// »—4
+			mezanin_list_add("VXI::60::INSTR", VI_INTF_VXI, 0xF14A, 6, 2);		// ¿ƒ—128
+			mezanin_list_add("VXI::70::INSTR", VI_INTF_VXI, 0xF14A, 7, 2);		// ¿ƒ—128
+			mezanin_list_add("VXI::75::INSTR", VI_INTF_VXI, 0x010D, 8, 1);		// ÕÃ
+			mezanin_list_add("VXI::77::INSTR", VI_INTF_VXI, 0x010D, 9, 1);		// ÕÃ
+			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0168, 10, 2);		// ŒÀ—
+			mezanin_list_add("VXI::90::INSTR", VI_INTF_VXI, 0x0168, 11, 2);		// ŒÀ—
+			mezanin_list_add("VXI::100::INSTR", VI_INTF_VXI, 0xF173, 12, 2);	// RFS VXi
 			mez = "comapp2";
 		}
-		/*
+
+		/*		/// –¿¡Œ“¿ — XML
 		QString app_path = QCoreApplication::applicationDirPath();
 		QFile file(app_path + QString("/%1_mezanins.xml").arg(mez));
 		if (!file.open(QFile::WriteOnly | QFile::Text))
@@ -107,6 +108,7 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 		if (!xml.read(&file, mezanin_list))
 			return 1;
 		*/
+
 		*retCnt = mezanin_list.size();
 		if(!mezanin_list.empty())
 			strcpy(desc, mezanin_list.at(0).desc);

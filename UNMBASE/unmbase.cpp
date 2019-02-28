@@ -88,9 +88,9 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		mezanin_list_add(0, 0);
 		*/
 
-		mezanin_list_add(2, 0x021);	// OSC5
+		mezanin_list_add(1, 0x021);	// OSC5
 		mezanin_list_add(0, 0);
-		mezanin_list_add(4, 0x1A);	// MC
+		mezanin_list_add(1, 0x1A);	// MC
 		mezanin_list_add(0, 0);
 		mezanin_list_add(0, 0);
 		mezanin_list_add(0, 0);
