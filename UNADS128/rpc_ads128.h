@@ -18,6 +18,7 @@
 #include <memory>
 #include <qlayout.h>
 #include <loki/Singleton.h>
+#include "../LKA-05_imitator/lka05_rpc.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -30,20 +31,14 @@ public slots:
 
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
-	void measurement_timer_ontimer();
-	void infin_timer_ontimer();
+	void ads_timer_ontimer();
 
-	int unads128_start();
-	int unads128_input_trigger(bool state);
-	int unads128_sample_width_q(uint& frame_width, uint&  width_in_bytes);
-	int unads128_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime);
-	int unads128_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples);
-	int unads128_sample_period(double _periodS);
-	int unads128_mode_cycle(uint _size);
-	int unads128_num_ready_data(uint& _num);
-	
+	void new_ku(int ku_n, int length, double u);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
 
-	void button_clicked();
+	int ads128_start();
+	int ads128_read_data(QVariantList thisbuf, QVariantList firstbuf);
+	int ads128_stop();
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -54,25 +49,21 @@ private:
 	bool auto_scroll;
 	QString log_filename;
 	QTimer log_timer;
-	std::unique_ptr<QTimer> infin_timer;
 	QTime begin_time;
 
+	std::unique_ptr<QTimer> ads_timer;
+	QMutex ads_mutex;
 	QStringList log_buffer;
 	QMutex log_mutex;
 	bool state;
+	bool timerads;
 
-	double periodS;
-	uint samples;
-	bool measuring;
-	bool infinit;
+	bool running;
 
-	QList <QLineEdit*>  checks; 
-	QLineEdit* buf_edit;
-	QVariantList buffer;
-	QMap<QObject*, int> buttons;
-	double impulse_length;
-signals:
-	void packet_ready();
+	QVariantList state_buffer; 
+
+	RPC_lka05_SLOT_Thread lka05_slot_thr;
+	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
 };
 
 #endif

@@ -9,8 +9,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include "ads128_socket_rpc.h"
+#include <qmessagebox.h>
 
-RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true), measuring(false), state(false)
+RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true),  state(false)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -25,21 +26,6 @@ RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), au
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcADS128Widget::auto_scroll_clicked);
-
-	QGridLayout* gr_layout = new QGridLayout;
-	for (int i = 0; i < 2; i++)
-		for (int j = 0; j < 4; j++)
-		{
-			QLineEdit* tmp_edit = new QLineEdit;
-			checks << tmp_edit;
-			gr_layout->addWidget(tmp_edit, i * 2, j);
-			QPushButton* push_b = new QPushButton(QString::number(j + 1 + i * 4));
-			connect(push_b, &QPushButton::clicked, this, &RpcADS128Widget::button_clicked);
-			buttons.insert(push_b, i * 2 + j);
-			gr_layout->addWidget(push_b, i * 2 + 1, j);
-		}
-
-	v_lay->addLayout(gr_layout);
 	v_lay->addWidget(edit);
 	v_lay->addWidget(auto_scroll_box);
 
@@ -50,6 +36,22 @@ RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), au
 	connect(&log_timer, &QTimer::timeout, this, &RpcADS128Widget::log_timer_ontimer);
 	log_timer.start(200);
 
+	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
+	lka05_slot_thr.start(); // вот тут падает
+
+	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
+	lka05_signal_thr.start(); // вот тут падает
+
+	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		this->deleteLater();
+		return;
+	}
+
+	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double)), this, SLOT(new_ku(int, int, double)));
+
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
@@ -59,148 +61,49 @@ RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), au
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
-	setWindowTitle(QString("ADS128 %1").arg(slot_port - 30029));
+	setWindowTitle(QString("ADS128 %1").arg(slot_port - 30059));
+
+	running = false;
 }
 
-int RpcADS128Widget::unads128_input_trigger(bool state)
+int RpcADS128Widget::ads128_read_data(QVariantList thisbuf, QVariantList firstbuf)
 {
-	QString _msg = QString("%1 %2 входные реле").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg((state == true) ? "замыкаю" : "размыкаю");
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
+	QMutexLocker lock(&ads_mutex);
 
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
+	thisbuf = state_buffer;
 	return 0;
 }
 
-int RpcADS128Widget::unads128_sample_width_q(uint& frame_width, uint&  width_in_bytes)
+int RpcADS128Widget::ads128_stop()
 {
-	frame_width = 8;
-	width_in_bytes = 64;
+	running = false;
 	return 0;
 }
-
-
-int RpcADS128Widget::unads128_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime)
-{
-	_buf = buf_edit->text().toUInt(0, 0);
-	_firstTime = 0;
-	_thisTime = 0;
-
-	QString _msg = QString("%1 Запрос данных").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
-
-	return 0;
-}
-int RpcADS128Widget::unads128_num_ready_data(uint&_num)
-{
-	_num = buffer.size();
-	return 0;
-}
-int RpcADS128Widget::unads128_mode_cycle(uint _size)
-{
-	samples = _size;
-	return 0;
-}
-
-int RpcADS128Widget::unads128_start()
+int RpcADS128Widget::ads128_start()
 {
 	QString _msg;
-	if (samples == 1)
-		_msg = QString("%1 Запускаю процесс однократного измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-	else
-		if (samples == 0)
-			_msg = QString("%1 Запускаю процесс непрерывного измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-		else
-			_msg = QString("%1 Запускаю процесс измерения %2 семплов").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(samples);
-
+		_msg = QString("%1 Запускаю процесс измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+	
 	QMutexLocker lock(&log_mutex);
 	log_buffer << _msg;
-
-	if (samples == 1)
-	{
-		buffer.clear();
-		QVariantList tmp_measurment;
-		for (int i = 0; i < 8; i++)
-			tmp_measurment << checks[i]->text().toDouble();
-
-		buffer << QVariant(tmp_measurment);
-
-		emit packet_ready();
-	}
-	else
-	{
-		if (samples == 0)
-		{
-			buffer.clear();
-			infin_timer = std::unique_ptr<QTimer>(new QTimer);
-			connect(infin_timer.get(), &QTimer::timeout, this, &RpcADS128Widget::infin_timer_ontimer);
-			infin_timer->start(periodS * 1000);
-			infinit = true;
-
-		}
-
-		else
-		{
-			buffer.clear();
-			buffer.reserve(samples);
-			for (int i = 0; i < samples; i++)
-			{
-				QVariantList tmp_measurment;
-				for (int j = 0; j < 8; j++)
-					tmp_measurment << 0;
-				buffer << QVariant(tmp_measurment);
-			}
-			measuring = true;
-			begin_time = QTime::currentTime();
-			QTimer::singleShot(samples * 1000 * periodS, this, SLOT(measurement_timer_ontimer()));
-		}
-	}
+	
+	running = true;
 
 	_cursor->insertText(_msg + "\n");
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
 	return 0;
 }
-int RpcADS128Widget::unads128_sample_period(double _periodS)
+
+void RpcADS128Widget::ads_timer_ontimer()
 {
-	periodS = _periodS;
-	return 0;
-}
-
-
-int RpcADS128Widget::unads128_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples)
-{
-	if (buffer.isEmpty())
-
-		realNumSamples = 0;
-
-	else
-	{
-		realNumSamples = numSamples;
-		if (realNumSamples > buffer.size())
-			realNumSamples = buffer.size();
-		buf = buffer.mid(0, realNumSamples);
-		buffer.erase(buffer.begin(), buffer.begin() + realNumSamples);
-	}
-	return 0;
-
+	
 }
 
 void RpcADS128Widget::auto_scroll_clicked(int _state)
 {
 	auto_scroll = (_state != 0);
 }
-
 
 void RpcADS128Widget::log_timer_ontimer()
 {
@@ -220,47 +123,14 @@ void RpcADS128Widget::log_timer_ontimer()
 	log_file.close();
 }
 
-void RpcADS128Widget::measurement_timer_ontimer()
+void RpcADS128Widget::new_ku(int ku_n, int length, double u)
 {
-	measuring = false;
-	emit packet_ready();
-}
-
-void RpcADS128Widget::infin_timer_ontimer()
-{
-	QVariantList tmp_measurment;
-	for (int i = 0; i < 8; i++)
-		tmp_measurment << checks[i]->text().toDouble();
-
-	buffer << QVariant(tmp_measurment);
-
+	  
 
 }
 
-void RpcADS128Widget::button_clicked()
+void RpcADS128Widget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
+ 
 
-	if (!measuring)
-		return;
-
-	QMap<QObject*, int>::iterator itr = buttons.find(sender());
-	if (itr == buttons.end())
-		return;
-
-	int cur_msecs = begin_time.msecsTo(QTime::currentTime());
-
-	double msecs_d = (double)(double(cur_msecs) / (double)(1000));
-
-	int start_ind = msecs_d / periodS;
-
-	impulse_length = checks[itr.value()]->text().toDouble();
-
-	int samples_length = impulse_length / periodS;
-
-	for (int i = start_ind; i < start_ind + samples_length; i++)
-	{
-		QVariantList tmp_meas = buffer[i].toList();
-		tmp_meas[itr.value()] = 26.5;
-		buffer[i] = tmp_meas;
-	}
 }

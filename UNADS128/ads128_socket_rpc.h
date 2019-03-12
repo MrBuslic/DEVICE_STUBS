@@ -35,7 +35,6 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void packet_ready();
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -103,17 +102,12 @@ public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant log_timer_ontimer(QVariantList& _values);
-	QVariant measurement_timer_ontimer(QVariantList& _values);
-	QVariant infin_timer_ontimer(QVariantList& _values);
-	QVariant unads128_start(QVariantList& _values);
-	QVariant unads128_input_trigger(QVariantList& _values);
-	QVariant unads128_sample_width_q(QVariantList& _values);
-	QVariant unads128_read_sample(QVariantList& _values);
-	QVariant unads128_read_packet(QVariantList& _values);
-	QVariant unads128_sample_period(QVariantList& _values);
-	QVariant unads128_mode_cycle(QVariantList& _values);
-	QVariant unads128_num_ready_data(QVariantList& _values);
-	QVariant button_clicked(QVariantList& _values);
+	QVariant ads_timer_ontimer(QVariantList& _values);
+	QVariant new_ku(QVariantList& _values);
+	QVariant new_mk(QVariantList& _values);
+	QVariant ads128_start(QVariantList& _values);
+	QVariant ads128_read_data(QVariantList& _values);
+	QVariant ads128_stop(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
