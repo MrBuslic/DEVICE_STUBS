@@ -1,0 +1,57 @@
+#ifndef RPC_VVK4_H
+#define RPC_VVK4_H
+#ifdef WIN32
+#include "winsock2.h"
+#endif
+#include <QObject>
+#include <QString>
+#include <QWidget>
+#include <QThread>
+#include <QLineEdit>
+#include <QTimer>
+#include <QMutex>
+#include <QFormLayout>
+#include <memory>
+#include <qlayout.h>
+#include <loki/Singleton.h>
+
+#ifndef SINGLETON_DEF
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#endif
+class RpcVvk4Widget : public QWidget
+{
+	Q_OBJECT
+public:
+	RpcVvk4Widget();
+	enum CHAN
+	{
+		EI = 0,
+		SUM
+	};
+public slots:
+	void log_timer_ontimer();
+	int unfoi_run();
+	int unvvk4_commut_ListOutput(int _line, QString _masOn, QString _masOff);
+private:
+	QLineEdit* ei_chanels_lbl;
+	QLineEdit* sum_chanels_lbl;
+	QString log_filename;
+	QTimer log_timer;
+	QStringList log_buffer;
+	QMutex log_mutex;
+	QList<int> ei_chanels_list;
+	QList<int> sum_chanels_list;
+
+	QList<int> string_to_int_list(QString chanels);
+	QString int_list_to_string(QList<int> chanels_list);
+	void update_view();
+
+	int n;
+	short chan;
+	double u;
+	double t;
+signals:
+	void foi_interrupt(int _n, short _chan, double _u, double _t);
+};
+
+#endif //RPC_VVK4_H
