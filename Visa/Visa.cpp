@@ -93,6 +93,11 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 			mez = "comapp2";
 		}
 
+		if (commapp == "comappFrame")
+		{
+			mezanin_list_add("VXI::103::INSTR", VI_INTF_VXI, 0x010D, 6, 1);		// ÕÃ
+			mezanin_list_add("VXI::104::INSTR", VI_INTF_VXI, 0x010D, 7, 1);		// ÕÃ
+		}
 		/*		/// –¿¡Œ“¿ — XML
 		QString app_path = QCoreApplication::applicationDirPath();
 		QFile file(app_path + QString("/%1_mezanins.xml").arg(mez));

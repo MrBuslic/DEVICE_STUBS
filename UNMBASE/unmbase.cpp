@@ -150,6 +150,26 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		
 	}
 
+	if (commapp == "comappFrame")
+	{
+		mezanin_list_add(1, 0x36);	// MKPRM
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+
+		mezanin_list_add(1, 0x37);	// MBKUPI
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+	}
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/
