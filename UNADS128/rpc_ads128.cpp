@@ -11,7 +11,7 @@
 #include "ads128_socket_rpc.h"
 #include <qmessagebox.h>
 
-RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true),  state(false)
+RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  state(false), ads_num(_ads_num)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -34,13 +34,16 @@ RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), au
 	if (!dir.exists())
 		QDir().mkdir("d:/logs");
 	connect(&log_timer, &QTimer::timeout, this, &RpcADS128Widget::log_timer_ontimer);
+	ads_timer = std::unique_ptr<QTimer>(new QTimer);
+	connect(ads_timer.get(), &QTimer::timeout, this, &RpcADS128Widget::ads_timer_ontimer);
+
 	log_timer.start(200);
 
 	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
-	lka05_slot_thr.start(); // вот тут падает
+	lka05_slot_thr.start(); 
 
 	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
-	lka05_signal_thr.start(); // вот тут падает
+	lka05_signal_thr.start(); 
 
 	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
 	{
@@ -55,14 +58,15 @@ RpcADS128Widget::RpcADS128Widget(int slot_port, int signal_port) : QWidget(), au
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
-	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->set_params(ip_str, 30050+ads_num);
 	rpc_slot_srv->start();
 	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
-	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->set_params(ip_str, 30055 + ads_num);
 	rpc_signal_srv->start();
-	setWindowTitle(QString("ADS128 %1").arg(slot_port - 30059));
-
+	setWindowTitle(QString("ADS128 %1").arg(ads_num));
+	for (int i = 0; i < 16; i++)
+		state_buffer << 0;
 	running = false;
 }
 
@@ -83,10 +87,7 @@ int RpcADS128Widget::ads128_start()
 {
 	QString _msg;
 		_msg = QString("%1 Запускаю процесс измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-	
-	QMutexLocker lock(&log_mutex);
-	log_buffer << _msg;
-	
+		
 	running = true;
 
 	_cursor->insertText(_msg + "\n");
@@ -97,7 +98,11 @@ int RpcADS128Widget::ads128_start()
 
 void RpcADS128Widget::ads_timer_ontimer()
 {
-	
+	ads_timer->stop();
+	QMutexLocker lock(&ads_mutex);
+	state_buffer.clear();
+	for (int i = 0; i < 16; i++)
+		state_buffer << 0;
 }
 
 void RpcADS128Widget::auto_scroll_clicked(int _state)
@@ -123,14 +128,38 @@ void RpcADS128Widget::log_timer_ontimer()
 	log_file.close();
 }
 
+void RpcADS128Widget::add_signal(int ads_chan, double _u)
+{
+	unsigned char new_state = 0;
+	if (_u > step_1)
+		new_state = 1;
+	if (_u > step_2)
+		new_state = 3;
+
+	int ads_group_n = ads_chan / 8;
+	int ads_chan_group = ads_chan % 8;
+
+	unsigned short old_group = state_buffer[ads_group_n].toInt();
+
+	old_group = old_group | (new_state << ads_chan_group);
+	state_buffer[ads_group_n] = old_group;
+}
+
 void RpcADS128Widget::new_ku(int ku_n, int length, double u)
 {
-	  
+	
 
+
+	int ads_chan_n = ku_n + 1;
+	add_signal(ads_chan_n, u);
+	ads_timer->start(length);
 }
 
 void RpcADS128Widget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
- 
-
+	int ads_chan_m = mshm + 33;
+	int ads_chan_p = pshm + 1;
+	add_signal(ads_chan_m, u_m);
+	add_signal(ads_chan_p, u_p);
+	ads_timer->start(qMax(length_m, length_p));
 }
