@@ -64,18 +64,10 @@ void RPC_vvk4_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
 
 void RPC_vvk4_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_vvk4_SIGNAL_Object::foi_interrupt)) {
-		SRPCSignalClass::Instance().toLog("foi_interrupt connected");
-		emit connect_signal("foi_interrupt(int, short, double, double)", true);
-	}
 }
 
 void RPC_vvk4_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_vvk4_SIGNAL_Object::foi_interrupt)) {
-		SRPCSignalClass::Instance().toLog("foi_interrupt disconnected");
-		//emit connect_signal("foi_interrupt(int, short, double, double)", false);
-	}
 }
 
 void RPC_vvk4_SIGNAL_Object::read_data()
@@ -111,31 +103,6 @@ void RPC_vvk4_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("vvk4 new signal " + op_name);
 
-			if (op_name == "foi_interrupt(int, short, double, double)")
-			{
-				int _n;
-				tmp_stream >> _n;
-				SRPCSignalClass::Instance().toLog("vvk4 " + op_name +" call_number "+ QString::number(call_number) + " _n = "+RPCSignalClass::QVariantToString(_n));
-				short _chan;
-				tmp_stream >> _chan;
-				SRPCSignalClass::Instance().toLog("vvk4 " + op_name +" call_number "+ QString::number(call_number) + " _chan = "+RPCSignalClass::QVariantToString(_chan));
-				double _u;
-				tmp_stream >> _u;
-				SRPCSignalClass::Instance().toLog("vvk4 " + op_name +" call_number "+ QString::number(call_number) + " _u = "+RPCSignalClass::QVariantToString(_u));
-				double _t;
-				tmp_stream >> _t;
-				SRPCSignalClass::Instance().toLog("vvk4 " + op_name +" call_number "+ QString::number(call_number) + " _t = "+RPCSignalClass::QVariantToString(_t));
-				emit foi_interrupt(_n, _chan, _u, _t);
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("vvk4 signal finished " + op_name +" call_number "+ QString::number(call_number));
-			}
 		}
 	}
 }
@@ -144,24 +111,6 @@ void RPC_vvk4_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_vvk4_SLOT_Object::log_timer_ontimer()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("log_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("vvk4 dynamic_call finished log_timer_ontimer");
-}
-int RPC_vvk4_SLOT_Object::unfoi_run()
-{
-	if(!connected) return 1;
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call unfoi_run %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unfoi_run()", tmp_list);
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call finished unfoi_run %1").arg(tmp_ret_params));
-	return res.toInt();
-}
 int RPC_vvk4_SLOT_Object::unvvk4_commut_ListOutput(int _line, QString _masOn, QString _masOff)
 {
 	if(!connected) return 1;
@@ -175,6 +124,44 @@ int RPC_vvk4_SLOT_Object::unvvk4_commut_ListOutput(int _line, QString _masOn, QS
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call finished unvvk4_commut_ListOutput %1").arg(tmp_ret_params));
 	return res.toInt();
+}
+void RPC_vvk4_SLOT_Object::get_commut_chanels_list(QVariantList& ei_list, QVariantList& sum_list)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(ei_list);
+	tmp_list << QVariant(sum_list);
+	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call get_commut_chanels_list %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_commut_chanels_list(QVariantList&, QVariantList&)", tmp_list);
+	ei_list = tmp_list.at(0).toList();
+	tmp_ret_params += " ei_list="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	sum_list = tmp_list.at(1).toList();
+	tmp_ret_params += " sum_list="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call finished get_commut_chanels_list %1").arg(tmp_ret_params));
+}
+int RPC_vvk4_SLOT_Object::unvvk4_config_MeasureLine(int line, int state)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(line);
+	tmp_list << QVariant(state);
+	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call unvvk4_config_MeasureLine %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unvvk4_config_MeasureLine(int, int)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call finished unvvk4_config_MeasureLine %1").arg(tmp_ret_params));
+	return res.toInt();
+}
+void RPC_vvk4_SLOT_Object::get_measure_lines(QVariantList& mes_list)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(mes_list);
+	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call get_measure_lines %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_measure_lines(QVariantList&)", tmp_list);
+	mes_list = tmp_list.at(0).toList();
+	tmp_ret_params += " mes_list="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	SRPCSignalClass::Instance().toLog(QString("vvk4 dynamic_call finished get_measure_lines %1").arg(tmp_ret_params));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

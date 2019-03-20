@@ -172,7 +172,10 @@ ViStatus _VI_FUNC unvvk4_config_ListOutput (ViSession vi_vvk4, ViInt16 line, ViP
 // Функция "Конфигурация всех выходов"	   0-снять конфигурацию, 1-сконфигурировать 
 ViStatus _VI_FUNC unvvk4_config_AllOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *NN_output){ return 0; }
 // Функция "Конфигурация измерительных линий" :	 0-отключить, 1-подключить	  
-ViStatus _VI_FUNC unvvk4_config_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine, ViInt16 state){ return 0; }
+ViStatus _VI_FUNC unvvk4_config_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine, ViInt16 state)
+{ 
+	return Srpc_buffer_class::Instance().vvk4_slot_thr.get_vvk4_obj()->unvvk4_config_MeasureLine(IzmLine, state);
+}
 
 // Функция "Запрос состояния конфигурации входных измерительных линий"  
 ViStatus _VI_FUNC unvvk4_config_MeasureLine_Q (ViSession vi_vvk4, ViInt16 *Mas){ return 0; }

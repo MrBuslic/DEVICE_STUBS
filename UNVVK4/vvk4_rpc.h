@@ -11,9 +11,10 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void log_timer_ontimer();
-	int unfoi_run();
 	int unvvk4_commut_ListOutput(int _line, QString _masOn, QString _masOff);
+	void get_commut_chanels_list(QVariantList& ei_list, QVariantList& sum_list);
+	int unvvk4_config_MeasureLine(int line, int state);
+	void get_measure_lines(QVariantList& mes_list);
 	////////////////////////////////////
 };
 
@@ -48,7 +49,6 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
-	void foi_interrupt(int _n, short _chan, double _u, double _t);
 };
 
 class RPC_vvk4_SIGNAL_Thread : public RPC_SIGNAL_Thread

@@ -14,15 +14,11 @@ RpcVvk4Widget::RpcVvk4Widget() : QWidget()
 	ei_chanels_lbl->setReadOnly(true);
 	sum_chanels_lbl = new QLineEdit("нет каналов");
 	sum_chanels_lbl->setReadOnly(true);
+	meas_chanels_lbl = new QLineEdit("не подключены");
+	meas_chanels_lbl->setReadOnly(true);
 	g_lay->addRow("EI:", ei_chanels_lbl);
 	g_lay->addRow("SUM:", sum_chanels_lbl);
-
-	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
-	QDir dir("d:/logs");
-	if (!dir.exists())
-		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcVvk4Widget::log_timer_ontimer);
-	log_timer.start(200);
+	g_lay->addRow("Измерительные линии:", meas_chanels_lbl);
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = 70001;
@@ -42,6 +38,7 @@ int RpcVvk4Widget::unvvk4_commut_ListOutput(int _line, QString _masOn, QString _
 	int res = -1;
 	QList<int> on_chanels = string_to_int_list(_masOn);
 	QList<int> off_chanels = string_to_int_list(_masOff);
+	QMutexLocker lock(&comut_mutex);
 	if (_line == CHAN::EI)
 	{
 		QList<int>::const_iterator on_it = on_chanels.constBegin();
@@ -78,13 +75,61 @@ int RpcVvk4Widget::unvvk4_commut_ListOutput(int _line, QString _masOn, QString _
 	}
 	else 
 	{
-		QString _msg = "Неверный канал";
-		{
-			QMutexLocker lock(&log_mutex);
-			log_buffer << _msg;
-		}
+		SRPCSignalClass::Instance().toLog("Неверный канал");
 	}
 	update_view();
+	return res;
+}
+
+int RpcVvk4Widget::unvvk4_config_MeasureLine(int line, int state)
+{
+	int res = -1;
+	if (line < 0 || line >4)
+	{
+		SRPCSignalClass::Instance().toLog("Недопустимый канал");
+		return res;
+	}
+	QMutexLocker lock(&meas_mutex);
+	if (line == 0)
+	{
+		if (state == 0)
+		{
+			measure_line_list.clear();
+			res = 0;
+		}
+		else if (state == 1)
+		{
+			measure_line_list.clear();
+			measure_line_list << 1 << 2 << 3 << 4;
+			res = 0;
+		}
+		else
+		{
+			SRPCSignalClass::Instance().toLog("Недопустимая команда");
+		}
+		return res;
+	}
+	if (state == 0)
+	{
+		if (measure_line_list.contains(line))
+		{
+			measure_line_list.removeAll(line);
+		}
+		res = 0;
+	}
+	else if (state == 1)
+	{
+		if (!measure_line_list.contains(line))
+		{
+			measure_line_list.append(line);
+			qSort(measure_line_list.begin(), measure_line_list.end());
+		}
+		res = 0;
+	}
+	else
+	{
+		SRPCSignalClass::Instance().toLog("Недопустимая команда");
+	}
 	return res;
 }
 
@@ -92,17 +137,20 @@ void RpcVvk4Widget::update_view()
 {
 	ei_chanels_lbl->setText(int_list_to_string(ei_chanels_list));
 	sum_chanels_lbl->setText(int_list_to_string(sum_chanels_list));
+	meas_chanels_lbl->setText(int_list_to_string(measure_line_list));
 }
 
-int RpcVvk4Widget::unfoi_run()
+void RpcVvk4Widget::get_commut_chanels_list(QVariantList& ei_list, QVariantList& sum_list)
 {
-	emit foi_interrupt(n, chan, u, t);
-	QString _msg = QString("%1 выдаю сигнал на канале %2 линии %3 с амплитудой %4 и длительностью %5").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(n).arg(chan).arg(u).arg(t);
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	return 0;
+	QMutexLocker lock(&comut_mutex);
+	qCopy(ei_chanels_list.begin(), ei_chanels_list.end(), ei_list.begin());
+	qCopy(sum_chanels_list.begin(), sum_chanels_list.end(), sum_list.begin());
+}
+
+void RpcVvk4Widget::get_measure_lines(QVariantList& mes_list)
+{
+	QMutexLocker lock(&meas_mutex);
+	qCopy(measure_line_list.begin(), measure_line_list.end(), mes_list.begin());
 }
 
 QList<int> RpcVvk4Widget::string_to_int_list(QString chanels)
@@ -190,22 +238,4 @@ QString RpcVvk4Widget::int_list_to_string(QList<int> chanels_list)
 		}
 	}
 	return res;
-}
-
-void RpcVvk4Widget::log_timer_ontimer()
-{
-	QStringList tmp_buffer;
-	{
-		QMutexLocker lock(&log_mutex);
-		tmp_buffer = log_buffer;
-		log_buffer.clear();
-	}
-	if (tmp_buffer.isEmpty())
-		return;
-	QFile log_file(log_filename);
-	QTextStream log_stream(&log_file);
-	log_file.open(QIODevice::Append);
-	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
-		log_stream << *itr << "\n";
-	log_file.close();
 }

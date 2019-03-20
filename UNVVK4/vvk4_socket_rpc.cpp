@@ -76,9 +76,10 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("vvk4_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
-		operators_map["unfoi_run()"] = &Socket_RPC_SLOT_Object::unfoi_run;
 		operators_map["unvvk4_commut_ListOutput(int, QString, QString)"] = &Socket_RPC_SLOT_Object::unvvk4_commut_ListOutput;
+		operators_map["get_commut_chanels_list(QVariantList&, QVariantList&)"] = &Socket_RPC_SLOT_Object::get_commut_chanels_list;
+		operators_map["unvvk4_config_MeasureLine(int, int)"] = &Socket_RPC_SLOT_Object::unvvk4_config_MeasureLine;
+		operators_map["get_measure_lines(QVariantList&)"] = &Socket_RPC_SLOT_Object::get_measure_lines;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -116,13 +117,10 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(foi_interrupt(int, short, double, double)), this, SLOT(foi_interrupt(int, short, double, double)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(RpcVvk4Widget* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(foi_interrupt(int, short, double, double)), this, SLOT(foi_interrupt(int, short, double, double)), Qt::DirectConnection);
-		data_map.insert("foi_interrupt(int, short, double, double)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -252,35 +250,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::foi_interrupt(int _n, short _chan, double _u, double _t)
-	{
-		auto& descriptor = *data_map["foi_interrupt(int, short, double, double)"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("foi_interrupt(int, short, double, double)");
-		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal foi_interrupt  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << _n;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _n =  %1").arg(RPCSignalClass::QVariantToString(_n)).arg(call_number));
-		tmp_stream << _chan;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _chan =  %1").arg(RPCSignalClass::QVariantToString(_chan)).arg(call_number));
-		tmp_stream << _u;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _u =  %1").arg(RPCSignalClass::QVariantToString(_u)).arg(call_number));
-		tmp_stream << _t;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _t =  %1").arg(RPCSignalClass::QVariantToString(_t)).arg(call_number));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal foi_interrupt sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal foi_interrupt finished").arg(objectName()));
-	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -293,39 +262,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
-	{
-		try
-		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::unfoi_run(QVariantList& _values)
-	{
-		try
-		{
-			int res = app->unfoi_run();
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
 	QVariant Socket_RPC_SLOT_Object::unvvk4_commut_ListOutput(QVariantList& _values)
 	{
 		try
@@ -345,6 +281,71 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::get_commut_chanels_list(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList ei_list = _values.at(0).value<QVariantList>();
+			QVariantList sum_list = _values.at(1).value<QVariantList>();
+			app->get_commut_chanels_list(ei_list, sum_list);
+			_values[0] = ei_list;
+			SRPCSignalClass::Instance().toLog(QString("%1 ei_list = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			_values[1] = sum_list;
+			SRPCSignalClass::Instance().toLog(QString("%1 sum_list = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unvvk4_config_MeasureLine(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int line = _values.at(0).value<int>();
+			int state = _values.at(1).value<int>();
+			int res = app->unvvk4_config_MeasureLine(line, state);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::get_measure_lines(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList mes_list = _values.at(0).value<QVariantList>();
+			app->get_measure_lines(mes_list);
+			_values[0] = mes_list;
+			SRPCSignalClass::Instance().toLog(QString("%1 mes_list = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

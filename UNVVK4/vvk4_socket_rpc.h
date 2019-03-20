@@ -35,7 +35,6 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void foi_interrupt(int _n, short _chan, double _u, double _t);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -102,9 +101,10 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
-	QVariant unfoi_run(QVariantList& _values);
 	QVariant unvvk4_commut_ListOutput(QVariantList& _values);
+	QVariant get_commut_chanels_list(QVariantList& _values);
+	QVariant unvvk4_config_MeasureLine(QVariantList& _values);
+	QVariant get_measure_lines(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
