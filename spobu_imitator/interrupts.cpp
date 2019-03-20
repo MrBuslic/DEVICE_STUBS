@@ -99,24 +99,21 @@ void Interrupt_Object::get_inter_from_server(int _n, short _chan, double _u, dou
 
 void Interrupt_Object::add_inter_to_stack(int _n)
 {
-	m_mutex.lock();
 	if (stack_of_interrupts.isEmpty())
 	{
-		emit need_handle_interrupt();
 		stack_of_interrupts.append(_n);
+		emit need_handle_interrupt();
 	}
 	else
 	{
 		stack_of_interrupts.append(_n);
 	}
-	m_mutex.unlock(); 
 	return;
 }
 
 bool Interrupt_Object::check_inter_stack()
 {
 	bool check = false;
-	m_mutex.lock();
 	if (stack_of_interrupts.size() > 0)
 	{
 		check = true;
@@ -125,15 +122,12 @@ bool Interrupt_Object::check_inter_stack()
 	{
 		check = false;
 	}
-	m_mutex.unlock();
 	return check;
 }
 
 void Interrupt_Object::clear_inter_stack()
 {
-	m_mutex.lock();
 	stack_of_interrupts.clear();
-	m_mutex.unlock();
 	return;
 }
 
@@ -141,8 +135,6 @@ QVector<int> Interrupt_Object::get_interrupts()
 {
 	QVector<int> buffer;
 	buffer.clear();
-	m_mutex.lock();
 	buffer = stack_of_interrupts;
-	m_mutex.unlock();
 	return buffer;
 }

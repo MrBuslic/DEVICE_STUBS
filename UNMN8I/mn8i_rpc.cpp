@@ -159,6 +159,30 @@ void RPC_mn8i_SLOT_Object::infin_timer_ontimer()
 	dynamic_call("infin_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished infin_timer_ontimer");
 }
+void RPC_mn8i_SLOT_Object::new_ku(int ku_n, int length, double u)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(ku_n);
+	tmp_list << QVariant(length);
+	tmp_list << QVariant(u);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call new_ku %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_ku(int, int, double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished new_ku");
+}
+void RPC_mn8i_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_mk(int, int, int, int, double, double, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished new_mk");
+}
 int RPC_mn8i_SLOT_Object::unmn8i_start()
 {
 	if(!connected) return 1;

@@ -1,5 +1,6 @@
 #include <unmbase.h>
 #include <windows.h>
+#include <qcoreapplication.h>
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
@@ -47,10 +48,130 @@ switch (fdwReason)      // Дерево разбора уведомлений
 return TRUE;    // Код возврата игнорируется
 }
 */
+
+struct mezanin_struct
+{
+	ViInt16 Present;
+	ViInt16 Type;
+};
+
+QList<mezanin_struct> mezanin_list;
+int mezanin_list_poiner = 0;
+
+void mezanin_list_add(ViInt16 Present, ViInt16 Type)
+{
+	mezanin_struct mez;
+	mez.Present = Present;
+	mez.Type = Type;
+	mezanin_list.push_back(mez);
+}
+
+
 _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 							ViBoolean id_query,
 							ViBoolean reset,
-							ViSession *vi){ return 0; }
+							ViSession *vi)
+{
+	QString commapp = QCoreApplication::applicationName();
+	if (commapp == "comapp1")
+	{
+		// Сначала инициализируется НМ, потом НМ-АРМ затем МНУ
+		// НМ
+		/*
+		mezanin_list_add(1, 0x021);	// OSC5
+		mezanin_list_add(1, 0x021);
+		mezanin_list_add(1, 0x021);
+		mezanin_list_add(1, 0x021);
+		mezanin_list_add(1, 0x1A);	// MC
+		mezanin_list_add(1, 0x1A);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		*/
+
+		mezanin_list_add(1, 0x021);	// OSC5
+		mezanin_list_add(0, 0);
+		mezanin_list_add(1, 0x1A);	// MC
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+
+		mezanin_list_add(1, 0x9);	// MDS32
+		mezanin_list_add(1, 0x9);	// MDS32
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+
+		mezanin_list_add(1, 0x5);	// MT8K4L
+		mezanin_list_add(1, 0x5);	// MT8K4L
+		mezanin_list_add(1, 0x5);	// MT8K4L
+		mezanin_list_add(1, 0x5);	// MT8K4L
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+
+		// НМУ
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+	}
+
+	if (commapp == "comapp2")
+	{
+		// Сначала инициализируется НМ, потом НМ-АРМ затем МНУ
+		// НМ
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(1, 0x17);	// MN8I
+		mezanin_list_add(1, 0x1F);	// MN3I
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+
+		mezanin_list_add(1, 0x021);	// OSC5
+		mezanin_list_add(0, 0);
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		
+	}
+
+	if (commapp == "comappFrame")
+	{
+		mezanin_list_add(1, 0x36);	// MKPRM
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+
+		mezanin_list_add(1, 0x37);	// MBKUPI
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+	}
+	return 0; 
+}
 /*--------------------------------------------------------------------------*/
 /* Init mezzanine session                                                   */
 /*  On M-module number Num (if present){ return 0; } open session. Session number is     */
@@ -367,12 +488,7 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                  
 									ViInt16 *Present,
 									ViInt16 *Type)
 {
-	//if (N == 1)
-	//{
-	//	*Present = 1;
-	//	*Type = 0x17;
-	//}
-	if ((N == 1) || (N == 2))//MDS32
+/*	if ((N == 1) || (N == 2))//MDS32
 	{
 		*Present = 1;
 		*Type = 0x5;
@@ -387,6 +503,12 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                  
 		*Present = 0;
 		*Type = 0;
 	}
+	
+*/
+	
+	*Present = mezanin_list.at(mezanin_list_poiner).Present;
+	*Type = mezanin_list.at(mezanin_list_poiner).Type;
+	mezanin_list_poiner++;
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/

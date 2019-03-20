@@ -64,18 +64,10 @@ void RPC_ads128_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
 
 void RPC_ads128_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_ads128_SIGNAL_Object::packet_ready)) {
-		SRPCSignalClass::Instance().toLog("packet_ready connected");
-		emit connect_signal("packet_ready()", true);
-	}
 }
 
 void RPC_ads128_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_ads128_SIGNAL_Object::packet_ready)) {
-		SRPCSignalClass::Instance().toLog("packet_ready disconnected");
-		//emit connect_signal("packet_ready()", false);
-	}
 }
 
 void RPC_ads128_SIGNAL_Object::read_data()
@@ -109,19 +101,6 @@ void RPC_ads128_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("ads128 new signal " + op_name);
 
-			if (op_name == "packet_ready()")
-			{
-				emit packet_ready();
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("ads128 signal finished " + op_name);
-			}
 		}
 	}
 }
@@ -145,143 +124,71 @@ void RPC_ads128_SLOT_Object::log_timer_ontimer()
 	dynamic_call("log_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished log_timer_ontimer");
 }
-void RPC_ads128_SLOT_Object::measurement_timer_ontimer()
+void RPC_ads128_SLOT_Object::ads_timer_ontimer()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call measurement_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("measurement_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished measurement_timer_ontimer");
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ads_timer_ontimer()", tmp_list);
+	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished ads_timer_ontimer");
 }
-void RPC_ads128_SLOT_Object::infin_timer_ontimer()
+void RPC_ads128_SLOT_Object::new_ku(int ku_n, int length, double u)
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call infin_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("infin_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished infin_timer_ontimer");
+	tmp_list << QVariant(ku_n);
+	tmp_list << QVariant(length);
+	tmp_list << QVariant(u);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call new_ku %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_ku(int, int, double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished new_ku");
 }
-int RPC_ads128_SLOT_Object::unads128_start()
+void RPC_ads128_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_mk(int, int, int, int, double, double, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished new_mk");
+}
+int RPC_ads128_SLOT_Object::ads128_start()
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_start %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_start()", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads128_start %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ads128_start()", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_start %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_start %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_ads128_SLOT_Object::unads128_input_trigger(bool state)
+int RPC_ads128_SLOT_Object::ads128_read_data(QVariantList thisbuf, QVariantList firstbuf)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
-	tmp_list << QVariant(state);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_input_trigger %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_input_trigger(bool)", tmp_list);
+	tmp_list << QVariant(thisbuf);
+	tmp_list << QVariant(firstbuf);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads128_read_data %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ads128_read_data(QVariantList, QVariantList)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_input_trigger %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_read_data %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_ads128_SLOT_Object::unads128_sample_width_q(uint& frame_width, uint& width_in_bytes)
+int RPC_ads128_SLOT_Object::ads128_stop()
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
-	tmp_list << QVariant(frame_width);
-	tmp_list << QVariant(width_in_bytes);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_sample_width_q %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_sample_width_q(uint&, uint&)", tmp_list);
-	frame_width = tmp_list.at(0).toUInt();
-	tmp_ret_params += " frame_width="+RPCSignalClass::QVariantToString(tmp_list.at(0));
-	width_in_bytes = tmp_list.at(1).toUInt();
-	tmp_ret_params += " width_in_bytes="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads128_stop %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ads128_stop()", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_sample_width_q %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_stop %1").arg(tmp_ret_params));
 	return res.toInt();
-}
-int RPC_ads128_SLOT_Object::unads128_read_sample(uint& _buf, uint& _firstTime, uint& _thisTime)
-{
-	if(!connected) return 1;
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	tmp_list << QVariant(_buf);
-	tmp_list << QVariant(_firstTime);
-	tmp_list << QVariant(_thisTime);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_read_sample %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_read_sample(uint&, uint&, uint&)", tmp_list);
-	_buf = tmp_list.at(0).toUInt();
-	tmp_ret_params += " _buf="+RPCSignalClass::QVariantToString(tmp_list.at(0));
-	_firstTime = tmp_list.at(1).toUInt();
-	tmp_ret_params += " _firstTime="+RPCSignalClass::QVariantToString(tmp_list.at(1));
-	_thisTime = tmp_list.at(2).toUInt();
-	tmp_ret_params += " _thisTime="+RPCSignalClass::QVariantToString(tmp_list.at(2));
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_read_sample %1").arg(tmp_ret_params));
-	return res.toInt();
-}
-int RPC_ads128_SLOT_Object::unads128_read_packet(bool isHot, uint numSamples, QVariantList& buf, uint& realNumSamples)
-{
-	if(!connected) return 1;
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	tmp_list << QVariant(isHot);
-	tmp_list << QVariant(numSamples);
-	tmp_list << QVariant(buf);
-	tmp_list << QVariant(realNumSamples);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_read_packet %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_read_packet(bool, uint, QVariantList&, uint&)", tmp_list);
-	buf = tmp_list.at(2).toList();
-	tmp_ret_params += " buf="+RPCSignalClass::QVariantToString(tmp_list.at(2));
-	realNumSamples = tmp_list.at(3).toUInt();
-	tmp_ret_params += " realNumSamples="+RPCSignalClass::QVariantToString(tmp_list.at(3));
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_read_packet %1").arg(tmp_ret_params));
-	return res.toInt();
-}
-int RPC_ads128_SLOT_Object::unads128_sample_period(double _periodS)
-{
-	if(!connected) return 1;
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	tmp_list << QVariant(_periodS);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_sample_period %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_sample_period(double)", tmp_list);
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_sample_period %1").arg(tmp_ret_params));
-	return res.toInt();
-}
-int RPC_ads128_SLOT_Object::unads128_mode_cycle(uint _size)
-{
-	if(!connected) return 1;
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	tmp_list << QVariant(_size);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_mode_cycle %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_mode_cycle(uint)", tmp_list);
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_mode_cycle %1").arg(tmp_ret_params));
-	return res.toInt();
-}
-int RPC_ads128_SLOT_Object::unads128_num_ready_data(uint& _num)
-{
-	if(!connected) return 1;
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	tmp_list << QVariant(_num);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call unads128_num_ready_data %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unads128_num_ready_data(uint&)", tmp_list);
-	_num = tmp_list.at(0).toUInt();
-	tmp_ret_params += " _num="+RPCSignalClass::QVariantToString(tmp_list.at(0));
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished unads128_num_ready_data %1").arg(tmp_ret_params));
-	return res.toInt();
-}
-void RPC_ads128_SLOT_Object::button_clicked()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call button_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("button_clicked()", tmp_list);
-	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished button_clicked");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -41,7 +41,9 @@ union WORD_QTY
 	struct
 	{
 		quint16 lower_bit : 2,
-				upper_bit : 3;
+			upper_bit : 3,
+			reserv : 11;
+
 	};
 };
 
@@ -662,20 +664,32 @@ void SPOBU_Widget::perform_CPI()
 		wait_info_word = false;
 		buf_size = 0;
 		words_buffer.clear();
-		send_receipt(1, 5, answer, os);
+		send_receipt(1, 7, answer, os);
 	}
 	else
 	{
 		if ((words[0] == 0x0004) && (words[1] == 0x0000) && (!wait_info_word))
 		{
 			answer = 0x00FF;
-			send_receipt(1, 5, answer, os);
+			send_receipt(1, 7, answer, os);
 			get_cmd();
 		}
 		else if ((words[0] == 0x000F) && (words[1] == 0x0000) && (wait_info_word))
 		{
 			answer = 0x00FF;
-			send_receipt(1, 5, answer, os);
+			send_receipt(1, 7, answer, os);
+			int answer;
+			int os = 1;
+			CWD.adr = 1;
+			CWD.subadr = 21;
+			CWD.count_word = 2;
+			CWD.trans_dir = 1;
+			QVariantList words;
+			for (int i = 0; i < CWD.count_word; i++)
+			{
+				words << 0;
+			}
+			emit signal_send_msg_mko(1, 1, CWD.com_word, words, os);
 			add_data_to_buffer(words);
 		}
 		else
@@ -684,7 +698,7 @@ void SPOBU_Widget::perform_CPI()
 			wait_info_word = false;
 			buf_size = 0;
 			words_buffer.clear();
-			send_receipt(1, 5, answer, os);
+			send_receipt(1, 7, answer, os);
 		}
 	}
 }
@@ -711,6 +725,7 @@ void SPOBU_Widget::get_cmd()
 	{
 		/*str = QString("Get response word with code - 0x%1").arg(os, 4, 16, QChar('0'));
 		edit->append(str);*/
+		answer = 0xFF00;
 		send_receipt(1, 5, answer, os);
 	}
 	else
@@ -719,14 +734,11 @@ void SPOBU_Widget::get_cmd()
 		switch (SKWORD.sk_code)
 		{
 		case 0x0015:
-			answer = 0x00FF;
-			send_receipt(1, 5, answer, os);
 			read_ab(words);
 			break;
 		case 0x003D:
-			answer = 0x00FF;
-			send_receipt(1, 5, answer, os);
 			SKWORD.word = words[0].toInt();
+			W_QTY.qty = 0;
 			W_QTY.lower_bit = SKWORD.l_word_count;
 			SKWORD.word = words[1].toInt();
 			W_QTY.upper_bit = SKWORD.u_word_count;
@@ -735,7 +747,7 @@ void SPOBU_Widget::get_cmd()
 			break;
 		default:
 			answer = 0xFF00;
-			send_receipt(1, 5, answer, os);
+			send_receipt(1, 7, answer, os);
 			/*str = QString("Get unknown command - 0x%1").arg(SKWORD.sk_code, 4, 16, QChar('0'));
 			edit->append(str);*/
 			break;
@@ -782,6 +794,7 @@ void SPOBU_Widget::add_data_to_buffer(QVariantList& words)
 	{
 		wait_info_word = true;
 		SKWORD.word = words[0].toInt();
+		W_QTY.qty = 0;
 		W_QTY.lower_bit = SKWORD.l_word_count;
 		SKWORD.word = words[1].toInt();
 		W_QTY.upper_bit = SKWORD.u_word_count;
@@ -798,6 +811,9 @@ void SPOBU_Widget::add_data_to_buffer(QVariantList& words)
 	}
 	else
 	{
+		int answer = 0x00FF;
+		int os;
+		send_receipt(1, 7, answer, os);
 		return;
 	}
 }
@@ -814,10 +830,10 @@ void SPOBU_Widget::write_ab()
 	SKWORD.word = words_buffer[1].toInt();
 	CWD.adr = SKWORD.adr;
 	CWD.subadr = SKWORD.subadr;
-	CWD.count_word = buf_size;
+	CWD.count_word = buf_size-2;
 	CWD.trans_dir = SKWORD.trans_dir;
 	QVariantList words;
-	for (int i = 2; i < buf_size + 2; i++)
+	for (int i = 2; i < buf_size; i++)
 	{
 		words << words_buffer[i];
 	}

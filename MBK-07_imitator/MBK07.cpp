@@ -17,12 +17,7 @@ union MKOWord
 MBK07_widg::MBK07_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
-	//	this->setFixedSize(1910, 1130);
 	setWindowTitle("МБК-07");
-	/*	MU1 -> setFixedSize(300,100);
-		MU1->setProperty("type", 1);
-		MU2->setFixedSize(300, 100);
-		MU2->setProperty("type", 2);*/
 	FSMU_gb = new QGroupBox("ФСМУ", this);
 	FSVU_gb = new QGroupBox("ФСВУ", this);
 
@@ -42,7 +37,6 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	for (int i = 0; i < 9; i++)
 	{
 		int tmp_d = 1 << i;
-		//lit_map.insert(i + 1, LITERA(tmp_d));
 		lit_map.insert(tmp_d, LITERA(i + 1));
 	}
 
@@ -79,8 +73,6 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	QLabel* Lit_lb = new QLabel("Литера");
 	QLabel* Stab_lb = new QLabel("Стабильность");
 	QLabel* Ann_lb = new QLabel("Антенна");
-	//QLabel submode("ИМ");
-	//submode->text = ("ИМ");
 	QList<QLabel*> sub_lb_list;
 	sub_lb_list << Mode_lb;
 	sub_lb_list << Lit_lb;
@@ -120,9 +112,6 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK07_widg::auto_scroll_clicked);
 	logs_lay->addWidget(edit);
 	logs_lay->addWidget(auto_scroll_box);
-	//logs_lay->addWidget(Logs);
-
-
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", 50001);
@@ -167,24 +156,13 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
 	log_timer.start(200);
 
-	//msg_to_log("рпп");
-	//paint_buttons();
 	set_new_tm();
 }
-
-//LKA05_widg::~LKA05_widg()
-//{
-
-//}
-//void MBK07_widg::current_com(int mshm_numb, int pshm_numb)
-//{
-//	
-//}
 void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	msg_to_log(_msg);
-//Странные штуки
+
 	int tmp_mshm = mshm;
 	int tmp_pshm = pshm - 8;
 
@@ -330,7 +308,6 @@ void MBK07_widg::write_words()
 	sub_le_list[0]->setText(res_mode);
 	QString lit_num = QString::number(current_lit);
 	sub_le_list[1]->setText(lit_num);
-//	QString tmp_stab = QString::number(current_stab);
 	sub_le_list[2]->setText(stab_names[current_stab]);
 	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
@@ -398,7 +375,6 @@ void MBK07_widg::set_new_tm()
 		f_word += 0x300;
 		break;
 	}
-	//шта?
 	if (pi8_fast)
 		f_word += 0x40;
 	if (IM)
@@ -429,40 +405,3 @@ void MBK07_widg::set_new_tm()
 	//Отправка 
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
-/*
-MU_MODULE::MU_MODULE() : current_dev(MAIN)
-{
-	working.insert(MAIN, true);
-	working.insert(RESERVE, true);
-
-	ab_working.insert(MAIN, true);
-	ab_working.insert(RESERVE, true);
-
-}
-
-MV_MODULE::MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(MAIN)
-{
-	devices.insert(MAIN, MV_DEV());
-	devices.insert(RESERVE, MV_DEV());
-}
-
-unsigned short MU_MODULE::get_tm()
-{
-	unsigned short _word = 0x1000;
-	if (!get_working())
-		_word += 4;
-	_word += 0x20 << current_dev;
-	return _word;
-}
-
-unsigned short MV_MODULE::get_tm()
-{
-	unsigned short _word = (com << 12) + (nim << 8);
-	if (!get_working())
-		_word += 2 << current_dev;
-	if (current_dev == OFF)
-		_word += 0xC0;
-	else
-		_word += 0x20 << current_dev;
-	return _word;*/
-	//}

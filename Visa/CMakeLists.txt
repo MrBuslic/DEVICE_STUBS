@@ -27,7 +27,8 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(SOURCES Visa.cpp)
+set(SOURCES Visa.cpp XMLClass.cpp)
+set(HEADERS XMLClass.h)
 include_directories($ENV{VISA_HOME}/include)
 
 add_library(visa32 SHARED ${HEADERS} ${SOURCES} export.def)

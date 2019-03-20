@@ -78,7 +78,6 @@ class MBK07_widg : public QWidget
     Q_OBJECT
 
 public:
-//	explicit LKA05_widg(QWidget *parent = 0);
 	MBK07_widg(QWidget *parent = 0);
 	//~MBK07_widg();
 	
@@ -132,19 +131,10 @@ protected:
 	
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
-
-//	void current_kom(int mshm_numb, int pshm_numb);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
-//	void mbk04(const QString& new_text);
-//	void save_choose_set();
 private:
-//	MU_MODULE mu_module;
-//	QList<MV_MODULE> mvku_modules;
-//	QList<MV_MODULE> mvmk_modules;
-
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
 	QTextDocument* _doc;
