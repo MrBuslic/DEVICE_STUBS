@@ -26,12 +26,13 @@ class RpcADS128Widget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcADS128Widget(int slot_port, int signal_port);
+	RpcADS128Widget(int _ads_num);
 public slots:
 
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 	void ads_timer_ontimer();
+
 
 	void new_ku(int ku_n, int length, double u);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
@@ -40,6 +41,9 @@ public slots:
 	int ads128_read_data(QVariantList thisbuf, QVariantList firstbuf);
 	int ads128_stop();
 private:
+	void add_signal(int ads_chan, double _u);
+
+
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
 	QTextDocument* _doc;
@@ -60,10 +64,17 @@ private:
 
 	bool running;
 
+	void form_ads(int chan, double length, double u);
 	QVariantList state_buffer; 
+	QVariantList buffer;
+
+	int ads_num;
 
 	RPC_lka05_SLOT_Thread lka05_slot_thr;
 	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+
+	double step_1 = 5.0;
+	double step_2= 15.0;
 };
 
 #endif

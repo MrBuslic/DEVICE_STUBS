@@ -95,7 +95,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	ViStatus _VI_FUNC unads128_start (ViSession vi)
 	{
 	Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_start();
-		return 0;
+		return 0; 
 	}
 
 	ViStatus _VI_FUNC unads128_start_check (ViSession vi) 
