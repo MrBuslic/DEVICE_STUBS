@@ -8,9 +8,12 @@
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QList>
+#include <QMessageBox>
 
 #include <boost/range/combine.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include "../UNOLS/ols_rpc.h"
 
 
 class KPRD_imitator :
@@ -65,9 +68,13 @@ private:
 
 	bool isset(qulonglong x, qulonglong n);
 
+	RPC_ols_SLOT_Thread ols_slot_thr;
+	RPC_ols_SIGNAL_Thread ols_signal_thr;
+
 signals:
 	void test(QVariantList maskList, QVariantList dataList);
 	void sendKPI(QString kpiList);
+	void newKPI(QVariantList KPIList);
 
 public slots:
 	void dataIn(QVariantList maskList, QVariantList dataList);

@@ -58,6 +58,21 @@ KPRD_imitator::KPRD_imitator()
 	connect(this, &KPRD_imitator::test, this, &KPRD_imitator::dataIn);
 	emit test(maskListTest, dataListTest);
 
+
+	ols_slot_thr.set_connection_params("127.0.0.1", 50051);
+	ols_slot_thr.start();
+
+	ols_signal_thr.set_connection_params("127.0.0.1", 50052);
+	ols_signal_thr.start();
+	
+	if (!ols_slot_thr.wait_connected(3) || !ols_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с ols_");
+		//this->deleteLater();
+		return;
+	}
+
+
 }
 
 KPRD_imitator::~KPRD_imitator()
@@ -117,7 +132,7 @@ bool KPRD_imitator::isset(qulonglong x, qulonglong n)
 	KPI_P           = 24,
 	KPI_0           = 25,
 	KPI_1           = 26,
-	KPI_R           = 27,
+	KPI_R           = 27,	return 0;
 
 	ATTEN_1_1       = 32,
 	ATTEN_1_2       = 33,
@@ -205,7 +220,7 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 					*FREQ_CLOCK = isset(res, 8);
 					*FREQ_DATA = isset(res, 9);
 					*FREQ_code = (*FREQ_code << 1) + *FREQ_DATA;
-					kod_label->setText("Код: " + QString::number(FREQ_0_code));
+					kod_label->setText("Код: " + QString::number(*FREQ_code));
 					if (isset(res, 25))
 						KPIString += "0";
 				}
