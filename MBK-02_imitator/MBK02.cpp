@@ -21,7 +21,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	Chan1_pbut = new QPushButton("1", this);
 	Chan2_pbut = new QPushButton("2", this);
-	Ant_pbut = new QPushButton("Ykrali", this);
+	Ant_pbut = new QPushButton("", this);
 	Ant_pbut->setMinimumWidth(165);
 	Chan1_pbut->setMinimumWidth(165);
 	Chan2_pbut->setMinimumWidth(165);
@@ -116,6 +116,12 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 		return;
 	}
 
+	KPRD_slot_thr.set_connection_params("127.0.0.1", 51061);
+	KPRD_slot_thr.start();
+
+	KPRD_signal_thr.set_connection_params("127.0.0.1", 51062);
+	KPRD_signal_thr.start();
+
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 
@@ -124,6 +130,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
 
+	connect(KPRD_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -134,6 +141,17 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	//msg_to_log("рпп");
 	//paint_buttons();
+	current_lit = 1;
+	for (int i = 0; i <= 3; i++)
+	{
+		tmp_list.push_back(LITER_PAUSE + (STEP * current_lit));
+		tmp_list.push_back(LITER_PAUSE + (STEP * current_lit) + ONE);
+		tmp_list.push_back(LITER_PAUSE + (STEP * current_lit));
+		tmp_list.push_back(LITER_PAUSE + (STEP * current_lit) + ZERO);
+	}
+		tmp_list.push_back(LITER_PAUSE + (STEP * 13) + ONE);
+		tmp_list.push_back(LITER_PAUSE + (ONE * 13) + ZERO);
+	new_KPI(tmp_list);
 	set_new_tm();
 }
 
@@ -163,6 +181,44 @@ void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 	//	write_words();
 	//	paint_buttons();
 	//	set_new_tm();
+}
+
+void MBK02_widg::new_KPI(QVariantList KPI_list)
+{
+	int tmp_in,tmp_len;
+	tmp_len = KPI_list.length();
+	bool ch_cur_lit = true;
+	//for (QVariantList::iterator itr = KPI_list.begin(); itr != KPI_list.end(); itr++)
+	//{
+	//	tmp_in = (*itr).toInt();
+	//}
+	for (int it_lit = 1; KPI_list.at(0).toInt() - (STEP*it_lit) != LITER_PAUSE; it_lit++)
+	{
+		if ((it_lit == current_lit) && (KPI_list.at(0).toInt() - (STEP*it_lit) != LITER_PAUSE))
+		{
+			msg_to_log("Некорректная литера");
+			ch_cur_lit = false;
+			break;
+		}
+	}
+	if (ch_cur_lit)
+	{
+		for (int i = 0; i < tmp_len; i++)
+		{
+			tmp_in = ((KPI_list.at(i).toInt() - LITER_PAUSE) - (STEP * current_lit));
+			if ((tmp_in >= -3) && (tmp_in <= 3)) tmp_str_KPI += "P";
+			else
+			{
+				if ((tmp_in >= 0xF9A) && (tmp_in <= 0xFA6)) tmp_str_KPI += "1";
+				else
+				{
+					if ((tmp_in >= 0xBB2) && (tmp_in <= 0xBBE)) tmp_str_KPI += "0";
+					else tmp_str_KPI += " ERR ";
+				}
+			}
+		}
+		msg_to_log(tmp_str_KPI);
+	}
 }
 
 
@@ -276,25 +332,6 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 void MBK02_widg::write_words()
 {
 	Lit_le->setText(QString::number(current_lit));
-	//	QString res_mode;
-	//	if (mode_names.contains(current_mode))
-	//	{
-	//		res_mode = mode_names[current_mode];
-	//		if (current_mode == PI8)
-	//		{
-	//			res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
-	//			//?все что перед - если, : -все что перед иначе.
-	//		}
-	//		if (IM == true)
-	//			res_mode += " ИМ";
-	//	}
-	//
-	//	sub_le_list[0]->setText(res_mode);
-	//	QString lit_num = QString::number(current_lit);
-	//	sub_le_list[1]->setText(lit_num);
-	////	QString tmp_stab = QString::number(current_stab);
-	//	sub_le_list[2]->setText(stab_names[current_stab]);
-	//	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
 void MBK02_widg::paint_buttons()
 {
@@ -327,96 +364,9 @@ void MBK02_widg::paint_buttons()
 		Ant_pbut->setText("");
 		Ant_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	if (current_FSMU == i)
-	//		FSMU_blocks[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	if (current_FSVU == i)
-	//		FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//}
 }
 
 void MBK02_widg::set_new_tm()
 {
-	//if ((current_FSMU == FSMU_OFF) || (current_stab == LOW_STAB))
-	//{
-	//	if (ab_state)
-	//	{
-	//		ab_state = false;
-	//		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	//	}
-	//	return;
-	//}
-	//else
-	//{
-	//	if (!ab_state)
-	//	{
-	//		ab_state = true;
-	//		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	//	}
-	//}
 
-	//QVariantList tm_words;
-	//unsigned short f_word = 0;
-	//unsigned short s_word = 0;
-	//if (current_FSVU != FSVU_OFF)
-	//	switch (current_FSVU)
-	//	{
-	//	case FSVU_One:
-	//		f_word += 0x3000;
-	//		break;
-	//	case FSVU_Two:
-	//		f_word += 0x2800;
-	//		break;
-	//	case FSVU_Three:
-	//		f_word += 0x1800;
-	//		break;
-	//	}
-	//switch (current_FSMU)
-	//{
-	//case FSMU_One:
-	//	f_word += 0x600;
-	//	break;
-	//case FSMU_Two:
-	//	f_word += 0x500;
-	//	break;
-	//case FSMU_Three:
-	//	f_word += 0x300;
-	//	break;
-	//}
-	////шта?
-	//if (pi8_fast)
-	//	f_word += 0x40;
-	//if (IM)
-	//	f_word += 0x10;
-	//if (current_mode != ERR)
-	//	f_word += 1 << full_mode(current_mode) - 1;
-	//tm_words.push_back(f_word);
-
-
-	//if (current_lit != 0)
-	//	s_word += 0x100 << current_lit - 1;
-	//s_word += 0x80 << STAB(current_stab) - 1;
-	//if (current_PSP != PSP_OFF)
-	//	s_word += PSP(current_PSP) - 1;
-	//switch (current_antenna)
-	//{
-	//case OHA:
-	//	s_word += 0xC;
-	//	break;
-	//case MHA1Y:
-	//	s_word += 0x14;
-	//	break;
-	//case MHA0Y:
-	//	s_word += 0x18;
-	//	break;
-	//}
-	//tm_words.push_back(s_word);
-	////Отправка 
-	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }

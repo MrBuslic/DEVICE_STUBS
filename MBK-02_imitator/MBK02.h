@@ -15,6 +15,7 @@
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../LKA-05_imitator/lka05_rpc.h"
+#include "../KPRD_imitator/kprd_rpc.h"
 
 enum CHANEL
 {
@@ -30,6 +31,13 @@ enum ANTENNA
 	MHA2PY = 2,
 	MHA2MY = 3,
 	MHAOFF = 4
+};
+enum KPI_STATE
+{
+	LITER_PAUSE = 0x138CE20,
+	ZERO = 0xBB8,
+	ONE = 0xFA0,
+	STEP = 0x27100
 };
 class MBK02_widg : public QWidget
 {
@@ -83,6 +91,7 @@ protected:
 	public slots :
 		void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	void new_KPI(QVariantList KPI_list);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 private:
@@ -96,15 +105,23 @@ private:
 	QTimer log_timer;
 	QStringList log_buffer;
 	QMutex log_mutex;
+	//---tmp
+	QString tmp_str_KPI;
+	//---tmp
 	void msg_to_log(const QString& _msg);
 
 	QMap<int, QString> ant_names;
+	QMap<int, KPI_STATE> check_KPI;
+	QVariantList tmp_list;
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 
 	RPC_lka05_SLOT_Thread lka05_slot_thr;
 	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+
+	RPC_kprd_SLOT_Thread KPRD_slot_thr;
+	RPC_kprd_SIGNAL_Thread KPRD_signal_thr;
 
 };
 

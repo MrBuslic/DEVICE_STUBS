@@ -45,9 +45,10 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
 SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
 SET(LKA05_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../LKA-05_imitator/lka05_rpc.h ${PROJECT_SOURCE_DIR}/../LKA-05_imitator/lka05_rpc.cpp)
+SET(KPRD_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../KPRD_imitator/kprd_rpc.h ${PROJECT_SOURCE_DIR}/../KPRD_imitator/kprd_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(MBK-02_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} ${LKA05_RPC_SOURCES})
+add_executable(MBK-02_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} ${LKA05_RPC_SOURCES} ${KPRD_RPC_SOURCES})
 target_link_libraries (MBK-02_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 

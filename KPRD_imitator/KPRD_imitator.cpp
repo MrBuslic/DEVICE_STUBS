@@ -1,5 +1,5 @@
 #include "KPRD_imitator.h"
-//#include "kprd_socket_rpc.h"
+#include "kprd_socket_rpc.h"
 
 KPRD_imitator::KPRD_imitator()  
 {
@@ -58,11 +58,23 @@ KPRD_imitator::KPRD_imitator()
 	connect(this, &KPRD_imitator::test, this, &KPRD_imitator::dataIn);
 	emit test(maskListTest, dataListTest);
 
+	QString ip_str = "127.0.0.1";
+	int slot_port = 51061;
+	int signal_port = 51062;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	rpc_slot_srv->set_app(this);
+	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->start();
+	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	rpc_signal_srv->set_app(this);
+	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->start();
 
-	ols_slot_thr.set_connection_params("127.0.0.1", 50051);
+
+	ols_slot_thr.set_connection_params("127.0.0.1", 52001);
 	ols_slot_thr.start();
 
-	ols_signal_thr.set_connection_params("127.0.0.1", 50052);
+	ols_signal_thr.set_connection_params("127.0.0.1", 52002);
 	ols_signal_thr.start();
 	
 	if (!ols_slot_thr.wait_connected(3) || !ols_signal_thr.wait_connected(3))

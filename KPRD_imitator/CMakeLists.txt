@@ -40,7 +40,7 @@ FILE(GLOB HEADERS *.h *.hpp)
   
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES  ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.h ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.cpp)
+SET(RPC_SOURCES  ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.h ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.cpp kprd_socket_rpc.h kprd_socket_rpc.cpp)
 
 add_executable(KPRD_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES})
 target_link_libraries (KPRD_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
@@ -53,10 +53,10 @@ endif()
 
 
 
-#ADD_CUSTOM_COMMAND(TARGET KPRD_imitator
-#	PRE_BUILD
-#	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/KPRD_imitator.h ${PROJECT_SOURCE_DIR} kprd
-#)
+ADD_CUSTOM_COMMAND(TARGET KPRD_imitator
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/KPRD_imitator.h ${PROJECT_SOURCE_DIR} kprd
+)
 
 
 
