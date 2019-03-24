@@ -51,9 +51,10 @@ RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  
 		this->deleteLater();
 		return;
 	}
-
-	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
-	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double)), this, SLOT(new_ku(int, int, double)));
+	if (ads_num == 0)
+		connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+	else
+		connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double)), this, SLOT(new_ku(int, int, double)));
 
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
@@ -70,7 +71,7 @@ RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  
 	running = false;
 }
 
-int RpcADS128Widget::ads128_read_data(QVariantList thisbuf, QVariantList firstbuf)
+int RpcADS128Widget::ads128_read_data(QVariantList& thisbuf, QVariantList& firstbuf)
 {
 	QMutexLocker lock(&ads_mutex);
 
@@ -141,7 +142,7 @@ void RpcADS128Widget::add_signal(int ads_chan, double _u)
 
 	unsigned short old_group = state_buffer[ads_group_n].toInt();
 
-	old_group = old_group | (new_state << ads_chan_group);
+	old_group = old_group | (new_state << ads_chan_group*2);
 	state_buffer[ads_group_n] = old_group;
 }
 
@@ -150,16 +151,18 @@ void RpcADS128Widget::new_ku(int ku_n, int length, double u)
 	
 
 
-	int ads_chan_n = ku_n + 1;
+	int ads_chan_n = ku_n;
 	add_signal(ads_chan_n, u);
 	ads_timer->start(length);
 }
 
 void RpcADS128Widget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
-	int ads_chan_m = mshm + 33;
-	int ads_chan_p = pshm + 1;
+	int ads_chan_m = mshm + 32;
+	int ads_chan_p = pshm;
 	add_signal(ads_chan_m, u_m);
+	add_signal(mshm+48, u_m);
 	add_signal(ads_chan_p, u_p);
+	add_signal(pshm+16, u_p);
 	ads_timer->start(qMax(length_m, length_p));
 }

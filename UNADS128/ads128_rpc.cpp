@@ -98,6 +98,8 @@ void RPC_ads128_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("ads128 new signal " + op_name);
 
@@ -166,7 +168,7 @@ int RPC_ads128_SLOT_Object::ads128_start()
 	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_start %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_ads128_SLOT_Object::ads128_read_data(QVariantList thisbuf, QVariantList firstbuf)
+int RPC_ads128_SLOT_Object::ads128_read_data(QVariantList& thisbuf, QVariantList& firstbuf)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -174,7 +176,11 @@ int RPC_ads128_SLOT_Object::ads128_read_data(QVariantList thisbuf, QVariantList 
 	tmp_list << QVariant(thisbuf);
 	tmp_list << QVariant(firstbuf);
 	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads128_read_data %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("ads128_read_data(QVariantList, QVariantList)", tmp_list);
+	dynamic_call("ads128_read_data(QVariantList&, QVariantList&)", tmp_list);
+	thisbuf = tmp_list.at(0).toList();
+	tmp_ret_params += " thisbuf="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	firstbuf = tmp_list.at(1).toList();
+	tmp_ret_params += " firstbuf="+RPCSignalClass::QVariantToString(tmp_list.at(1));
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_read_data %1").arg(tmp_ret_params));
 	return res.toInt();

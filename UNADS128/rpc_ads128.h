@@ -38,7 +38,7 @@ public slots:
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
 
 	int ads128_start();
-	int ads128_read_data(QVariantList thisbuf, QVariantList firstbuf);
+	int ads128_read_data(QVariantList& thisbuf, QVariantList& firstbuf);
 	int ads128_stop();
 private:
 	void add_signal(int ads_chan, double _u);

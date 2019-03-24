@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -81,7 +82,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		operators_map["new_ku(int, int, double)"] = &Socket_RPC_SLOT_Object::new_ku;
 		operators_map["new_mk(int, int, int, int, double, double, int)"] = &Socket_RPC_SLOT_Object::new_mk;
 		operators_map["ads128_start()"] = &Socket_RPC_SLOT_Object::ads128_start;
-		operators_map["ads128_read_data(QVariantList, QVariantList)"] = &Socket_RPC_SLOT_Object::ads128_read_data;
+		operators_map["ads128_read_data(QVariantList&, QVariantList&)"] = &Socket_RPC_SLOT_Object::ads128_read_data;
 		operators_map["ads128_stop()"] = &Socket_RPC_SLOT_Object::ads128_stop;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -384,6 +385,11 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			QVariantList thisbuf = _values.at(0).value<QVariantList>();
 			QVariantList firstbuf = _values.at(1).value<QVariantList>();
 			int res = app->ads128_read_data(thisbuf, firstbuf);
+			_values[0] = thisbuf;
+			SRPCSignalClass::Instance().toLog(QString("%1 thisbuf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			_values[1] = firstbuf;
+			SRPCSignalClass::Instance().toLog(QString("%1 firstbuf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			with_return = true;
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}

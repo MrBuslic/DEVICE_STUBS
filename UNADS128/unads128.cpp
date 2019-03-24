@@ -9,7 +9,7 @@ int ads128_count = 0;
 
 rpc_buffer_class::rpc_buffer_class()
 {
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		RPC_ads128_SLOT_Thread* slot_thr = new RPC_ads128_SLOT_Thread;
 		slot_thr->set_connection_params("127.0.0.1", 30050 + i);
