@@ -46,6 +46,7 @@ private:
 	QMutex signal_mutex;
 	RpcMN8IWidget* app;
 	static int obj_num;
+	static int call_number;
 	QMap<QString, std::shared_ptr<SignalData> > data_map;
 };
 

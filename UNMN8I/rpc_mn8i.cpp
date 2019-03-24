@@ -302,16 +302,16 @@ void RpcMN8IWidget::form_impulse(int chan, double length, double u)
 
 void RpcMN8IWidget::new_ku(int ku_n, int length, double u)
 {
+	form_impulse(4, double(length) / 1000.0, u);
 	form_impulse(5, double(length) / 1000.0, u);
-	form_impulse(6, double(length) / 1000.0, u);
 }
 
 void RpcMN8IWidget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
 {
+	form_impulse(0, double(length_m) / 1000.0, u_m);
 	form_impulse(1, double(length_m) / 1000.0, u_m);
-	form_impulse(2, double(length_m) / 1000.0, u_m);
 
+	form_impulse(2, double(length_p) / 1000.0, u_p);
 	form_impulse(3, double(length_p) / 1000.0, u_p);
-	form_impulse(4, double(length_p) / 1000.0, u_p);
 
 }

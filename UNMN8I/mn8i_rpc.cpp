@@ -106,6 +106,8 @@ void RPC_mn8i_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mn8i new signal " + op_name);
 
@@ -120,7 +122,7 @@ void RPC_mn8i_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mn8i signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mn8i signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}
