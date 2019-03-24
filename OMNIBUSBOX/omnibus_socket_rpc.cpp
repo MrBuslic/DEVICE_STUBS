@@ -321,11 +321,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _state = _values.at(0).value<int>();
 			app->auto_scroll_clicked(_state);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -341,7 +342,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->log_timer_ontimer();
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -354,13 +355,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mko = _values.at(0).value<int>();
 			int addr = _values.at(1).value<int>();
 			bool _on = _values.at(2).value<bool>();
 			app->switch_ab(mko, addr, _on);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -373,6 +375,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mko = _values.at(0).value<int>();
 			int addr = _values.at(1).value<int>();
 			int saddr = _values.at(2).value<int>();
@@ -380,7 +383,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->set_new_data(mko, addr, saddr, words);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -393,6 +396,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mko = _values.at(0).value<int>();
 			int line = _values.at(1).value<int>();
 			int cwd = _values.at(2).value<int>();
@@ -400,11 +404,13 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			int os = _values.at(4).value<int>();
 			app->send_msg(mko, line, cwd, words, os);
 			_values[3] = words;
+			SRPCSignalClass::Instance().toLog(QString("%1 words = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[3])));
 			_values[4] = os;
+			SRPCSignalClass::Instance().toLog(QString("%1 os = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[4])));
 			with_return = true;
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -418,9 +424,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		try
 		{
 			QVariant res = app->get_dt();
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return QVariant();
 		}
@@ -433,11 +440,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QString _msg = _values.at(0).value<QString>();
 			app->message_to_log_slot(_msg);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
