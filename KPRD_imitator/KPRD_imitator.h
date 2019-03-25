@@ -47,13 +47,13 @@ private:
 
 	bool FREQ_P_CLOCK = false;
 	bool FREQ_P_DATA = false;
-	bool FREQ_P_ENABLE = false;
+	bool FREQ_P_ENABLE = true;
 	bool FREQ_0_CLOCK = false;
 	bool FREQ_0_DATA = false;
-	bool FREQ_0_ENABLE = false;
+	bool FREQ_0_ENABLE = true;
 	bool FREQ_1_CLOCK = false;
 	bool FREQ_1_DATA = false;
-	bool FREQ_1_ENABLE = false;
+	bool FREQ_1_ENABLE = true;
 
 	bool KPI_P = false;
 	bool KPI_0 = false;

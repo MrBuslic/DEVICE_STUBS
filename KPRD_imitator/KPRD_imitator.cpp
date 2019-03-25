@@ -179,6 +179,15 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 		qulonglong DATA = DATAVar.toULongLong();
 		qulonglong res = MASK & DATA;
 
+		if (isset(res, 24))
+			emit newKPI(QVariantList() << FREQ_P_code);
+		if (isset(res, 25))
+			emit newKPI(QVariantList() << FREQ_0_code);
+		if (isset(res, 26))
+			emit newKPI(QVariantList() << FREQ_1_code);
+		if (isset(res, 27))
+			emit newKPI(QVariantList() << 0);
+
 		auto val1 = (res << 26 >> 58);
 		auto val2 = (res << 20 >> 58);
 		qulonglong attenuation_val = val1 + val2;
@@ -193,13 +202,19 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 			auto FREQ_DATA = &FREQ_P_DATA;
 			auto FREQ_code = &FREQ_P_code;
 			auto kod_label = pause_kod_label;
+			
+			if (!isset(res, 2) && *FREQ_ENABLE)	// Если выбрали генератор
+			{
+				*FREQ_code = 0;			// Сбросить код
+				*FREQ_ENABLE = false;	// Генератор выбран (настраивается)
+			}
 
-			if (isset(res, 2))	// КОД обнуляется
-				*FREQ_code = 0;
+			if (isset(res, 2))	
+				*FREQ_ENABLE = true;	// выключить настройку генератора
 
 			if (!isset(res, 2))	// FREQ_1_ENABLE
 			{
-				*FREQ_ENABLE = true;
+				//*FREQ_ENABLE = true;
 
 				if (isset(res, 0))
 				{
@@ -221,12 +236,17 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 			auto FREQ_code = &FREQ_0_code;
 			auto kod_label = zero_kod_label;
 
-			if(isset(res, 10))	// КОД обнуляется
-				*FREQ_code = 0;
-
-			if (!isset(res, 10))	// FREQ_0_ENABLE
+			if (!isset(res, 10) && *FREQ_ENABLE)	// Если выбрали генератор
 			{
-				*FREQ_ENABLE = true;
+				*FREQ_code = 0;			// Сбросить код
+				*FREQ_ENABLE = false;	// Генератор выбран (настраивается)
+			}
+
+			if (isset(res, 10))
+				*FREQ_ENABLE = true;	// выключить настройку генератора
+
+			if (!isset(res, 10))	// FREQ_1_ENABLE
+			{
 				if (isset(res, 8))
 				{
 					*FREQ_CLOCK = isset(res, 8);
@@ -247,12 +267,18 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 			auto FREQ_code = &FREQ_1_code;
 			auto kod_label = one_kod_label;
 
-			if (isset(res, 18))	// КОД обнуляется
-				*FREQ_code = 0;
+
+			if (!isset(res, 18) && *FREQ_ENABLE)	// Если выбрали генератор
+			{
+				*FREQ_code = 0;			// Сбросить код
+				*FREQ_ENABLE = false;	// Генератор выбран (настраивается)
+			}
+
+			if (isset(res, 18))
+				*FREQ_ENABLE = true;	// выключить настройку генератора
 
 			if (!isset(res, 18))	// FREQ_1_ENABLE
 			{
-				*FREQ_ENABLE = true;
 
 				if (isset(res, 16))
 				{
