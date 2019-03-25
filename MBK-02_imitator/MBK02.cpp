@@ -1,5 +1,5 @@
 #include "MBK02.h"
-
+#include "rpc_ports.h"
 #include <QMessageBox>
 
 union MKOWord
@@ -103,24 +103,24 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 		return;
 	}
 
-	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
-	lka05_slot_thr.start(); // вот тут падает
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
 
-	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
-	lka05_signal_thr.start(); // вот тут падает
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
 
-	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
 		this->deleteLater();
 		return;
 	}
 
-	KPRD_slot_thr.set_connection_params("127.0.0.1", 51061);
-	KPRD_slot_thr.start();
+	kpi_slot_thr.set_connection_params("127.0.0.1", KPI_SLOT);
+	kpi_slot_thr.start();
 
-	KPRD_signal_thr.set_connection_params("127.0.0.1", 51062);
-	KPRD_signal_thr.start();
+	kpi_signal_thr.set_connection_params("127.0.0.1", KPI_SIGNAL);
+	kpi_signal_thr.start();
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
@@ -128,9 +128,9 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 
-	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 
-	connect(KPRD_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
+	connect(kpi_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -155,7 +155,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	set_new_tm();
 }
 
-void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	//	msg_to_log(_msg);

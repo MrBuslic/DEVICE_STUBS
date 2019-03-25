@@ -18,7 +18,7 @@
 #include <memory>
 #include <qlayout.h>
 #include <loki/Singleton.h>
-#include "../LKA-05_imitator/lka05_rpc.h"
+#include "../buses_imitator/mku_bus_rpc.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -34,8 +34,8 @@ public slots:
 	void ads_timer_ontimer();
 
 
-	void new_ku(int ku_n, int length, double u);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	void new_ku(int ku_n, int length, double u, int line);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 
 	int ads128_start();
 	int ads128_read_data(QVariantList& thisbuf, QVariantList& firstbuf);
@@ -70,8 +70,8 @@ private:
 
 	int ads_num;
 
-	RPC_lka05_SLOT_Thread lka05_slot_thr;
-	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
 	double step_1 = 5.0;
 	double step_2= 15.0;

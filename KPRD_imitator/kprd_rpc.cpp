@@ -73,11 +73,6 @@ void RPC_kprd_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		SRPCSignalClass::Instance().toLog("sendKPI connected");
 		emit connect_signal("sendKPI(QString)", true);
 	}
-	else
-	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::newKPI)) {
-		SRPCSignalClass::Instance().toLog("newKPI connected");
-		emit connect_signal("newKPI(QVariantList)", true);
-	}
 }
 
 void RPC_kprd_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -90,11 +85,6 @@ void RPC_kprd_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::sendKPI)) {
 		SRPCSignalClass::Instance().toLog("sendKPI disconnected");
 		//emit connect_signal("sendKPI(QString)", false);
-	}
-	else
-	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::newKPI)) {
-		SRPCSignalClass::Instance().toLog("newKPI disconnected");
-		//emit connect_signal("newKPI(QVariantList)", false);
 	}
 }
 
@@ -126,6 +116,8 @@ void RPC_kprd_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("kprd new signal " + op_name);
 
@@ -133,10 +125,10 @@ void RPC_kprd_SIGNAL_Object::read_data()
 			{
 				QVariantList maskList;
 				tmp_stream >> maskList;
-				SRPCSignalClass::Instance().toLog("kprd " + op_name +" maskList = "+RPCSignalClass::QVariantToString(maskList));
+				SRPCSignalClass::Instance().toLog("kprd " + op_name +" call_number "+ QString::number(call_number) + " maskList = "+RPCSignalClass::QVariantToString(maskList));
 				QVariantList dataList;
 				tmp_stream >> dataList;
-				SRPCSignalClass::Instance().toLog("kprd " + op_name +" dataList = "+RPCSignalClass::QVariantToString(dataList));
+				SRPCSignalClass::Instance().toLog("kprd " + op_name +" call_number "+ QString::number(call_number) + " dataList = "+RPCSignalClass::QVariantToString(dataList));
 				emit test(maskList, dataList);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -146,13 +138,13 @@ void RPC_kprd_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("kprd signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("kprd signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 			if (op_name == "sendKPI(QString)")
 			{
 				QString kpiList;
 				tmp_stream >> kpiList;
-				SRPCSignalClass::Instance().toLog("kprd " + op_name +" kpiList = "+RPCSignalClass::QVariantToString(kpiList));
+				SRPCSignalClass::Instance().toLog("kprd " + op_name +" call_number "+ QString::number(call_number) + " kpiList = "+RPCSignalClass::QVariantToString(kpiList));
 				emit sendKPI(kpiList);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -162,23 +154,7 @@ void RPC_kprd_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("kprd signal finished " + op_name);
-			}
-			if (op_name == "newKPI(QVariantList)")
-			{
-				QVariantList KPIList;
-				tmp_stream >> KPIList;
-				SRPCSignalClass::Instance().toLog("kprd " + op_name +" KPIList = "+RPCSignalClass::QVariantToString(KPIList));
-				emit newKPI(KPIList);
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("kprd signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("kprd signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}

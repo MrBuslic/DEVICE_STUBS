@@ -14,6 +14,7 @@
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../mbk04_imitator/mbk04_rpc.h"
+#include "../buses_imitator/mku_bus_rpc.h"
 
 class LKA05_widg : public QWidget
 {
@@ -75,9 +76,8 @@ public slots:
 	void save_choose_set();
 	void new_tm(int tm); 
 signals:
-	void new_ku(int ku_n, int length, double u);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
-	
+	void new_ku(int ku_n, int length, double u, int line);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 private:
 	MU_MODULE mu_module;
 	QList<MV_MODULE> mvku_modules;
@@ -89,6 +89,9 @@ private:
 
 	RPC_mbk04_SLOT_Thread mbk04_slot_thr;
 	RPC_mbk04_SIGNAL_Thread mbk04_signal_thr;
+
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SLOT_Thread mku_signal_thr;
 };
 
 #endif // LKA05_H

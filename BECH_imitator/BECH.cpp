@@ -1,5 +1,7 @@
 #include "BECH.h"
 
+#include "rpc_ports.h"
+
 #include <QMessageBox>
 
 union MKOWord
@@ -99,10 +101,10 @@ BECH_widg::BECH_widg(QWidget *parent)
 
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", 50001);
+	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", 50002);
+	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
 	signal_thr.start(); // вот тут падает
 
 	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
@@ -112,13 +114,13 @@ BECH_widg::BECH_widg(QWidget *parent)
 		return;
 	}
 
-	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
-	lka05_slot_thr.start(); // вот тут падает
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
 
-	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
-	lka05_signal_thr.start(); // вот тут падает
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
 
-	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
 		this->deleteLater();
@@ -131,7 +133,7 @@ BECH_widg::BECH_widg(QWidget *parent)
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 
-	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -145,7 +147,7 @@ BECH_widg::BECH_widg(QWidget *parent)
 }
 
 
-void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 
 	int uu = 0;

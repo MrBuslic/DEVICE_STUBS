@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -115,16 +116,16 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(new_ku(int, int, double)), this, SLOT(new_ku(int, int, double)));
-		disconnect(app, SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+		disconnect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
+		disconnect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(LKA05_widg* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(new_ku(int, int, double)), this, SLOT(new_ku(int, int, double)), Qt::DirectConnection);
-		data_map.insert("new_ku(int, int, double)", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)), Qt::DirectConnection);
-		data_map.insert("new_mk(int, int, int, int, double, double, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)), Qt::DirectConnection);
+		data_map.insert("new_ku(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)), Qt::DirectConnection);
+		data_map.insert("new_mk(int, int, int, int, double, double, int, int, int)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -254,18 +255,24 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::new_ku(int ku_n, int length, double u)
+	void Socket_RPC_SIGNAL_Object::new_ku(int ku_n, int length, double u, int line)
 	{
-		auto& descriptor = *data_map["new_ku(int, int, double)"].get();
+		auto& descriptor = *data_map["new_ku(int, int, double, int)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("new_ku(int, int, double)");
+		tmp_stream << QString("new_ku(int, int, double, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_ku  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << ku_n;
+		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 ku_n =  %1").arg(RPCSignalClass::QVariantToString(ku_n)).arg(call_number));
 		tmp_stream << length;
+		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 length =  %1").arg(RPCSignalClass::QVariantToString(length)).arg(call_number));
 		tmp_stream << u;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_ku").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 u =  %1").arg(RPCSignalClass::QVariantToString(u)).arg(call_number));
+		tmp_stream << line;
+		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -277,22 +284,34 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+	void Socket_RPC_SIGNAL_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 	{
-		auto& descriptor = *data_map["new_mk(int, int, int, int, double, double, int)"].get();
+		auto& descriptor = *data_map["new_mk(int, int, int, int, double, double, int, int, int)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("new_mk(int, int, int, int, double, double, int)");
+		tmp_stream << QString("new_mk(int, int, int, int, double, double, int, int, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_mk  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << mshm;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 mshm =  %1").arg(RPCSignalClass::QVariantToString(mshm)).arg(call_number));
 		tmp_stream << pshm;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 pshm =  %1").arg(RPCSignalClass::QVariantToString(pshm)).arg(call_number));
 		tmp_stream << length_m;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 length_m =  %1").arg(RPCSignalClass::QVariantToString(length_m)).arg(call_number));
 		tmp_stream << length_p;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 length_p =  %1").arg(RPCSignalClass::QVariantToString(length_p)).arg(call_number));
 		tmp_stream << u_m;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 u_m =  %1").arg(RPCSignalClass::QVariantToString(u_m)).arg(call_number));
 		tmp_stream << u_p;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 u_p =  %1").arg(RPCSignalClass::QVariantToString(u_p)).arg(call_number));
 		tmp_stream << dt;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_mk").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 dt =  %1").arg(RPCSignalClass::QVariantToString(dt)).arg(call_number));
+		tmp_stream << line_m;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 line_m =  %1").arg(RPCSignalClass::QVariantToString(line_m)).arg(call_number));
+		tmp_stream << line_p;
+		SRPCSignalClass::Instance().toLog(QString("new_mk  call_number %2 line_p =  %1").arg(RPCSignalClass::QVariantToString(line_p)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();

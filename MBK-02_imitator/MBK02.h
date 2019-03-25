@@ -14,8 +14,8 @@
 #include <qplaintextedit.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
-#include "../LKA-05_imitator/lka05_rpc.h"
-#include "../KPRD_imitator/kprd_rpc.h"
+#include "../buses_imitator/mku_bus_rpc.h"
+#include "../buses_imitator/kpi_bus_rpc.h"
 
 enum CHANEL
 {
@@ -90,7 +90,7 @@ protected:
 
 	public slots :
 		void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void new_KPI(QVariantList KPI_list);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
@@ -117,11 +117,11 @@ private:
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 
-	RPC_lka05_SLOT_Thread lka05_slot_thr;
-	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
-	RPC_kprd_SLOT_Thread KPRD_slot_thr;
-	RPC_kprd_SIGNAL_Thread KPRD_signal_thr;
+	RPC_kpi_bus_SLOT_Thread kpi_slot_thr;
+	RPC_kpi_bus_SIGNAL_Thread kpi_signal_thr;
 
 };
 

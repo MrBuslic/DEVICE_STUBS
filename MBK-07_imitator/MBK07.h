@@ -14,7 +14,7 @@
 #include <qplaintextedit.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
-#include "../LKA-05_imitator/lka05_rpc.h"
+#include "../buses_imitator/mku_bus_rpc.h"
 
 enum FSMU_numbB
 {
@@ -131,7 +131,7 @@ protected:
 	
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 private:
@@ -147,11 +147,11 @@ private:
 	QMutex log_mutex;
 	void msg_to_log(const QString& _msg);
 
-	RPC_omnibus_SLOT_Thread slot_thr;
-	RPC_omnibus_SIGNAL_Thread signal_thr;
+	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
+	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
 
-	RPC_lka05_SLOT_Thread lka05_slot_thr;
-	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
 
 	QMap<int, QString> mode_names;

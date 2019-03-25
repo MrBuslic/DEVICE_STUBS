@@ -1,5 +1,5 @@
 #include "MBK07.h"
-
+#include "rpc_ports.h"
 #include <QMessageBox>
 
 union MKOWord
@@ -114,39 +114,39 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	logs_lay->addWidget(auto_scroll_box);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", 50001);
-	slot_thr.start(); // вот тут падает
+	omnibus_slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+	omnibus_slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", 50002);
-	signal_thr.start(); // вот тут падает
+	omnibus_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+	omnibus_signal_thr.start(); // вот тут падает
 
-	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
+	if (!omnibus_slot_thr.wait_connected(3) || !omnibus_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
 		this->deleteLater();
 		return;
 	}
 
-	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
-	lka05_slot_thr.start(); // вот тут падает
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
 
-	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
-	lka05_signal_thr.start(); // вот тут падает
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
 
-	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
 		this->deleteLater();
 		return;
 	}
 
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 
-	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -158,7 +158,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 
 	set_new_tm();
 }
-void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	msg_to_log(_msg);
@@ -334,7 +334,7 @@ void MBK07_widg::set_new_tm()
 		if (ab_state)
 		{
 			ab_state = false;
-			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+			omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 		}
 		return;
 	}
@@ -343,7 +343,7 @@ void MBK07_widg::set_new_tm()
 		if (!ab_state)
 		{
 			ab_state = true;
-			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+			omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 		}
 	}
 
@@ -403,5 +403,5 @@ void MBK07_widg::set_new_tm()
 	}
 	tm_words.push_back(s_word);
 	//Отправка 
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }

@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -115,7 +116,6 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			return;
 		disconnect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)));
 		disconnect(app, SIGNAL(sendKPI(QString)), this, SLOT(sendKPI(QString)));
-		disconnect(app, SIGNAL(newKPI(QVariantList)), this, SLOT(newKPI(QVariantList)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(KPRD_imitator* _app)
 	{
@@ -124,8 +124,6 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		data_map.insert("test(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(sendKPI(QString)), this, SLOT(sendKPI(QString)), Qt::DirectConnection);
 		data_map.insert("sendKPI(QString)", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(newKPI(QVariantList)), this, SLOT(newKPI(QVariantList)), Qt::DirectConnection);
-		data_map.insert("newKPI(QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -263,9 +261,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("test(QVariantList, QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal test  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << maskList;
+		SRPCSignalClass::Instance().toLog(QString("test  call_number %2 maskList =  %1").arg(RPCSignalClass::QVariantToString(maskList)).arg(call_number));
 		tmp_stream << dataList;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal test").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("test  call_number %2 dataList =  %1").arg(RPCSignalClass::QVariantToString(dataList)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -285,8 +286,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("sendKPI(QString)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal sendKPI  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << kpiList;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal sendKPI").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("sendKPI  call_number %2 kpiList =  %1").arg(RPCSignalClass::QVariantToString(kpiList)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -297,27 +300,6 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal sendKPI finished").arg(objectName()));
-	}
-	void Socket_RPC_SIGNAL_Object::newKPI(QVariantList KPIList)
-	{
-		auto& descriptor = *data_map["newKPI(QVariantList)"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("newKPI(QVariantList)");
-		tmp_stream << KPIList;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal newKPI").arg(objectName()).arg(QThread::currentThread()->objectName()));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal newKPI sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal newKPI finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

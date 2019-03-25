@@ -1,5 +1,6 @@
 #include "KPRD_imitator.h"
 #include "kprd_socket_rpc.h"
+#include "rpc_ports.h"
 
 KPRD_imitator::KPRD_imitator()  
 {
@@ -59,8 +60,8 @@ KPRD_imitator::KPRD_imitator()
 	emit test(maskListTest, dataListTest);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 51061;
-	int signal_port = 51062;
+	int slot_port = KPRD_SLOT;
+	int signal_port = KPRD_SIGNAL;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
@@ -71,20 +72,31 @@ KPRD_imitator::KPRD_imitator()
 	rpc_signal_srv->start();
 
 
-	ols_slot_thr.set_connection_params("127.0.0.1", 52001);
+	ols_slot_thr.set_connection_params("127.0.0.1", OLS_SLOT+1);
 	ols_slot_thr.start();
 
-	ols_signal_thr.set_connection_params("127.0.0.1", 52002);
+	ols_signal_thr.set_connection_params("127.0.0.1", OLS_SIGNAL+1);
 	ols_signal_thr.start();
 	
 	if (!ols_slot_thr.wait_connected(3) || !ols_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с ols_");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с ols");
 		//this->deleteLater();
 		return;
 	}
 
+	kpi_slot_thr.set_connection_params("127.0.0.1", KPI_SLOT);
+	kpi_slot_thr.start();
 
+	kpi_signal_thr.set_connection_params("127.0.0.1", KPI_SIGNAL);
+	kpi_signal_thr.start();
+
+	if (!kpi_slot_thr.wait_connected(3) || !kpi_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с kpi_bus");
+		//this->deleteLater();
+		return;
+	}
 }
 
 KPRD_imitator::~KPRD_imitator()
@@ -171,6 +183,7 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
 	KPIString = "";
+	QVariantList kpi_list;
 	for (auto const& i : boost::combine(maskList, dataList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
@@ -180,13 +193,25 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 		qulonglong res = MASK & DATA;
 
 		if (isset(res, 24))
-			emit newKPI(QVariantList() << FREQ_P_code);
+		{
+			kpi_list << FREQ_P_code;
+			KPIString += "P";
+		}
 		if (isset(res, 25))
-			emit newKPI(QVariantList() << FREQ_0_code);
+		{
+			kpi_list << FREQ_0_code;
+			KPIString += "0";
+		}
 		if (isset(res, 26))
-			emit newKPI(QVariantList() << FREQ_1_code);
+		{
+			kpi_list << FREQ_1_code;
+			KPIString += "1";
+		}
 		if (isset(res, 27))
-			emit newKPI(QVariantList() << 0);
+		{
+			kpi_list << 0;
+			KPIString += "Х";
+		}
 
 		auto val1 = (res << 26 >> 58);
 		auto val2 = (res << 20 >> 58);
@@ -222,8 +247,7 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 					*FREQ_DATA = isset(res, 1);
 					*FREQ_code = (*FREQ_code << 1) + *FREQ_DATA;
 					kod_label->setText("Код: " + QString::number(*FREQ_code));
-					if(isset(res, 24))
-						KPIString += "P";
+
 				}
 			}
 		}
@@ -253,8 +277,7 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 					*FREQ_DATA = isset(res, 9);
 					*FREQ_code = (*FREQ_code << 1) + *FREQ_DATA;
 					kod_label->setText("Код: " + QString::number(*FREQ_code));
-					if (isset(res, 25))
-						KPIString += "0";
+
 				}
 			}
 		}
@@ -286,11 +309,14 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 					*FREQ_DATA = isset(res, 17);
 					*FREQ_code = (*FREQ_code << 1) + *FREQ_DATA;
 					kod_label->setText("Код: " + QString::number(*FREQ_code));
-					if (isset(res, 26))
-						KPIString += "1";
+
 				}
 			}
 		}
-		log_edit->setText("Выдано: " + KPIString + "\n");
+		
+
+
 	}	// for
+	log_edit->setText("Выдано: " + KPIString + "\n");
+	kpi_slot_thr.get_kpi_bus_obj()->make_KPI(kpi_list);
 }

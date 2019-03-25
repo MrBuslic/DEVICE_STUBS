@@ -80,8 +80,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["measurement_timer_ontimer()"] = &Socket_RPC_SLOT_Object::measurement_timer_ontimer;
 		operators_map["infin_timer_ontimer()"] = &Socket_RPC_SLOT_Object::infin_timer_ontimer;
-		operators_map["new_ku(int, int, double)"] = &Socket_RPC_SLOT_Object::new_ku;
-		operators_map["new_mk(int, int, int, int, double, double, int)"] = &Socket_RPC_SLOT_Object::new_mk;
+		operators_map["new_ku(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku;
+		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_mk;
 		operators_map["unmn8i_start()"] = &Socket_RPC_SLOT_Object::unmn8i_start;
 		operators_map["unmn8i_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unmn8i_input_trigger;
 		operators_map["unmn8i_sample_width_q(uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_sample_width_q;
@@ -372,7 +372,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			int ku_n = _values.at(0).value<int>();
 			int length = _values.at(1).value<int>();
 			double u = _values.at(2).value<double>();
-			app->new_ku(ku_n, length, u);
+			int line = _values.at(3).value<int>();
+			app->new_ku(ku_n, length, u, line);
 			return 0;
 		}
 		catch(const std::exception &)
@@ -396,7 +397,9 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			double u_m = _values.at(4).value<double>();
 			double u_p = _values.at(5).value<double>();
 			int dt = _values.at(6).value<int>();
-			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt);
+			int line_m = _values.at(7).value<int>();
+			int line_p = _values.at(8).value<int>();
+			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 			return 0;
 		}
 		catch(const std::exception &)

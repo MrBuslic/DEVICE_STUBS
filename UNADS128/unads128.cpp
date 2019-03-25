@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "ads128_rpc.h"
 #include "unads128_h.h"
+#include "rpc_ports.h"
 
 int ads128_count = 0;
 
@@ -12,12 +13,12 @@ rpc_buffer_class::rpc_buffer_class()
 	for (int i = 0; i < 2; i++)
 	{
 		RPC_ads128_SLOT_Thread* slot_thr = new RPC_ads128_SLOT_Thread;
-		slot_thr->set_connection_params("127.0.0.1", 30050 + i);
+		slot_thr->set_connection_params("127.0.0.1", ADS_SLOT + i);
 		slot_thr->start();
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		RPC_ads128_SIGNAL_Thread* signal_thr = new RPC_ads128_SIGNAL_Thread;
-		signal_thr->set_connection_params("127.0.0.1", 30055 + i);
+		signal_thr->set_connection_params("127.0.0.1", ADS_SIGNAL + i);
 		signal_thr->start();
 		//bool res = signal_thr->wait_connected(5);
 

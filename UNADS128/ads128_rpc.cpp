@@ -133,17 +133,18 @@ void RPC_ads128_SLOT_Object::ads_timer_ontimer()
 	dynamic_call("ads_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished ads_timer_ontimer");
 }
-void RPC_ads128_SLOT_Object::new_ku(int ku_n, int length, double u)
+void RPC_ads128_SLOT_Object::new_ku(int ku_n, int length, double u, int line)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(ku_n);
 	tmp_list << QVariant(length);
 	tmp_list << QVariant(u);
+	tmp_list << QVariant(line);
 	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call new_ku %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("new_ku(int, int, double)", tmp_list);
+	dynamic_call("new_ku(int, int, double, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished new_ku");
 }
-void RPC_ads128_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void RPC_ads128_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(mshm);
@@ -153,8 +154,10 @@ void RPC_ads128_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length
 	tmp_list << QVariant(u_m);
 	tmp_list << QVariant(u_p);
 	tmp_list << QVariant(dt);
+	tmp_list << QVariant(line_m);
+	tmp_list << QVariant(line_p);
 	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("new_mk(int, int, int, int, double, double, int)", tmp_list);
+	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished new_mk");
 }
 int RPC_ads128_SLOT_Object::ads128_start()

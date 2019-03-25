@@ -37,7 +37,6 @@ signals:
 public slots:
 	void test(QVariantList maskList, QVariantList dataList);
 	void sendKPI(QString kpiList);
-	void newKPI(QVariantList KPIList);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -48,6 +47,7 @@ private:
 	QMutex signal_mutex;
 	KPRD_imitator* app;
 	static int obj_num;
+	static int call_number;
 	QMap<QString, std::shared_ptr<SignalData> > data_map;
 };
 

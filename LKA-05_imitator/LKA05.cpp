@@ -1,7 +1,7 @@
 #include "LKA05.h"
 #include "lka05_socket_rpc.h"
 #include <QMessageBox>
-
+#include "rpc_ports.h"
 union MKOWord
 {
 	quint16 com_word;				 // командное слово целиком
@@ -104,10 +104,10 @@ LKA05_widg::LKA05_widg()
 	v_l->addLayout(MU_glayout);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", 50001);
+	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", 50002);
+	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
 	signal_thr.start(); // вот тут падает
 
 	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
@@ -117,21 +117,35 @@ LKA05_widg::LKA05_widg()
 		return;
 	}
 
-	mbk04_slot_thr.set_connection_params("127.0.0.1", 50051);
+	mbk04_slot_thr.set_connection_params("127.0.0.1", MBK04_SLOT);
 	mbk04_slot_thr.start(); // вот тут падает
 
-	mbk04_signal_thr.set_connection_params("127.0.0.1", 50052);
+	mbk04_signal_thr.set_connection_params("127.0.0.1", MBK04_SIGNAL);
 	mbk04_signal_thr.start(); // вот тут падает
 
 	if (!mbk04_slot_thr.wait_connected(3) || !mbk04_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mbk04_");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mbk04");
 		this->deleteLater();
 		return;
 	}
+
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
+
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
+
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
+		this->deleteLater();
+		return;
+	}
+
 	QString ip_str = "127.0.0.1";
-	int slot_port = 50061;
-	int signal_port = 50062;
+	int slot_port = LKA05_SLOT;
+	int signal_port = LKA05_SIGNAL;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
@@ -151,8 +165,9 @@ LKA05_widg::LKA05_widg()
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
 
-	connect(this, SIGNAL(new_ku(int, int, double)), mbk04_slot_thr.get_mbk04_obj().get(), SLOT(new_ku(int, int, double)), Qt::DirectConnection);
-//	connect(this, SIGNAL(new_data(int, int, int, QVariantList)), slot_thr.get_omnibus_obj().get(), SLOT(set_new_data(int, int, int, QVariantList))); 
+	connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
+	connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
+
 //	choose_dialog();
 	//(1040 2040 2140 2240  3040 3140 3240) в начале все модули имеют основной канал и му1
 	//нужно обработать входящие (первые 4 знака) для таблицы 6, для какого модуля пришло слово
@@ -362,7 +377,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
 							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
 							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
-							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom));
+							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom), 3, 3);
 							max_p++;
 						}
 						else 
@@ -392,7 +407,11 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 						{
 							MV_DEV& param_ku = mvku_modules[nim].get_settings();
 							mvku_modules[nim].set_ku_p(num_ku);
-							emit new_ku(num_ku+nim*8, param_ku.length_kom, param_ku.u_kom);
+							int full_num_ku = num_ku + nim * 8;
+							if ((full_num_ku >= 16) && (full_num_ku <= 18)) //Команды в МБК04 не заведены на внешнюю шину и выдаются напрямую
+								mbk04_slot_thr.get_mbk04_obj()->new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom);
+							else
+								emit new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
 							max_ku++;
 						}
 						else

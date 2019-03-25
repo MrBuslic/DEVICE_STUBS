@@ -14,7 +14,7 @@
 #include <boost/tuple/tuple.hpp>
 
 #include "../UNOLS/ols_rpc.h"
-
+#include "../buses_imitator/kpi_bus_rpc.h"
 
 class KPRD_imitator :
 	public QMainWindow
@@ -71,10 +71,12 @@ private:
 	RPC_ols_SLOT_Thread ols_slot_thr;
 	RPC_ols_SIGNAL_Thread ols_signal_thr;
 
+	RPC_kpi_bus_SLOT_Thread kpi_slot_thr;
+	RPC_kpi_bus_SIGNAL_Thread kpi_signal_thr;
+
 signals:
 	void test(QVariantList maskList, QVariantList dataList);
 	void sendKPI(QString kpiList);
-	void newKPI(QVariantList KPIList);
 
 public slots:
 	void dataIn(QVariantList maskList, QVariantList dataList);

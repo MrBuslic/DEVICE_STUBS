@@ -39,7 +39,7 @@ add_library(unmn8i_32 SHARED ${UNMN8I_HEADERS} ${UNMN8I_SOURCES} export.def)
 target_link_libraries(unmn8i_32 socket_rpc)
 
 set(RPC_MN8I_SOURCES rpc_mn8i.h rpc_mn8i.cpp 
-	../LKA-05_imitator/lka05_rpc.h ../LKA-05_imitator/lka05_rpc.cpp
+	../buses_imitator/mku_bus_rpc.h ../buses_imitator/mku_bus_rpc.cpp
 	mn8i_main.cpp mn8i_socket_rpc.h mn8i_socket_rpc.cpp)
 
 add_executable(rpc_mn8i WIN32 ${RPC_MN8I_SOURCES})

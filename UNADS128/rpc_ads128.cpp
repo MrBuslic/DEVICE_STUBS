@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include "ads128_socket_rpc.h"
+#include "rpc_ports.h"
 #include <qmessagebox.h>
 
 RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  state(false), ads_num(_ads_num)
@@ -39,31 +40,31 @@ RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  
 
 	log_timer.start(200);
 
-	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
-	lka05_slot_thr.start(); 
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); 
 
-	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
-	lka05_signal_thr.start(); 
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); 
 
-	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
 		this->deleteLater();
 		return;
 	}
 	if (ads_num == 0)
-		connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+		connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	else
-		connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double)), this, SLOT(new_ku(int, int, double)));
+		connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
 
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
-	rpc_slot_srv->set_params(ip_str, 30050+ads_num);
+	rpc_slot_srv->set_params(ip_str, ADS_SLOT+ads_num);
 	rpc_slot_srv->start();
 	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
-	rpc_signal_srv->set_params(ip_str, 30055 + ads_num);
+	rpc_signal_srv->set_params(ip_str, ADS_SIGNAL + ads_num);
 	rpc_signal_srv->start();
 	setWindowTitle(QString("ADS128 %1").arg(ads_num));
 	for (int i = 0; i < 16; i++)
@@ -146,23 +147,31 @@ void RpcADS128Widget::add_signal(int ads_chan, double _u)
 	state_buffer[ads_group_n] = old_group;
 }
 
-void RpcADS128Widget::new_ku(int ku_n, int length, double u)
+void RpcADS128Widget::new_ku(int ku_n, int length, double u, int line)
 {
 	
 
 
 	int ads_chan_n = ku_n;
-	add_signal(ads_chan_n, u);
+	if (line & 1)
+		add_signal(ads_chan_n, u);
+	if (line & 2)
+		add_signal(ads_chan_n+8, u);
+
 	ads_timer->start(length);
 }
 
-void RpcADS128Widget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void RpcADS128Widget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	int ads_chan_m = mshm + 32;
 	int ads_chan_p = pshm;
-	add_signal(ads_chan_m, u_m);
-	add_signal(mshm+48, u_m);
-	add_signal(ads_chan_p, u_p);
-	add_signal(pshm+16, u_p);
+	if (line_m & 1)
+		add_signal(ads_chan_m, u_m);
+	if (line_m & 2)
+		add_signal(mshm+48, u_m);
+	if (line_p & 1)
+		add_signal(ads_chan_p, u_p);
+	if (line_p & 2)
+		add_signal(pshm+16, u_p);
 	ads_timer->start(qMax(length_m, length_p));
 }

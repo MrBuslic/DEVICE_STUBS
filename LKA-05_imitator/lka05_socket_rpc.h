@@ -35,8 +35,8 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void new_ku(int ku_n, int length, double u);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
+	void new_ku(int ku_n, int length, double u, int line);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -47,6 +47,7 @@ private:
 	QMutex signal_mutex;
 	LKA05_widg* app;
 	static int obj_num;
+	static int call_number;
 	QMap<QString, std::shared_ptr<SignalData> > data_map;
 };
 

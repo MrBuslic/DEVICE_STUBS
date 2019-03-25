@@ -42,7 +42,9 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
 SET(RPC_SOURCES  ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.h ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.cpp kprd_socket_rpc.h kprd_socket_rpc.cpp)
 
-add_executable(KPRD_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES})
+SET(KPI_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/kpi_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/kpi_bus_rpc.cpp)
+
+add_executable(KPRD_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES} ${KPI_RPC_SOURCES})
 target_link_libraries (KPRD_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
