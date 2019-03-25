@@ -11,8 +11,6 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	int unfoi_chan_setup(int _n, short _chan, double _u, double _t);
 	int unfoi_run();
 	////////////////////////////////////
@@ -49,7 +47,6 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
-	void foi_interrupt(int _n, short _chan, double _u, double _t);
 };
 
 class RPC_foi_SIGNAL_Thread : public RPC_SIGNAL_Thread

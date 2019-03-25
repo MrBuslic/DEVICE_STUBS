@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -75,8 +76,6 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	setObjectName(QString("foi_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["unfoi_chan_setup(int, short, double, double)"] = &Socket_RPC_SLOT_Object::unfoi_chan_setup;
 		operators_map["unfoi_run()"] = &Socket_RPC_SLOT_Object::unfoi_run;
 		///////////////////////////////////////////////////////////////////////
@@ -116,13 +115,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(foi_interrupt(int, short, double, double)), this, SLOT(foi_interrupt(int, short, double, double)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(RpcFoiWidget* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(foi_interrupt(int, short, double, double)), this, SLOT(foi_interrupt(int, short, double, double)), Qt::DirectConnection);
-		data_map.insert("foi_interrupt(int, short, double, double)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -252,30 +248,6 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::foi_interrupt(int _n, short _chan, double _u, double _t)
-	{
-		auto& descriptor = *data_map["foi_interrupt(int, short, double, double)"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("foi_interrupt(int, short, double, double)");
-		tmp_stream << _n;
-		tmp_stream << _chan;
-		tmp_stream << _u;
-		tmp_stream << _t;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal foi_interrupt").arg(objectName()).arg(QThread::currentThread()->objectName()));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal foi_interrupt sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal foi_interrupt finished").arg(objectName()));
-	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -288,40 +260,6 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int _state = _values.at(0).value<int>();
-			app->auto_scroll_clicked(_state);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
-	{
-		try
-		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
 	QVariant Socket_RPC_SLOT_Object::unfoi_chan_setup(QVariantList& _values)
 	{
 		try
