@@ -90,10 +90,10 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	All_vblay->addWidget(auto_scroll_box);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", 50001);
+	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", 50002);
+	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
 	signal_thr.start(); // вот тут падает
 
 	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
@@ -111,7 +111,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с МКУ");
 		this->deleteLater();
 		return;
 	}
@@ -121,6 +121,13 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	kpi_signal_thr.set_connection_params("127.0.0.1", KPI_SIGNAL);
 	kpi_signal_thr.start();
+
+	if (!kpi_slot_thr.wait_connected(3) || !kpi_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с КПИ");
+		this->deleteLater();
+		return;
+	}
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
@@ -141,7 +148,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	//msg_to_log("рпп");
 	//paint_buttons();
-	current_lit = 1;
+	current_lit = 0;
 	for (int i = 0; i <= 3; i++)
 	{
 		tmp_list.push_back(LITER_PAUSE + (STEP * current_lit));
@@ -194,6 +201,12 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 	//}
 	for (int it_lit = 1; KPI_list.at(0).toInt() - (STEP*it_lit) != LITER_PAUSE; it_lit++)
 	{
+		if (current_lit = 0)
+		{
+			msg_to_log("Литера не задана, либо задана нулевая литера");
+			ch_cur_lit = false;
+			break;
+		}
 		if ((it_lit == current_lit) && (KPI_list.at(0).toInt() - (STEP*it_lit) != LITER_PAUSE))
 		{
 			msg_to_log("Некорректная литера");
@@ -209,10 +222,10 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 			if ((tmp_in >= -3) && (tmp_in <= 3)) tmp_str_KPI += "P";
 			else
 			{
-				if ((tmp_in >= 0xF9A) && (tmp_in <= 0xFA6)) tmp_str_KPI += "1";
+				if ((tmp_in >= ONE - 6) && (tmp_in <= ONE + 6)) tmp_str_KPI += "1";
 				else
 				{
-					if ((tmp_in >= 0xBB2) && (tmp_in <= 0xBBE)) tmp_str_KPI += "0";
+					if ((tmp_in >= ZERO - 6) && (tmp_in <= ZERO + 6)) tmp_str_KPI += "0";
 					else tmp_str_KPI += " ERR ";
 				}
 			}

@@ -83,23 +83,6 @@ BECH_widg::BECH_widg(QWidget *parent)
 	All_vblay->addWidget(KP_gb);
 	All_vblay->addLayout(FINIK_REZH_hlay);
 
-	//QVBoxLayout *logs_lay = new QVBoxLayout(this);
-	//edit = new QTextEdit(this);
-	//_scroll_bar = edit->verticalScrollBar();
-	//_doc = new QTextDocument();
-	//_cursor = new QTextCursor(_doc);
-	//edit->setDocument(_doc);
-	//edit->setReadOnly(true);
-	//_doc->setMaximumBlockCount(1000);
-	//setMinimumSize(490, 300);
-	//auto_scroll_box = new QCheckBox(this);
-	//auto_scroll_box->setText("Автопрокрутка");
-	//auto_scroll_box->setChecked(true);
-	//connect(auto_scroll_box, &QCheckBox::stateChanged, this, &BECH_widg::auto_scroll_clicked);
-	//logs_lay->addWidget(edit);
-	//logs_lay->addWidget(auto_scroll_box);
-
-
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
@@ -127,6 +110,18 @@ BECH_widg::BECH_widg(QWidget *parent)
 		return;
 	}
 
+	interrupt_slot_thr.set_connection_params("127.0.0.1", INTERRUPTS_SLOT);
+	interrupt_slot_thr.start(); // вот тут падает
+
+	interrupt_signal_thr.set_connection_params("127.0.0.1", INTERRUPTS_SIGNAL);
+	interrupt_signal_thr.start(); // вот тут падает
+
+	if (!interrupt_slot_thr.wait_connected(3) || !interrupt_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с interrupt_bus в Foi");
+		this->deleteLater();
+		return;
+	}
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 
@@ -143,9 +138,42 @@ BECH_widg::BECH_widg(QWidget *parent)
 	connect(&log_timer, &QTimer::timeout, this, &BECH_widg::log_timer_ontimer);
 	log_timer.start(200);
 
-	//set_new_tm();
+	edit = new QTextEdit(this);
+	_scroll_bar = edit->verticalScrollBar();
+	_doc = new QTextDocument();
+	_cursor = new QTextCursor(_doc);
+	edit->setDocument(_doc);
+	edit->setReadOnly(true);
+	_doc->setMaximumBlockCount(1000);
+	setMinimumSize(360, 300);
+	auto_scroll_box = new QCheckBox(this);
+	auto_scroll_box->setText("Автопрокрутка");
+	auto_scroll_box->setChecked(true);
+	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &BECH_widg::auto_scroll_clicked);
+	All_vblay->addWidget(edit);
+	All_vblay->addWidget(auto_scroll_box);
+
+	//inter_tmr = new QTimer(this);
+	connect(&inter_tmr, &QTimer::timeout, this, &BECH_widg::BECH_interrupt_setup);
+	//connect(&inter_tmr, SIGNAL(timeout()), this, SLOT(BECH_widg::BECH_interrupt_setup(5,3,1,3)));
+	inter_tmr.start(1000);
 }
 
+void BECH_widg::BECH_interrupt_setup()
+{
+	n = 5;
+	chan = 3;
+	u = 5;
+	t = 4.5;
+	BECH_interrupt_run();
+}
+
+void BECH_widg::BECH_interrupt_run()
+{
+	QString t_msg = QString("Выдаю сигнал на канале %1 линии %2 с амплитудой %3 и длительностью %4").arg(n).arg(chan).arg(u).arg(t);
+	msg_to_log(t_msg);
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan, u, t);
+}
 
 void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
@@ -153,49 +181,49 @@ void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_
 	int uu = 0;
 	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	//	msg_to_log(_msg);
-		int tmp_mshm = mshm;
-		int tmp_pshm = pshm;
-	
-		switch (tmp_mshm)
-		{
-		case 3:
-			current_LKA = LKA_1;
-			break;
-		case 4:
-			current_LKA = LKA_2;
-			break;
-		case 8:
-			current_KP = KP_1; 
-			break;
-		case 9:
-			current_KP = KP_2; 
-			break;
-		}
-		write_words();
-		paint_buttons();
+	int tmp_mshm = mshm;
+	int tmp_pshm = pshm;
+
+	switch (tmp_mshm)
+	{
+	case 3:
+		current_LKA = LKA_1;
+		break;
+	case 4:
+		current_LKA = LKA_2;
+		break;
+	case 8:
+		current_KP = KP_1;
+		break;
+	case 9:
+		current_KP = KP_2;
+		break;
+	}
+	write_words();
+	paint_buttons();
 	//	set_new_tm();
 }
 
 
 void BECH_widg::msg_to_log(const QString& _msg)
 {
-	//{
-	//	QMutexLocker lock(&log_mutex);
-	//	log_buffer << _msg;
-	//}
-	//_cursor->insertText(_msg + "\n");
-	//if (auto_scroll)
-	//	_scroll_bar->setValue(_scroll_bar->maximum());
+	{
+		QMutexLocker lock(&log_mutex);
+		log_buffer << _msg;
+	}
+	_cursor->insertText(_msg + "\n");
+	if (auto_scroll)
+		_scroll_bar->setValue(_scroll_bar->maximum());
 }
 
 void BECH_widg::auto_scroll_clicked(int _state)
 {
-	//auto_scroll = (_state != 0);
+	auto_scroll = (_state != 0);
 }
 
 void BECH_widg::log_timer_ontimer()
 {
-	/*QStringList tmp_buffer;
+	QStringList tmp_buffer;
 	{
 		QMutexLocker lock(&log_mutex);
 		tmp_buffer = log_buffer;
@@ -208,7 +236,7 @@ void BECH_widg::log_timer_ontimer()
 	log_file.open(QIODevice::Append);
 	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
 		log_stream << *itr << "\n";
-	log_file.close();*/
+	log_file.close();
 }
 
 void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
@@ -223,7 +251,7 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//	msg_to_log(_msg);
 
 		int tmp_word = words[0].toInt();
-		
+
 		char reset = tmp_word & 0x1F;
 		if (reset != 15)
 		{
@@ -251,15 +279,15 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			current_FINIK = FINIK_1;
 			current_FINIK_REZH = FINIK_REZH_PI8;
 		}
-			write_words();
-			paint_buttons();
+		write_words();
+		paint_buttons();
 		//	set_new_tm();
 	}
 }
 void BECH_widg::write_words()
 {
-		if (mode_names.contains(current_FINIK_REZH))
-			Mode_le->setText(mode_names[current_FINIK_REZH]);
+	if (mode_names.contains(current_FINIK_REZH))
+		Mode_le->setText(mode_names[current_FINIK_REZH]);
 }
 void BECH_widg::paint_buttons()
 {
