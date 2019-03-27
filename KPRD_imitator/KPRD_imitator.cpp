@@ -56,8 +56,8 @@ KPRD_imitator::KPRD_imitator()
 	dataListTest << 0xFFFFFFFFFFBFF << 0xFFFFFFFFFFBFF << 0xFFFFFFFFFFBFF << 0xFFFFFFFFFF9FF << 0xFFFFFFFFFF9FF << 0xFFFFFFFFFFBFF;
 	dataListTest << 0xFFFFFFFF9FFFF << 0xFFFFFFFF9FFFF << 0xFFFFFFFFBFFFF << 0xFFFFFFFFBFFFF << 0xFFFFFFFFBFFFF << 0xFFFFFFFFBFFFF;
 
-	connect(this, &KPRD_imitator::test, this, &KPRD_imitator::dataIn);
-	emit test(maskListTest, dataListTest);
+	//connect(this, &KPRD_imitator::test, this, &KPRD_imitator::dataIn);
+	//emit test(maskListTest, dataListTest);
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = KPRD_SLOT;
@@ -72,10 +72,10 @@ KPRD_imitator::KPRD_imitator()
 	rpc_signal_srv->start();
 
 
-	ols_slot_thr.set_connection_params("127.0.0.1", OLS_SLOT+1);
+	ols_slot_thr.set_connection_params("127.0.0.1", OLS_SLOT);
 	ols_slot_thr.start();
 
-	ols_signal_thr.set_connection_params("127.0.0.1", OLS_SIGNAL+1);
+	ols_signal_thr.set_connection_params("127.0.0.1", OLS_SIGNAL);
 	ols_signal_thr.start();
 	
 	if (!ols_slot_thr.wait_connected(3) || !ols_signal_thr.wait_connected(3))
@@ -84,6 +84,8 @@ KPRD_imitator::KPRD_imitator()
 		//this->deleteLater();
 		return;
 	}
+	
+	connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr.get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPRD_imitator::dataIn);
 
 	kpi_slot_thr.set_connection_params("127.0.0.1", KPI_SLOT);
 	kpi_slot_thr.start();
@@ -184,6 +186,7 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 		return;
 	KPIString = "";
 	QVariantList kpi_list;
+	int a = 0;
 	for (auto const& i : boost::combine(maskList, dataList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
@@ -191,6 +194,12 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 		qulonglong MASK = MASKVar.toULongLong();
 		qulonglong DATA = DATAVar.toULongLong();
 		qulonglong res = MASK & DATA;
+
+		
+		if (isset(res, 1))	{++a;}
+		if (isset(res, 9)) { ++a; }
+		if (isset(res, 17)) { ++a; }
+
 
 		if (isset(res, 24))
 		{
@@ -228,20 +237,20 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 			auto FREQ_code = &FREQ_P_code;
 			auto kod_label = pause_kod_label;
 			
-			if (!isset(res, 2) && *FREQ_ENABLE)	// Если выбрали генератор
+			if (isset(res, 2) && !*FREQ_ENABLE)	// Если выбрали генератор
 			{
 				*FREQ_code = 0;			// Сбросить код
-				*FREQ_ENABLE = false;	// Генератор выбран (настраивается)
+				*FREQ_ENABLE = true;	// Генератор выбран (настраивается)
 			}
 
-			if (isset(res, 2))	
-				*FREQ_ENABLE = true;	// выключить настройку генератора
+			if (!isset(res, 2))	
+				*FREQ_ENABLE = false;	// выключить настройку генератора
 
-			if (!isset(res, 2))	// FREQ_1_ENABLE
+			if (isset(res, 2))	// FREQ_1_ENABLE
 			{
 				//*FREQ_ENABLE = true;
 
-				if (isset(res, 0))
+				if (!isset(res, 0))
 				{
 					*FREQ_CLOCK = isset(res, 0);
 					*FREQ_DATA = isset(res, 1);

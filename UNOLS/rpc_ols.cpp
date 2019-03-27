@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QDir>
 #include "ols_socket_rpc.h"
-
+#include "rpc_ports.h"
 
 //rpc_buffer_class kprd_list;
 
@@ -35,8 +35,8 @@ RpcOlsWidget::RpcOlsWidget() : QWidget(), auto_scroll(true)
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30001;
-	int signal_port = 30002;
+	int slot_port = OLS_SLOT;
+	int signal_port = OLS_SIGNAL;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);

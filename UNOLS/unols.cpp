@@ -1,18 +1,21 @@
 #include <unols.h>
 #include "unols_h.h"
 #include <windows.h>
+#include "rpc_ports.h"
+
+int unols_state = UNOLS_STOP;
 
 rpc_buffer_class::rpc_buffer_class()
 {
 	for (int i = 0; i < 1; i++)
 	{
 		RPC_ols_SLOT_Thread* slot_thr = new RPC_ols_SLOT_Thread;
-		slot_thr->set_connection_params("127.0.0.1", 31070 + i);
+		slot_thr->set_connection_params("127.0.0.1", OLS_SLOT + i);
 		slot_thr->start();
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		RPC_ols_SIGNAL_Thread* signal_thr = new RPC_ols_SIGNAL_Thread;
-		signal_thr->set_connection_params("127.0.0.1", 31075 + i);
+		signal_thr->set_connection_params("127.0.0.1", OLS_SIGNAL + i);
 		signal_thr->start();
 		//bool res = signal_thr->wait_connected(5);
 
@@ -81,7 +84,9 @@ extern "C" {
 ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName, 
 								ViBoolean 	id_query,
 								ViBoolean 	reset, 
-								ViPSession 	vi){ return 0; }
+	ViPSession 	vi) {
+	*vi = 1;  return 0;
+}
 /****************************************************************************
 		Функции конфигурации
 *****************************************************************************/
@@ -160,7 +165,7 @@ ViStatus _VI_FUNC unols_config_inpExt_Q (ViSession vi,  ViPInt16 st){ return 0; 
 ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){
 	if (devise == 2) {
 		Srpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_write_data_kf(Srpc_buffer_class::Instance().ols_buffer, Srpc_buffer_class::Instance().mask_buffer);
-		
+		unols_state = UNOLS_WAIT;
 	}
 	return 0; 
 }  //todo (передача 2 буферов в rpc)
@@ -168,6 +173,7 @@ ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){
 ViStatus _VI_FUNC unols_trigger_imm (ViSession vi, ViInt16 devise){
 	if (devise == 2) {//Generator
 		Srpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_trigger_imm();
+		unols_state = UNOLS_STOP;
 	}
 	return 0;
 }     //todo
@@ -177,8 +183,7 @@ ViStatus _VI_FUNC unols_reset_status (ViSession vi, ViInt16 devise, ViUInt16 mas
 ViStatus _VI_FUNC unols_reset_DRAM (ViSession vi, ViInt16 devise, ViUInt32 period, ViUInt32 offsetData){ return 0; }
 ViStatus _VI_FUNC unols_status_Q (ViSession vi, ViInt16 devise,  
                                   ViPUInt16  stateDev, ViPUInt16 eventDev, ViPUInt16 errDev){ 
-	//*stateDev = unols_state;
-	*stateDev = 0;
+	*stateDev = unols_state;
 	return 0; } // todo
 /****************************************************************************
 		 Данные

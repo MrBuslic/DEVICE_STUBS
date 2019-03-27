@@ -47,7 +47,7 @@ private:
 
 	bool FREQ_P_CLOCK = false;
 	bool FREQ_P_DATA = false;
-	bool FREQ_P_ENABLE = true;
+	bool FREQ_P_ENABLE = false;
 	bool FREQ_0_CLOCK = false;
 	bool FREQ_0_DATA = false;
 	bool FREQ_0_ENABLE = true;
