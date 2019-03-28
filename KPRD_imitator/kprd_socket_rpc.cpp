@@ -115,15 +115,15 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)));
-		disconnect(app, SIGNAL(sendKPI(QString)), this, SLOT(sendKPI(QString)));
+		disconnect(app, SIGNAL(sendKPI(QVariantList)), this, SLOT(sendKPI(QVariantList)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(KPRD_imitator* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)), Qt::DirectConnection);
 		data_map.insert("test(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(sendKPI(QString)), this, SLOT(sendKPI(QString)), Qt::DirectConnection);
-		data_map.insert("sendKPI(QString)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(sendKPI(QVariantList)), this, SLOT(sendKPI(QVariantList)), Qt::DirectConnection);
+		data_map.insert("sendKPI(QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -278,14 +278,14 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal test finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::sendKPI(QString kpiList)
+	void Socket_RPC_SIGNAL_Object::sendKPI(QVariantList kpiList)
 	{
-		auto& descriptor = *data_map["sendKPI(QString)"].get();
+		auto& descriptor = *data_map["sendKPI(QVariantList)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("sendKPI(QString)");
+		tmp_stream << QString("sendKPI(QVariantList)");
 		tmp_stream << (++call_number);
 		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal sendKPI  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << kpiList;

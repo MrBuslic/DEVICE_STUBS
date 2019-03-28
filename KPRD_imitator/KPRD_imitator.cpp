@@ -118,21 +118,27 @@ KPRD_imitator::~KPRD_imitator()
 
 }
 
-void KPRD_imitator::set_antenna_label(qulonglong val)
+QString KPRD_imitator::set_antenna_label(qulonglong val)
 {
+	QString res = "";
 	switch (val)
 	{
 		case 14: antenna_label->setText("Антенна: МНА2+Y");
+			res = "МНА2+Y";
 			break;
 		case 13: antenna_label->setText("Антенна: МНА1-Y");
+			res = "МНА1-Y";
 			break;
 		case 11: antenna_label->setText("Антенна: МНА1+Y");
+			res = "МНА1+Y";
 			break;
 		case 7: antenna_label->setText("Антенна: МНА2-Y");
+			res = "МНА2-Y";
 			break;
 	default: antenna_label->setText("Антенна: ");
 		break;
 	}
+	return res;
 }
 
 bool KPRD_imitator::isset(qulonglong x, qulonglong n)
@@ -186,7 +192,7 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 		return;
 	KPIString = "";
 	QVariantList kpi_list;
-	int a = 0;
+
 	for (auto const& i : boost::combine(dataList, maskList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
@@ -195,41 +201,41 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 		qulonglong DATA = DATAVar.toULongLong();
 		qulonglong res = MASK & DATA;
 
-		
-		if (isset(res, 1))	{++a;}
-		if (isset(res, 9)) { ++a; }
-		if (isset(res, 17)) { ++a; }
-
-
 		auto val1 = (res << 26 >> 58);
 		auto val2 = (res << 20 >> 58);
 		qulonglong attenuation_val = val1 + val2;
 		attenuation_label->setText("Ослабление: " + QString::number(attenuation_val));
 		qulonglong antenna_name = res << 12 >> 60;
-		set_antenna_label(antenna_name);
+		QString antenna = set_antenna_label(antenna_name);
+
+		QVariantList KPI;
 
 		if (!isset(res, 24))
 		{
-			kpi_list << FREQ_P_code;
+			//kpi_list << FREQ_P_code;
 			KPIString += "P";
+			KPI << FREQ_P_code << antenna << attenuation_val;
 		}
 		if (!isset(res, 25))
 		{
-			kpi_list << FREQ_0_code;
+			//kpi_list << FREQ_0_code;
 			KPIString += "0";
+			KPI << FREQ_0_code << antenna << attenuation_val;
 		}
 		if (!isset(res, 26))
 		{
-			kpi_list << FREQ_1_code;
+			//kpi_list << FREQ_1_code;
 			KPIString += "1";
+			KPI << FREQ_1_code << antenna << attenuation_val;
 		}
 		if (!isset(res, 27))
 		{
-			kpi_list << 0;
+			//kpi_list << 0;
 			KPIString += "Х";
+			KPI << 0 << attenuation_val << antenna;
 		}
 
-
+		kpi_list.push_back(KPI);
 
 		if (isset(MASK, 2)) // FREQ_P
 		{

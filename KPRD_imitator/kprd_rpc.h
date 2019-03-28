@@ -47,7 +47,7 @@ protected:
 signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void test(QVariantList maskList, QVariantList dataList);
-	void sendKPI(QString kpiList);
+	void sendKPI(QVariantList kpiList);
 };
 
 class RPC_kprd_SIGNAL_Thread : public RPC_SIGNAL_Thread
