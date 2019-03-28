@@ -14,7 +14,7 @@
 #include <qplaintextedit.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
-#include "../LKA-05_imitator/lka05_rpc.h"
+#include "../buses_imitator/mku_bus_rpc.h"
 
 enum FSMU_numbB
 {
@@ -33,15 +33,16 @@ enum FSVU_numbB
 enum STAB
 {
 	LOW_STAB = 0,
-	HIGH_STAB = 1,
-	KG1_STAB = 2,
-	KG2_STAB = 3
+	KG1_STAB = 1,
+	KG2_STAB = 2,
+	HIGH_STAB = 3,
+
 };
 enum ANTENNA
 {
 	OHA = 0,
-	MHA1Y = 1,
-	MHA0Y = 2
+	MHAPY = 1,
+	MHAMY = 2
 };
 enum full_mode
 {
@@ -72,124 +73,11 @@ enum LITERA
 	LIT8 = 8
 };
 
-/*class MU_MODULE
-{
-public:
-	MU_MODULE();
-	virtual unsigned short get_tm();
-	void set_working(CURRENT_DEV _dev, bool _flag)
-	{
-		if (_dev == OFF)
-			return;
-
-		working[_dev] = _flag;
-	}
-	void set_ab_working(CURRENT_DEV _dev, bool _flag)
-	{
-		if (_dev == OFF)
-			return;
-
-		ab_working[_dev] = _flag;
-	}
-	bool get_working()
-	{
-		return working[current_dev];
-	}
-	bool get_ab_working()
-	{
-		return ab_working[current_dev];
-	}
-	void switch_cur_dev(CURRENT_DEV _dev)
-	{
-		if (_dev == OFF)
-			return;
-		current_dev = _dev;
-	}
-	CURRENT_DEV get_current_dev()
-	{
-		return current_dev;
-	}
-private:
-	QMap<CURRENT_DEV, bool> working;
-	QMap<CURRENT_DEV, bool> ab_working;
-	CURRENT_DEV current_dev;
-};
-
-
-struct MV_DEV
-{
-	double u_kom = 27.0;
-	int dt_kom = 1;
-	int length_kom = 200;
-	bool working = true;
-};
-
-class MV_MODULE : public LKA05_MODULE
-{
-public:
-	MV_MODULE(int _com, int _nim);
-	virtual unsigned short get_tm();
-	bool get_working()
-	{
-		return devices[current_dev].working;
-	}
-	void set_working(CURRENT_DEV _dev, bool _flag)
-	{
-		if (_dev == OFF)
-			return;
-
-		devices[_dev].working = _flag;
-	}
-	void switch_cur_dev(CURRENT_DEV _dev)
-	{
-		current_dev = _dev;
-	}
-	CURRENT_DEV get_current_dev()
-	{
-		return current_dev;
-	}
-	MV_DEV& get_settings()
-	{
-		return devices[current_dev];
-	}
-//	void set_settings()
-//	{	
-//	}
-
-private:
-	QMap<CURRENT_DEV, MV_DEV> devices;
-	CURRENT_DEV current_dev;
-	int com;
-	int nim;
-};
-*/
-/*class Sub_tmp
-{
-public:
-	void set_lab(QLabel* lab)
-	{
-		sub_lab = lab;
-	}
-	void set_line(QLineEdit* line)
-	{
-		sub_lined = line;
-	}
-	void order()
-	{
-		sub_just->addWidget(sub_lab);
-		sub_just->addWidget(sub_lined);
-	}
-private:
-	QLabel* sub_lab;
-	QLineEdit* sub_lined;
-	QVBoxLayout* sub_just = new QVBoxLayout();
-};*/
 class MBK07_widg : public QWidget
 {
     Q_OBJECT
 
 public:
-//	explicit LKA05_widg(QWidget *parent = 0);
 	MBK07_widg(QWidget *parent = 0);
 	//~MBK07_widg();
 	
@@ -243,19 +131,10 @@ protected:
 	
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt);
-
-//	void current_kom(int mshm_numb, int pshm_numb);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
-//	void mbk04(const QString& new_text);
-//	void save_choose_set();
 private:
-//	MU_MODULE mu_module;
-//	QList<MV_MODULE> mvku_modules;
-//	QList<MV_MODULE> mvmk_modules;
-
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
 	QTextDocument* _doc;
@@ -268,11 +147,11 @@ private:
 	QMutex log_mutex;
 	void msg_to_log(const QString& _msg);
 
-	RPC_omnibus_SLOT_Thread slot_thr;
-	RPC_omnibus_SIGNAL_Thread signal_thr;
+	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
+	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
 
-	RPC_lka05_SLOT_Thread lka05_slot_thr;
-	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
 
 	QMap<int, QString> mode_names;

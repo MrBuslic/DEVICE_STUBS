@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -267,11 +268,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _state = _values.at(0).value<int>();
 			app->auto_scroll_clicked(_state);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -287,7 +289,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->log_timer_ontimer();
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -301,9 +303,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		try
 		{
 			int res = app->unmt8k4l_start();
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -316,11 +319,13 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			bool state = _values.at(0).value<bool>();
 			int res = app->unmt8k4l_input_trigger(state);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -333,15 +338,19 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			uint frame_width = _values.at(0).value<uint>();
 			uint width_in_bytes = _values.at(1).value<uint>();
 			int res = app->unmt8k4l_sample_width_q(frame_width, width_in_bytes);
 			_values[0] = frame_width;
+			SRPCSignalClass::Instance().toLog(QString("%1 frame_width = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
 			_values[1] = width_in_bytes;
+			SRPCSignalClass::Instance().toLog(QString("%1 width_in_bytes = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
 			with_return = true;
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}
@@ -354,17 +363,22 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariantList _buf = _values.at(0).value<QVariantList>();
 			uint _firstTime = _values.at(1).value<uint>();
 			uint _thisTime = _values.at(2).value<uint>();
 			int res = app->unmt8k4l_read_sample(_buf, _firstTime, _thisTime);
 			_values[0] = _buf;
+			SRPCSignalClass::Instance().toLog(QString("%1 _buf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
 			_values[1] = _firstTime;
+			SRPCSignalClass::Instance().toLog(QString("%1 _firstTime = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
 			_values[2] = _thisTime;
+			SRPCSignalClass::Instance().toLog(QString("%1 _thisTime = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[2])));
 			with_return = true;
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 1;
 		}

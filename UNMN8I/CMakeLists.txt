@@ -25,6 +25,7 @@ set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Gui_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
+
 if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
@@ -37,7 +38,9 @@ add_library(unmn8i_32 SHARED ${UNMN8I_HEADERS} ${UNMN8I_SOURCES} export.def)
 
 target_link_libraries(unmn8i_32 socket_rpc)
 
-set(RPC_MN8I_SOURCES rpc_mn8i.h rpc_mn8i.cpp mn8i_main.cpp mn8i_socket_rpc.h mn8i_socket_rpc.cpp)
+set(RPC_MN8I_SOURCES rpc_mn8i.h rpc_mn8i.cpp 
+	../buses_imitator/mku_bus_rpc.h ../buses_imitator/mku_bus_rpc.cpp
+	mn8i_main.cpp mn8i_socket_rpc.h mn8i_socket_rpc.cpp)
 
 add_executable(rpc_mn8i WIN32 ${RPC_MN8I_SOURCES})
 set_target_properties(rpc_mn8i PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )

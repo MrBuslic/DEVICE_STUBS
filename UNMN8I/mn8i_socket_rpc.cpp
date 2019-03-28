@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -79,6 +80,8 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["measurement_timer_ontimer()"] = &Socket_RPC_SLOT_Object::measurement_timer_ontimer;
 		operators_map["infin_timer_ontimer()"] = &Socket_RPC_SLOT_Object::infin_timer_ontimer;
+		operators_map["new_ku(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku;
+		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_mk;
 		operators_map["unmn8i_start()"] = &Socket_RPC_SLOT_Object::unmn8i_start;
 		operators_map["unmn8i_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unmn8i_input_trigger;
 		operators_map["unmn8i_sample_width_q(uint&, uint&)"] = &Socket_RPC_SLOT_Object::unmn8i_sample_width_q;
@@ -270,7 +273,8 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("packet_ready()");
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal packet_ready").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal packet_ready  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -349,6 +353,53 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		try
 		{
 			app->infin_timer_ontimer();
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::new_ku(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int ku_n = _values.at(0).value<int>();
+			int length = _values.at(1).value<int>();
+			double u = _values.at(2).value<double>();
+			int line = _values.at(3).value<int>();
+			app->new_ku(ku_n, length, u, line);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::new_mk(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int mshm = _values.at(0).value<int>();
+			int pshm = _values.at(1).value<int>();
+			int length_m = _values.at(2).value<int>();
+			int length_p = _values.at(3).value<int>();
+			double u_m = _values.at(4).value<double>();
+			double u_p = _values.at(5).value<double>();
+			int dt = _values.at(6).value<int>();
+			int line_m = _values.at(7).value<int>();
+			int line_p = _values.at(8).value<int>();
+			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 			return 0;
 		}
 		catch(const std::exception &)

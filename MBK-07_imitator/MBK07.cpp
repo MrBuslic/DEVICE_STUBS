@@ -1,5 +1,5 @@
 #include "MBK07.h"
-
+#include "rpc_ports.h"
 #include <QMessageBox>
 
 union MKOWord
@@ -17,12 +17,7 @@ union MKOWord
 MBK07_widg::MBK07_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
-	//	this->setFixedSize(1910, 1130);
 	setWindowTitle("МБК-07");
-	/*	MU1 -> setFixedSize(300,100);
-		MU1->setProperty("type", 1);
-		MU2->setFixedSize(300, 100);
-		MU2->setProperty("type", 2);*/
 	FSMU_gb = new QGroupBox("ФСМУ", this);
 	FSVU_gb = new QGroupBox("ФСВУ", this);
 
@@ -36,13 +31,12 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	stab_names.insert(STAB::KG2_STAB, "КГ 2");
 
 	ant_names.insert(ANTENNA::OHA, "OHA");
-	ant_names.insert(ANTENNA::MHA1Y, "MHA+Y");
-	ant_names.insert(ANTENNA::MHA0Y, "MHA-Y");
+	ant_names.insert(ANTENNA::MHAPY, "MHA+Y");
+	ant_names.insert(ANTENNA::MHAMY, "MHA-Y");
 
 	for (int i = 0; i < 9; i++)
 	{
 		int tmp_d = 1 << i;
-		//lit_map.insert(i + 1, LITERA(tmp_d));
 		lit_map.insert(tmp_d, LITERA(i + 1));
 	}
 
@@ -70,12 +64,15 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 		FSMU_hblayout->addWidget(FSMU_blocks[i]);
 		FSVU_hblayout->addWidget(FSVU_canals[i]);
 	}
+	for (int i = 0; i < 3; i++)
+	{
+		FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+		FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	}
 	QLabel* Mode_lb = new QLabel("Режим");
 	QLabel* Lit_lb = new QLabel("Литера");
 	QLabel* Stab_lb = new QLabel("Стабильность");
 	QLabel* Ann_lb = new QLabel("Антенна");
-	//QLabel submode("ИМ");
-	//submode->text = ("ИМ");
 	QList<QLabel*> sub_lb_list;
 	sub_lb_list << Mode_lb;
 	sub_lb_list << Lit_lb;
@@ -115,44 +112,41 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK07_widg::auto_scroll_clicked);
 	logs_lay->addWidget(edit);
 	logs_lay->addWidget(auto_scroll_box);
-	//logs_lay->addWidget(Logs);
-
-
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", 50001);
-	slot_thr.start(); // вот тут падает
+	omnibus_slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+	omnibus_slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", 50002);
-	signal_thr.start(); // вот тут падает
+	omnibus_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+	omnibus_signal_thr.start(); // вот тут падает
 
-	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
+	if (!omnibus_slot_thr.wait_connected(3) || !omnibus_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
 		this->deleteLater();
 		return;
 	}
 
-	lka05_slot_thr.set_connection_params("127.0.0.1", 50061);
-	lka05_slot_thr.start(); // вот тут падает
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
 
-	lka05_signal_thr.set_connection_params("127.0.0.1", 50062);
-	lka05_signal_thr.start(); // вот тут падает
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
 
-	if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
 		this->deleteLater();
 		return;
 	}
 
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 
-	connect(lka05_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int)), this, SLOT(new_mk(int, int, int, int, double, double, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -162,24 +156,13 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
 	log_timer.start(200);
 
-	//msg_to_log("рпп");
-	//paint_buttons();
 	set_new_tm();
 }
-
-//LKA05_widg::~LKA05_widg()
-//{
-
-//}
-//void MBK07_widg::current_com(int mshm_numb, int pshm_numb)
-//{
-//	
-//}
-void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt)
+void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	msg_to_log(_msg);
-//Странные штуки
+
 	int tmp_mshm = mshm;
 	int tmp_pshm = pshm - 8;
 
@@ -325,7 +308,6 @@ void MBK07_widg::write_words()
 	sub_le_list[0]->setText(res_mode);
 	QString lit_num = QString::number(current_lit);
 	sub_le_list[1]->setText(lit_num);
-//	QString tmp_stab = QString::number(current_stab);
 	sub_le_list[2]->setText(stab_names[current_stab]);
 	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
@@ -333,13 +315,13 @@ void MBK07_widg::paint_buttons()
 {
 	for (int i = 0; i < 3; i++)
 	{
-		FSMU_blocks[i]->setStyleSheet("background - color: rgb(204, 204, 204);");
+		FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 		if (current_FSMU == i)
 			FSMU_blocks[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
 	for (int i = 0; i < 3; i++)
 	{
-		FSVU_canals[i]->setStyleSheet("background - color: rgb(204, 204, 204);");
+		FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 		if (current_FSVU == i)
 			FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
@@ -352,7 +334,7 @@ void MBK07_widg::set_new_tm()
 		if (ab_state)
 		{
 			ab_state = false;
-			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+			omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 		}
 		return;
 	}
@@ -361,7 +343,7 @@ void MBK07_widg::set_new_tm()
 		if (!ab_state)
 		{
 			ab_state = true;
-			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+			omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 		}
 	}
 
@@ -393,8 +375,7 @@ void MBK07_widg::set_new_tm()
 		f_word += 0x300;
 		break;
 	}
-	//шта?
-	if (!pi8_fast)
+	if (pi8_fast)
 		f_word += 0x40;
 	if (IM)
 		f_word += 0x10;
@@ -405,7 +386,7 @@ void MBK07_widg::set_new_tm()
 
 	if (current_lit != 0)
 		s_word += 0x100 << current_lit - 1;
-	s_word += 0x20 << STAB(current_stab) - 1;
+	s_word += 0x80 << STAB(current_stab) - 1;
 	if (current_PSP != PSP_OFF)
 		s_word += PSP(current_PSP) - 1;
 	switch (current_antenna)
@@ -413,51 +394,14 @@ void MBK07_widg::set_new_tm()
 	case OHA:
 		s_word += 0xC;
 		break;
-	case MHA1Y:
+	case MHAPY:
 		s_word += 0x14;
 		break;
-	case MHA0Y:
+	case MHAMY:
 		s_word += 0x18;
 		break;
 	}
 	tm_words.push_back(s_word);
-	//Отправка
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+	//Отправка 
+	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
 }
-/*
-MU_MODULE::MU_MODULE() : current_dev(MAIN)
-{
-	working.insert(MAIN, true);
-	working.insert(RESERVE, true);
-
-	ab_working.insert(MAIN, true);
-	ab_working.insert(RESERVE, true);
-
-}
-
-MV_MODULE::MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(MAIN)
-{
-	devices.insert(MAIN, MV_DEV());
-	devices.insert(RESERVE, MV_DEV());
-}
-
-unsigned short MU_MODULE::get_tm()
-{
-	unsigned short _word = 0x1000;
-	if (!get_working())
-		_word += 4;
-	_word += 0x20 << current_dev;
-	return _word;
-}
-
-unsigned short MV_MODULE::get_tm()
-{
-	unsigned short _word = (com << 12) + (nim << 8);
-	if (!get_working())
-		_word += 2 << current_dev;
-	if (current_dev == OFF)
-		_word += 0xC0;
-	else
-		_word += 0x20 << current_dev;
-	return _word;*/
-	//}

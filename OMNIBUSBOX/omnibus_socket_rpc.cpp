@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -266,13 +267,20 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("new_message(QVariant, int, int, int, QVariantList, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_message  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << dt;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 dt =  %1").arg(RPCSignalClass::QVariantToString(dt)).arg(call_number));
 		tmp_stream << mko;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 mko =  %1").arg(RPCSignalClass::QVariantToString(mko)).arg(call_number));
 		tmp_stream << line;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
 		tmp_stream << cwd;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 cwd =  %1").arg(RPCSignalClass::QVariantToString(cwd)).arg(call_number));
 		tmp_stream << words;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 words =  %1").arg(RPCSignalClass::QVariantToString(words)).arg(call_number));
 		tmp_stream << os;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_message").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 os =  %1").arg(RPCSignalClass::QVariantToString(os)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -292,8 +300,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("message_to_log(QString)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal message_to_log  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << _msg;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal message_to_log").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("message_to_log  call_number %2 _msg =  %1").arg(RPCSignalClass::QVariantToString(_msg)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -321,11 +331,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _state = _values.at(0).value<int>();
 			app->auto_scroll_clicked(_state);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -341,7 +352,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->log_timer_ontimer();
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -354,13 +365,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mko = _values.at(0).value<int>();
 			int addr = _values.at(1).value<int>();
 			bool _on = _values.at(2).value<bool>();
 			app->switch_ab(mko, addr, _on);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -373,6 +385,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mko = _values.at(0).value<int>();
 			int addr = _values.at(1).value<int>();
 			int saddr = _values.at(2).value<int>();
@@ -380,7 +393,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			app->set_new_data(mko, addr, saddr, words);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -393,6 +406,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mko = _values.at(0).value<int>();
 			int line = _values.at(1).value<int>();
 			int cwd = _values.at(2).value<int>();
@@ -400,11 +414,13 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			int os = _values.at(4).value<int>();
 			app->send_msg(mko, line, cwd, words, os);
 			_values[3] = words;
+			SRPCSignalClass::Instance().toLog(QString("%1 words = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[3])));
 			_values[4] = os;
+			SRPCSignalClass::Instance().toLog(QString("%1 os = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[4])));
 			with_return = true;
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}
@@ -418,9 +434,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		try
 		{
 			QVariant res = app->get_dt();
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return QVariant();
 		}
@@ -433,11 +450,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 	{
 		try
 		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QString _msg = _values.at(0).value<QString>();
 			app->message_to_log_slot(_msg);
 			return 0;
 		}
-		catch(std::exception &err)
+		catch(const std::exception &)
 		{
 			return 0;
 		}

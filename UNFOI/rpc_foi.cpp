@@ -4,36 +4,18 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
+#include "rpc_ports.h"
 #include "foi_socket_rpc.h"
 
-RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
-{
-	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	edit = new QTextEdit(this);
-	_scroll_bar = edit->verticalScrollBar();
-	_doc = new QTextDocument();
-	_cursor = new QTextCursor(_doc);
-	edit->setDocument(_doc);
-	edit->setReadOnly(true);
-	_doc->setMaximumBlockCount(1000);
-	setMinimumSize(490, 300);
-	auto_scroll_box = new QCheckBox(this);
-	auto_scroll_box->setText("Автопрокрутка");
-	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcFoiWidget::auto_scroll_clicked);
-	v_lay->addWidget(edit);
-	v_lay->addWidget(auto_scroll_box);
+#include <qmessagebox.h>
 
-	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
-	QDir dir("d:/logs");
-	if (!dir.exists())
-		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcFoiWidget::log_timer_ontimer);
-	log_timer.start(200);
+RpcFoiWidget::RpcFoiWidget() : QWidget()
+{
+	LogWidget* log_widg = new LogWidget(this);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30001;
-	int signal_port = 30002;
+	int slot_port = FOI_SLOT;
+	int signal_port = FOI_SIGNAL;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
@@ -42,6 +24,20 @@ RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
+
+
+	interrupt_slot_thr.set_connection_params("127.0.0.1", INTERRUPTS_SLOT);
+	interrupt_slot_thr.start(); // вот тут падает
+
+	interrupt_signal_thr.set_connection_params("127.0.0.1", INTERRUPTS_SIGNAL);
+	interrupt_signal_thr.start(); // вот тут падает
+
+	if (!interrupt_slot_thr.wait_connected(3) || !interrupt_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с interrupt_bus в Foi");
+		this->deleteLater();
+		return;
+	}
 }
 
 int RpcFoiWidget::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
@@ -55,38 +51,9 @@ int RpcFoiWidget::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
 
 int RpcFoiWidget::unfoi_run()
 {
-	emit foi_interrupt(n, chan, u, t);
-	QString _msg = QString("%1 выдаю сигнал на канале %2 линии %3 с амплитудой %4 и длительностью %5").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(n).arg(chan).arg(u).arg(t);
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg+"\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
+	SRPCSignalClass::Instance().toLog(QString("Выдаю сигнал на канале %1 линии %2 с амплитудой %3 и длительностью %4").arg(n).arg(chan).arg(u).arg(t));
+
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan, u, t);
+
 	return 0;
-}
-
-void RpcFoiWidget::auto_scroll_clicked(int _state)
-{
-	auto_scroll = (_state != 0);
-}
-
-
-void RpcFoiWidget::log_timer_ontimer()
-{
-	QStringList tmp_buffer;
-	{
-		QMutexLocker lock(&log_mutex);
-		tmp_buffer = log_buffer;
-		log_buffer.clear();
-	}
-	if (tmp_buffer.isEmpty())
-		return;
-	QFile log_file(log_filename);
-	QTextStream log_stream(&log_file);
-	log_file.open(QIODevice::Append);
-	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
-		log_stream << *itr << "\n";
-	log_file.close();
 }

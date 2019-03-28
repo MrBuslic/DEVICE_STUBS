@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -263,10 +264,14 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("mds32_get_sample(int, uint&, int&)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mds32_get_sample  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << channel;
+		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 channel =  %1").arg(RPCSignalClass::QVariantToString(channel)).arg(call_number));
 		tmp_stream << buf;
+		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 buf =  %1").arg(RPCSignalClass::QVariantToString(buf)).arg(call_number));
 		tmp_stream << flag;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mds32_get_sample").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 flag =  %1").arg(RPCSignalClass::QVariantToString(flag)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();

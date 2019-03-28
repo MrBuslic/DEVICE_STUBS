@@ -3,21 +3,22 @@
 #include <windows.h>
 #include "ads128_rpc.h"
 #include "unads128_h.h"
+#include "rpc_ports.h"
 
 int ads128_count = 0;
 
 
 rpc_buffer_class::rpc_buffer_class()
 {
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		RPC_ads128_SLOT_Thread* slot_thr = new RPC_ads128_SLOT_Thread;
-		slot_thr->set_connection_params("127.0.0.1", 30050 + i);
+		slot_thr->set_connection_params("127.0.0.1", ADS_SLOT + i);
 		slot_thr->start();
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		RPC_ads128_SIGNAL_Thread* signal_thr = new RPC_ads128_SIGNAL_Thread;
-		signal_thr->set_connection_params("127.0.0.1", 30055 + i);
+		signal_thr->set_connection_params("127.0.0.1", ADS_SIGNAL + i);
 		signal_thr->start();
 		//bool res = signal_thr->wait_connected(5);
 
@@ -27,7 +28,7 @@ rpc_buffer_class::rpc_buffer_class()
 	}
 }
 
-// Объявляем функцию DllMain
+// Объявляем функцию DllMain  
 
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	DWORD fdwReason, LPVOID lpvReserved)
@@ -94,8 +95,8 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 	ViStatus _VI_FUNC unads128_start (ViSession vi)
 	{
-		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->unads128_start();
-		return 0;
+	Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_start();
+		return 0; 
 	}
 
 	ViStatus _VI_FUNC unads128_start_check (ViSession vi) 
@@ -105,6 +106,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 	ViStatus _VI_FUNC unads128_stop (ViSession vi) 
 	{
+		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_stop();
 		return 0;
 	}
 
@@ -133,6 +135,8 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	ViStatus _VI_FUNC unads128_install_handler (ViSession vi,
 		ViAddr user_handler)
 	{
+
+
 		return 0;
 	}
 
@@ -140,6 +144,14 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		ViUInt16 _VI_FAR thisBuiff[],
 		ViUInt16 _VI_FAR firstBuff[]) 
 	{
+
+		QVariantList thisbuf;
+
+		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_read_data(thisbuf, QVariantList());
+
+		for (int i = 0; i < 16; i++)
+				thisBuiff[i] = thisbuf[i].toUInt();
+			
 		return 0;
 	}
 

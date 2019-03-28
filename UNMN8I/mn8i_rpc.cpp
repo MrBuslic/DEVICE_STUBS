@@ -106,6 +106,8 @@ void RPC_mn8i_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mn8i new signal " + op_name);
 
@@ -120,7 +122,7 @@ void RPC_mn8i_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mn8i signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mn8i signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}
@@ -158,6 +160,33 @@ void RPC_mn8i_SLOT_Object::infin_timer_ontimer()
 	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call infin_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("infin_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished infin_timer_ontimer");
+}
+void RPC_mn8i_SLOT_Object::new_ku(int ku_n, int length, double u, int line)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(ku_n);
+	tmp_list << QVariant(length);
+	tmp_list << QVariant(u);
+	tmp_list << QVariant(line);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call new_ku %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_ku(int, int, double, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished new_ku");
+}
+void RPC_mn8i_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(line_m);
+	tmp_list << QVariant(line_p);
+	SRPCSignalClass::Instance().toLog(QString("mn8i dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mn8i dynamic_call finished new_mk");
 }
 int RPC_mn8i_SLOT_Object::unmn8i_start()
 {

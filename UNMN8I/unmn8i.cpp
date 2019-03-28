@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "mn8i_rpc.h"
 #include "unmn8i_h.h"
+#include "rpc_ports.h"
 int mn8i_count = 0;
 
 UNMN8IIntHandle _interrupt_handle;
@@ -15,12 +16,12 @@ rpc_buffer_class::rpc_buffer_class()
 	for (int i = 0; i < 1; i++)
 	{
 		RPC_mn8i_SLOT_Thread* slot_thr = new RPC_mn8i_SLOT_Thread;
-		slot_thr->set_connection_params("127.0.0.1", 30040 + i);
+		slot_thr->set_connection_params("127.0.0.1", MN8I_SLOT + i);
 		slot_thr->start();
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		RPC_mn8i_SIGNAL_Thread* signal_thr = new RPC_mn8i_SIGNAL_Thread;
-		signal_thr->set_connection_params("127.0.0.1", 30045 + i);
+		signal_thr->set_connection_params("127.0.0.1", MN8I_SIGNAL + i);
 		signal_thr->start();
 		//bool res = signal_thr->wait_connected(5);
 

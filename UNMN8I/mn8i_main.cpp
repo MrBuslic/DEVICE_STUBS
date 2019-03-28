@@ -21,13 +21,13 @@ int main(int argc, char **argv)
 	LogWidget log_widget;
 	log_widget.show();
 	RpcMN8IWidget* mn8i_widget;
-	if (argc < 3)
+	if (argc < 2)
 	{
-		mn8i_widget = new RpcMN8IWidget(30040, 30045);
+		mn8i_widget = new RpcMN8IWidget(0);
 	}
 	else
 	{
-		mn8i_widget = new RpcMN8IWidget(QString(argv[1]).toInt(), QString(argv[2]).toInt());
+		mn8i_widget = new RpcMN8IWidget(QString(argv[1]).toInt());
 	}
 
 	mn8i_widget->show();

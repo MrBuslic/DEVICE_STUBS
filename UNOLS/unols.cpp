@@ -1,57 +1,92 @@
 #include <unols.h>
+#include "unols_h.h"
 #include <windows.h>
+#include "rpc_ports.h"
+
+int unols_state = UNOLS_STOP;
+
+rpc_buffer_class::rpc_buffer_class()
+{
+	for (int i = 0; i < 1; i++)
+	{
+		RPC_ols_SLOT_Thread* slot_thr = new RPC_ols_SLOT_Thread;
+		slot_thr->set_connection_params("127.0.0.1", OLS_SLOT + i);
+		slot_thr->start();
+		//if (!slot_thr.wait_connected(3))
+		//	return false;
+		RPC_ols_SIGNAL_Thread* signal_thr = new RPC_ols_SIGNAL_Thread;
+		signal_thr->set_connection_params("127.0.0.1", OLS_SIGNAL + i);
+		signal_thr->start();
+		//bool res = signal_thr->wait_connected(5);
+
+
+		ols_slot_thr.push_back(slot_thr);
+		ols_signal_thr.push_back(signal_thr);
+	}
+}
+
+
+// Объявляем функцию DllMain
+
+BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
+	DWORD fdwReason, LPVOID lpvReserved)
+{
+	Srpc_buffer_class::Instance();
+	switch (fdwReason)      // Дерево разбора уведомлений
+	{
+	case DLL_PROCESS_ATTACH: // Подключение DLL
+							 //MessageBox(NULL,"Подключение Заглушки UNMN8I для Мезонина МН8И","Использование заглушек!", MB_ICONINFORMATION);
+
+							 //if (lpvReserved)  // Определение способа загрузки
+							 // MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+							 //else
+							 //MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
+							 //return 1; // успешная инициализация
+
+		break;
+
+	case DLL_PROCESS_DETACH: // Отключение DLL
+							 // Здесь – освобождаем память, закрываем
+							 // файлы и т.д.
+		break;
+
+	case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
+							// Здесь – если надо переходим на
+							// многопоточный режим работы с
+							// использованием средств синхронизации
+							// таких как критическая секция, мутанты,
+							// семафоры и т.д.
+		break;
+
+	case DLL_THREAD_DETACH:
+		//Уведомление о завершении потока
+		// Здесь – если надо освобождаем все ресурсы, 
+		// вязанные с завершившимся потоком. Какой именно
+		// поток завершился можно узнать просмотром списка
+		// потоков средствами TOOLHELP32
+		//MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
+		break;
+
+	}
+	return TRUE;    // Код возврата игнорируется
+}
+
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
 #endif
-/*
-// Объявляем функцию DllMain
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-      DWORD fdwReason, LPVOID lpvReserved)
-{
 
-switch (fdwReason)      // Дерево разбора уведомлений
-{
-  case DLL_PROCESS_ATTACH: // Подключение DLL
-    MessageBox(NULL,"Подключение Заглушки UNOLS для ОЛС","Использование заглушек!", MB_ICONINFORMATION);
 
-    if (lpvReserved)  // Определение способа загрузки
-      MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    else
-      MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    return 1; // успешная инициализация
 
-  case DLL_PROCESS_DETACH: // Отключение DLL
-    // Здесь – освобождаем память, закрываем
-    // файлы и т.д.
-    break;
 
-  case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
-    // Здесь – если надо переходим на
-    // многопоточный режим работы с
-    // использованием средств синхронизации
-    // таких как критическая секция, мутанты,
-    // семафоры и т.д.
-    break;
-
-  case DLL_THREAD_DETACH:
-      //Уведомление о завершении потока
-    // Здесь – если надо освобождаем все ресурсы, 
-    // вязанные с завершившимся потоком. Какой именно
-    // поток завершился можно узнать просмотром списка
-    // потоков средствами TOOLHELP32
-    break;
-
-  }
-return TRUE;    // Код возврата игнорируется
-}
-*/
 /****************************************************************************
 		Функция инициализация сеанса с инструментом
 *****************************************************************************/
 ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName, 
 								ViBoolean 	id_query,
 								ViBoolean 	reset, 
-								ViPSession 	vi){ return 0; }
+	ViPSession 	vi) {
+	*vi = 1;  return 0;
+}
 /****************************************************************************
 		Функции конфигурации
 *****************************************************************************/
@@ -127,13 +162,29 @@ ViStatus _VI_FUNC unols_config_inpExt_Q (ViSession vi,  ViPInt16 st){ return 0; 
 /****************************************************************************
 		Функции управления/состояния
 *****************************************************************************/
-ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){ return 0; }  
-ViStatus _VI_FUNC unols_trigger_imm (ViSession vi, ViInt16 devise){ return 0; }     
+ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){
+	if (devise == 2) {
+		Srpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_write_data_kf(Srpc_buffer_class::Instance().ols_buffer, Srpc_buffer_class::Instance().mask_buffer);
+		unols_state = UNOLS_WAIT;
+	}
+	return 0; 
+}  //todo (передача 2 буферов в rpc)
+
+ViStatus _VI_FUNC unols_trigger_imm (ViSession vi, ViInt16 devise){
+	if (devise == 2) {//Generator
+		Srpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_trigger_imm();
+		unols_state = UNOLS_STOP;
+	}
+	return 0;
+}     //todo
+
 ViStatus _VI_FUNC unols_stop (ViSession vi, ViInt16 devise){ return 0; }   
 ViStatus _VI_FUNC unols_reset_status (ViSession vi, ViInt16 devise, ViUInt16 maskEvent, ViUInt16 errorEvent){ return 0; } 
 ViStatus _VI_FUNC unols_reset_DRAM (ViSession vi, ViInt16 devise, ViUInt32 period, ViUInt32 offsetData){ return 0; }
 ViStatus _VI_FUNC unols_status_Q (ViSession vi, ViInt16 devise,  
-                                  ViPUInt16  stateDev, ViPUInt16 eventDev, ViPUInt16 errDev){ return 0; }
+                                  ViPUInt16  stateDev, ViPUInt16 eventDev, ViPUInt16 errDev){ 
+	*stateDev = unols_state;
+	return 0; } // todo
 /****************************************************************************
 		 Данные
 *****************************************************************************/
@@ -146,7 +197,11 @@ ViStatus _VI_FUNC unols_read_allData (ViSession vi, ViInt16 devise, ViUInt32 per
 ViStatus _VI_FUNC unols_read_dataKF (ViSession vi, ViUInt32 period,    
                                     ViUInt32 offsetData, void* data, void* maska){ return 0; }									
 ViStatus _VI_FUNC unols_write_dataKF (ViSession vi, ViUInt32 period,   
-                                    ViUInt32 offsetData, void* data, void* maska){ return 0; }
+                                    ViUInt32 offsetData, void* data, void* maska){
+	//как определить число каналов?
+	Srpc_buffer_class::Instance().put_data(period, data, maska);
+//	kprd_list.put_data(period, data, maska);
+	return 0; }
 ViStatus _VI_FUNC unols_write_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
                                        ViUInt32 offsetData, void* data){ return 0; }   
 ViStatus _VI_FUNC unols_read_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,

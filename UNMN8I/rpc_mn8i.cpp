@@ -8,9 +8,11 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <qmessagebox.h>
 #include "mn8i_socket_rpc.h"
+#include "rpc_ports.h"
 
-RpcMN8IWidget::RpcMN8IWidget(int slot_port, int signal_port) : QWidget(), auto_scroll(true), measuring(false), state(false)
+RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), auto_scroll(true), measuring(false), state(false)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -50,16 +52,33 @@ RpcMN8IWidget::RpcMN8IWidget(int slot_port, int signal_port) : QWidget(), auto_s
 	connect(&log_timer, &QTimer::timeout, this, &RpcMN8IWidget::log_timer_ontimer);
 	log_timer.start(200);
  
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
+
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
+
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		this->deleteLater();
+		return;
+	}
+
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
+
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
-	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->set_params(ip_str, MN8I_SLOT+mn8i_num);
 	rpc_slot_srv->start();
 	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
-	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->set_params(ip_str, MN8I_SIGNAL+mn8i_num);
 	rpc_signal_srv->start();
-	setWindowTitle(QString("mn8i %1").arg(slot_port - 30029));
+	setWindowTitle(QString("mn8i %1").arg(mn8i_num));
+
 }
 
 int RpcMN8IWidget::unmn8i_input_trigger(bool state)
@@ -211,6 +230,11 @@ void RpcMN8IWidget::auto_scroll_clicked(int _state)
 }
 
 
+
+
+
+
+
 void RpcMN8IWidget::log_timer_ontimer()
 {
 	QStringList tmp_buffer;
@@ -256,20 +280,45 @@ void RpcMN8IWidget::button_clicked()
 	if (itr == buttons.end())
 		return;
 
+	form_impulse(itr.value(), checks[itr.value()]->text().toDouble(), 26.5);
+}
+
+void RpcMN8IWidget::form_impulse(int chan, double length, double u)
+{
 	int cur_msecs = begin_time.msecsTo(QTime::currentTime());
 
 	double msecs_d = (double)(double(cur_msecs) / (double)(1000));
 
 	int start_ind = msecs_d / periodS;
 
-	impulse_length = checks[itr.value()]->text().toDouble();
-
-	int samples_length = impulse_length / periodS;
+	int samples_length = length / periodS;
 
 	for (int i = start_ind; i < start_ind + samples_length; i++)
 	{
 		QVariantList tmp_meas = buffer[i].toList();
-		tmp_meas[itr.value()] = 26.5;
+		tmp_meas[chan] = u;
 		buffer[i] = tmp_meas;
 	}
+}
+
+void RpcMN8IWidget::new_ku(int ku_n, int length, double u, int line)
+{
+	if (line & 1)
+		form_impulse(4, double(length) / 1000.0, u);
+	if (line & 2)
+		form_impulse(5, double(length) / 1000.0, u);
+}
+
+void RpcMN8IWidget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	if (line_m & 1)
+		form_impulse(0, double(length_m) / 1000.0, u_m);
+	if (line_m & 2)
+		form_impulse(1, double(length_m) / 1000.0, u_m);
+
+	if (line_p & 1)
+		form_impulse(2, double(length_p) / 1000.0, u_p);
+	if (line_p & 2)
+		form_impulse(3, double(length_p) / 1000.0, u_p);
+
 }

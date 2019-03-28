@@ -339,7 +339,16 @@ BTICardAPI VOID __stdcall BTICard_IRIGFieldPutMin(ULONG value,LPULONG irigvalh,L
 BTICardAPI VOID __stdcall BTICard_IRIGFieldPutSec(ULONG value,LPULONG irigvalh,LPULONG irigvall){  }
 BTICardAPI ERRVAL __stdcall BTICard_IRIGInputThresholdGet(LPUSHORT dacval,HCORE handleval){ return 0; }
 BTICardAPI ERRVAL __stdcall BTICard_IRIGInputThresholdSet(USHORT dacval,HCORE handleval){ return 0; }
-BTICardAPI ERRVAL __stdcall BTICard_IRIGRd(LPBTIIRIGTIME irigtime,HCORE handleval){ return 0; }
+BTICardAPI ERRVAL __stdcall BTICard_IRIGRd(LPBTIIRIGTIME irigtime,HCORE handleval)
+{
+	QTime tmp_time = QTime::currentTime();
+	irigtime->hours = tmp_time.hour();
+	irigtime->min = tmp_time.minute();
+	irigtime->sec = tmp_time.second();
+	irigtime->msec = tmp_time.msec();
+	irigtime->usec = 0;
+	return 0; 
+}
 BTICardAPI ERRVAL __stdcall BTICard_IRIGRdEx(LPUSHORT timebuf,HCORE handleval){ return 0; }
 BTICardAPI BOOL __stdcall BTICard_IRIGSyncStatus(HCORE handleval){ return 0; }
 BTICardAPI VOID __stdcall BTICard_IRIGTimeBCDToBin(LPULONG timevalh,LPULONG timevall,ULONG irigvalh,ULONG irigvall){ }

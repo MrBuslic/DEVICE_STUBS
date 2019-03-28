@@ -2,6 +2,7 @@
 #include <socket_rpc.h>
 #include <windows.h>
 #include "mfsk24_rpc.h"
+#include <rpc_ports.h>
 
 #ifndef SINGLETON_DEF
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
@@ -19,12 +20,12 @@ private:
 		for (int i = 0; i < 2; i++)
 		{
 			RPC_mfsk24_SLOT_Thread* slot_thr = new RPC_mfsk24_SLOT_Thread;
-			slot_thr->set_connection_params("127.0.0.1", 30010 + i);
+			slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT + i);
 			slot_thr->start();
 			//if (!slot_thr.wait_connected(3))
 			//	return false;
 			RPC_mfsk24_SIGNAL_Thread* signal_thr = new RPC_mfsk24_SIGNAL_Thread;
-			signal_thr->set_connection_params("127.0.0.1", 30015 + i);
+			signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL + i);
 			signal_thr->start();
 			//if (!signal_thr.wait_connected(3))
 			//	return false;

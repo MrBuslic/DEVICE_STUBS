@@ -46,6 +46,7 @@ private:
 	QMutex signal_mutex;
 	RpcMN8IWidget* app;
 	static int obj_num;
+	static int call_number;
 	QMap<QString, std::shared_ptr<SignalData> > data_map;
 };
 
@@ -105,6 +106,8 @@ public:
 	QVariant log_timer_ontimer(QVariantList& _values);
 	QVariant measurement_timer_ontimer(QVariantList& _values);
 	QVariant infin_timer_ontimer(QVariantList& _values);
+	QVariant new_ku(QVariantList& _values);
+	QVariant new_mk(QVariantList& _values);
 	QVariant unmn8i_start(QVariantList& _values);
 	QVariant unmn8i_input_trigger(QVariantList& _values);
 	QVariant unmn8i_sample_width_q(QVariantList& _values);

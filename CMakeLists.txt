@@ -11,7 +11,11 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1})
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2}/stubs)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 
+add_subdirectory(buses_imitator)
+
+
 add_subdirectory(AG7972)
+add_subdirectory(IBEP_imitator)
 add_subdirectory(HPE1472)
 add_subdirectory(OMNIBUSBOX)
 add_subdirectory(UNADS128)
@@ -42,9 +46,14 @@ add_subdirectory(UNMVI102)
 
 add_subdirectory(bkupi_imitator)
 add_subdirectory(tpo_imitator)
+add_subdirectory(spobu_imitator)
+add_subdirectory(cbk_imitator)
 add_subdirectory(mbk04_imitator)
 add_subdirectory(LKA-05_imitator)
 add_subdirectory(MBK-07_imitator)
+add_subdirectory(BECH_imitator)
+add_subdirectory(MBK-02_imitator)
+add_subdirectory(KPRD_imitator)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})

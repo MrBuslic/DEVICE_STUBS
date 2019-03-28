@@ -21,13 +21,13 @@ int main(int argc, char **argv)
 	LogWidget log_widget;
 	log_widget.show();
 	RpcADS128Widget* ads128_widget;
-	if (argc < 3)
+	if (argc < 2)
 	{
-		ads128_widget = new RpcADS128Widget(0040, 30045);
+		ads128_widget = new RpcADS128Widget(0);
 	}
 	else
 	{
-		ads128_widget = new RpcADS128Widget(QString(argv[1]).toInt(), QString(argv[2]).toInt());
+		ads128_widget = new RpcADS128Widget(QString(argv[1]).toInt());
 	}
 
 	ads128_widget->show();
