@@ -57,10 +57,8 @@ private:
 	//// window choose settings
 	QPushButton * okBut;
 	QDialog *dlg;
-	void MU1_set(QVariantList words);
 	QGroupBox* CheckButtonsBox;
 	QCheckBox* add_set(QString name, QString data, bool is_main = true);
-	void choose_dialog();
 	QCheckBox cb;
 	QList<QCheckBox*> set_list;
 	QList<QCheckBox*> set_list_mu2;
@@ -72,7 +70,6 @@ private:
 
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
-	void save_choose_set();
 	void new_tm(int tm); 
 signals:
 	void new_ku(int ku_n, int length, double u);
