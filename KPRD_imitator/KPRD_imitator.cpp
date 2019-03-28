@@ -126,7 +126,7 @@ void KPRD_imitator::set_antenna_label(qulonglong val)
 			break;
 		case 13: antenna_label->setText("Антенна: МНА1-Y");
 			break;
-		case 11: antenna_label->setText("Антенна: МНА2+Y");
+		case 11: antenna_label->setText("Антенна: МНА1+Y");
 			break;
 		case 7: antenna_label->setText("Антенна: МНА2-Y");
 			break;
@@ -180,17 +180,17 @@ bool KPRD_imitator::isset(qulonglong x, qulonglong n)
 	MNA2_MINUS_U    = 51
 */
 
-void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
+void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 {
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
 	KPIString = "";
 	QVariantList kpi_list;
 	int a = 0;
-	for (auto const& i : boost::combine(maskList, dataList)) // range based
+	for (auto const& i : boost::combine(dataList, maskList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
-		boost::tie(MASKVar, DATAVar) = i;
+		boost::tie(DATAVar, MASKVar) = i;
 		qulonglong MASK = MASKVar.toULongLong();
 		qulonglong DATA = DATAVar.toULongLong();
 		qulonglong res = MASK & DATA;
@@ -201,33 +201,35 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 		if (isset(res, 17)) { ++a; }
 
 
-		if (isset(res, 24))
-		{
-			kpi_list << FREQ_P_code;
-			KPIString += "P";
-		}
-		if (isset(res, 25))
-		{
-			kpi_list << FREQ_0_code;
-			KPIString += "0";
-		}
-		if (isset(res, 26))
-		{
-			kpi_list << FREQ_1_code;
-			KPIString += "1";
-		}
-		if (isset(res, 27))
-		{
-			kpi_list << 0;
-			KPIString += "Х";
-		}
-
 		auto val1 = (res << 26 >> 58);
 		auto val2 = (res << 20 >> 58);
 		qulonglong attenuation_val = val1 + val2;
 		attenuation_label->setText("Ослабление: " + QString::number(attenuation_val));
 		qulonglong antenna_name = res << 12 >> 60;
 		set_antenna_label(antenna_name);
+
+		if (!isset(res, 24))
+		{
+			kpi_list << FREQ_P_code;
+			KPIString += "P";
+		}
+		if (!isset(res, 25))
+		{
+			kpi_list << FREQ_0_code;
+			KPIString += "0";
+		}
+		if (!isset(res, 26))
+		{
+			kpi_list << FREQ_1_code;
+			KPIString += "1";
+		}
+		if (!isset(res, 27))
+		{
+			kpi_list << 0;
+			KPIString += "Х";
+		}
+
+
 
 		if (isset(MASK, 2)) // FREQ_P
 		{
@@ -237,20 +239,18 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 			auto FREQ_code = &FREQ_P_code;
 			auto kod_label = pause_kod_label;
 			
-			if (isset(res, 2) && !*FREQ_ENABLE)	// Если выбрали генератор
+			if (!isset(res, 2) && *FREQ_ENABLE)	// Если выбрали генератор
 			{
 				*FREQ_code = 0;			// Сбросить код
-				*FREQ_ENABLE = true;	// Генератор выбран (настраивается)
+				*FREQ_ENABLE = false;	// Генератор выбран (настраивается)
 			}
 
-			if (!isset(res, 2))	
-				*FREQ_ENABLE = false;	// выключить настройку генератора
+			if (isset(res, 2))
+				*FREQ_ENABLE = true;	// выключить настройку генератора
 
-			if (isset(res, 2))	// FREQ_1_ENABLE
+			if (!isset(res, 2))	// FREQ_1_ENABLE
 			{
-				//*FREQ_ENABLE = true;
-
-				if (!isset(res, 0))
+				if (isset(res, 0))
 				{
 					*FREQ_CLOCK = isset(res, 0);
 					*FREQ_DATA = isset(res, 1);

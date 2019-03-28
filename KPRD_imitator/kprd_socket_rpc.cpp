@@ -318,9 +318,9 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QVariantList maskList = _values.at(0).value<QVariantList>();
-			QVariantList dataList = _values.at(1).value<QVariantList>();
-			app->dataIn(maskList, dataList);
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->dataIn(dataList, maskList);
 			return 0;
 		}
 		catch(const std::exception &)

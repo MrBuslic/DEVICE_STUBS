@@ -116,6 +116,8 @@ void RPC_omnibus_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("omnibus new signal " + op_name);
 
@@ -123,22 +125,22 @@ void RPC_omnibus_SIGNAL_Object::read_data()
 			{
 				QVariant dt;
 				tmp_stream >> dt;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" dt = "+RPCSignalClass::QVariantToString(dt));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " dt = "+RPCSignalClass::QVariantToString(dt));
 				int mko;
 				tmp_stream >> mko;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" mko = "+RPCSignalClass::QVariantToString(mko));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " mko = "+RPCSignalClass::QVariantToString(mko));
 				int line;
 				tmp_stream >> line;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" line = "+RPCSignalClass::QVariantToString(line));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " line = "+RPCSignalClass::QVariantToString(line));
 				int cwd;
 				tmp_stream >> cwd;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" cwd = "+RPCSignalClass::QVariantToString(cwd));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " cwd = "+RPCSignalClass::QVariantToString(cwd));
 				QVariantList words;
 				tmp_stream >> words;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" words = "+RPCSignalClass::QVariantToString(words));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " words = "+RPCSignalClass::QVariantToString(words));
 				int os;
 				tmp_stream >> os;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" os = "+RPCSignalClass::QVariantToString(os));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " os = "+RPCSignalClass::QVariantToString(os));
 				emit new_message(dt, mko, line, cwd, words, os);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -148,13 +150,13 @@ void RPC_omnibus_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("omnibus signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("omnibus signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 			if (op_name == "message_to_log(QString)")
 			{
 				QString _msg;
 				tmp_stream >> _msg;
-				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" _msg = "+RPCSignalClass::QVariantToString(_msg));
+				SRPCSignalClass::Instance().toLog("omnibus " + op_name +" call_number "+ QString::number(call_number) + " _msg = "+RPCSignalClass::QVariantToString(_msg));
 				emit message_to_log(_msg);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -164,7 +166,7 @@ void RPC_omnibus_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("omnibus signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("omnibus signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}

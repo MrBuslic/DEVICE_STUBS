@@ -148,7 +148,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	//msg_to_log("рпп");
 	//paint_buttons();
-	current_lit = 0;
+	current_lit = 1;
 	for (int i = 0; i <= 3; i++)
 	{
 		tmp_list.push_back(LITER_PAUSE + (STEP * current_lit));
@@ -190,48 +190,42 @@ void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 	//	set_new_tm();
 }
 
+
+/*
+МНА2+Y
+МНА1-Y
+МНА1+Y
+МНА2-Y
+*/
 void MBK02_widg::new_KPI(QVariantList KPI_list)
 {
 	int tmp_in,tmp_len;
 	tmp_len = KPI_list.length();
-	bool ch_cur_lit = true;
-	//for (QVariantList::iterator itr = KPI_list.begin(); itr != KPI_list.end(); itr++)
-	//{
-	//	tmp_in = (*itr).toInt();
-	//}
-	for (int it_lit = 1; KPI_list.at(0).toInt() - (STEP*it_lit) != LITER_PAUSE; it_lit++)
+	if (current_lit == 0)
 	{
-		if (current_lit = 0)
-		{
-			msg_to_log("Литера не задана, либо задана нулевая литера");
-			ch_cur_lit = false;
-			break;
-		}
-		if ((it_lit == current_lit) && (KPI_list.at(0).toInt() - (STEP*it_lit) != LITER_PAUSE))
-		{
-			msg_to_log("Некорректная литера");
-			ch_cur_lit = false;
-			break;
-		}
+		msg_to_log("Литера не задана, либо задана нулевая литера");
+		return;
 	}
-	if (ch_cur_lit)
+	QString tmp_str_KPI;
+
+	int tmp_p = LITER_PAUSE + (STEP * (current_lit-1));
+	int tmp_0 = LITER_PAUSE + (STEP * (current_lit-1)) + ZERO;
+	int tmp_1 = LITER_PAUSE + (STEP * (current_lit-1)) + ONE;
+	for (int i = 0; i < tmp_len; i++)
 	{
-		for (int i = 0; i < tmp_len; i++)
+		tmp_in = KPI_list.at(i).toInt();
+		if ((tmp_in >= tmp_p - 7) && (tmp_in <= tmp_p + 7)) tmp_str_KPI += "P";
+		else
 		{
-			tmp_in = ((KPI_list.at(i).toInt() - LITER_PAUSE) - (STEP * current_lit));
-			if ((tmp_in >= -3) && (tmp_in <= 3)) tmp_str_KPI += "P";
+			if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
 			else
 			{
-				if ((tmp_in >= ONE - 6) && (tmp_in <= ONE + 6)) tmp_str_KPI += "1";
-				else
-				{
-					if ((tmp_in >= ZERO - 6) && (tmp_in <= ZERO + 6)) tmp_str_KPI += "0";
-					else tmp_str_KPI += " ERR ";
-				}
+				if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
+				else tmp_str_KPI += " ERR ";
 			}
 		}
-		msg_to_log(tmp_str_KPI);
 	}
+	msg_to_log(tmp_str_KPI);
 }
 
 

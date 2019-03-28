@@ -79,7 +79,7 @@ signals:
 	void sendKPI(QString kpiList);
 
 public slots:
-	void dataIn(QVariantList maskList, QVariantList dataList);
+	void dataIn(QVariantList dataList, QVariantList maskList);
 
 
 };

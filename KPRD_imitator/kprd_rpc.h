@@ -11,7 +11,7 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void dataIn(QVariantList maskList, QVariantList dataList);
+	void dataIn(QVariantList dataList, QVariantList maskList);
 	////////////////////////////////////
 };
 
