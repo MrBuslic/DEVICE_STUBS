@@ -170,6 +170,19 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		mezanin_list_add(0, 0);
 		mezanin_list_add(0, 0);
 	}
+
+	if (commapp == "iksa_server")
+	{
+		mezanin_list_add(1, 0x0A);	// MFSK24
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+		mezanin_list_add(0, 0);
+	}
+
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/

@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -260,11 +261,16 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("foi_interrupt(int, short, double, double)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal foi_interrupt  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << _n;
+		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _n =  %1").arg(RPCSignalClass::QVariantToString(_n)).arg(call_number));
 		tmp_stream << _chan;
+		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _chan =  %1").arg(RPCSignalClass::QVariantToString(_chan)).arg(call_number));
 		tmp_stream << _u;
+		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _u =  %1").arg(RPCSignalClass::QVariantToString(_u)).arg(call_number));
 		tmp_stream << _t;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal foi_interrupt").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _t =  %1").arg(RPCSignalClass::QVariantToString(_t)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();

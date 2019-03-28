@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -269,7 +270,8 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("mfsk24_()");
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -289,9 +291,12 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("mfsk24_state_change(int, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_state_change  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << channel;
+		SRPCSignalClass::Instance().toLog(QString("mfsk24_state_change  call_number %2 channel =  %1").arg(RPCSignalClass::QVariantToString(channel)).arg(call_number));
 		tmp_stream << state;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_state_change").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("mfsk24_state_change  call_number %2 state =  %1").arg(RPCSignalClass::QVariantToString(state)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -311,8 +316,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("mfsk24_impulse_change(QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_impulse_change  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << channels;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mfsk24_impulse_change").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("mfsk24_impulse_change  call_number %2 channels =  %1").arg(RPCSignalClass::QVariantToString(channels)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();

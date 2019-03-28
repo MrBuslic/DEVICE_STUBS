@@ -106,6 +106,8 @@ void RPC_mds32_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mds32 new signal " + op_name);
 
@@ -113,13 +115,13 @@ void RPC_mds32_SIGNAL_Object::read_data()
 			{
 				int channel;
 				tmp_stream >> channel;
-				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" channel = "+RPCSignalClass::QVariantToString(channel));
+				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" call_number "+ QString::number(call_number) + " channel = "+RPCSignalClass::QVariantToString(channel));
 				uint buf;
 				tmp_stream >> buf;
-				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" buf = "+RPCSignalClass::QVariantToString(buf));
+				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" call_number "+ QString::number(call_number) + " buf = "+RPCSignalClass::QVariantToString(buf));
 				int flag;
 				tmp_stream >> flag;
-				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" flag = "+RPCSignalClass::QVariantToString(flag));
+				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" call_number "+ QString::number(call_number) + " flag = "+RPCSignalClass::QVariantToString(flag));
 				emit mds32_get_sample(channel, buf, flag);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -134,7 +136,7 @@ void RPC_mds32_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mds32 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mds32 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}

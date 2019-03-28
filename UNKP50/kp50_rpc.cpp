@@ -106,6 +106,8 @@ void RPC_kp50_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("kp50 new signal " + op_name);
 
@@ -113,16 +115,16 @@ void RPC_kp50_SIGNAL_Object::read_data()
 			{
 				int _n;
 				tmp_stream >> _n;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" _n = "+RPCSignalClass::QVariantToString(_n));
+				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _n = "+RPCSignalClass::QVariantToString(_n));
 				short _chan;
 				tmp_stream >> _chan;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" _chan = "+RPCSignalClass::QVariantToString(_chan));
+				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _chan = "+RPCSignalClass::QVariantToString(_chan));
 				double _u;
 				tmp_stream >> _u;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" _u = "+RPCSignalClass::QVariantToString(_u));
+				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _u = "+RPCSignalClass::QVariantToString(_u));
 				double _t;
 				tmp_stream >> _t;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" _t = "+RPCSignalClass::QVariantToString(_t));
+				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _t = "+RPCSignalClass::QVariantToString(_t));
 				emit foi_interrupt(_n, _chan, _u, _t);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -132,7 +134,7 @@ void RPC_kp50_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("kp50 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("kp50 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}

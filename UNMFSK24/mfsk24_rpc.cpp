@@ -126,6 +126,8 @@ void RPC_mfsk24_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mfsk24 new signal " + op_name);
 
@@ -140,16 +142,16 @@ void RPC_mfsk24_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 			if (op_name == "mfsk24_state_change(int, int)")
 			{
 				int channel;
 				tmp_stream >> channel;
-				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" channel = "+RPCSignalClass::QVariantToString(channel));
+				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" call_number "+ QString::number(call_number) + " channel = "+RPCSignalClass::QVariantToString(channel));
 				int state;
 				tmp_stream >> state;
-				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" state = "+RPCSignalClass::QVariantToString(state));
+				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" call_number "+ QString::number(call_number) + " state = "+RPCSignalClass::QVariantToString(state));
 				emit mfsk24_state_change(channel, state);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -159,13 +161,13 @@ void RPC_mfsk24_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 			if (op_name == "mfsk24_impulse_change(QVariantList)")
 			{
 				QVariantList channels;
 				tmp_stream >> channels;
-				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" channels = "+RPCSignalClass::QVariantToString(channels));
+				SRPCSignalClass::Instance().toLog("mfsk24 " + op_name +" call_number "+ QString::number(call_number) + " channels = "+RPCSignalClass::QVariantToString(channels));
 				emit mfsk24_impulse_change(channels);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -175,7 +177,7 @@ void RPC_mfsk24_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mfsk24 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}
