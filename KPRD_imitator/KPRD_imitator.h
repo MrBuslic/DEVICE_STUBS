@@ -43,7 +43,7 @@ private:
 
 	QGridLayout *gridLayout;
 
-	void set_antenna_label(qulonglong val);
+	QString set_antenna_label(qulonglong val);
 
 	bool FREQ_P_CLOCK = false;
 	bool FREQ_P_DATA = false;
@@ -76,7 +76,8 @@ private:
 
 signals:
 	void test(QVariantList maskList, QVariantList dataList);
-	void sendKPI(QString kpiList);
+	//void sendKPI(QString kpiList);
+	void sendKPI(QVariantList kpiList);
 
 public slots:
 	void dataIn(QVariantList dataList, QVariantList maskList);

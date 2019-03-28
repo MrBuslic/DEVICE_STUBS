@@ -36,7 +36,7 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void test(QVariantList maskList, QVariantList dataList);
-	void sendKPI(QString kpiList);
+	void sendKPI(QVariantList kpiList);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
