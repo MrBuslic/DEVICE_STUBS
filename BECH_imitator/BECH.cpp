@@ -153,10 +153,10 @@ BECH_widg::BECH_widg(QWidget *parent)
 	All_vblay->addWidget(edit);
 	All_vblay->addWidget(auto_scroll_box);
 
-	//inter_tmr = new QTimer(this);
-	connect(&inter_tmr, &QTimer::timeout, this, &BECH_widg::BECH_interrupt_setup);
+	inter_tmr = new QTimer(this);
+	connect(inter_tmr, &QTimer::timeout, this, &BECH_widg::BECH_interrupt_setup);
 	//connect(&inter_tmr, SIGNAL(timeout()), this, SLOT(BECH_widg::BECH_interrupt_setup(5,3,1,3)));
-	inter_tmr.start(1000);
+	inter_tmr->start(1000);
 }
 
 void BECH_widg::BECH_interrupt_setup()

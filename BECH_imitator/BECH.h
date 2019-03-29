@@ -121,7 +121,7 @@ private:
 	QTimer log_timer;
 	QStringList log_buffer;
 	QMutex log_mutex;
-	QTimer inter_tmr;
+	QTimer *inter_tmr;
 
 
 	int n;
