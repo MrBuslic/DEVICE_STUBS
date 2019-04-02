@@ -7,7 +7,7 @@ int unols_state = UNOLS_STOP;
 
 rpc_buffer_class::rpc_buffer_class()
 {
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		RPC_ols_SLOT_Thread* slot_thr = new RPC_ols_SLOT_Thread;
 		slot_thr->set_connection_params("127.0.0.1", OLS_SLOT + i);
