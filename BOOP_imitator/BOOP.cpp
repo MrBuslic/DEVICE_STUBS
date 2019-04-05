@@ -3,7 +3,6 @@
 #include "rpc_ports.h"
 
 BOOP::BOOP() {
-  widget = new QWidget(this);
 
   // Contains other containers
 
@@ -185,15 +184,15 @@ BOOP::BOOP() {
 
   logArea = new QTextEdit();
 
-  QVBoxLayout* mainLayout = new QVBoxLayout();
+  QVBoxLayout* mainLayout = new QVBoxLayout(this);
   mainLayout->addLayout(firstStripe);
   mainLayout->addLayout(secondStripe);
   mainLayout->addLayout(thirdStripe);
   mainLayout->addWidget(logArea);
 
-  widget->setWindowTitle("Блок управления приводами");
-  widget->setLayout(mainLayout);
-  widget->show();
+  this->setWindowTitle("Блок управления приводами");
+  this->setLayout(mainLayout);
+  this->show();
 
 
   slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
@@ -224,9 +223,13 @@ BOOP::BOOP() {
 
 }
 
-BOOP::~BOOP() {
+BOOP::~BOOP()
+{
+	slot_thr.quit();
+	signal_thr.quit();
 
-
+	mku_slot_thr.quit();
+	mku_signal_thr.quit();
 }
 void BOOP::new_message (QVariant dt, int mko, int line, int cwd, QVariantList words, int os) 
 {
