@@ -121,8 +121,8 @@ private:
 	QMap<int, KPI_STATE> check_KPI;
 	QVariantList tmp_list;
 
-	RPC_omnibus_SLOT_Thread slot_thr;
-	RPC_omnibus_SIGNAL_Thread signal_thr;
+	//RPC_omnibus_SLOT_Thread slot_thr;
+	//RPC_omnibus_SIGNAL_Thread signal_thr;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;

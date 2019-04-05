@@ -96,10 +96,13 @@ private:
 	QPushButton * okBut;
 	QDialog *dlg;
 	bool flag;
+	bool ready_og;
 
-	void paint_buttons();
-	void write_words();
+	void update_graphics();
 	void set_new_tm();
+	void omni_connect();
+	void update_time();
+	void set_warm_og();
 protected:
 	
 public slots:
@@ -122,8 +125,12 @@ private:
 	QStringList log_buffer;
 	QMutex log_mutex;
 	QTimer *inter_tmr;
+	QTimer *warm_og;
+	QTimer *AbOn_tmr;
 
-
+	int standart_tm = 600000;
+	int tm_towarm;
+	int cooling_cof = 4;
 	int n;
 	short chan;
 	double u;
@@ -140,8 +147,8 @@ private:
 
 
 	QMap<int, QString> mode_names;
-	QMap<int, FINIK> finik_list;
-	QMap<int, FINIK_REZH> finik_rezh_list;
+	QMap<OG, qint64> OG_start_warm;
+	QMap<OG, qint64> OG_finish_warm;
 
 	RPC_interrupt_bus_SLOT_Thread interrupt_slot_thr;
 	RPC_interrupt_bus_SIGNAL_Thread interrupt_signal_thr;

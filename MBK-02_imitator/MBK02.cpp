@@ -87,20 +87,20 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	All_vblay->addWidget(auto_scroll_box);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-	slot_thr.start(); // вот тут падает
+	//slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+	//slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-	signal_thr.start(); // вот тут падает
+	//signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+	//signal_thr.start(); // вот тут падает
 
-	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
-	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
-		this->deleteLater();
-		return;
-	}
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
+	//if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
+	//{
+	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
+	//	this->deleteLater();
+	//	return;
+	//}
+	//slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	//flag = true;
 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
 	mku_slot_thr.start(); // вот тут падает
@@ -142,7 +142,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(kpi_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	//connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	//connect(this, &MBK02_widg::set_new_tm, this, &MBK02_widg::update_tm);
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -203,9 +203,10 @@ void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 */
 void MBK02_widg::new_KPI(QVariantList KPI_list)
 {
-	current_lit = 1;
+	current_lit = 2;
 	int tmp_in, tmp_len, tmp_weak;
 	QString tmp_str_ant;
+	t_ant_ch->stop();
 	tmp_len = KPI_list.length();
 	if (current_lit == 0)
 	{
@@ -217,54 +218,76 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 	int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
 	int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
 	int tmp_1 = LITER_PAUSE + (STEP * (current_lit - 1)) + ONE;
-	for (int i = 0; (i <= tmp_len) || (!t_ant_ch->isActive()); i++)
+	for (int i = 0; (i < tmp_len) && (!t_ant_ch->isActive()); i++)
 	{
-		tmp_correct = true;
 		tmp_list = KPI_list.at(i).toList();
 		tmp_in = tmp_list.at(0).toInt();
 		tmp_str_ant = tmp_list.at(1).toString();
 		tmp_weak = tmp_list.at(2).toInt();
-		if ((tmp_in >= tmp_p - 7) && (tmp_in <= tmp_p + 7)) tmp_str_KPI += "P";
-		else
+		tmp_correct = true;
+		switch (current_ant)
 		{
-			if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
-			else
-			{
-				if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
-				//else tmp_str_KPI += " ERR ";
-				else tmp_correct = false;
-			}
-		}
-		switch (current_chan)
-		{
-		case 1:
-			if ((tmp_str_ant == "МНА2+Y") || (tmp_str_ant == "МНА2-Y"))
+		case MHA1MY:
+			if (tmp_str_ant != "МНА1-Y")
 			{
 				t_err_kpi->start(5000);
 				tmp_correct = false;
 			}
 			break;
-		case 2:
-			if ((tmp_str_ant == "МНА1+Y") || (tmp_str_ant == "МНА1-Y"))
+		case MHA1PY:
+			if (tmp_str_ant != "МНА1+Y")
 			{
 				t_err_kpi->start(5000);
 				tmp_correct = false;
 			}
 			break;
+		case MHA2MY:
+			if (tmp_str_ant != "МНА2-Y")
+			{
+				t_err_kpi->start(5000);
+				tmp_correct = false;
+			}
+			break;
+		case MHA2PY:
+			if (tmp_str_ant != "МНА2+Y")
+			{
+				t_err_kpi->start(5000);
+				tmp_correct = false;
+			}
+			break;
+		default:
+			t_err_kpi->start(5000);
+			tmp_correct = false;
+			break;
 		}
-		if ((tmp_weak < 100) || (tmp_weak > 132)) tmp_correct = false;
 		if (tmp_correct)
 		{
-			signal_con = true;
-
-			char tmp_l = tmp_str_KPI.toInt();
-			if (tmp_str_KPI != "P")
-				list_to_R14732.push_back(tmp_l);
-			if (t_err_kpi->isActive() || (i == tmp_len)) t_err_kpi->stop();
+			if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI += "P";
+			else
+			{
+				if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
+				else
+				{
+					if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
+					//else tmp_str_KPI += " ERR ";
+					else tmp_correct = false;
+				}
+			}
+			if ((tmp_weak < 50) || (tmp_weak > 100))
+				tmp_correct = false;
+			if (tmp_correct)
+			{
+				signal_con = true;
+				char tmp_l = tmp_str_KPI.toInt();
+				if (tmp_str_KPI != "P")
+					list_to_R14732.push_back(tmp_l);
+				if (t_err_kpi->isActive() || (i == tmp_len)) t_err_kpi->stop();
+				update_graphics();
+			}
+			else t_err_kpi->start(5000);
 		}
-		else t_err_kpi->start(5000);
-		msg_to_log(tmp_str_KPI);
 	}
+	msg_to_log(tmp_str_KPI);
 	if (tmp_correct)
 	{
 		update_tm(26);
@@ -294,6 +317,7 @@ void MBK02_widg::lose_cont()
 	list_to_R14732.clear();
 	msg_to_log("Потеряно соединение\n");
 	update_tm(26);
+	update_graphics();
 }
 
 
