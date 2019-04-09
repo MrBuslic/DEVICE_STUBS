@@ -103,6 +103,7 @@ private:
 	void omni_connect();
 	void update_time();
 	void set_warm_og();
+	void set_tm_towarm(int _tm_towarm);
 protected:
 	
 public slots:
@@ -125,12 +126,13 @@ private:
 	QStringList log_buffer;
 	QMutex log_mutex;
 	QTimer *inter_tmr;
-	QTimer *warm_og;
+	QTimer *warm_og_tmr;
 	QTimer *AbOn_tmr;
 
-	int standart_tm = 600000;
+	int standart_tm = 120000;
 	int tm_towarm;
 	int cooling_cof = 4;
+	int warm_er = 100;//погрешность нагрева
 	int n;
 	short chan;
 	double u;

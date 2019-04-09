@@ -101,11 +101,11 @@ BECH_widg::BECH_widg(QWidget *parent)
 	inter_tmr->start(1000);
 
 
-	warm_og = new QTimer(this);
-	warm_og->start(tm_towarm);
-	warm_og->setSingleShot(true);
-	connect(warm_og, &QTimer::timeout, this, &BECH_widg::set_warm_og);
-	connect(warm_og, &QTimer::stop, this, &BECH_widg::set_warm_og);
+	warm_og_tmr = new QTimer(this);
+	warm_og_tmr->start(tm_towarm);
+	warm_og_tmr->setSingleShot(true);
+	connect(warm_og_tmr, &QTimer::timeout, this, &BECH_widg::set_warm_og);
+	connect(warm_og_tmr, &QTimer::stop, this, &BECH_widg::set_warm_og);
 	OG_start_warm[OG_1] = (QDateTime::currentMSecsSinceEpoch());
 
 	AbOn_tmr = new QTimer(this);
@@ -315,34 +315,33 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 
 		update_graphics();
 		update_time();
-		set_new_tm();
+		//set_new_tm();
 	}
 }
 
 void BECH_widg::set_warm_og()
 {
-	if (OG_finish_warm[current_OG] != 0)
+	//Проверка на перегрев мб?
+	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+	OG_finish_warm[current_OG] = msecs_time;
+	if (OG_start_warm[current_OG] == 0) OG_start_warm[current_OG] = OG_finish_warm[current_OG] - standart_tm;
+	if (((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= (standart_tm - warm_er)) || ((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= (standart_tm + warm_er)))
 	{
-		qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
-		OG_finish_warm[current_OG] = msecs_time;
-		if ((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= standart_tm)
-		{
-			ready_og = true;
-			msg_to_log("Прогрелся ОГ № " + QString::number(current_OG + 1));
-			set_new_tm();
-		}
-		else
-		{
-			ready_og = false;
-			msg_to_log("Прогревание ОГ № " + QString::number(current_OG + 1) + " прервано");
-		}
+		ready_og = true;
+		msg_to_log("Прогрелся ОГ № " + QString::number(current_OG + 1));
+		set_new_tm();
+	}
+	else
+	{
+		ready_og = false;
+		msg_to_log("Прогревание ОГ № " + QString::number(current_OG + 1) + " прервано");
 	}
 }
 
 void BECH_widg::update_time()
 {
 	ready_og = false;
-	warm_og->stop();
+	warm_og_tmr->stop();
 	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
 	if (OG_finish_warm[current_OG] == 0) // Если ОГ не нагревался вообще
 	{
@@ -352,7 +351,8 @@ void BECH_widg::update_time()
 	}
 	else // Если нагревался
 	{
-		if (OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= standart_tm) // Если ОГ нагрелся полностью
+		// Если ОГ нагрелся полностью
+		if ((OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= (standart_tm - warm_er)) || (OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= (standart_tm - warm_er)))
 		{
 			if (msecs_time - OG_finish_warm[current_OG] >= (standart_tm * cooling_cof)) // Если после полного нагрева ОГ прошло достаточно времени, чтобы тот полностью охладился
 			{
@@ -385,9 +385,9 @@ void BECH_widg::update_time()
 				tm_towarm = OG_finish_warm[current_OG] - msecs_time;
 			}
 		}
-		if (tm_towarm != 0)
-			warm_og->start(tm_towarm);
 	}
+	if (tm_towarm != 0)
+		warm_og_tmr->start(tm_towarm);
 }
 
 void BECH_widg::omni_connect()
@@ -421,6 +421,11 @@ void BECH_widg::update_graphics()
 				KP_pbut[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 		}
 	}
+}
+
+void BECH_widg::set_tm_towarm(int _tm_towarm)
+{
+	tm_towarm = _tm_towarm;
 }
 
 void BECH_widg::set_new_tm()
