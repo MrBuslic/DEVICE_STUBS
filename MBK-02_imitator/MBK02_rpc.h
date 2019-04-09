@@ -19,6 +19,7 @@ public slots:
 	void log_timer_ontimer();
 	void reverse_ant();
 	void lose_cont();
+	void update_graphics();
 	////////////////////////////////////
 };
 
@@ -55,6 +56,7 @@ signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
+	void emit_update_graphics();
 };
 
 class RPC_MBK02_SIGNAL_Thread : public RPC_SIGNAL_Thread

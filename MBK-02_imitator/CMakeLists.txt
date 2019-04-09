@@ -43,8 +43,8 @@ SET(BKUPI_SOURCES main.cpp MBK02.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp mbk02_socket_rpc.h mbk02_socket_rpc.cpp)
-SET(MKU_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp)
+#SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp mbk02_socket_rpc.h mbk02_socket_rpc.cpp)
+SET(MKU_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp mbk02_socket_rpc.h mbk02_socket_rpc.cpp)
 SET(KPI_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/kpi_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/kpi_bus_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 

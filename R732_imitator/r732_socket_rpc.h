@@ -1,11 +1,11 @@
-#ifndef MBK02_SOCKET_RPC_H
-#define MBK02_SOCKET_RPC_H
+#ifndef R732_SOCKET_RPC_H
+#define R732_SOCKET_RPC_H
 
 #include <QObject>
 #include <QString>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include "MBK02.h"
+#include "R732.h"
 
 #include <QWidget>
 #include <QTextEdit>
@@ -29,15 +29,14 @@ public:
 	~Socket_RPC_SIGNAL_Object()
 	{
 	}
-	void set_app(MBK02_widg* _app);
+	void set_app(R732_widg* _app);
 
 	void set_socket(QTcpSocket* _rpc_socket);
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void msg_to_14R732(QVariantList data);
-	void set_new_tm(int sadr, int word);
-	void emit_update_graphics();
+	void new_ku(int ku_n, int length, double u, int line);
+	void toLog(QString& Message);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -46,7 +45,7 @@ private:
 	void send_signal_func(QByteArray* _arr);
 	QTcpSocket* rpc_socket;
 	QMutex signal_mutex;
-	MBK02_widg* app;
+	R732_widg* app;
 	static int obj_num;
 	static int call_number;
 	QMap<QString, std::shared_ptr<SignalData> > data_map;
@@ -58,7 +57,7 @@ class Socket_RPC_SIGNAL_Server : public QObject
 	Q_OBJECT
 public:
 	Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
-	void set_app(MBK02_widg* _app)
+	void set_app(R732_widg* _app)
 	{
 		app = _app;
 	}
@@ -66,7 +65,7 @@ public slots:
 	void tcp_slot();
 private:
 	QTcpServer* rpc_server;
-	MBK02_widg* app;
+	R732_widg* app;
 	QList<std::shared_ptr<Socket_RPC_SIGNAL_Object> > rpc_objects;
 };
 
@@ -75,7 +74,7 @@ class Socket_RPC_SIGNAL_Thread : public QThread
 	Q_OBJECT
 public:
 	Socket_RPC_SIGNAL_Thread();
-	void set_app(MBK02_widg* _app)
+	void set_app(R732_widg* _app)
 	{
 		app = _app;
 	}
@@ -87,7 +86,7 @@ public:
 	void run();
 private:
 	Socket_RPC_SIGNAL_Server* rpc_srv;
-	MBK02_widg* app;
+	R732_widg* app;
 	QString conn_ip;
 	int conn_port;
 };
@@ -96,7 +95,7 @@ class Socket_RPC_SLOT_Object : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Object(MBK02_widg* _app, int socketDescriptor);
+	Socket_RPC_SLOT_Object(R732_widg* _app, int socketDescriptor);
 	~Socket_RPC_SLOT_Object()
 	{
 	}
@@ -105,21 +104,14 @@ public:
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant new_message(QVariantList& _values);
-	QVariant new_mk(QVariantList& _values);
-	QVariant new_KPI(QVariantList& _values);
-	QVariant auto_scroll_clicked(QVariantList& _values);
-	QVariant update_tm(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
-	QVariant reverse_ant(QVariantList& _values);
-	QVariant lose_cont(QVariantList& _values);
-	QVariant update_graphics(QVariantList& _values);
+	QVariant set_new_mbk02_tm(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
 private:
 	OPERATORS_MAP operators_map;
 	QTcpSocket* rpc_socket;
-	MBK02_widg* app;
+	R732_widg* app;
 	bool with_return;
 	static int obj_num;
 };
@@ -128,12 +120,12 @@ class Socket_RPC_SLOT_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Thread(MBK02_widg* _app, int _socketDescriptor);
+	Socket_RPC_SLOT_Thread(R732_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
 	private:
 	std::shared_ptr<Socket_RPC_SLOT_Object> rpc_obj;
-	MBK02_widg* app;
+	R732_widg* app;
 	int socketDescriptor;
 };
 
@@ -141,11 +133,11 @@ class Socket_RPC_SLOT_Server : public QTcpServer
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, MBK02_widg* _app);
+	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, R732_widg* _app);
 protected:
 	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
 private:
-	MBK02_widg* app;
+	R732_widg* app;
 	QList<std::shared_ptr<Socket_RPC_SLOT_Thread> > rpc_objects;
 };
 
@@ -154,7 +146,7 @@ class Socket_RPC_SLOT_Server_Thread : public QThread
 	Q_OBJECT
 public:
 	Socket_RPC_SLOT_Server_Thread();
-	void set_app(MBK02_widg* _app)
+	void set_app(R732_widg* _app)
 	{
 		app = _app;
 	}
@@ -166,7 +158,7 @@ public:
 	void run();
 private:
 	Socket_RPC_SLOT_Server* rpc_srv;
-	MBK02_widg* app;
+	R732_widg* app;
 	QString conn_ip;
 	int conn_port;
 

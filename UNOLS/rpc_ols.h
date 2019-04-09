@@ -23,7 +23,7 @@ class RpcOlsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcOlsWidget();
+	RpcOlsWidget(int ols_num);
 public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
