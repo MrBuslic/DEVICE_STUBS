@@ -116,15 +116,12 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
-		disconnect(app, SIGNAL(toLog(QString&)), this, SLOT(toLog(QString&)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(R732_widg* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)), Qt::DirectConnection);
 		data_map.insert("new_ku(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(toLog(QString&)), this, SLOT(toLog(QString&)), Qt::DirectConnection);
-		data_map.insert("toLog(QString&)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -282,30 +279,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku finished").arg(objectName()));
-	}
-	void Socket_RPC_SIGNAL_Object::toLog(QString& Message)
-	{
-		auto& descriptor = *data_map["toLog(QString&)"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("toLog(QString&)");
-		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal toLog  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << Message;
-		SRPCSignalClass::Instance().toLog(QString("toLog  call_number %2 Message =  %1").arg(RPCSignalClass::QVariantToString(Message)).arg(call_number));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal toLog sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		Message = data_map["toLog(QString&)"]->signal_data.at(0).toString();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal toLog finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

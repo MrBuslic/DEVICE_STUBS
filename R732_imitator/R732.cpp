@@ -17,8 +17,6 @@ union MKOWord
 
 R732_widg::R732_widg()
 {
-	connect(this, &R732_widg::toLog, &SRPCSignalClass::Instance(), &RPCSignalClass::rpc_toLog, Qt::DirectConnection);
-
 	mpvn_modules << MV_MODULE(5, 0);
 	mvku_modules << MV_MODULE(2, 0);
 
@@ -115,7 +113,6 @@ R732_widg::R732_widg()
 
 	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
-	connect(this, &R732_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
 
 	paint_buttons();
 	//set_new_tm();
@@ -129,131 +126,117 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
-//		if (tmp_cwd.subadr == 17)
-//		{
-//			bool need_mvku_renew = false;
-//			bool need_mvmk_renew = false;
-//			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-//			{
-//				int bus_reset = (itr->toInt() & 0x3);
-//				//				int read_input = (itr->toInt() & 0x1);
-//
-//				int switch_dev = (itr->toInt() & 0xC0) >> 6;
-//				int com = (itr->toInt() & 0x7000) >> 12; //меняю с 0х3000 на 011100...
-//				int nim = (itr->toInt() & 0x0300) >> 8;
-//				switch (com)
-//				{
-//				case 1:
-//					continue;
-//				case 2:
-//					if (switch_dev)
-//						mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-//					if (bus_reset)
-//					{
-//						mvku_modules[nim].set_ku_p(-1);
-//						need_mvku_renew = true;
-//					}
-//					break;
-//				case 3:
-//					continue;
-//				case 5:
-//					if (switch_dev)
-//						mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-//					break;
-//				};
-//			}
-//			paint_buttons();
-//			set_new_tm();
-//			if (need_mvku_renew)
-//				new_data_mv(29);
-//
-//			if (need_mvmk_renew)
-//				new_data_mv(28);
-//
-//		}
-//		if (tmp_cwd.subadr == 28) //MK
-//		{
-//			int max_p;
-//			max_p = 0;
-//			int num_vertic;
-//			//QVariantList pshm_list;
-//
-//			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-//			{
-//				int pshm = (itr->toInt()) >> 12;
-//				if (pshm >= 12)
-//				{
-//					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
-//					break;
-//				}
-//				MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
-//				for (int mshm = 0; mshm <= 11; mshm++)
-//				{
-//					num_vertic = (itr->toInt()&(1 << mshm));
-//					if (num_vertic != 0)
-//					{
-//						if (max_p <= 4)
-//						{
-//							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
-//							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
-//							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
-//							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom - param_mshm.dt_kom), 3, 3);
-//							max_p++;
-//						}
-//						else
-//						{
-//							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-//							break;
-//						}
-//					}
-//				}
-//			}
-//			new_data_mv(tmp_cwd.subadr);
-//		}
-//		if (tmp_cwd.subadr == 29) //KU
-//		{
-//			int ku;
-//			int max_ku;
-//			max_ku = 0;
-//			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-//			{
-//				int nim = (itr->toInt() & 0x0700) >> 8;
-//				for (num_ku = 0; num_ku <= 7; num_ku++)
-//				{
-//					ku = (itr->toInt()&(1 << num_ku));
-//					if (ku != 0)
-//					{
-//						if (max_ku <= 4)
-//						{
-//							MV_DEV& param_ku = mvku_modules[nim].get_settings();
-//							mvku_modules[nim].set_ku_p(num_ku);
-//							int full_num_ku = num_ku + nim * 8;
-//							if ((full_num_ku >= 16) && (full_num_ku <= 18)) //Команды в МБК04 не заведены на внешнюю шину и выдаются напрямую
-//								mbk04_slot_thr.get_mbk04_obj()->new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom);
-//							else
-//								emit new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
-//							max_ku++;
-//						}
-//						else
-//						{
-//							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-//							break;
-//						}
-//					}
-//
-//				}
-//			}
-//			new_data_mv(tmp_cwd.subadr);
-//		}
-//		if (tmp_cwd.subadr == 30)
-//		{
-//			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-//		}
-//		if (tmp_cwd.subadr == 26)
-//		{
-//
-//		}
-		if ((tmp_cwd.subadr == 2) || (tmp_cwd.subadr == 3) || (tmp_cwd.subadr == 29))
+		//		if (tmp_cwd.subadr == 17)
+		//		{
+		//			bool need_mvku_renew = false;
+		//			bool need_mvmk_renew = false;
+		//			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+		//			{
+		//				int bus_reset = (itr->toInt() & 0x3);
+		//				//				int read_input = (itr->toInt() & 0x1);
+		//
+		//				int switch_dev = (itr->toInt() & 0xC0) >> 6;
+		//				int com = (itr->toInt() & 0x7000) >> 12; //меняю с 0х3000 на 011100...
+		//				int nim = (itr->toInt() & 0x0300) >> 8;
+		//				switch (com)
+		//				{
+		//				case 1:
+		//					continue;
+		//				case 2:
+		//					if (switch_dev)
+		//						mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+		//					if (bus_reset)
+		//					{
+		//						mvku_modules[nim].set_ku_p(-1);
+		//						need_mvku_renew = true;
+		//					}
+		//					break;
+		//				case 3:
+		//					continue;
+		//				case 5:
+		//					if (switch_dev)
+		//						mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+		//					break;
+		//				};
+		//			}
+		//			paint_buttons();
+		//			set_new_tm();
+		//			if (need_mvku_renew)
+		//				new_data_mv(29);
+		//
+		//			if (need_mvmk_renew)
+		//				new_data_mv(28);
+		//
+		//		}
+		//		if (tmp_cwd.subadr == 28) //MK
+		//		{
+		//			int max_p;
+		//			max_p = 0;
+		//			int num_vertic;
+		//			//QVariantList pshm_list;
+		//
+		//			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+		//			{
+		//				int pshm = (itr->toInt()) >> 12;
+		//				if (pshm >= 12)
+		//				{
+		//					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
+		//					break;
+		//				}
+		//				MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
+		//				for (int mshm = 0; mshm <= 11; mshm++)
+		//				{
+		//					num_vertic = (itr->toInt()&(1 << mshm));
+		//					if (num_vertic != 0)
+		//					{
+		//						if (max_p <= 4)
+		//						{
+		//							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
+		//							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
+		//							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
+		//							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom - param_mshm.dt_kom), 3, 3);
+		//							max_p++;
+		//						}
+		//						else
+		//						{
+		//							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
+		//							break;
+		//						}
+		//					}
+		//				}
+		//			}
+		//			new_data_mv(tmp_cwd.subadr);
+		//		}
+		if (tmp_cwd.subadr == 29) //KU
+		{
+			int ku;
+			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			{
+				int nim = (itr->toInt() & 0x0700) >> 8;
+				for (num_ku = 0; num_ku <= 7; num_ku++)
+				{
+					ku = (itr->toInt()&(1 << num_ku));
+					if (ku != 0 && nim == 0)
+					{
+						MV_DEV& param_ku = mvku_modules[nim].get_settings();
+						mvku_modules[nim].set_ku_p(num_ku);
+						int full_num_ku = num_ku + nim * 8;
+						mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
+					}
+
+				}
+			}
+			new_data_mv();
+		}
+		//		if (tmp_cwd.subadr == 30)
+		//		{
+		//			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+		//		}
+		//		if (tmp_cwd.subadr == 26)
+		//		{
+		//
+		//		}
+		if ((tmp_cwd.subadr == 2) || (tmp_cwd.subadr == 3))
 		{
 			mbk02_slot_thr.get_MBK02_obj()->new_message(dt, mko, line, cwd, words, os);
 		}
@@ -266,6 +249,17 @@ void R732_widg::set_new_mbk02_tm(int sadr, int word)
 	QVariantList tm_words;
 	tm_words << word;
 	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, sadr, tm_words);
+}
+
+void R732_widg::new_data_mv()
+{
+	QVariantList new_words;
+
+	unsigned short _word = mvku_modules[0].get_data_mvku();
+	new_words << _word;
+	new_words << _word;
+
+	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 29, new_words);
 }
 
 void R732_widg::paint_buttons()

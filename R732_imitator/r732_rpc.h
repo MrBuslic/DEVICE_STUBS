@@ -48,7 +48,6 @@ protected:
 signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void new_ku(int ku_n, int length, double u, int line);
-	void toLog(QString& Message);
 };
 
 class RPC_r732_SIGNAL_Thread : public RPC_SIGNAL_Thread

@@ -50,15 +50,15 @@ private:
 	int MKO;
 	int adr;
 	bool flag;
+	int num_ku;
 
 	void paint_buttons();
-
+	void new_data_mv();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void set_new_mbk02_tm(int sadr, int word);
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
-	void toLog(QString& Message);
 };
 
 #endif // R732_H
