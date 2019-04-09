@@ -44,7 +44,7 @@ add_subdirectory(SCHWARZ_stub)
 add_subdirectory(TEST1003)
 add_subdirectory(UNMVI102)
 
-add_subdirectory(bkupi_imitator)
+#add_subdirectory(bkupi_imitator)
 add_subdirectory(tpo_imitator)
 add_subdirectory(spobu_imitator)
 add_subdirectory(cbk_imitator)
