@@ -73,6 +73,11 @@ void RPC_MBK02_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		SRPCSignalClass::Instance().toLog("set_new_tm connected");
 		emit connect_signal("set_new_tm(int, int)", true);
 	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::emit_update_graphics)) {
+		SRPCSignalClass::Instance().toLog("emit_update_graphics connected");
+		emit connect_signal("emit_update_graphics()", true);
+	}
 }
 
 void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -85,6 +90,11 @@ void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_tm)) {
 		SRPCSignalClass::Instance().toLog("set_new_tm disconnected");
 		//emit connect_signal("set_new_tm(int, int)", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::emit_update_graphics)) {
+		SRPCSignalClass::Instance().toLog("emit_update_graphics disconnected");
+		//emit connect_signal("emit_update_graphics()", false);
 	}
 }
 
@@ -146,6 +156,19 @@ void RPC_MBK02_SIGNAL_Object::read_data()
 				tmp_stream >> word;
 				SRPCSignalClass::Instance().toLog("MBK02 " + op_name +" call_number "+ QString::number(call_number) + " word = "+RPCSignalClass::QVariantToString(word));
 				emit set_new_tm(sadr, word);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("MBK02 signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
+			if (op_name == "emit_update_graphics()")
+			{
+				emit emit_update_graphics();
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -237,6 +260,13 @@ void RPC_MBK02_SLOT_Object::lose_cont()
 	SRPCSignalClass::Instance().toLog(QString("MBK02 dynamic_call lose_cont %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("lose_cont()", tmp_list);
 	SRPCSignalClass::Instance().toLog("MBK02 dynamic_call finished lose_cont");
+}
+void RPC_MBK02_SLOT_Object::update_graphics()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("MBK02 dynamic_call update_graphics %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("update_graphics()", tmp_list);
+	SRPCSignalClass::Instance().toLog("MBK02 dynamic_call finished update_graphics");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

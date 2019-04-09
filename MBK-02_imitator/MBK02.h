@@ -84,7 +84,7 @@ private:
 	QPushButton *Ant_pbut;
 	QLineEdit* Lit_le;
 
-	void update_graphics();
+	
 
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
@@ -95,9 +95,11 @@ public slots:
 	void log_timer_ontimer();
 	void reverse_ant();
 	void lose_cont();
+	void update_graphics();
 signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
+	void emit_update_graphics();
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;

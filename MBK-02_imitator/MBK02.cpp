@@ -140,6 +140,8 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 
+	connect(this, &MBK02_widg::emit_update_graphics, this, &MBK02_widg::update_graphics);
+
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(kpi_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
 	//connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
@@ -341,14 +343,14 @@ void MBK02_widg::update_tm(int sadr)
 	case 4:
 		switch (current_lit)
 		{
-		case 1: word += 0x20; break;
-		case 2: word += 0x28; break;
-		case 3: word += 0x30; break;
-		case 4: word += 0x38; break;
-		case 5: word += 0x40; break;
-		case 6: word += 0x48; break;
-		case 7: word += 0x50; break;
-		case 8: word += 0x58; break;
+		case 1: word += 0x18; break;
+		case 2: word += 0x20; break;
+		case 3: word += 0x28; break;
+		case 4: word += 0x30; break;
+		case 5: word += 0x38; break;
+		case 6: word += 0x40; break;
+		case 7: word += 0x48; break;
+		case 8: word += 0x50; break;
 		}
 		word += (word << 8);
 		break;
@@ -463,7 +465,7 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			update_tm(1);
 			break;
 		};
-		update_graphics();
+		emit emit_update_graphics();
 	}
 }
 void MBK02_widg::update_graphics()

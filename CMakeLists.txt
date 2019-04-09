@@ -55,6 +55,7 @@ add_subdirectory(BECH_imitator)
 add_subdirectory(MBK-02_imitator)
 add_subdirectory(KPRD_imitator)
 add_subdirectory(BOOP_imitator)
+add_subdirectory(R732_imitator)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})
