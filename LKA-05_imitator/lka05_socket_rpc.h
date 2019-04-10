@@ -104,7 +104,6 @@ public:
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant new_message(QVariantList& _values);
-	QVariant save_choose_set(QVariantList& _values);
 	QVariant new_tm(QVariantList& _values);
 public slots:
 	void read_data();

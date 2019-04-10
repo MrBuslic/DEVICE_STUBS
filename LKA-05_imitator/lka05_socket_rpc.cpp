@@ -77,7 +77,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
-		operators_map["save_choose_set()"] = &Socket_RPC_SLOT_Object::save_choose_set;
 		operators_map["new_tm(int)"] = &Socket_RPC_SLOT_Object::new_tm;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -347,22 +346,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			QVariantList words = _values.at(4).value<QVariantList>();
 			int os = _values.at(5).value<int>();
 			app->new_message(dt, mko, line, cwd, words, os);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::save_choose_set(QVariantList& _values)
-	{
-		try
-		{
-			app->save_choose_set();
 			return 0;
 		}
 		catch(const std::exception &)

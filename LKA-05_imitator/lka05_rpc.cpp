@@ -207,13 +207,6 @@ void RPC_lka05_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd,
 	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_message");
 }
-void RPC_lka05_SLOT_Object::save_choose_set()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call save_choose_set %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("save_choose_set()", tmp_list);
-	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished save_choose_set");
-}
 void RPC_lka05_SLOT_Object::new_tm(int tm)
 {
 	QVariantList tmp_list;

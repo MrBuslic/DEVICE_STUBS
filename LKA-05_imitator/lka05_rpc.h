@@ -12,7 +12,6 @@ public:
 	////////////////////////////////////
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void save_choose_set();
 	void new_tm(int tm);
 	////////////////////////////////////
 };
