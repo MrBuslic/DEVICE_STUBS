@@ -13,10 +13,12 @@ public:
 
 public slots:
 	void make_ku(int ku_n, int length, double u, int line);
+	void make_ku_732(int ku_n, int length, double u, int line);
 	void make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
+	void new_ku_732(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 };
 

@@ -12,6 +12,8 @@
 #include <QMainWindow>
 #include <QLineEdit>
 #include <qplaintextedit.h>
+#include <QTime>
+#include <QTimer>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
@@ -34,7 +36,7 @@ enum ANTENNA
 };
 enum KPI_STATE
 {
-	LITER_PAUSE = 0x138CE20,
+	LITER_PAUSE = 0x138CE20, 
 	ZERO = 0xBB8,
 	ONE = 0xFA0,
 	STEP = 0x27100
@@ -55,7 +57,7 @@ private:
 	QMainWindow* main_widg;
 	//Хранимые текущие
 
-	int current_lit = 0;
+	int current_lit;
 	CHANEL current_chan = CHANEL_OFF;
 	ANTENNA current_ant = MHAOFF;
 
@@ -78,22 +80,26 @@ private:
 
 	QPushButton *Chan1_pbut;
 	QPushButton *Chan2_pbut;
-	QPushButton *Sig1_pbut;
-	QPushButton *Sig2_pbut;
+	QPushButton *Sig_pbut;
 	QPushButton *Ant_pbut;
 	QLineEdit* Lit_le;
 
-	void paint_buttons();
-	void write_words();
-	void set_new_tm();
-protected:
+	
 
-	public slots :
-		void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+public slots:
+	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void new_KPI(QVariantList KPI_list);
 	void auto_scroll_clicked(int _state);
+	void update_tm(int sadr);
 	void log_timer_ontimer();
+	void reverse_ant();
+	void lose_cont();
+	void update_graphics();
+signals:
+	void msg_to_14R732(QVariantList data);
+	void set_new_tm(int sadr, int word);
+	void emit_update_graphics();
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -105,17 +111,20 @@ private:
 	QTimer log_timer;
 	QStringList log_buffer;
 	QMutex log_mutex;
-	//---tmp
-	QString tmp_str_KPI;
-	//---tmp
+	QTimer *t_ant_ch;
+	QTimer *t_sleep;
+	QTimer *t_err_kpi;
+	bool signal_con = false;
+	QVariantList list_to_R14732;
+
 	void msg_to_log(const QString& _msg);
 
 	QMap<int, QString> ant_names;
 	QMap<int, KPI_STATE> check_KPI;
 	QVariantList tmp_list;
 
-	RPC_omnibus_SLOT_Thread slot_thr;
-	RPC_omnibus_SIGNAL_Thread signal_thr;
+	//RPC_omnibus_SLOT_Thread slot_thr;
+	//RPC_omnibus_SIGNAL_Thread signal_thr;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;

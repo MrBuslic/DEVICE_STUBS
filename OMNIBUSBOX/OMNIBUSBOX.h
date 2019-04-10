@@ -15,6 +15,7 @@
 #include <memory>
 #include <qlayout.h>
 #include <loki/Singleton.h>
+#include "rpc_ports.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 

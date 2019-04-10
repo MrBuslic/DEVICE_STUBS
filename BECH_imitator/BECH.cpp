@@ -25,6 +25,18 @@ BECH_widg::BECH_widg(QWidget *parent)
 	mode_names.insert(1, "ПИ-8");
 	mode_names.insert(2, "Ошибка");
 
+	OG_start_warm.insert(OG_1, 0);
+	OG_start_warm.insert(OG_2, 0);
+	OG_start_warm.insert(OG_3, 0);
+
+	OG_finish_warm.insert(OG_1, 0);
+	OG_finish_warm.insert(OG_2, 0);
+	OG_finish_warm.insert(OG_3, 0);
+
+	ready_og = false;
+	tm_towarm = standart_tm;
+	cooling_cof = 4;
+
 	for (int i = 0; i < 3; i++)
 	{
 		QString numb = QString::number(i + 1);
@@ -77,28 +89,29 @@ BECH_widg::BECH_widg(QWidget *parent)
 	FINIK_REZH_hlay->addWidget(Mode_lb);
 	FINIK_REZH_hlay->addWidget(Mode_le);
 
-	All_vblay->addWidget(LKA_gb);
 	All_vblay->addWidget(OG_gb);
 	All_vblay->addWidget(FINIK_gb);
+	All_vblay->addWidget(LKA_gb);
 	All_vblay->addWidget(KP_gb);
 	All_vblay->addLayout(FINIK_REZH_hlay);
 
-	//QVBoxLayout *logs_lay = new QVBoxLayout(this);
-	//edit = new QTextEdit(this);
-	//_scroll_bar = edit->verticalScrollBar();
-	//_doc = new QTextDocument();
-	//_cursor = new QTextCursor(_doc);
-	//edit->setDocument(_doc);
-	//edit->setReadOnly(true);
-	//_doc->setMaximumBlockCount(1000);
-	//setMinimumSize(490, 300);
-	//auto_scroll_box = new QCheckBox(this);
-	//auto_scroll_box->setText("Автопрокрутка");
-	//auto_scroll_box->setChecked(true);
-	//connect(auto_scroll_box, &QCheckBox::stateChanged, this, &BECH_widg::auto_scroll_clicked);
-	//logs_lay->addWidget(edit);
-	//logs_lay->addWidget(auto_scroll_box);
 
+	inter_tmr = new QTimer(this);
+	connect(inter_tmr, &QTimer::timeout, this, &BECH_widg::BECH_interrupt_setup);
+	inter_tmr->start(1000);
+
+
+	warm_og = new QTimer(this);
+	warm_og->start(tm_towarm);
+	warm_og->setSingleShot(true);
+	connect(warm_og, &QTimer::timeout, this, &BECH_widg::set_warm_og);
+	connect(warm_og, &QTimer::stop, this, &BECH_widg::set_warm_og);
+	OG_start_warm[OG_1] = (QDateTime::currentMSecsSinceEpoch());
+
+	AbOn_tmr = new QTimer(this);
+	AbOn_tmr->start(5000);
+	AbOn_tmr->setSingleShot(true);
+	connect(AbOn_tmr, &QTimer::timeout, this, &BECH_widg::omni_connect);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
@@ -127,11 +140,23 @@ BECH_widg::BECH_widg(QWidget *parent)
 		return;
 	}
 
+	interrupt_slot_thr.set_connection_params("127.0.0.1", INTERRUPTS_SLOT);
+	interrupt_slot_thr.start(); // вот тут падает
+
+	interrupt_signal_thr.set_connection_params("127.0.0.1", INTERRUPTS_SIGNAL);
+	interrupt_signal_thr.start(); // вот тут падает
+
+	if (!interrupt_slot_thr.wait_connected(3) || !interrupt_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с interrupt_bus в Foi");
+		this->deleteLater();
+		return;
+	}
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	flag = false;
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 
@@ -143,9 +168,40 @@ BECH_widg::BECH_widg(QWidget *parent)
 	connect(&log_timer, &QTimer::timeout, this, &BECH_widg::log_timer_ontimer);
 	log_timer.start(200);
 
-	//set_new_tm();
+	edit = new QTextEdit(this);
+	_scroll_bar = edit->verticalScrollBar();
+	_doc = new QTextDocument();
+	_cursor = new QTextCursor(_doc);
+	edit->setDocument(_doc);
+	edit->setReadOnly(true);
+	_doc->setMaximumBlockCount(1000);
+	setMinimumSize(360, 300);
+	auto_scroll_box = new QCheckBox(this);
+	auto_scroll_box->setText("Автопрокрутка");
+	auto_scroll_box->setChecked(true);
+	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &BECH_widg::auto_scroll_clicked);
+	All_vblay->addWidget(edit);
+	All_vblay->addWidget(auto_scroll_box);
+
+	update_graphics();
+	set_new_tm();
 }
 
+void BECH_widg::BECH_interrupt_setup()
+{
+	n = 5;
+	chan = 3;
+	u = 5;
+	t = 4.5;
+	BECH_interrupt_run();
+}
+
+void BECH_widg::BECH_interrupt_run()
+{
+	//	QString t_msg = QString("Выдаю сигнал на канале %1 линии %2 с амплитудой %3 и длительностью %4").arg(n).arg(chan).arg(u).arg(t);
+	//	msg_to_log(t_msg);
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan, u, t);
+}
 
 void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
@@ -153,49 +209,48 @@ void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_
 	int uu = 0;
 	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	//	msg_to_log(_msg);
-		int tmp_mshm = mshm;
-		int tmp_pshm = pshm;
-	
-		switch (tmp_mshm)
-		{
-		case 3:
-			current_LKA = LKA_1;
-			break;
-		case 4:
-			current_LKA = LKA_2;
-			break;
-		case 8:
-			current_KP = KP_1; 
-			break;
-		case 9:
-			current_KP = KP_2; 
-			break;
-		}
-		write_words();
-		paint_buttons();
+	int tmp_mshm = mshm;
+	int tmp_pshm = pshm;
+
+	switch (tmp_mshm)
+	{
+	case 3:
+		current_LKA = LKA_1;
+		break;
+	case 4:
+		current_LKA = LKA_2;
+		break;
+	case 8:
+		current_KP = KP_1;
+		break;
+	case 9:
+		current_KP = KP_2;
+		break;
+	}
+	update_graphics();
 	//	set_new_tm();
 }
 
 
 void BECH_widg::msg_to_log(const QString& _msg)
 {
-	//{
-	//	QMutexLocker lock(&log_mutex);
-	//	log_buffer << _msg;
-	//}
-	//_cursor->insertText(_msg + "\n");
-	//if (auto_scroll)
-	//	_scroll_bar->setValue(_scroll_bar->maximum());
+	{
+		QMutexLocker lock(&log_mutex);
+		log_buffer << _msg;
+	}
+	_cursor->insertText(_msg + "\n");
+	if (auto_scroll)
+		_scroll_bar->setValue(_scroll_bar->maximum());
 }
 
 void BECH_widg::auto_scroll_clicked(int _state)
 {
-	//auto_scroll = (_state != 0);
+	auto_scroll = (_state != 0);
 }
 
 void BECH_widg::log_timer_ontimer()
 {
-	/*QStringList tmp_buffer;
+	QStringList tmp_buffer;
 	{
 		QMutexLocker lock(&log_mutex);
 		tmp_buffer = log_buffer;
@@ -208,7 +263,7 @@ void BECH_widg::log_timer_ontimer()
 	log_file.open(QIODevice::Append);
 	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
 		log_stream << *itr << "\n";
-	log_file.close();*/
+	log_file.close();
 }
 
 void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
@@ -223,7 +278,7 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//	msg_to_log(_msg);
 
 		int tmp_word = words[0].toInt();
-		
+
 		char reset = tmp_word & 0x1F;
 		if (reset != 15)
 		{
@@ -232,7 +287,13 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			//	char kp_ch = 1; мат ком
 			char tmp = tmp_word & 3;
 			if ((tmp_word & 3) > 0)
+			{
+				if (current_OG != OG_ERR)
+				{
+					set_warm_og();
+				}
 				current_OG = OG((tmp_word & 3) - 1);
+			}
 			if ((tmp_word & 0xC) >> 2 > 0)
 				current_FINIK = FINIK(((tmp_word & 0xC) >> 2) - 1);
 			switch (finik_rezh_ch)
@@ -251,18 +312,95 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			current_FINIK = FINIK_1;
 			current_FINIK_REZH = FINIK_REZH_PI8;
 		}
-			write_words();
-			paint_buttons();
-		//	set_new_tm();
+
+		update_graphics();
+		update_time();
+		set_new_tm();
 	}
 }
-void BECH_widg::write_words()
+
+void BECH_widg::set_warm_og()
 {
-		if (mode_names.contains(current_FINIK_REZH))
-			Mode_le->setText(mode_names[current_FINIK_REZH]);
+	if (OG_finish_warm[current_OG] != 0)
+	{
+		qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+		OG_finish_warm[current_OG] = msecs_time;
+		if ((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= standart_tm)
+		{
+			ready_og = true;
+			msg_to_log("Прогрелся ОГ № " + QString::number(current_OG + 1));
+			set_new_tm();
+		}
+		else
+		{
+			ready_og = false;
+			msg_to_log("Прогревание ОГ № " + QString::number(current_OG + 1) + " прервано");
+		}
+	}
 }
-void BECH_widg::paint_buttons()
+
+void BECH_widg::update_time()
 {
+	ready_og = false;
+	warm_og->stop();
+	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+	if (OG_finish_warm[current_OG] == 0) // Если ОГ не нагревался вообще
+	{
+		tm_towarm = standart_tm;
+		OG_start_warm[current_OG] = msecs_time;
+		OG_finish_warm[current_OG] = msecs_time + tm_towarm;
+	}
+	else // Если нагревался
+	{
+		if (OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= standart_tm) // Если ОГ нагрелся полностью
+		{
+			if (msecs_time - OG_finish_warm[current_OG] >= (standart_tm * cooling_cof)) // Если после полного нагрева ОГ прошло достаточно времени, чтобы тот полностью охладился
+			{
+				tm_towarm = standart_tm;
+				OG_start_warm[current_OG] = msecs_time;
+				OG_finish_warm[current_OG] = msecs_time + standart_tm;
+			}
+			else // Если не прошло достаточно времени
+			{
+				//Время охлаждения это текущее время - время остановки ОГ  
+				//Время нулевого прогрева, при ОГ - полностью был нагрет = Текущее время - (стандарт нагрева - время охлаждения / коэфициент охлаждения)
+				OG_start_warm[current_OG] = msecs_time - (standart_tm - (msecs_time - OG_finish_warm[current_OG]) / cooling_cof);
+				OG_finish_warm[current_OG] = OG_start_warm[current_OG] + standart_tm;
+				tm_towarm = OG_finish_warm[current_OG] - msecs_time;
+			}
+		}
+		else // Если нагрелся не полностью
+		{
+			if (msecs_time < OG_finish_warm[current_OG]) // Если после частичного нагрева ОГ прошло достаточно времени, чтобы тот полностью охладился
+			{
+				tm_towarm = standart_tm;
+				OG_start_warm[current_OG] = msecs_time;
+				OG_finish_warm[current_OG] = msecs_time + standart_tm;
+			}
+			else
+			{
+				//Время нулевого прогрева, при ОГ - частично прогрет = Текущее время - ((время конца прогревания - время начала прогревания) - время охлаждения / коэфициент охлаждения) 
+				OG_start_warm[current_OG] = msecs_time - ((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) - (msecs_time - OG_finish_warm[current_OG]) / cooling_cof);
+				OG_finish_warm[current_OG] = OG_start_warm[current_OG] + standart_tm;
+				tm_towarm = OG_finish_warm[current_OG] - msecs_time;
+			}
+		}
+		if (tm_towarm != 0)
+			warm_og->start(tm_towarm);
+	}
+}
+
+void BECH_widg::omni_connect()
+{
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	flag = true;
+	set_new_tm();
+}
+
+void BECH_widg::update_graphics()
+{
+	if (mode_names.contains(current_FINIK_REZH))
+		Mode_le->setText(mode_names[current_FINIK_REZH]);
 	for (int i = 0; i < 3; i++)
 	{
 		OG_pbut[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -287,80 +425,57 @@ void BECH_widg::paint_buttons()
 
 void BECH_widg::set_new_tm()
 {
-	//if ((current_FSMU == FSMU_OFF) || (current_stab == LOW_STAB))
-	//{
-	//	if (ab_state)
-	//	{
-	//		ab_state = false;
-	//		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	//	}
-	//	return;
-	//}
-	//else
-	//{
-	//	if (!ab_state)
-	//	{
-	//		ab_state = true;
-	//		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	//	}
-	//}
-
-	//QVariantList tm_words;
-	//unsigned short f_word = 0;
-	//unsigned short s_word = 0;
-	//if (current_FSVU != FSVU_OFF)
-	//	switch (current_FSVU)
-	//	{
-	//	case FSVU_One:
-	//		f_word += 0x3000;
-	//		break;
-	//	case FSVU_Two:
-	//		f_word += 0x2800;
-	//		break;
-	//	case FSVU_Three:
-	//		f_word += 0x1800;
-	//		break;
-	//	}
-	//switch (current_FSMU)
-	//{
-	//case FSMU_One:
-	//	f_word += 0x600;
-	//	break;
-	//case FSMU_Two:
-	//	f_word += 0x500;
-	//	break;
-	//case FSMU_Three:
-	//	f_word += 0x300;
-	//	break;
-	//}
-	////шта?
-	//if (pi8_fast)
-	//	f_word += 0x40;
-	//if (IM)
-	//	f_word += 0x10;
-	//if (current_mode != ERR)
-	//	f_word += 1 << full_mode(current_mode) - 1;
-	//tm_words.push_back(f_word);
-
-
-	//if (current_lit != 0)
-	//	s_word += 0x100 << current_lit - 1;
-	//s_word += 0x80 << STAB(current_stab) - 1;
-	//if (current_PSP != PSP_OFF)
-	//	s_word += PSP(current_PSP) - 1;
-	//switch (current_antenna)
-	//{
-	//case OHA:
-	//	s_word += 0xC;
-	//	break;
-	//case MHA1Y:
-	//	s_word += 0x14;
-	//	break;
-	//case MHA0Y:
-	//	s_word += 0x18;
-	//	break;
-	//}
-	//tm_words.push_back(s_word);
-	////Отправка 
-	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+	unsigned short _word = 0;
+	QVariantList tmp_list;
+	switch (current_OG)
+	{
+	case OG_1:
+		_word = 1;
+		break;
+	case OG_2:
+		_word = 2;
+		break;
+	case OG_3:
+		_word = 4;
+		break;
+	}
+	switch (current_FINIK)
+	{
+	case FINIK_1:
+		_word += 8;
+		break;
+	case FINIK_2:
+		_word += 0x10;
+		break;
+	case FINIK_3:
+		_word += 0x20;
+		break;
+	}
+	if (current_LKA != LKA_OFF)
+	{
+		if (current_LKA != LKA_2) _word += 0x40;
+	}
+	else msg_to_log("Ошибка ОК ЛКАБ");
+	if (current_KP != KP_OFF)
+	{
+		if (current_KP != KP_2) _word += 0x80;
+	}
+	else msg_to_log("Ошибка ОК КП");
+	///Норма сигналов 1с на выходе 1,2 и норма сигналов 5 МГц на выходе 1-4
+	///Норма сигнала 1с на выходе 1
+	_word += 0x100;
+	///Норма сигнала 1с на выходе 2
+	_word += 0x200;
+	///Норма сигнала 5 МГц на выходе 1
+	_word += 0x400;
+	///Норма сигнала 5 МГц на выходе 2
+	_word += 0x800;
+	///Норма сигнала 5 МГц на выходе 3
+	_word += 0x1000;
+	///Норма сигнала 5 МГц на выходе 4
+	_word += 0x2000;
+	if (current_FINIK != FINIK_ERR) _word += 0x4000;
+	if (ready_og) _word += 0x8000;
+	tmp_list.push_back(_word);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
 }

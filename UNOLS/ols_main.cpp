@@ -19,7 +19,15 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	LogWidget log_widget;
 	log_widget.show();
-	RpcOlsWidget ols_widget;
-	ols_widget.show();
+	RpcOlsWidget* ols_widget;
+	if (argc < 2)
+	{
+		ols_widget = new RpcOlsWidget(0);
+	}
+	else
+	{
+		ols_widget = new RpcOlsWidget(QString(argv[1]).toInt());
+	}
+	ols_widget->show();
 	return app.exec();
 }

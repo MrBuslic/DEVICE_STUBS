@@ -27,6 +27,12 @@ void MKUWidget::make_ku(int ku_n, int length, double u, int line)
 {
 	emit new_ku(ku_n, length, u, line);
 }
+
+void MKUWidget::make_ku_732(int ku_n, int length, double u, int line)
+{
+	emit new_ku_732(ku_n, length, u, line);
+}
+
 void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);

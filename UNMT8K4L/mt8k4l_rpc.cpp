@@ -98,6 +98,8 @@ void RPC_mt8k4l_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mt8k4l new signal " + op_name);
 

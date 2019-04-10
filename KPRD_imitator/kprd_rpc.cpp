@@ -71,7 +71,7 @@ void RPC_kprd_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::sendKPI)) {
 		SRPCSignalClass::Instance().toLog("sendKPI connected");
-		emit connect_signal("sendKPI(QString)", true);
+		emit connect_signal("sendKPI(QVariantList)", true);
 	}
 }
 
@@ -84,7 +84,7 @@ void RPC_kprd_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::sendKPI)) {
 		SRPCSignalClass::Instance().toLog("sendKPI disconnected");
-		//emit connect_signal("sendKPI(QString)", false);
+		//emit connect_signal("sendKPI(QVariantList)", false);
 	}
 }
 
@@ -140,9 +140,9 @@ void RPC_kprd_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("kprd signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
-			if (op_name == "sendKPI(QString)")
+			if (op_name == "sendKPI(QVariantList)")
 			{
-				QString kpiList;
+				QVariantList kpiList;
 				tmp_stream >> kpiList;
 				SRPCSignalClass::Instance().toLog("kprd " + op_name +" call_number "+ QString::number(call_number) + " kpiList = "+RPCSignalClass::QVariantToString(kpiList));
 				emit sendKPI(kpiList);
@@ -164,11 +164,11 @@ void RPC_kprd_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_kprd_SLOT_Object::dataIn(QVariantList maskList, QVariantList dataList)
+void RPC_kprd_SLOT_Object::dataIn(QVariantList dataList, QVariantList maskList)
 {
 	QVariantList tmp_list;
-	tmp_list << QVariant(maskList);
 	tmp_list << QVariant(dataList);
+	tmp_list << QVariant(maskList);
 	SRPCSignalClass::Instance().toLog(QString("kprd dynamic_call dataIn %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("dataIn(QVariantList, QVariantList)", tmp_list);
 	SRPCSignalClass::Instance().toLog("kprd dynamic_call finished dataIn");

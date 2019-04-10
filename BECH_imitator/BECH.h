@@ -11,10 +11,13 @@
 #include <QPushButton>
 #include <QMainWindow>
 #include <QLineEdit>
+#include <QTimer>
+#include <QTime>
 #include <qplaintextedit.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
+#include "../buses_imitator/interrupt_bus_rpc.h"
 
 enum LKA
 {
@@ -93,10 +96,13 @@ private:
 	QPushButton * okBut;
 	QDialog *dlg;
 	bool flag;
+	bool ready_og;
 
-	void paint_buttons();
-	void write_words();
+	void update_graphics();
 	void set_new_tm();
+	void omni_connect();
+	void update_time();
+	void set_warm_og();
 protected:
 	
 public slots:
@@ -104,6 +110,8 @@ public slots:
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
+	void BECH_interrupt_setup();
+	void BECH_interrupt_run();
 private:
 
 	QTextEdit* edit;
@@ -116,6 +124,19 @@ private:
 	QTimer log_timer;
 	QStringList log_buffer;
 	QMutex log_mutex;
+	QTimer *inter_tmr;
+	QTimer *warm_og;
+	QTimer *AbOn_tmr;
+
+	int standart_tm = 600000;
+	int tm_towarm;
+	int cooling_cof = 4;
+	int n;
+	short chan;
+	double u;
+	double t;
+
+
 	void msg_to_log(const QString& _msg);
 
 	RPC_omnibus_SLOT_Thread slot_thr;
@@ -126,8 +147,11 @@ private:
 
 
 	QMap<int, QString> mode_names;
-	QMap<int, FINIK> finik_list;
-	QMap<int, FINIK_REZH> finik_rezh_list;
+	QMap<OG, qint64> OG_start_warm;
+	QMap<OG, qint64> OG_finish_warm;
+
+	RPC_interrupt_bus_SLOT_Thread interrupt_slot_thr;
+	RPC_interrupt_bus_SIGNAL_Thread interrupt_signal_thr;
 };
 
 #endif // BECH_H

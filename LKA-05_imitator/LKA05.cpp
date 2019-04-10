@@ -20,21 +20,15 @@ LKA05_widg::LKA05_widg()
 	{
 		mvku_modules << MV_MODULE(2, i);
 		mvmk_modules << MV_MODULE(3, i);
-//		mpvn_modules << MV_MODULE(5, 0);
 	}
-//	for (int i = 0; i < 1; i++)
-//	{
 		mpvn_modules << MV_MODULE(5, 0);
-//	}
 	widg = new QWidget(this);
 	this->setFixedSize(572, 200);
 	setWindowTitle("ЛКА-05");
 	MU1 = new QPushButton("МУ 1", this);
 	MU1 -> setFixedSize(180,50);
-	MU1->setProperty("type", 1);
 	MU2 = new QPushButton("МУ 2", this);
 	MU2->setFixedSize(180, 50);
-	MU2->setProperty("type", 2);
 	main_MPVN = new QPushButton("Основной", this);
 //	main_MPBN->setFixedSize(300, 100);
 	reserve_MPVN = new QPushButton("Резервный", this);
@@ -159,8 +153,6 @@ LKA05_widg::LKA05_widg()
 	adr = 4;
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
-	connect(MU1, &QPushButton::clicked, this, &LKA05_widg::choose_dialog);
-	connect(MU2, &QPushButton::clicked, this, &LKA05_widg::choose_dialog);
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
@@ -168,9 +160,6 @@ LKA05_widg::LKA05_widg()
 	connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
 	connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
 
-//	choose_dialog();
-	//(1040 2040 2140 2240  3040 3140 3240) в начале все модули имеют основной канал и му1
-	//нужно обработать входящие (первые 4 знака) для таблицы 6, для какого модуля пришло слово
 	
 	paint_buttons();
 	set_new_tm();
@@ -179,36 +168,6 @@ LKA05_widg::LKA05_widg()
 LKA05_widg::~LKA05_widg()
 {
 
-}
-
-void LKA05_widg::choose_dialog()
-{
-	
-//	emit btnClicked(ind);
-//	QLabel *label_1;
-//	QCheckBox *check_1;
-	dlg = new QDialog(this, /*Qt::WindowSystemMenuHint |*/ Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
-//	QPushButton * okBut;
-	QPushButton *clBut;
-	//	okBut.setFlat(true);
-	MU1_set(words);
-	
-
-	QVBoxLayout* v_lay = new QVBoxLayout(dlg);
-	okBut = new QPushButton("ok", dlg);
-	clBut = new QPushButton("close", dlg);
-	QHBoxLayout* h_lay = new QHBoxLayout;
-	h_lay->addWidget(CheckButtonsBox);
-	v_lay->addLayout(h_lay);
-	QHBoxLayout* h_lay2 = new QHBoxLayout;
-	h_lay2->addWidget(okBut, 0, Qt::AlignLeft);
-	h_lay2->addWidget(clBut, 0, Qt::AlignRight);
-	v_lay->addLayout(h_lay2);
-//	connect(okBut, SIGNAL(clicked()), dlg, SLOT(save_choose_set()));
-	connect(clBut, SIGNAL(clicked()), dlg, SLOT(reject()));
-	connect(okBut, SIGNAL(clicked()), dlg, SLOT(accept()));
-	connect(okBut, &QPushButton::clicked, this, &LKA05_widg::save_choose_set);
-	dlg->show();
 }
 
 QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
@@ -222,60 +181,6 @@ QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
 	return cb;
 }
 
-
-void LKA05_widg::MU1_set(QVariantList words)
-{
-	QVBoxLayout *vbox = new QVBoxLayout;
-	CheckButtonsBox = new QGroupBox(dlg);
-	CheckButtonsBox->setTitle("Settings:");
-	CheckButtonsBox->setFlat(true);
-//	set_list.clear();
-	int ind = static_cast<QPushButton*>(sender())->property("type").toInt();
-	if (ind == 1)
-	{
-		if (flag == true)
-		{
-			flag = false;
-			add_set("Неисправн №1", "1");
-	//		words[0] = 0x1080;
-//			QVBoxLayout *vbox = new QVBoxLayout;
-			foreach(QCheckBox* cb, set_list)
-				vbox->addWidget(cb);
-		}
-	}
-	if (ind == 2)
-	{
-		add_set("Неисправн №2", "2");
-		add_set("Неисправн №3", "3");
-//		QVBoxLayout *vbox = new QVBoxLayout;
-		foreach(QCheckBox* cb, set_list)
-			vbox->addWidget(cb);
-	}
-
-//	QVBoxLayout *vbox = new QVBoxLayout;
-//	foreach(QCheckBox* cb, set_list)
-//		vbox->addWidget(cb);
-
-	vbox->addStretch(1);
-	CheckButtonsBox->setLayout(vbox);
-//	test(MKO, adr, words);
-
-}
-
-void LKA05_widg::save_choose_set()
-{
-	foreach(QCheckBox* cb, set_list)
-		{
-			if (cb->isChecked())
-			{
-				words[0] = 0x1080;
-			}
-		}
-
-	//test(MKO, adr, words);
-		
-	
-}
 
 void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
@@ -424,6 +329,10 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				}
 			}
 			new_data_mv(tmp_cwd.subadr);
+		}
+		if (tmp_cwd.subadr == 30)
+		{
+			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 		}
 		if (tmp_cwd.subadr == 26) 
 		{

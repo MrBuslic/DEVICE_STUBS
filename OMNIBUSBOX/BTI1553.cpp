@@ -13,7 +13,7 @@
 #include "omnibus_rpc.h"
 #include "instruments.h"
 #include <QApplication>
-
+#include "rpc_ports.h"
 //структура командного слова сообщения МКО
 //
 union MkoWord
@@ -78,14 +78,14 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	case DLL_PROCESS_ATTACH: // Подключение DLL
 		if (!slot_thr.isRunning())
 		{
-			slot_thr.set_connection_params(ip_str, 50001);
+			slot_thr.set_connection_params(ip_str, OMNIBUS_SLOT);
 			slot_thr.start();
 		}
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		if (!signal_thr.isRunning())
 		{
-			signal_thr.set_connection_params(ip_str, 50002);
+			signal_thr.set_connection_params(ip_str, OMNIBUS_SIGNAL);
 			signal_thr.start();
 		}
 		signal_thr.wait_connected(3);

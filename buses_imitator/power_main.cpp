@@ -1,4 +1,4 @@
-#include "buses.h"
+#include "power_bus.h"
 #include <QApplication>
 #include <QTextCodec>
 
@@ -19,8 +19,8 @@ int main(int argc, char **argv)
 //	LogWidget log_w;
 //	log_w.show();
 
-	BusesWidget buses_widget;
-	buses_widget.show();
+	PowerWidget power_widget;
+	power_widget.show();
 
     return app.exec();
 }

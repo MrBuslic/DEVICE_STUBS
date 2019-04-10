@@ -56,8 +56,8 @@ KPRD_imitator::KPRD_imitator()
 	dataListTest << 0xFFFFFFFFFFBFF << 0xFFFFFFFFFFBFF << 0xFFFFFFFFFFBFF << 0xFFFFFFFFFF9FF << 0xFFFFFFFFFF9FF << 0xFFFFFFFFFFBFF;
 	dataListTest << 0xFFFFFFFF9FFFF << 0xFFFFFFFF9FFFF << 0xFFFFFFFFBFFFF << 0xFFFFFFFFBFFFF << 0xFFFFFFFFBFFFF << 0xFFFFFFFFBFFFF;
 
-	connect(this, &KPRD_imitator::test, this, &KPRD_imitator::dataIn);
-	emit test(maskListTest, dataListTest);
+	//connect(this, &KPRD_imitator::test, this, &KPRD_imitator::dataIn);
+	//emit test(maskListTest, dataListTest);
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = KPRD_SLOT;
@@ -72,10 +72,10 @@ KPRD_imitator::KPRD_imitator()
 	rpc_signal_srv->start();
 
 
-	ols_slot_thr.set_connection_params("127.0.0.1", OLS_SLOT+1);
+	ols_slot_thr.set_connection_params("127.0.0.1", OLS_SLOT);
 	ols_slot_thr.start();
 
-	ols_signal_thr.set_connection_params("127.0.0.1", OLS_SIGNAL+1);
+	ols_signal_thr.set_connection_params("127.0.0.1", OLS_SIGNAL);
 	ols_signal_thr.start();
 	
 	if (!ols_slot_thr.wait_connected(3) || !ols_signal_thr.wait_connected(3))
@@ -84,6 +84,8 @@ KPRD_imitator::KPRD_imitator()
 		//this->deleteLater();
 		return;
 	}
+	
+	connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr.get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPRD_imitator::dataIn);
 
 	kpi_slot_thr.set_connection_params("127.0.0.1", KPI_SLOT);
 	kpi_slot_thr.start();
@@ -116,21 +118,27 @@ KPRD_imitator::~KPRD_imitator()
 
 }
 
-void KPRD_imitator::set_antenna_label(qulonglong val)
+QString KPRD_imitator::set_antenna_label(qulonglong val)
 {
+	QString res = "";
 	switch (val)
 	{
 		case 14: antenna_label->setText("Антенна: МНА2+Y");
+			res = "МНА2+Y";
 			break;
 		case 13: antenna_label->setText("Антенна: МНА1-Y");
+			res = "МНА1-Y";
 			break;
-		case 11: antenna_label->setText("Антенна: МНА2+Y");
+		case 11: antenna_label->setText("Антенна: МНА1+Y");
+			res = "МНА1+Y";
 			break;
 		case 7: antenna_label->setText("Антенна: МНА2-Y");
+			res = "МНА2-Y";
 			break;
 	default: antenna_label->setText("Антенна: ");
 		break;
 	}
+	return res;
 }
 
 bool KPRD_imitator::isset(qulonglong x, qulonglong n)
@@ -178,47 +186,56 @@ bool KPRD_imitator::isset(qulonglong x, qulonglong n)
 	MNA2_MINUS_U    = 51
 */
 
-void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
+void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 {
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
 	KPIString = "";
 	QVariantList kpi_list;
-	for (auto const& i : boost::combine(maskList, dataList)) // range based
+
+	for (auto const& i : boost::combine(dataList, maskList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
-		boost::tie(MASKVar, DATAVar) = i;
+		boost::tie(DATAVar, MASKVar) = i;
 		qulonglong MASK = MASKVar.toULongLong();
 		qulonglong DATA = DATAVar.toULongLong();
 		qulonglong res = MASK & DATA;
-
-		if (isset(res, 24))
-		{
-			kpi_list << FREQ_P_code;
-			KPIString += "P";
-		}
-		if (isset(res, 25))
-		{
-			kpi_list << FREQ_0_code;
-			KPIString += "0";
-		}
-		if (isset(res, 26))
-		{
-			kpi_list << FREQ_1_code;
-			KPIString += "1";
-		}
-		if (isset(res, 27))
-		{
-			kpi_list << 0;
-			KPIString += "Х";
-		}
 
 		auto val1 = (res << 26 >> 58);
 		auto val2 = (res << 20 >> 58);
 		qulonglong attenuation_val = val1 + val2;
 		attenuation_label->setText("Ослабление: " + QString::number(attenuation_val));
 		qulonglong antenna_name = res << 12 >> 60;
-		set_antenna_label(antenna_name);
+		QString antenna = set_antenna_label(antenna_name);
+
+		QVariantList KPI;
+
+		if (!isset(res, 24))
+		{
+			//kpi_list << FREQ_P_code;
+			KPIString += "P";
+			KPI << FREQ_P_code << antenna << attenuation_val;
+		}
+		if (!isset(res, 25))
+		{
+			//kpi_list << FREQ_0_code;
+			KPIString += "0";
+			KPI << FREQ_0_code << antenna << attenuation_val;
+		}
+		if (!isset(res, 26))
+		{
+			//kpi_list << FREQ_1_code;
+			KPIString += "1";
+			KPI << FREQ_1_code << antenna << attenuation_val;
+		}
+		if (!isset(res, 27))
+		{
+			//kpi_list << 0;
+			KPIString += "Х";
+			KPI << 0 << attenuation_val << antenna;
+		}
+
+		kpi_list.push_back(KPI);
 
 		if (isset(MASK, 2)) // FREQ_P
 		{
@@ -234,13 +251,11 @@ void KPRD_imitator::dataIn(QVariantList maskList, QVariantList dataList)
 				*FREQ_ENABLE = false;	// Генератор выбран (настраивается)
 			}
 
-			if (isset(res, 2))	
+			if (isset(res, 2))
 				*FREQ_ENABLE = true;	// выключить настройку генератора
 
 			if (!isset(res, 2))	// FREQ_1_ENABLE
 			{
-				//*FREQ_ENABLE = true;
-
 				if (isset(res, 0))
 				{
 					*FREQ_CLOCK = isset(res, 0);

@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -266,13 +267,20 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("new_message(QVariant, int, int, int, QVariantList, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_message  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << dt;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 dt =  %1").arg(RPCSignalClass::QVariantToString(dt)).arg(call_number));
 		tmp_stream << mko;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 mko =  %1").arg(RPCSignalClass::QVariantToString(mko)).arg(call_number));
 		tmp_stream << line;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
 		tmp_stream << cwd;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 cwd =  %1").arg(RPCSignalClass::QVariantToString(cwd)).arg(call_number));
 		tmp_stream << words;
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 words =  %1").arg(RPCSignalClass::QVariantToString(words)).arg(call_number));
 		tmp_stream << os;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_message").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("new_message  call_number %2 os =  %1").arg(RPCSignalClass::QVariantToString(os)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -292,8 +300,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("message_to_log(QString)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal message_to_log  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << _msg;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal message_to_log").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("message_to_log  call_number %2 _msg =  %1").arg(RPCSignalClass::QVariantToString(_msg)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
