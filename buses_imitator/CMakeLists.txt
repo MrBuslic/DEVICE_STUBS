@@ -93,4 +93,18 @@ if(WIN32)
 endif()
 
 
+SET(power_RPC_SOURCES ${PROJECT_SOURCE_DIR}/power_bus_socket_rpc.h ${PROJECT_SOURCE_DIR}/power_bus_socket_rpc.cpp)
 
+add_executable(power_bus ${MY_WIN_FLAG} power_bus.h power_bus.cpp power_main.cpp ${power_RPC_SOURCES})
+target_link_libraries (power_bus ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
+
+ADD_CUSTOM_COMMAND(TARGET power_bus
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/power_bus.h ${PROJECT_SOURCE_DIR} power_bus
+)
+
+if(WIN32)
+  qt5_use_modules(power_bus Core Widgets Network Gui)
+ # SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+endif()

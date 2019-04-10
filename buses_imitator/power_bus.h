@@ -1,43 +1,45 @@
-#ifndef MBK02_H
-#define MBK02_H
+#ifndef POWER_BUS_H
+#define POWER_BUS_H
 
-#include <QDialog>
-#include <QMap>
-#include <QXmlStreamReader>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGroupBox>
-#include <QPushButton>
-#include <QMainWindow>
-#include <QLineEdit>
-#include <qplaintextedit.h>
+#include <QWidget>
+#include <qmap.h>
 
-class BusesWidget : public QWidget
+enum POWER_BUSES
+{
+	NK = 0,
+	K1,
+	K2
+};
+
+class PowerWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	//	explicit LKA05_widg(QWidget *parent = 0);
-	BusesWidget(QWidget *parent = 0);
-	//~MBK02_widg();
-
-
+	PowerWidget(QWidget *parent = 0);
 
 public slots:
-	void make_interrupt(int _n, short _chan, double _u, double _t);
-	void make_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void make_ku(int ku_n, int length, double u, int line);
-	void make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
-	void make_KPI(QVariantList KPI_list);
+	void set_u(int bus, double volt);
+	void get_i(int bus, double& curr);
 
+	void set_i(int bus, QString name, double curr);
 signals:
-	void new_interrupt(int _n, short _chan, double _u, double _t);
-	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_ku(int ku_n, int length, double u, int line);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
-	void new_KPI(QVariantList KPI_list);
+	void u_on_nk(double volt);
+	void u_on_k1(double volt);
+	void u_on_k2(double volt);
+
+private:
+	double nk_volt;
+	double k1_volt;
+	double k2_volt;
+	double nk_curr;
+	double k1_curr;
+	double k2_curr;
+
+	QMap<QString, double> nk_curr_map;
+	QMap<QString, double> k1_curr_map;
+	QMap<QString, double> k2_curr_map;
 };
 
-#endif // MBK02_H
+#endif // POWER_BUS_H
 
