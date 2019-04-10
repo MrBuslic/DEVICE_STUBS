@@ -106,9 +106,11 @@ public:
 	QVariant ads_timer_ontimer(QVariantList& _values);
 	QVariant new_ku(QVariantList& _values);
 	QVariant new_mk(QVariantList& _values);
+	QVariant ads128_conf_analog(QVariantList& _values);
 	QVariant ads128_start(QVariantList& _values);
 	QVariant ads128_read_data(QVariantList& _values);
 	QVariant ads128_stop(QVariantList& _values);
+	QVariant ads128_analog_q(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

@@ -121,6 +121,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		ViReal64 level_0,
 		ViReal64 level_1)
 	{
+		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_conf_analog(group,level_0,level_1);
 		return 0;
 	}
 
@@ -129,6 +130,13 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		ViPReal64 level_0,
 		ViPReal64 level_1)
 	{
+		uint group_;
+		double lev0;
+		double lev1;
+		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_analog_q(group_, lev0, lev1);
+		*level_0 = lev0;
+		*level_1 = lev1;
+		group = group_;
 		return 0;
 	}
 

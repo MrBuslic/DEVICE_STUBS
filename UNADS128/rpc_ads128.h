@@ -36,10 +36,11 @@ public slots:
 
 	void new_ku(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
-
+	int ads128_conf_analog(uint group, double level_0, double level_1);
 	int ads128_start();
 	int ads128_read_data(QVariantList& thisbuf, QVariantList& firstbuf);
 	int ads128_stop();
+	int ads128_analog_q(uint group_, double& lev0, double& lev1);
 private:
 	void add_signal(int ads_chan, double _u);
 
@@ -64,7 +65,6 @@ private:
 
 	bool running;
 
-	void form_ads(int chan, double length, double u);
 	QVariantList state_buffer; 
 	QVariantList buffer;
 
@@ -73,8 +73,8 @@ private:
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
-	double step_1 = 5.0;
-	double step_2= 15.0;
+	double step_1;
+	double step_2;
 };
 
 #endif

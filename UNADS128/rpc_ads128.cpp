@@ -48,7 +48,7 @@ RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  
 
 	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku");
 		this->deleteLater();
 		return;
 	}
@@ -72,8 +72,20 @@ RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  
 	running = false;
 }
 
+
+
 int RpcADS128Widget::ads128_read_data(QVariantList& thisbuf, QVariantList& firstbuf)
-{
+{   
+	QString _msg = QString("%1 Чтение данных").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+	{
+		QMutexLocker lock(&log_mutex);
+		log_buffer << _msg;
+	}
+	_cursor->insertText(_msg + "\n");
+	if (auto_scroll)
+		_scroll_bar->setValue(_scroll_bar->maximum());
+
+
 	QMutexLocker lock(&ads_mutex);
 
 	thisbuf = state_buffer;
@@ -89,12 +101,30 @@ int RpcADS128Widget::ads128_start()
 {
 	QString _msg;
 		_msg = QString("%1 Запускаю процесс измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+		{
+		QMutexLocker lock(&log_mutex);
+			log_buffer << _msg;
+		}
 		
 	running = true;
 
 	_cursor->insertText(_msg + "\n");
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
+	return 0;
+}
+
+int RpcADS128Widget::ads128_conf_analog(uint group, double level_0, double level_1)
+{
+	step_1 = level_0;
+	step_2 = level_1;
+	return 0;
+}
+
+int RpcADS128Widget::ads128_analog_q(uint group_, double& lev0, double& lev1)
+{
+	lev0 = 5;
+	lev1 = 15;
 	return 0;
 }
 
@@ -129,7 +159,6 @@ void RpcADS128Widget::log_timer_ontimer()
 		log_stream << *itr << "\n";
 	log_file.close();
 }
-
 void RpcADS128Widget::add_signal(int ads_chan, double _u)
 {
 	unsigned char new_state = 0;
@@ -143,15 +172,12 @@ void RpcADS128Widget::add_signal(int ads_chan, double _u)
 
 	unsigned short old_group = state_buffer[ads_group_n].toInt();
 
-	old_group = old_group | (new_state << ads_chan_group*2);
+	old_group = ( old_group & ( ~ (3 << (ads_chan_group * 2)))) | (new_state << (ads_chan_group*2));
 	state_buffer[ads_group_n] = old_group;
 }
 
 void RpcADS128Widget::new_ku(int ku_n, int length, double u, int line)
 {
-	
-
-
 	int ads_chan_n = ku_n;
 	if (line & 1)
 		add_signal(ads_chan_n, u);

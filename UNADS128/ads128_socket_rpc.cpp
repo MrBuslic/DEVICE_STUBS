@@ -81,9 +81,11 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["ads_timer_ontimer()"] = &Socket_RPC_SLOT_Object::ads_timer_ontimer;
 		operators_map["new_ku(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku;
 		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_mk;
+		operators_map["ads128_conf_analog(uint, double, double)"] = &Socket_RPC_SLOT_Object::ads128_conf_analog;
 		operators_map["ads128_start()"] = &Socket_RPC_SLOT_Object::ads128_start;
 		operators_map["ads128_read_data(QVariantList&, QVariantList&)"] = &Socket_RPC_SLOT_Object::ads128_read_data;
 		operators_map["ads128_stop()"] = &Socket_RPC_SLOT_Object::ads128_stop;
+		operators_map["ads128_analog_q(uint, double&, double&)"] = &Socket_RPC_SLOT_Object::ads128_analog_q;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -363,6 +365,27 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
+	QVariant Socket_RPC_SLOT_Object::ads128_conf_analog(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint group = _values.at(0).value<uint>();
+			double level_0 = _values.at(1).value<double>();
+			double level_1 = _values.at(2).value<double>();
+			int res = app->ads128_conf_analog(group, level_0, level_1);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
 	QVariant Socket_RPC_SLOT_Object::ads128_start(QVariantList& _values)
 	{
 		try
@@ -410,6 +433,32 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		try
 		{
 			int res = app->ads128_stop();
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::ads128_analog_q(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint group_ = _values.at(0).value<uint>();
+			double lev0 = _values.at(1).value<double>();
+			double lev1 = _values.at(2).value<double>();
+			int res = app->ads128_analog_q(group_, lev0, lev1);
+			_values[1] = lev0;
+			SRPCSignalClass::Instance().toLog(QString("%1 lev0 = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			_values[2] = lev1;
+			SRPCSignalClass::Instance().toLog(QString("%1 lev1 = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[2])));
+			with_return = true;
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}

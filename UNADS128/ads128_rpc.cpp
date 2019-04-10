@@ -160,6 +160,20 @@ void RPC_ads128_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length
 	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("ads128 dynamic_call finished new_mk");
 }
+int RPC_ads128_SLOT_Object::ads128_conf_analog(uint group, double level_0, double level_1)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(group);
+	tmp_list << QVariant(level_0);
+	tmp_list << QVariant(level_1);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads128_conf_analog %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ads128_conf_analog(uint, double, double)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_conf_analog %1").arg(tmp_ret_params));
+	return res.toInt();
+}
 int RPC_ads128_SLOT_Object::ads128_start()
 {
 	if(!connected) return 1;
@@ -197,6 +211,24 @@ int RPC_ads128_SLOT_Object::ads128_stop()
 	dynamic_call("ads128_stop()", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_stop %1").arg(tmp_ret_params));
+	return res.toInt();
+}
+int RPC_ads128_SLOT_Object::ads128_analog_q(uint group_, double& lev0, double& lev1)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(group_);
+	tmp_list << QVariant(lev0);
+	tmp_list << QVariant(lev1);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call ads128_analog_q %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ads128_analog_q(uint, double&, double&)", tmp_list);
+	lev0 = tmp_list.at(1).toDouble();
+	tmp_ret_params += " lev0="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	lev1 = tmp_list.at(2).toDouble();
+	tmp_ret_params += " lev1="+RPCSignalClass::QVariantToString(tmp_list.at(2));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("ads128 dynamic_call finished ads128_analog_q %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 
