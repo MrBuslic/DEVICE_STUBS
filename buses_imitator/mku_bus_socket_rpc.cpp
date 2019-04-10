@@ -77,6 +77,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["make_ku(int, int, double, int)"] = &Socket_RPC_SLOT_Object::make_ku;
+		operators_map["make_ku_732(int, int, double, int)"] = &Socket_RPC_SLOT_Object::make_ku_732;
 		operators_map["make_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::make_mk;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -116,6 +117,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
+		disconnect(app, SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
 		disconnect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(MKUWidget* _app)
@@ -123,6 +125,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		app = _app;
 		connect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)), Qt::DirectConnection);
 		data_map.insert("new_ku(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)), Qt::DirectConnection);
+		data_map.insert("new_ku_732(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)), Qt::DirectConnection);
 		data_map.insert("new_mk(int, int, int, int, double, double, int, int, int)", std::shared_ptr<SignalData>(new SignalData()));
 
@@ -283,6 +287,35 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku finished").arg(objectName()));
 	}
+	void Socket_RPC_SIGNAL_Object::new_ku_732(int ku_n, int length, double u, int line)
+	{
+		auto& descriptor = *data_map["new_ku_732(int, int, double, int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_ku_732(int, int, double, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_ku_732  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << ku_n;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_732  call_number %2 ku_n =  %1").arg(RPCSignalClass::QVariantToString(ku_n)).arg(call_number));
+		tmp_stream << length;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_732  call_number %2 length =  %1").arg(RPCSignalClass::QVariantToString(length)).arg(call_number));
+		tmp_stream << u;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_732  call_number %2 u =  %1").arg(RPCSignalClass::QVariantToString(u)).arg(call_number));
+		tmp_stream << line;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_732  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku_732 sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku_732 finished").arg(objectName()));
+	}
 	void Socket_RPC_SIGNAL_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 	{
 		auto& descriptor = *data_map["new_mk(int, int, int, int, double, double, int, int, int)"].get();
@@ -344,6 +377,27 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			double u = _values.at(2).value<double>();
 			int line = _values.at(3).value<int>();
 			app->make_ku(ku_n, length, u, line);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::make_ku_732(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int ku_n = _values.at(0).value<int>();
+			int length = _values.at(1).value<int>();
+			double u = _values.at(2).value<double>();
+			int line = _values.at(3).value<int>();
+			app->make_ku_732(ku_n, length, u, line);
 			return 0;
 		}
 		catch(const std::exception &)

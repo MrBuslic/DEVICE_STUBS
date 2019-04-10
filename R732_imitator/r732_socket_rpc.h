@@ -36,7 +36,6 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void new_ku(int ku_n, int length, double u, int line);
-	void toLog(QString& Message);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();

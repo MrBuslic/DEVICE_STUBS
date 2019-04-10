@@ -68,11 +68,6 @@ void RPC_r732_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		SRPCSignalClass::Instance().toLog("new_ku connected");
 		emit connect_signal("new_ku(int, int, double, int)", true);
 	}
-	else
-	if (signal == QMetaMethod::fromSignal(&RPC_r732_SIGNAL_Object::toLog)) {
-		SRPCSignalClass::Instance().toLog("toLog connected");
-		emit connect_signal("toLog(QString&)", true);
-	}
 }
 
 void RPC_r732_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -80,11 +75,6 @@ void RPC_r732_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_r732_SIGNAL_Object::new_ku)) {
 		SRPCSignalClass::Instance().toLog("new_ku disconnected");
 		//emit connect_signal("new_ku(int, int, double, int)", false);
-	}
-	else
-	if (signal == QMetaMethod::fromSignal(&RPC_r732_SIGNAL_Object::toLog)) {
-		SRPCSignalClass::Instance().toLog("toLog disconnected");
-		//emit connect_signal("toLog(QString&)", false);
 	}
 }
 
@@ -139,25 +129,6 @@ void RPC_r732_SIGNAL_Object::read_data()
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("r732 signal finished " + op_name +" call_number "+ QString::number(call_number));
-			}
-			if (op_name == "toLog(QString&)")
-			{
-				QString Message;
-				tmp_stream >> Message;
-				SRPCSignalClass::Instance().toLog("r732 " + op_name +" call_number "+ QString::number(call_number) + " Message = "+RPCSignalClass::QVariantToString(Message));
-				emit toLog(Message);
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QVariantList return_list;
-				return_list << QVariant(Message);
-				tmp_stream2 << return_list;
 				QByteArray tmp_arr3;
 				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
 				tmp_stream3 << tmp_arr2.size();
