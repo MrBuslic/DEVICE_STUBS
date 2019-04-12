@@ -116,6 +116,8 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mbk04 new signal " + op_name);
 
@@ -123,7 +125,7 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 			{
 				int nw;
 				tmp_stream >> nw;
-				SRPCSignalClass::Instance().toLog("mbk04 " + op_name +" nw = "+RPCSignalClass::QVariantToString(nw));
+				SRPCSignalClass::Instance().toLog("mbk04 " + op_name +" call_number "+ QString::number(call_number) + " nw = "+RPCSignalClass::QVariantToString(nw));
 				emit new_tm(nw);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -133,7 +135,7 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 			if (op_name == "state_changed_signal()")
 			{
@@ -146,7 +148,7 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}

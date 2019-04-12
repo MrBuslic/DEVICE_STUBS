@@ -273,8 +273,7 @@ void MainWidget::new_SCHBK(QVariantList words)
 		
 			schbk_arr[2*i] = words.at(i).toInt() & 0xF;
 	}
-	data_includer.includeSCHBK(frame.get(), schbk_arr.get(), 32);
-	emit send_FRAME(frame);
+	data_includer.includeSCHBK((unsigned char*)(frame.data()), schbk_arr.get(), 32);
 }
 
 void MainWidget::clean_frame_data(QString REZH)
@@ -288,13 +287,14 @@ void MainWidget::clean_frame_data(QString REZH)
 	QStringList tmp_list;
 	QTextStream in_frame(&frame_file);
 	tmp_list = in_frame.readAll().split("\n");
-	frame = BYTE_ARRAY(new BYTE[tmp_list.count()]);
+	clean_frame = QByteArray();
+	clean_frame.resize(tmp_list.count());
 	i = 0;
 	for (QStringList::iterator itr = tmp_list.begin(); itr != tmp_list.end(); itr++, i++)
 	{
 		frame[i] = itr->toInt();
 	}
 	frame_file.close();
-	
+	frame = clean_frame;
 }
 

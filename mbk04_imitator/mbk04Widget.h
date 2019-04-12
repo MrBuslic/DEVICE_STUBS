@@ -55,7 +55,8 @@ private:
 	REZH_FRAME current_rezh;
 	QByteArray *buffer1, *buffer2;
 	FrameDataIncluder data_includer;
-	BYTE_ARRAY frame;
+	QByteArray frame;
+	QByteArray clean_frame;
 private:
 	void new_SCHBK(QVariantList words);
 	void clean_frame_data(QString REZH);
