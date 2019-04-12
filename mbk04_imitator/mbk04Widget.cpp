@@ -4,6 +4,7 @@
 //#include "FrameDBController.hpp"
 //#include "instruments.h"
 #include "mbk04_socket_rpc.h"
+#include "rpc_ports.h"
 //структура командного слова сообщения МКО
 //
 union MKOWord
@@ -78,8 +79,8 @@ MainWidget::MainWidget()
 	current_rezh = REZH_FRAME::OFF_REZH;
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 50051;
-	int signal_port = 50052;
+	int slot_port = MBK04_SLOT;
+	int signal_port = MBK04_SIGNAL;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
