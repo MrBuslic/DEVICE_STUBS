@@ -108,3 +108,19 @@ if(WIN32)
   qt5_use_modules(power_bus Core Widgets Network Gui)
  # SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
+
+SET(frame_RPC_SOURCES ${PROJECT_SOURCE_DIR}/frame_bus_socket_rpc.h ${PROJECT_SOURCE_DIR}/frame_bus_socket_rpc.cpp)
+
+add_executable(frame_bus ${MY_WIN_FLAG} frame_bus.h frame_bus.cpp frame_main.cpp ${frame_RPC_SOURCES})
+target_link_libraries (frame_bus ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
+
+ADD_CUSTOM_COMMAND(TARGET frame_bus
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/frame_bus.h ${PROJECT_SOURCE_DIR} frame_bus
+)
+
+if(WIN32)
+  qt5_use_modules(frame_bus Core Widgets Network Gui)
+ # SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+endif()
