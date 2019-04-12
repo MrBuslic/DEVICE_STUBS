@@ -17,7 +17,9 @@ class PowerWidget : public QWidget
 
 public:
 	PowerWidget(QWidget *parent = 0);
-
+private:
+	QTimer *tmp_time;
+	void tmp_funk();
 public slots:
 	void set_u(int bus, double volt);
 	void get_i(int bus, double& curr);

@@ -21,19 +21,86 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
+	tmp_time = new QTimer(this);
+	connect(tmp_time, &QTimer::timeout, this, &PowerWidget::tmp_funk);
+	tmp_time->start(30000);
+	tmp_time->setSingleShot(true);
 }
 
-void PowerWidget::set_u(int bus, double volt)
-{
+//Õ  - Ã¡ -07, Ã¡ -04, Ã¡ -02, ¡”œ
+// 1 - À ¿-05, ¿—Õ, ¡›◊, ÷¡ 
+// 2 - Ã–-733, Ã–-732
 
+void PowerWidget::tmp_funk()
+{
+	set_u(1, 27.0);
+	set_u(0, 31.0);
+}
+
+void PowerWidget::set_u(int bus, double volt) //
+{
+	switch (bus)
+	{
+	case 0:
+		nk_volt = volt;
+		emit u_on_nk(volt);
+		break;
+	case 1:
+		k1_volt = volt;
+		emit u_on_k1(volt);
+		break;
+	case 2:
+		k2_volt = volt;
+		emit u_on_k2(volt);
+		break;
+	}
 }
 
 void PowerWidget::get_i(int bus, double& curr)
 {
-
+	double tmp_curr = 0;
+	switch (bus)
+	{
+	case 0:
+		for (QMap<QString, double>::iterator itr = nk_curr_map.begin(); itr != nk_curr_map.end(); itr++)
+		{
+			tmp_curr += itr.value();
+		}
+		curr = tmp_curr;
+		nk_curr = tmp_curr;
+		break;
+	case 1:
+		for (QMap<QString, double>::iterator itr = k1_curr_map.begin(); itr != k1_curr_map.end(); itr++)
+		{
+			tmp_curr += itr.value();
+		}
+		curr = tmp_curr;
+		k1_curr = tmp_curr;
+		break;
+	case 2:
+		for (QMap<QString, double>::iterator itr = k2_curr_map.begin(); itr != k2_curr_map.end(); itr++)
+		{
+			tmp_curr += itr.value();
+		}
+		curr = tmp_curr;
+		k2_curr = tmp_curr;
+		break;
+	}
 }
 
 void PowerWidget::set_i(int bus, QString name, double curr)
 {
+	switch (bus)
+	{
+	case 0:
+		nk_curr_map[name] = curr;
+		break;
+	case 1:
+		k1_curr_map[name] = curr;
+		break;
+	case 2:
+		k2_curr_map[name] = curr;
+		break;
 
+	}
 }

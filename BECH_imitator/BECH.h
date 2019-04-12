@@ -18,6 +18,7 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/interrupt_bus_rpc.h"
+#include "../buses_imitator/power_bus_rpc.h"
 
 enum LKA
 {
@@ -57,18 +58,17 @@ class BECH_widg : public QWidget
 
 public:
 	BECH_widg(QWidget *parent = 0);
-	//~MBK07_widg();
+	~BECH_widg();
 	
-
 private:
 	QWidget* widg;
 	/// -- √лавное окно;
 	QMainWindow* main_widg;
 	//’ранимые текущие
 
-	OG current_OG = OG_1;
-	FINIK current_FINIK = FINIK_1;
-	FINIK_REZH current_FINIK_REZH = FINIK_REZH_PI8;
+	OG current_OG = OG_ERR;
+	FINIK current_FINIK = FINIK_ERR;
+	FINIK_REZH current_FINIK_REZH = FINIK_REZH_ERR;
 	KP current_KP = KP_OFF;
 	LKA current_LKA = LKA_OFF;
 
@@ -103,7 +103,11 @@ private:
 	void omni_connect();
 	void update_time();
 	void set_warm_og();
-	void set_tm_towarm(int _tm_towarm);
+	void imit_off();
+	void imit_on();
+	void change_power(bool switch_og);
+	void set_change_power();
+	void set_power_back();
 protected:
 	
 public slots:
@@ -113,7 +117,9 @@ public slots:
 	void log_timer_ontimer();
 	void BECH_interrupt_setup();
 	void BECH_interrupt_run();
+	void get_power(double volt);
 private:
+	void msg_to_log(const QString& _msg);
 
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -128,18 +134,24 @@ private:
 	QTimer *inter_tmr;
 	QTimer *warm_og_tmr;
 	QTimer *AbOn_tmr;
+	QTimer *Power_tmr;
+
+	QMap<int, QString> mode_names;
+	QMap<OG, qint64> OG_start_warm;
+	QMap<OG, qint64> OG_finish_warm;
 
 	int standart_tm = 120000;
 	int tm_towarm;
 	int cooling_cof = 4;
-	int warm_er = 100;//погрешность нагрева
+	int power = 0;
+	int warm_er = 500;//погрешность нагрева
 	int n;
 	short chan;
 	double u;
 	double t;
-
-
-	void msg_to_log(const QString& _msg);
+	QString name = "ЅЁ„";
+	int bus  = 1;
+	int _volt;
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
@@ -147,13 +159,11 @@ private:
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
-
-	QMap<int, QString> mode_names;
-	QMap<OG, qint64> OG_start_warm;
-	QMap<OG, qint64> OG_finish_warm;
-
 	RPC_interrupt_bus_SLOT_Thread interrupt_slot_thr;
 	RPC_interrupt_bus_SIGNAL_Thread interrupt_signal_thr;
+
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 };
 
 #endif // BECH_H

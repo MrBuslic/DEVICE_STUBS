@@ -24,15 +24,18 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	mode_names.insert(full_mode::PI15, "ПИ15");
 	mode_names.insert(full_mode::PI8, "ПИ8");
 	mode_names.insert(full_mode::WTF8, "ВТФ8");
-
+	mode_names.insert(full_mode::ERR, "");
+	
 	stab_names.insert(STAB::LOW_STAB, "НС");
 	stab_names.insert(STAB::HIGH_STAB, "ВС");
 	stab_names.insert(STAB::KG1_STAB, "КГ 1");
 	stab_names.insert(STAB::KG2_STAB, "КГ 2");
+	stab_names.insert(STAB::OFF_STAB, "");
 
 	ant_names.insert(ANTENNA::OHA, "OHA");
 	ant_names.insert(ANTENNA::MHAPY, "MHA+Y");
 	ant_names.insert(ANTENNA::MHAMY, "MHA-Y");
+	ant_names.insert(ANTENNA::ANT_OFF, "");
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -46,6 +49,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 		FSMU_blocks << new QPushButton(numb, this);
 		FSVU_canals << new QPushButton(numb, this);
 	}
+
 	All_vblayout = new QHBoxLayout();
 	QVBoxLayout *logs_lay = new QVBoxLayout(this);
 	FSMUFSVU_vblayout = new QVBoxLayout();
@@ -59,6 +63,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	FSMUFSVU_vblayout->addWidget(FSVU_gb);
 	FSMU_gb->setAlignment(Qt::AlignHCenter);
 	FSVU_gb->setAlignment(Qt::AlignHCenter);
+
 	for (int i = 0; i < 3; i++)
 	{
 		FSMU_hblayout->addWidget(FSMU_blocks[i]);
@@ -69,6 +74,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 		FSMU_blocks[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 		FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
+
 	QLabel* Mode_lb = new QLabel("Режим");
 	QLabel* Lit_lb = new QLabel("Литера");
 	QLabel* Stab_lb = new QLabel("Стабильность");
@@ -92,6 +98,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	sub_le_list << Lit_le;
 	sub_le_list << Stab_le;
 	sub_le_list << Ann_le;
+
 	for (int i = 0; i < 4; i++)
 	{
 		SubGrid_glayout->addWidget(sub_lb_list[i], i, 0);
@@ -140,14 +147,26 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 		return;
 	}
 
-	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); // вот тут падает
 
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); // вот тут падает
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
+	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
-
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -156,8 +175,60 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
 	log_timer.start(200);
 
+}
+
+void MBK07_widg::get_power(double volt)
+{
+	if (volt >= 20.0)
+		imit_on();
+	else
+		if (volt == 0) imit_off();
+}
+
+void MBK07_widg::change_power()
+{
+	//Надо подправить - при включении не выставлены каналы ФСМУ и ФСВУ
+	power = 0;
+	if (current_FSMU != FSMU_OFF) power += 1;
+	if (current_FSVU != FSVU_OFF) power += 3;
+}
+
+void MBK07_widg::imit_on()
+{
+	msg_to_log("Питание включено");
+
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	flag = true;
+	change_power();
+	set_power_back();
 	set_new_tm();
 }
+
+void MBK07_widg::imit_off()
+{
+	msg_to_log("Питание отключено");
+	current_antenna = ANT_OFF;
+	current_FSMU = FSMU_OFF;
+	current_FSVU = FSVU_OFF;
+	current_lit = 0;
+	current_mode = ERR;
+	current_PSP = PSP_OFF;
+	current_stab = OFF_STAB;
+
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	flag = false;
+
+	set_new_tm();
+	update_graphics();
+}
+
+void MBK07_widg::set_power_back()
+{
+	double curr;
+	curr = (double)power;
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
+
 void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
@@ -175,14 +246,13 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 		current_stab = STAB(tmp_pshm);
 		break;
 	case 2:
-		current_FSVU = FSVU_numbB(tmp_pshm); 
+		current_FSVU = FSVU_numbB(tmp_pshm);
 		break;
 	case 3:
-		current_antenna = ANTENNA(tmp_pshm); 
+		current_antenna = ANTENNA(tmp_pshm);
 		break;
 	}
-	write_words();
-	paint_buttons();
+	update_graphics();
 	set_new_tm();
 }
 
@@ -241,13 +311,8 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		switch (tmp_cwd.subadr)
 		{
 		case 2:
-
-
 			char rezh;
 			rezh = tmp_word & 7;
-
-
-
 			mode_itr = mode_names.find(rezh);
 			if (mode_itr == mode_names.end())
 			{
@@ -266,7 +331,6 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			IM = ((tmp_word & 0x10) != 0);
 			break;
 		case 3:
-
 			byte liter;
 			liter = tmp_word & 0xFF;
 			lit_itr = lit_map.find(liter);
@@ -275,43 +339,19 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				current_lit = 0;
 				break;
 			}
-
 			current_lit = LITERA(lit_itr.value());
 			break;
 		case 4:
-
 			char psp_ch = tmp_word & 3;
-
 			current_PSP = PSP(psp_ch + 1);
-
 			break;
 		};
-		write_words();
+		update_graphics();
 		set_new_tm();
 	}
 }
-void MBK07_widg::write_words()
-{
-	QString res_mode;
-	if (mode_names.contains(current_mode))
-	{
-		res_mode = mode_names[current_mode];
-		if (current_mode == PI8)
-		{
-			res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
-			//?все что перед - если, : -все что перед иначе.
-		}
-		if (IM == true)
-			res_mode += " ИМ";
-	}
 
-	sub_le_list[0]->setText(res_mode);
-	QString lit_num = QString::number(current_lit);
-	sub_le_list[1]->setText(lit_num);
-	sub_le_list[2]->setText(stab_names[current_stab]);
-	sub_le_list[3]->setText(ant_names[current_antenna]);
-}
-void MBK07_widg::paint_buttons()
+void MBK07_widg::update_graphics()
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -325,6 +365,35 @@ void MBK07_widg::paint_buttons()
 		if (current_FSVU == i)
 			FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
+
+	QString res_mode;
+	if (mode_names.contains(current_mode))
+	{
+		res_mode = mode_names[current_mode];
+		if (current_mode != ERR)
+		{
+			if (current_mode == PI8)
+			{
+				res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
+				//?все что перед - если, : -все что перед иначе.
+			}
+			if (IM == true)
+				res_mode += " ИМ";
+		}
+		else res_mode = "";
+	}
+
+	sub_le_list[0]->setText(res_mode);
+	QString lit_num;
+	if (current_lit != 0)
+	{
+		lit_num = QString::number(current_lit);
+		sub_le_list[1]->setText(lit_num);
+	}
+	else
+		sub_le_list[1]->setText("");
+	sub_le_list[2]->setText(stab_names[current_stab]);
+	sub_le_list[3]->setText(ant_names[current_antenna]);
 }
 
 void MBK07_widg::set_new_tm()
@@ -383,7 +452,6 @@ void MBK07_widg::set_new_tm()
 		f_word += 1 << full_mode(current_mode) - 1;
 	tm_words.push_back(f_word);
 
-
 	if (current_lit != 0)
 		s_word += 0x100 << current_lit - 1;
 	s_word += 0x80 << STAB(current_stab) - 1;
@@ -402,6 +470,16 @@ void MBK07_widg::set_new_tm()
 		break;
 	}
 	tm_words.push_back(s_word);
+	change_power();
 	//Отправка 
 	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+}
+
+MBK07_widg::~MBK07_widg()
+{
+	omnibus_slot_thr.quit();
+	omnibus_signal_thr.quit();
+
+	mku_slot_thr.quit();
+	mku_signal_thr.quit();
 }
