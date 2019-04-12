@@ -157,6 +157,8 @@ LKA05_widg::LKA05_widg()
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
 
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
+
 	connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
 	connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
 
@@ -180,7 +182,23 @@ QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
 	set_list.push_back(cb);
 	return cb;
 }
+void LKA05_widg::new_ku_732(int ku_n, int length, double u, int line)
+{
 
+	switch (ku_n)
+	{
+	case 3: mu_module.switch_cur_dev(CURRENT_DEV(MAIN));
+		paint_buttons();
+		set_new_tm();
+		break;
+	case 4: mu_module.switch_cur_dev(CURRENT_DEV(RESERVE));
+		paint_buttons();
+		set_new_tm(); 
+		break;
+	default:
+		break;
+	};
+}
 
 void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {

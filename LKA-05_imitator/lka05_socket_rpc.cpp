@@ -78,6 +78,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
 		operators_map["new_tm(int)"] = &Socket_RPC_SLOT_Object::new_tm;
+		operators_map["new_ku_732(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku_732;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -364,6 +365,27 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int tm = _values.at(0).value<int>();
 			app->new_tm(tm);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::new_ku_732(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int ku_n = _values.at(0).value<int>();
+			int length = _values.at(1).value<int>();
+			double u = _values.at(2).value<double>();
+			int line = _values.at(3).value<int>();
+			app->new_ku_732(ku_n, length, u, line);
 			return 0;
 		}
 		catch(const std::exception &)

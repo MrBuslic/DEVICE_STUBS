@@ -215,6 +215,17 @@ void RPC_lka05_SLOT_Object::new_tm(int tm)
 	dynamic_call("new_tm(int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_tm");
 }
+void RPC_lka05_SLOT_Object::new_ku_732(int ku_n, int length, double u, int line)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(ku_n);
+	tmp_list << QVariant(length);
+	tmp_list << QVariant(u);
+	tmp_list << QVariant(line);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call new_ku_732 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_ku_732(int, int, double, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_ku_732");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
