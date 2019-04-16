@@ -47,7 +47,7 @@ SET(BKUPI_SOURCES main.cpp mbk04Widget.cpp)
 
 link_directories(${QT_LIBRARY_DIR} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES mbk04_socket_rpc.h mbk04_socket_rpc.cpp)
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.cpp mbk04_socket_rpc.h mbk04_socket_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_executable(mbk04_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES})

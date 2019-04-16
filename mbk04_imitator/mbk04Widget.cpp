@@ -6,7 +6,8 @@
 //#include "FrameDBController.hpp"
 //#include "instruments.h"
 #include "mbk04_socket_rpc.h"
-#include <QElapsedTimer>
+//#include "frame_bus_rpc"
+#include <QTimer>
 //структура командного слова сообщения МКО
 //
 union MKOWord
@@ -79,6 +80,12 @@ MainWidget::MainWidget()
 
 	current_dev = CURRENT_DEV::OFF;
 	current_rezh = REZH_FRAME::OFF_REZH;
+	frame_slot_obj = new RPC_frame_bus_SLOT_Object("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start();
+
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start();
 
 	QString ip_str = "127.0.0.1"; 
 	int slot_port = MBK04_SLOT;
@@ -92,10 +99,10 @@ MainWidget::MainWidget()
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
-	QElapsedTimer timer;
-	/*timer.start();
-	while (!timer.hasExpired(4000))
-		emit send_FRAME(frame);*/
+	timer = new QTimer(this);
+	
+	connect(timer,&QTimer::timeout, this, &MainWidget::send_frame);
+	timer->start(4000);
 }
 
 
@@ -279,7 +286,7 @@ void MainWidget::new_SCHBK(QVariantList words)
 void MainWidget::clean_frame_data(QString REZH)
 {
 	int i = 0;
-	QFile frame_file(REZH + ".dat"); //уточнить имя файла и путь к нему!
+	QFile frame_file(QCoreApplication::applicationDirPath() + "/" + REZH + ".dat"); //уточнить имя файла и путь к нему!
 	
 	if (!frame_file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return ;
@@ -298,3 +305,24 @@ void MainWidget::clean_frame_data(QString REZH)
 	frame = clean_frame;
 }
 
+void MainWidget::send_frame()
+{
+	if (current_rezh == REZH_FRAME::OFF_REZH)
+		return;
+
+	QString mode;
+	switch (current_rezh)
+	{
+	case REZH_FRAME::VTF:
+		mode = "vtf";
+		break;
+
+	case REZH_FRAME::PI8:
+		mode = "pi8";
+		break;
+	case REZH_FRAME::PI15:
+		mode = "pi15";
+		break;
+	}
+		emit frame_slot_obj->make_new_frame(mode, frame);
+}

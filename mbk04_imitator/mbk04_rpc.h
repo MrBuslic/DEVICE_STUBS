@@ -13,6 +13,7 @@ public:
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_ku(int ku_n, int length, double u);
+	void send_frame();
 	////////////////////////////////////
 };
 

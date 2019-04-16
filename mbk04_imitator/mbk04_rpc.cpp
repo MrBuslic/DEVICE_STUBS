@@ -181,6 +181,13 @@ void RPC_mbk04_SLOT_Object::new_ku(int ku_n, int length, double u)
 	dynamic_call("new_ku(int, int, double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mbk04 dynamic_call finished new_ku");
 }
+void RPC_mbk04_SLOT_Object::send_frame()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("mbk04 dynamic_call send_frame %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("send_frame()", tmp_list);
+	SRPCSignalClass::Instance().toLog("mbk04 dynamic_call finished send_frame");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

@@ -78,6 +78,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
 		operators_map["new_ku(int, int, double)"] = &Socket_RPC_SLOT_Object::new_ku;
+		operators_map["send_frame()"] = &Socket_RPC_SLOT_Object::send_frame;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -342,6 +343,22 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			int length = _values.at(1).value<int>();
 			double u = _values.at(2).value<double>();
 			app->new_ku(ku_n, length, u);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::send_frame(QVariantList& _values)
+	{
+		try
+		{
+			app->send_frame();
 			return 0;
 		}
 		catch(const std::exception &)
