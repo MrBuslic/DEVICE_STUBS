@@ -42,15 +42,22 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 	
 
 	setCommandsVec();
-
-	QSettings tmp_settings("Cometa", "СПО МКПА МЦА");
-	QString ip = tmp_settings.value("IP_rm", "192.168.0.100").toString();
+	
+	QSettings settings("Cometa", "СПО МКПА МЦА");
+	QString ip = settings.value("IP_rm", "192.168.0.100").toString();
 	if (ip == "localhost")	// QUdpSocket::bind не жрёт "localhost". Ему "127.0.0.1" подавай.
 		ip = "127.0.0.1";
 	bool t = _sock.bind(QHostAddress(ip), 10001);
 
+	QSettings tmp_settings("Cometa", "СПО МКПА МЦА");
+	ip = tmp_settings.value("IP_gen", "192.168.1.224").toString();
+	if (ip == "localhost")	// QUdpSocket::bind не жрёт "localhost". Ему "127.0.0.1" подавай.
+		ip = "127.0.0.1";
+	t = _ag_sock.bind(QHostAddress(ip), 5025);
+
 	connect(&_sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error_Slot(QAbstractSocket::SocketError)));
 	connect(&_sock, &QUdpSocket::readyRead, this, &RM_MBK07_imitator::read);
+	connect(&_ag_sock, &QUdpSocket::readyRead, this, &RM_MBK07_imitator::read_ag);
 
 	//connect(_sock, SIGNAL(readyRead()), SLOT(read()));
 }
@@ -202,3 +209,18 @@ void RM_MBK07_imitator::read()
 	delete sockbufResponse;
 }
 
+void RM_MBK07_imitator::read_ag()
+{
+	qint64 received_bytes = _ag_sock.bytesAvailable();
+	char* sockbuf;
+	sockbuf = new char[received_bytes];
+
+	auto *host = new QHostAddress();
+	quint16 port = 0;
+	auto readSize = _ag_sock.readDatagram(sockbuf, received_bytes, host, &port);
+
+	_ag_sock.writeDatagram((char*)1, readSize, *host, port);
+
+	delete sockbuf;
+	delete host;
+}

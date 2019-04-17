@@ -41,6 +41,7 @@ private:
 	QGridLayout *gridLayout;
 
 	QUdpSocket _sock;
+	QUdpSocket _ag_sock;
 	/// Проверка контрольной суммы
 	bool checkCS(const char *sockbuf);
 	/// Формирование ответа
@@ -61,6 +62,7 @@ signals:
 public slots :
 	void error_Slot(QAbstractSocket::SocketError socketError);
 	void read();
+	void read_ag();
 
 };
 
