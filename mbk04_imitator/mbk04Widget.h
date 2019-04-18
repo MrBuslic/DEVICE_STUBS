@@ -64,7 +64,7 @@ private:
 
 	RPC_frame_bus_SLOT_Thread frame_slot_thr;
 	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
-	RPC_frame_bus_SLOT_Object * frame_slot_obj;
+
 private slots:
 	void state_changed();
 public slots:

@@ -8,6 +8,8 @@
 #include "mbk04_socket_rpc.h"
 //#include "frame_bus_rpc"
 #include <QTimer>
+#include <qmessagebox.h>
+
 //структура командного слова сообщения МКО
 //
 union MKOWord
@@ -80,13 +82,18 @@ MainWidget::MainWidget()
 
 	current_dev = CURRENT_DEV::OFF;
 	current_rezh = REZH_FRAME::OFF_REZH;
-	frame_slot_obj = new RPC_frame_bus_SLOT_Object("127.0.0.1", FRAME_SLOT);
 	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
 	frame_slot_thr.start();
 
 	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
 	frame_signal_thr.start();
 
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в Mkprm");
+		this->deleteLater();
+		return;
+	}
 	QString ip_str = "127.0.0.1"; 
 	int slot_port = MBK04_SLOT;
 	int signal_port = MBK04_SIGNAL;
@@ -99,10 +106,7 @@ MainWidget::MainWidget()
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
-	timer = new QTimer(this);
 	
-	connect(timer,&QTimer::timeout, this, &MainWidget::send_frame);
-	timer->start(4000);
 }
 
 
@@ -206,6 +210,9 @@ void MainWidget::state_changed()
 	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
 	if (current_dev != CURRENT_DEV::OFF)
 	{
+		timer = new QTimer(this);
+
+		connect(timer, &QTimer::timeout, this, &MainWidget::send_frame);
 
 
 		switch (current_rezh)
@@ -215,6 +222,7 @@ void MainWidget::state_changed()
 			new_ok3 = 0;
 			new_ok4 = 1;
 			clean_frame_data("vtf");
+			timer->start(11000);
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
@@ -224,6 +232,7 @@ void MainWidget::state_changed()
 			new_ok3 = 1;
 			new_ok4 = 0;
 			clean_frame_data("pi8");
+			timer->start(4000);
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -233,6 +242,7 @@ void MainWidget::state_changed()
 			new_ok3 = 0;
 			new_ok4 = 0;
 			clean_frame_data("pi15");
+			timer->start(4000);
 			ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -241,6 +251,7 @@ void MainWidget::state_changed()
 			new_ok2 = 1;
 			new_ok3 = 1;
 			new_ok4 = 1;
+			timer->stop();
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -299,7 +310,7 @@ void MainWidget::clean_frame_data(QString REZH)
 	i = 0;
 	for (QStringList::iterator itr = tmp_list.begin(); itr != tmp_list.end(); itr++, i++)
 	{
-		frame[i] = itr->toInt();
+		clean_frame[i] = itr->toInt();
 	}
 	frame_file.close();
 	frame = clean_frame;
@@ -314,15 +325,16 @@ void MainWidget::send_frame()
 	switch (current_rezh)
 	{
 	case REZH_FRAME::VTF:
-		mode = "vtf";
+		mode = "ВТФ";
 		break;
 
 	case REZH_FRAME::PI8:
-		mode = "pi8";
+		mode = "ПИ8";
 		break;
 	case REZH_FRAME::PI15:
-		mode = "pi15";
+		mode = "ПИ15";
 		break;
 	}
-		emit frame_slot_obj->make_new_frame(mode, frame);
+	
+	frame_slot_thr.get_frame_bus_obj()->make_new_frame(mode, frame);
 }
