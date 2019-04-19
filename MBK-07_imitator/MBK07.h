@@ -161,6 +161,7 @@ private:
 	QString name = "лай-07";
 	int bus = 0;
 	int power = 0;
+	double volt;
 	int fsmu_v = 0x033B;
 	int fsvu_v = 0x0292;
 

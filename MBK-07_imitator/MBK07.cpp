@@ -192,8 +192,9 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 
 }
 
-void MBK07_widg::get_power(double volt)
+void MBK07_widg::get_power(double _volt)
 {
+	volt = _volt;
 	if (volt >= 20.0)
 		imit_on();
 	else
@@ -242,7 +243,7 @@ void MBK07_widg::imit_off()
 void MBK07_widg::set_power_back()
 {
 	double curr;
-	curr = (double)power;
+	curr = (double)power/volt;
 	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
 }
 
