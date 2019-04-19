@@ -37,7 +37,6 @@ signals:
 public slots:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
-	void emit_update_graphics();
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -105,14 +104,12 @@ public:
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant new_message(QVariantList& _values);
-	QVariant new_mk(QVariantList& _values);
+	QVariant new_ku_732(QVariantList& _values);
+	QVariant set_new_mbk02_tm(QVariantList& _values);
 	QVariant new_KPI(QVariantList& _values);
 	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant update_tm(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
-	QVariant reverse_ant(QVariantList& _values);
-	QVariant lose_cont(QVariantList& _values);
-	QVariant update_graphics(QVariantList& _values);
+	QVariant get_power(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

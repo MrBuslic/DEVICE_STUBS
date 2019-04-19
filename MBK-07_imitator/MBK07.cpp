@@ -25,7 +25,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	mode_names.insert(full_mode::PI8, "ПИ8");
 	mode_names.insert(full_mode::WTF8, "ВТФ8");
 	mode_names.insert(full_mode::ERR, "");
-	
+
 	stab_names.insert(STAB::LOW_STAB, "НС");
 	stab_names.insert(STAB::HIGH_STAB, "ВС");
 	stab_names.insert(STAB::KG1_STAB, "КГ 1");
@@ -160,6 +160,20 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 		return;
 	}
 
+
+	//frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	//frame_slot_thr.start(); // вот тут падает
+
+	//frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	//frame_signal_thr.start(); // вот тут падает
+
+	//if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	//{
+	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+	//	this->deleteLater();
+	//	return;
+	//}
+
 	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
@@ -167,6 +181,7 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
+	//connect(frame_signal_thr.get_obj().get(), SIGNAL(), this, SLOT(get_frame()));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -188,9 +203,9 @@ void MBK07_widg::get_power(double volt)
 void MBK07_widg::change_power()
 {
 	//Надо подправить - при включении не выставлены каналы ФСМУ и ФСВУ
-	power = 0;
-	if (current_FSMU != FSMU_OFF) power += 1;
-	if (current_FSVU != FSVU_OFF) power += 3;
+	//power = 0.5;
+	if (current_FSMU != FSMU_OFF) power = 150;
+	if (current_FSVU != FSVU_OFF) power = 180;
 }
 
 void MBK07_widg::imit_on()
@@ -202,6 +217,7 @@ void MBK07_widg::imit_on()
 	change_power();
 	set_power_back();
 	set_new_tm();
+	power = 150;
 }
 
 void MBK07_widg::imit_off()
@@ -219,6 +235,7 @@ void MBK07_widg::imit_off()
 	flag = false;
 
 	set_new_tm();
+	power = 0.0;
 	update_graphics();
 }
 
@@ -473,6 +490,20 @@ void MBK07_widg::set_new_tm()
 	change_power();
 	//Отправка 
 	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+
+	f_word = 0;
+	s_word = 0;
+	int tmp_vlt;
+	QVariantList tm_msh_words;
+	if (current_FSMU != FSMU_OFF)
+	{
+		f_word = fsmu_v;
+		if (current_FSVU != FSVU_OFF)
+			s_word = fsvu_v;
+	}
+	tm_msh_words.push_back(f_word);
+	tm_msh_words.push_back(s_word);
+	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 26, tm_words);
 }
 
 MBK07_widg::~MBK07_widg()

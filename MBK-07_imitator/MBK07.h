@@ -16,6 +16,7 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
+//#include "../buses_imitator/frame_bus_rpc.h"
 
 enum FSMU_numbB
 {
@@ -140,6 +141,9 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 	void get_power(double volt);
+	//void get_frame(int frame);
+signals:
+	void push_frame();
 private:
 	void msg_to_log(const QString& _msg);
 
@@ -157,6 +161,8 @@ private:
 	QString name = "лай-07";
 	int bus = 0;
 	int power = 0;
+	int fsmu_v = 0x033B;
+	int fsvu_v = 0x0292;
 
 	QMap<int, QString> mode_names;
 	QMap<int, LITERA> lit_map;
@@ -171,6 +177,9 @@ private:
 
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
+
+//	RPC_frame_bus_SLOT_Thread frame_slot_thr;
+//	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
 };
 
 #endif // MBK07_H

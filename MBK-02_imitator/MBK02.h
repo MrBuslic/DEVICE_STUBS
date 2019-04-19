@@ -18,6 +18,7 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/kpi_bus_rpc.h"
+#include "../buses_imitator/power_bus_rpc.h"
 
 enum CHANEL
 {
@@ -48,17 +49,14 @@ class MBK02_widg : public QWidget
 public:
 	//	explicit LKA05_widg(QWidget *parent = 0);
 	MBK02_widg(QWidget *parent = 0);
-	//~MBK02_widg();
-
+	~MBK02_widg();
 
 private:
 	QWidget* widg;
-	/// -- Главное окно;
 	QMainWindow* main_widg;
-	//Хранимые текущие
 
 	int current_lit;
-	CHANEL current_chan = CHANEL_OFF;
+	CHANEL current_chanel = CHANEL_OFF;
 	ANTENNA current_ant = MHAOFF;
 
 	const int MKO = 1;
@@ -84,22 +82,28 @@ private:
 	QPushButton *Ant_pbut;
 	QLineEdit* Lit_le;
 
-	
-
-public slots:
-	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
-	void new_KPI(QVariantList KPI_list);
-	void auto_scroll_clicked(int _state);
-	void update_tm(int sadr);
 	void log_timer_ontimer();
 	void reverse_ant();
 	void lose_cont();
 	void update_graphics();
+	void change_power(bool switch_chanel);
+	void imit_off();
+	void imit_on();
+	void _update_time();
+	void set_warm_chanel();
+	void set_power_back();
+public slots:
+	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+	void new_ku_732(int ku_n, int length, double u, int line);
+	void set_new_mbk02_tm();
+	void new_KPI(QVariantList KPI_list);
+	void auto_scroll_clicked(int _state);
+	void update_tm(int sadr);
+	void get_power(double volt);
 signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
-	void emit_update_graphics();
+	void set_new_power_tm(int sadr, QVariantList);
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -112,19 +116,26 @@ private:
 	QStringList log_buffer;
 	QMutex log_mutex;
 	QTimer *t_ant_ch;
-	QTimer *t_sleep;
+	QTimer *warm_chanel_tmr;
 	QTimer *t_err_kpi;
 	bool signal_con = false;
 	QVariantList list_to_R14732;
+	QString name = "МБК-02";
+	int bus = 0;
+	double power_i = 0.0;
+	int ready_chanel = false;
+	int tm_towarm;
+	int warm_er = 500;//погрешность нагрева
+	int standart_tm = 360000;
+	int cooling_cof = 4;
 
 	void msg_to_log(const QString& _msg);
 
 	QMap<int, QString> ant_names;
-	QMap<int, KPI_STATE> check_KPI;
-	QVariantList tmp_list;
+	QMap<CHANEL, qint64> chanel_start_warm;
+	QMap<CHANEL, qint64> chanel_finish_warm;
 
-	//RPC_omnibus_SLOT_Thread slot_thr;
-	//RPC_omnibus_SIGNAL_Thread signal_thr;
+	QVariantList tmp_list;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
@@ -132,6 +143,8 @@ private:
 	RPC_kpi_bus_SLOT_Thread kpi_slot_thr;
 	RPC_kpi_bus_SIGNAL_Thread kpi_signal_thr;
 
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 };
 
 #endif // MBK02_H

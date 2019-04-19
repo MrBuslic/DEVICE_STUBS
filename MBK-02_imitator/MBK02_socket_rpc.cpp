@@ -77,14 +77,11 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
-		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_mk;
+		operators_map["new_ku_732(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku_732;
 		operators_map["new_KPI(QVariantList)"] = &Socket_RPC_SLOT_Object::new_KPI;
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["update_tm(int)"] = &Socket_RPC_SLOT_Object::update_tm;
-		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
-		operators_map["reverse_ant()"] = &Socket_RPC_SLOT_Object::reverse_ant;
-		operators_map["lose_cont()"] = &Socket_RPC_SLOT_Object::lose_cont;
-		operators_map["update_graphics()"] = &Socket_RPC_SLOT_Object::update_graphics;
+		operators_map["get_power(double)"] = &Socket_RPC_SLOT_Object::get_power;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -124,7 +121,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return;
 		disconnect(app, SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(msg_to_14R732(QVariantList)));
 		disconnect(app, SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_tm(int, int)));
-		disconnect(app, SIGNAL(emit_update_graphics()), this, SLOT(emit_update_graphics()));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(MBK02_widg* _app)
 	{
@@ -133,8 +129,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		data_map.insert("msg_to_14R732(QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_tm(int, int)), Qt::DirectConnection);
 		data_map.insert("set_new_tm(int, int)", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(emit_update_graphics()), this, SLOT(emit_update_graphics()), Qt::DirectConnection);
-		data_map.insert("emit_update_graphics()", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -312,27 +306,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal set_new_tm finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::emit_update_graphics()
-	{
-		auto& descriptor = *data_map["emit_update_graphics()"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("emit_update_graphics()");
-		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal emit_update_graphics  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal emit_update_graphics sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal emit_update_graphics finished").arg(objectName()));
-	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -368,21 +341,16 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::new_mk(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::new_ku_732(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int mshm = _values.at(0).value<int>();
-			int pshm = _values.at(1).value<int>();
-			int length_m = _values.at(2).value<int>();
-			int length_p = _values.at(3).value<int>();
-			double u_m = _values.at(4).value<double>();
-			double u_p = _values.at(5).value<double>();
-			int dt = _values.at(6).value<int>();
-			int line_m = _values.at(7).value<int>();
-			int line_p = _values.at(8).value<int>();
-			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
+			int ku_n = _values.at(0).value<int>();
+			int length = _values.at(1).value<int>();
+			double u = _values.at(2).value<double>();
+			int line = _values.at(3).value<int>();
+			app->new_ku_732(ku_n, length, u, line);
 			return 0;
 		}
 		catch(const std::exception &)
@@ -448,59 +416,13 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::get_power(QVariantList& _values)
 	{
 		try
 		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::reverse_ant(QVariantList& _values)
-	{
-		try
-		{
-			app->reverse_ant();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::lose_cont(QVariantList& _values)
-	{
-		try
-		{
-			app->lose_cont();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant Socket_RPC_SLOT_Object::update_graphics(QVariantList& _values)
-	{
-		try
-		{
-			app->update_graphics();
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			double volt = _values.at(0).value<double>();
+			app->get_power(volt);
 			return 0;
 		}
 		catch(const std::exception &)

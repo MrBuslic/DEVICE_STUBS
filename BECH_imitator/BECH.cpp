@@ -101,8 +101,6 @@ BECH_widg::BECH_widg(QWidget *parent)
 	warm_og_tmr = new QTimer(this);
 	warm_og_tmr->setSingleShot(true);
 	connect(warm_og_tmr, &QTimer::timeout, this, &BECH_widg::set_warm_og);
-	connect(warm_og_tmr, &QTimer::stop, this, &BECH_widg::set_warm_og);
-	OG_start_warm[OG_1] = (QDateTime::currentMSecsSinceEpoch());
 
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
@@ -112,7 +110,6 @@ BECH_widg::BECH_widg(QWidget *parent)
 	Power_tmr->setSingleShot(true);
 	connect(Power_tmr, &QTimer::timeout, this, &BECH_widg::set_change_power);
 
-	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
@@ -223,9 +220,9 @@ void BECH_widg::get_power(double volt)
 void BECH_widg::set_power_back()
 {
 	double curr;
-	if (power != 0)
+	if (power_vt != 0)
 	{
-		 curr = (double)power / _volt;
+		curr = (double)power_vt / _volt;
 	}
 	else
 		curr = 0;
@@ -267,33 +264,28 @@ void BECH_widg::set_change_power()
 
 void BECH_widg::change_power(bool switch_og)
 {
-	if (switch_og)
+	if (switch_og)//генератор переключился?
 	{
-		power = 60;
-		Power_tmr->start(60000);
+		power_vt = 60;
+		Power_tmr->start(tm_towarm);
 		set_power_back();
 	}
 	else
 	{
-		switch (power)
+		switch (power_vt)
 		{
 		case 0:
-			power = 60;
-			Power_tmr->start(60000);
+			power_vt = 60;
+			Power_tmr->start(tm_towarm);
 			set_power_back();
 			break;
 		case 60:
-			power = 45;
-			Power_tmr->start(120000);
-			set_power_back();
-			break;
-		case 45:
-			power = 35;
+			power_vt = 35;
 			set_power_back();
 			break;
 		case 35:
-			power = 60;
-			Power_tmr->start(60000);
+			power_vt = 60;
+			Power_tmr->start(tm_towarm);
 			set_power_back();
 			break;
 		}
@@ -383,14 +375,14 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			char tmp = tmp_word & 3;
 			if ((tmp_word & 3) > 0)
 			{
-				if (current_OG != OG_ERR)
-				{
-					set_warm_og();
-				}
 				if (current_OG != OG((tmp_word & 3) - 1))
 				{
-					change_power(true);
+					if (warm_og_tmr->isActive())
+						warm_og_tmr->stop();
+					set_warm_og();
 					current_OG = OG((tmp_word & 3) - 1);
+					update_time();
+					change_power(true);
 				}
 			}
 			if ((tmp_word & 0xC) >> 2 > 0)
@@ -413,13 +405,13 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		}
 
 		update_graphics();
-		update_time();
 		set_new_tm();
 	}
 }
 
 void BECH_widg::set_warm_og()
 {
+	ready_og = false;
 	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
 	OG_finish_warm[current_OG] = msecs_time;
 	if (OG_start_warm[current_OG] == 0) OG_start_warm[current_OG] = OG_finish_warm[current_OG] - standart_tm;
@@ -431,7 +423,6 @@ void BECH_widg::set_warm_og()
 	}
 	else
 	{
-		ready_og = false;
 		msg_to_log("Прогревание ОГ № " + QString::number(current_OG + 1) + " прервано");
 	}
 }
@@ -439,7 +430,6 @@ void BECH_widg::set_warm_og()
 void BECH_widg::update_time()
 {
 	ready_og = false;
-	warm_og_tmr->stop();
 	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
 	if (OG_finish_warm[current_OG] == 0) // Если ОГ не нагревался вообще
 	{
@@ -588,4 +578,7 @@ BECH_widg::~BECH_widg()
 
 	interrupt_slot_thr.quit();
 	interrupt_signal_thr.quit();
+
+	power_slot_thr.quit();
+	power_signal_thr.quit();
 }

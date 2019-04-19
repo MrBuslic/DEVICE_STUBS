@@ -71,6 +71,12 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	ant_names.insert(ANTENNA::MHA2MY, "MHA2-Y");
 	ant_names.insert(ANTENNA::MHA2PY, "MHA2+Y");
 
+	chanel_start_warm.insert(CHANEL_1, 0);
+	chanel_start_warm.insert(CHANEL_2, 0);
+
+	chanel_finish_warm.insert(CHANEL_1, 0);
+	chanel_finish_warm.insert(CHANEL_2, 0);
+
 	edit = new QTextEdit(this);
 	_scroll_bar = edit->verticalScrollBar();
 	_doc = new QTextDocument();
@@ -85,22 +91,6 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &MBK02_widg::auto_scroll_clicked);
 	All_vblay->addWidget(edit);
 	All_vblay->addWidget(auto_scroll_box);
-
-	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	//slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-	//slot_thr.start(); // вот тут падает
-
-	//signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-	//signal_thr.start(); // вот тут падает
-
-	//if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
-	//	this->deleteLater();
-	//	return;
-	//}
-	//slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	//flag = true;
 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
 	mku_slot_thr.start(); // вот тут падает
@@ -128,6 +118,19 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 		return;
 	}
 
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); // вот тут падает
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); // вот тут падает
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
 	QString ip_str = "127.0.0.1";
 	int slot_port = MBK02_SLOT;
 	int signal_port = MBK02_SIGNAL;
@@ -140,12 +143,10 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 
-	connect(this, &MBK02_widg::emit_update_graphics, this, &MBK02_widg::update_graphics);
-
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 	connect(kpi_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
-	//connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-	//connect(this, &MBK02_widg::set_new_tm, this, &MBK02_widg::update_tm);
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -156,144 +157,297 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 
 	t_ant_ch = new QTimer(this);
 	connect(t_ant_ch, &QTimer::timeout, this, &MBK02_widg::reverse_ant);
-	t_ant_ch->start(5000);
-	t_sleep = new QTimer(this);
-	//connect(t_sleep, &QTimer::timeout, this, &BECH_widg::BECH_interrupt_setup);
-	t_sleep->start(420000);
+	warm_chanel_tmr = new QTimer(this);
+	connect(warm_chanel_tmr, &QTimer::timeout, this, &MBK02_widg::set_warm_chanel);
+	warm_chanel_tmr->setSingleShot(true);
 	t_err_kpi = new QTimer(this);
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
-	current_chan = CHANEL_1;
+}
+
+void MBK02_widg::get_power(double volt)
+{
+	if (volt >= 20.0)
+		imit_on();
+	else
+		if (volt == 0) imit_off();
+}
+
+void MBK02_widg::change_power(bool switch_chanel)
+{
+	if (switch_chanel)
+	{
+		power_i = 1;
+		set_power_back();
+	}
+	else
+	{
+		if (power_i == 0)
+		{
+			power_i = 1;
+			set_power_back();
+		}
+		else
+		{
+			if (power_i == 1)
+			{
+				power_i = 0.63;
+				set_power_back();
+			}
+			else
+			{
+				if (power_i = 0.63)
+				{
+					power_i = 1;
+					set_power_back();
+				}
+			}
+		}
+	}
+}
+
+void MBK02_widg::set_power_back()
+{
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, power_i);
+}
+
+void MBK02_widg::imit_on()
+{
+	msg_to_log("Питание включено");
+	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
+	warm_chanel_tmr->start(standart_tm);//6 min
+	t_ant_ch->start(5000);
+	change_power(true);
+	_update_time();
 	update_graphics();
 }
 
-void MBK02_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+void MBK02_widg::imit_off()
 {
-	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-	//	msg_to_log(_msg);
-	////Странные штуки
-	//	int tmp_mshm = mshm;
-	//	int tmp_pshm = pshm - 8;
-	//
-	//	switch (tmp_mshm)
-	//	{
-	//	case 0:
-	//		current_FSMU = FSMU_numbB(tmp_pshm);
-	//		break;
-	//	case 1:
-	//		current_stab = STAB(tmp_pshm);
-	//		break;
-	//	case 2:
-	//		current_FSVU = FSVU_numbB(tmp_pshm); 
-	//		break;
-	//	case 3:
-	//		current_antenna = ANTENNA(tmp_pshm); 
-	//		break;
-	//	}
-	//	write_words();
-	//	paint_buttons();
-	//	set_new_tm();
+	msg_to_log("Питание отключено");
+	current_chanel = CHANEL_OFF;
+	current_ant = MHAOFF;
+	current_lit = 0;
+	update_graphics();
 }
 
-
-/*
-МНА2+Y
-МНА1-Y
-МНА1+Y
-МНА2-Y
-*/
-void MBK02_widg::new_KPI(QVariantList KPI_list)
+void MBK02_widg::new_ku_732(int ku_n, int length, double u, int line)
 {
-	current_lit = 2;
-	int tmp_in, tmp_len, tmp_weak;
-	QString tmp_str_ant;
-	t_ant_ch->stop();
-	tmp_len = KPI_list.length();
-	if (current_lit == 0)
+	int tmp_ku_n = ku_n;
+	if (current_chanel != tmp_ku_n)
 	{
-		msg_to_log("Литера не задана, либо задана нулевая литера");
-		return;
-	}
-	QString tmp_str_KPI;
-	bool tmp_correct = true;
-	int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
-	int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
-	int tmp_1 = LITER_PAUSE + (STEP * (current_lit - 1)) + ONE;
-	for (int i = 0; (i < tmp_len) && (!t_ant_ch->isActive()); i++)
-	{
-		tmp_list = KPI_list.at(i).toList();
-		tmp_in = tmp_list.at(0).toInt();
-		tmp_str_ant = tmp_list.at(1).toString();
-		tmp_weak = tmp_list.at(2).toInt();
-		tmp_correct = true;
-		switch (current_ant)
+		switch (tmp_ku_n)
 		{
-		case MHA1MY:
-			if (tmp_str_ant != "МНА1-Y")
-			{
-				t_err_kpi->start(5000);
-				tmp_correct = false;
-			}
+		case CHANEL_1:
+			current_ant = MHA1MY;
 			break;
-		case MHA1PY:
-			if (tmp_str_ant != "МНА1+Y")
-			{
-				t_err_kpi->start(5000);
-				tmp_correct = false;
-			}
-			break;
-		case MHA2MY:
-			if (tmp_str_ant != "МНА2-Y")
-			{
-				t_err_kpi->start(5000);
-				tmp_correct = false;
-			}
-			break;
-		case MHA2PY:
-			if (tmp_str_ant != "МНА2+Y")
-			{
-				t_err_kpi->start(5000);
-				tmp_correct = false;
-			}
-			break;
-		default:
-			t_err_kpi->start(5000);
-			tmp_correct = false;
+		case CHANEL_2:
+			current_ant = MHA2MY;
 			break;
 		}
-		if (tmp_correct)
+		set_warm_chanel();
+		current_chanel = CHANEL(tmp_ku_n);
+		if (!t_ant_ch->isActive())
+		t_ant_ch->start(5000);
+		update_graphics();
+		_update_time();
+		update_tm(1);
+	}
+}
+
+void MBK02_widg::set_new_mbk02_tm()
+{
+	/*int tmp_ku_n = ku_n;
+	if (current_chanel != CHANEL(tmp_ku_n) - 1)
+	{
+		switch (CHANEL(tmp_ku_n) - 1)
 		{
-			if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI += "P";
+		case CHANEL_1:
+			set_warm_chanel();
+			current_ant = MHA1MY;
+			break;
+		case CHANEL_2:
+			set_warm_chanel();
+			current_ant = MHA2MY;
+			break;
+		}
+		current_chanel = CHANEL(tmp_ku_n - 1);
+		change_power(true);
+		_update_time();
+		update_tm(1); 1555592251021 1555591891021
+	}*/
+}
+
+void MBK02_widg::set_warm_chanel()
+{
+	if (warm_chanel_tmr->isActive())
+		warm_chanel_tmr->stop();
+	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+	chanel_finish_warm[current_chanel] = msecs_time;
+	if (chanel_start_warm[current_chanel] == 0) chanel_start_warm[current_chanel] = chanel_finish_warm[current_chanel] - standart_tm;
+	if (((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm - warm_er)) || ((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm + warm_er)))
+	{
+		ready_chanel = true;
+		t_ant_ch->stop();
+		update_tm(1);
+		msg_to_log("Прогрелся комплект № " + QString::number(current_chanel + 1));
+		change_power(false);
+	}
+	else
+	{
+		ready_chanel = false;
+		msg_to_log("Прогревание комплект № " + QString::number(current_chanel + 1) + " прервано");
+		change_power(true);
+	}
+}
+
+void MBK02_widg::_update_time()
+{
+	ready_chanel = false;
+	//set_warm_chanel();
+	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+	if (chanel_finish_warm[current_chanel] == 0) // Если комплект не нагревался вообще
+	{
+		tm_towarm = standart_tm;
+		chanel_start_warm[current_chanel] = msecs_time;
+		chanel_finish_warm[current_chanel] = msecs_time + tm_towarm;
+	}
+	else // Если нагревался
+	{
+		// Если комплект нагрелся полностью
+		if ((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel] >= (standart_tm - warm_er)) || (chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel] >= (standart_tm - warm_er)))
+		{
+			if (msecs_time - chanel_finish_warm[current_chanel] >= (standart_tm * cooling_cof)) // Если после полного нагрева комплекта прошло достаточно времени, чтобы тот полностью охладился
+			{
+				tm_towarm = standart_tm;
+				chanel_start_warm[current_chanel] = msecs_time;
+				chanel_finish_warm[current_chanel] = msecs_time + standart_tm;
+			}
+			else // Если не прошло достаточно времени
+			{
+				//Время охлаждения это текущее время - время остановки комплекта  
+				//Время нулевого прогрева, при комплекта - полностью был нагрет = Текущее время - (стандарт нагрева - время охлаждения / коэфициент охлаждения)
+				chanel_start_warm[current_chanel] = msecs_time - (standart_tm - (msecs_time - chanel_finish_warm[current_chanel]) / cooling_cof);
+				chanel_finish_warm[current_chanel] = chanel_start_warm[current_chanel] + standart_tm;
+				tm_towarm = chanel_finish_warm[current_chanel] - msecs_time;
+			}
+		}
+		else // Если нагрелся не полностью
+		{
+			if (msecs_time < chanel_finish_warm[current_chanel]) // Если после частичного нагрева ОГ прошло достаточно времени, чтобы тот полностью охладился
+			{
+				tm_towarm = standart_tm;
+				chanel_start_warm[current_chanel] = msecs_time;
+				chanel_finish_warm[current_chanel] = msecs_time + standart_tm;
+			}
 			else
 			{
-				if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
-				else
-				{
-					if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
-					//else tmp_str_KPI += " ERR ";
-					else tmp_correct = false;
-				}
+				//Время нулевого прогрева, при комплекта - частично прогрет = Текущее время - ((время конца прогревания - время начала прогревания) - время охлаждения / коэфициент охлаждения) 
+				chanel_start_warm[current_chanel] = msecs_time - ((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) - (msecs_time - chanel_finish_warm[current_chanel]) / cooling_cof);
+				chanel_finish_warm[current_chanel] = chanel_start_warm[current_chanel] + standart_tm;
+				tm_towarm = chanel_finish_warm[current_chanel] - msecs_time;
 			}
-			if ((tmp_weak < 50) || (tmp_weak > 100))
-				tmp_correct = false;
-			if (tmp_correct)
-			{
-				signal_con = true;
-				char tmp_l = tmp_str_KPI.toInt();
-				if (tmp_str_KPI != "P")
-					list_to_R14732.push_back(tmp_l);
-				if (t_err_kpi->isActive() || (i == tmp_len)) t_err_kpi->stop();
-				update_graphics();
-			}
-			else t_err_kpi->start(5000);
 		}
 	}
-	msg_to_log(tmp_str_KPI);
-	if (tmp_correct)
+	if (tm_towarm != 0)
+		warm_chanel_tmr->start(tm_towarm);
+}
+
+void MBK02_widg::new_KPI(QVariantList KPI_list)
+{
+	if (!ready_chanel) return;
+	else
 	{
-		update_tm(26);
-		emit msg_to_14R732(list_to_R14732);
+		current_lit = 2;
+		int tmp_in, tmp_len, tmp_weak;
+		QString tmp_str_ant;
+		//t_ant_ch->stop();
+		tmp_len = KPI_list.length();
+		if (current_lit == 0)
+		{
+			msg_to_log("Литера не задана, либо задана нулевая литера");
+			return;
+		}
+		QString tmp_str_KPI;
+		bool tmp_correct = true;
+		int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
+		int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
+		int tmp_1 = LITER_PAUSE + (STEP * (current_lit - 1)) + ONE;
+		for (int i = 0; (i < tmp_len) && (!t_ant_ch->isActive()); i++)
+		{
+			tmp_list = KPI_list.at(i).toList();
+			tmp_in = tmp_list.at(0).toInt();
+			tmp_str_ant = tmp_list.at(1).toString();
+			tmp_weak = tmp_list.at(2).toInt();
+			tmp_correct = true;
+			switch (current_ant)
+			{
+			case MHA1MY:
+				if (tmp_str_ant != "МНА1-Y")
+				{
+					t_err_kpi->start(5000);
+					tmp_correct = false;
+				}
+				break;
+			case MHA1PY:
+				if (tmp_str_ant != "МНА1+Y")
+				{
+					t_err_kpi->start(5000);
+					tmp_correct = false;
+				}
+				break;
+			case MHA2MY:
+				if (tmp_str_ant != "МНА2-Y")
+				{
+					t_err_kpi->start(5000);
+					tmp_correct = false;
+				}
+				break;
+			case MHA2PY:
+				if (tmp_str_ant != "МНА2+Y")
+				{
+					t_err_kpi->start(5000);
+					tmp_correct = false;
+				}
+				break;
+			default:
+				t_err_kpi->start(5000);
+				tmp_correct = false;
+				break;
+			}
+			if (tmp_correct)
+			{
+				if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI += "P";
+				else
+				{
+					if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
+					else
+					{
+						if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
+						else tmp_correct = false;
+					}
+				}
+				if ((tmp_weak < 50) || (tmp_weak > 100))
+					tmp_correct = false;
+				if (tmp_correct)
+				{
+					signal_con = true;
+					char tmp_l = tmp_str_KPI.toInt();
+					if (tmp_str_KPI != "P")
+						list_to_R14732.push_back(tmp_l);
+					if (t_err_kpi->isActive() || (i == tmp_len)) t_err_kpi->stop();
+					update_graphics();
+				}
+				else t_err_kpi->start(5000);
+			}
+		}
+		msg_to_log(tmp_str_KPI);
+		if (tmp_correct)
+		{
+			update_tm(26);
+			emit msg_to_14R732(list_to_R14732);
+		}
 	}
 }
 
@@ -326,11 +480,11 @@ void MBK02_widg::lose_cont()
 void MBK02_widg::update_tm(int sadr)
 {
 	int _sadr = sadr;
-	unsigned short word = 0;
+	unsigned short word = 0x48;
 	switch (_sadr)
 	{
 	case 1:
-		if (signal_con)	word += current_chan + 1;
+		if (signal_con)	word += current_chanel + 1;
 		switch (current_ant)
 		{
 		case MHA1MY: word += 4; break;
@@ -338,7 +492,16 @@ void MBK02_widg::update_tm(int sadr)
 		case MHA2MY: word += 8; break;
 		case MHA2PY:break;
 		}
+		if (ready_chanel)
+		{
+			switch (current_chanel)
+			{
+			case CHANEL_1: word = word - 0x32; break;
+			case CHANEL_2: word = word - 0x16; break;
+			}
+		}
 		word += (word << 8);
+		emit set_new_tm(_sadr, word);
 		break;
 	case 4:
 		switch (current_lit)
@@ -353,11 +516,24 @@ void MBK02_widg::update_tm(int sadr)
 		case 8: word += 0x50; break;
 		}
 		word += (word << 8);
+		emit set_new_tm(_sadr, word);
 		break;
-	case 26://Измерения в Вольтах
-		; break;
+	case 26:
+		QVariantList tmp_list;
+		int f_word, s_word = 0;
+		switch (current_chanel)
+		{
+		case CHANEL_1:
+
+			break;
+		case CHANEL_2:
+
+			break;
+		}
+		tmp_list.push_back(f_word);
+		tmp_list.push_back(s_word);
+		emit set_new_power_tm(_sadr, tmp_list);
 	}
-	emit set_new_tm(_sadr, word);
 }
 
 void MBK02_widg::msg_to_log(const QString& _msg)
@@ -432,7 +608,7 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		case 3:
 			if (tmp_word == 0)
 			{
-				switch (current_chan)
+				switch (current_chanel)
 				{
 				case CHANEL_1:
 					if (current_ant == MHA1MY)
@@ -450,31 +626,19 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				break;
 				update_tm(1);
 			}
-		case 29:
-			char chan_chk;
-			chan_chk = tmp_word & 7;
-			if (current_chan != CHANEL(chan_chk) - 1)
-			{
-				switch (CHANEL(chan_chk) - 1)
-				{
-				case CHANEL_1: current_ant = MHA1MY; break;
-				case CHANEL_2: current_ant = MHA2MY; break;
-				}
-			}
-			current_chan = CHANEL(chan_chk - 1);
-			update_tm(1);
-			break;
-		};
-		emit emit_update_graphics();
+		}
+		update_graphics();
 	}
 }
 void MBK02_widg::update_graphics()
 {
 	if ((current_lit > 0) && (current_lit < 9))
 		Lit_le->setText(QString::number(current_lit));
-	if ((current_chan != CHANEL_OFF) || (current_chan != CHANEL_ERR))
+	else
+		Lit_le->setText("");
+	if ((current_chanel != CHANEL_OFF) || (current_chanel != CHANEL_ERR))
 	{
-		switch (current_chan)
+		switch (current_chanel)
 		{
 		case CHANEL_1:
 			Chan1_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
@@ -485,11 +649,11 @@ void MBK02_widg::update_graphics()
 			Chan2_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
 			break;
 		}
-		if (current_chan == CHANEL_OFF)
-		{
-			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
-			Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
-		}
+	}
+	else
+	{
+		Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+		Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
 	if (current_ant != MHAOFF)
 	{
@@ -511,5 +675,17 @@ void MBK02_widg::update_graphics()
 		Sig_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 		Sig_pbut->setText("Остутствует");
 	}
+
+}
+MBK02_widg::~MBK02_widg()
+{
+	mku_slot_thr.quit();
+	mku_signal_thr.quit();
+
+	mku_slot_thr.quit();
+	mku_signal_thr.quit();
+
+	power_slot_thr.quit();
+	power_signal_thr.quit();
 }
 

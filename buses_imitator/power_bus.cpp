@@ -33,8 +33,9 @@ PowerWidget::PowerWidget(QWidget *parent)
 
 void PowerWidget::tmp_funk()
 {
+	set_u(0, 27.0);
 	set_u(1, 27.0);
-	set_u(0, 31.0);
+	set_u(2, 27.0);
 }
 
 void PowerWidget::set_u(int bus, double volt) //
