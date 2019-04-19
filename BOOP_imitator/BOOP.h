@@ -18,7 +18,7 @@ class BOOP : public QWidget
 public:
 	BOOP();
 	~BOOP();
-	void new_data(int mko, int addr, int saddr, QVariantList words);
+	void new_data(int mko, int address, int subaddress, QVariantList words);
 
 private:
 	// Main Window
@@ -63,13 +63,17 @@ private:
 	QTextEdit *logArea;
 
 public slots:
-	 void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+	 void new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word);
+
 private:
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SLOT_Thread mku_signal_thr;
+
+	const int MKO = 1;
+	const int address = 9;
 };
 
 #endif

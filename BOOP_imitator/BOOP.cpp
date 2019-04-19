@@ -2,7 +2,26 @@
 #include <QMessageBox>
 #include "rpc_ports.h"
 
-BOOP::BOOP() {
+class MKOWord
+{
+public:
+	MKOWord(quint16 raw_word)
+	{
+		this->command_word = raw_word;
+	}
+
+	quint16 command_word;			
+
+	struct {
+		quint16 words_count : 5,
+				subaddress : 5,   
+				transaction_direction : 1,      
+				address : 5;
+	};
+};
+
+BOOP::BOOP()
+{
 
   // Contains other containers
 
@@ -220,9 +239,7 @@ BOOP::BOOP() {
 	  this->deleteLater();
 	  return;
   }
-
 }
-
 BOOP::~BOOP()
 {
 	slot_thr.quit();
@@ -231,9 +248,23 @@ BOOP::~BOOP()
 	mku_slot_thr.quit();
 	mku_signal_thr.quit();
 }
-void BOOP::new_message (QVariant dt, int mko, int line, int cwd, QVariantList words, int os) 
+
+void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word) 
+{
+	MKOWord *parsed_word = new MKOWord(command_word);
+
+	if ((MKO == this->MKO) && (parsed_word->address == this->address))
+	{
+
+		QString _message = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(parsed_word->subaddress).arg(parsed_word->command_word);
+		// msg_to_log(_message);
+
+		// Do something
+	}
+}
+void BOOP::new_data(int mko, int address, int subaddress, QVariantList words)
 {
 
-  // Do something
+	// Do something
 
 }
