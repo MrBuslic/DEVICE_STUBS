@@ -12,14 +12,12 @@ public:
 	////////////////////////////////////
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void new_ku_732(int ku_n, int length, double u, int line);
+	void set_new_mbk02_tm(int ku_n, int line);
 	void new_KPI(QVariantList KPI_list);
 	void auto_scroll_clicked(int _state);
 	void update_tm(int sadr);
-	void log_timer_ontimer();
-	void reverse_ant();
-	void lose_cont();
-	void update_graphics();
+	void get_power(double volt);
 	////////////////////////////////////
 };
 
@@ -56,7 +54,6 @@ signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
-	void emit_update_graphics();
 };
 
 class RPC_MBK02_SIGNAL_Thread : public RPC_SIGNAL_Thread

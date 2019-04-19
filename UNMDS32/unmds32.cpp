@@ -8,6 +8,7 @@ extern "C" {
 #include <socket_rpc.h>
 #include <windows.h>
 #include "mds32_rpc.h"
+#include "rpc_ports.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 int mds_count = 0;
@@ -23,12 +24,12 @@ private:
 		for (int i = 0; i < 2; i++)
 		{
 			RPC_mds32_SLOT_Thread* slot_thr = new RPC_mds32_SLOT_Thread;
-			slot_thr->set_connection_params("127.0.0.1", 30020+i);
+			slot_thr->set_connection_params("127.0.0.1", MDS_SLOT +i);
 			slot_thr->start();
 			//if (!slot_thr.wait_connected(3))
 			//	return false;
 			RPC_mds32_SIGNAL_Thread* signal_thr = new RPC_mds32_SIGNAL_Thread;
-			signal_thr->set_connection_params("127.0.0.1", 30025+i);
+			signal_thr->set_connection_params("127.0.0.1", MDS_SIGNAL +i);
 			signal_thr->start();
 			//if (!signal_thr.wait_connected(3))
 			//	return false;

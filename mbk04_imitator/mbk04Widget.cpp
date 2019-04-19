@@ -1,10 +1,15 @@
 #include "mbk04Widget.h"
+#include "rpc_ports.h"
+#include <bitset>
 //#include "MonitorDBController.hpp"
 //#include "ProtocolDBController.hpp"
 //#include "FrameDBController.hpp"
 //#include "instruments.h"
 #include "mbk04_socket_rpc.h"
-#include "rpc_ports.h"
+//#include "frame_bus_rpc"
+#include <QTimer>
+#include <qmessagebox.h>
+
 //структура командного слова сообщения МКО
 //
 union MKOWord
@@ -77,8 +82,19 @@ MainWidget::MainWidget()
 
 	current_dev = CURRENT_DEV::OFF;
 	current_rezh = REZH_FRAME::OFF_REZH;
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start();
 
-	QString ip_str = "127.0.0.1";
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start();
+
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в Mkprm");
+		this->deleteLater();
+		return;
+	}
+	QString ip_str = "127.0.0.1"; 
 	int slot_port = MBK04_SLOT;
 	int signal_port = MBK04_SIGNAL;
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
@@ -90,6 +106,7 @@ MainWidget::MainWidget()
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
+	
 }
 
 
@@ -112,7 +129,7 @@ void MainWidget::new_ku(int ku_n, int length, double u)
 	{
 	case 16: current_dev = CURRENT_DEV::MAIN; emit state_changed_signal(); break;
 	case 17: current_dev = CURRENT_DEV::OFF; emit state_changed_signal(); break;
-	case 18:current_dev = CURRENT_DEV::RESERVE; emit state_changed_signal(); break;
+	case 18: current_dev = CURRENT_DEV::RESERVE; emit state_changed_signal(); break;
 
 	default:
 		break;
@@ -141,6 +158,10 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			default:
 				break;
 			};
+		}
+		else if (tmp_cwd.subadr == 6)
+		{
+			new_SCHBK(words);
 		}
 
 	}
@@ -189,6 +210,9 @@ void MainWidget::state_changed()
 	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
 	if (current_dev != CURRENT_DEV::OFF)
 	{
+		timer = new QTimer(this);
+
+		connect(timer, &QTimer::timeout, this, &MainWidget::send_frame);
 
 
 		switch (current_rezh)
@@ -197,6 +221,8 @@ void MainWidget::state_changed()
 			new_ok2 = 0;
 			new_ok3 = 0;
 			new_ok4 = 1;
+			clean_frame_data("vtf");
+			timer->start(11000);
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
@@ -205,6 +231,8 @@ void MainWidget::state_changed()
 			new_ok2 = 0;
 			new_ok3 = 1;
 			new_ok4 = 0;
+			clean_frame_data("pi8");
+			timer->start(4000);
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -213,6 +241,8 @@ void MainWidget::state_changed()
 			new_ok2 = 1;
 			new_ok3 = 0;
 			new_ok4 = 0;
+			clean_frame_data("pi15");
+			timer->start(4000);
 			ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -221,6 +251,7 @@ void MainWidget::state_changed()
 			new_ok2 = 1;
 			new_ok3 = 1;
 			new_ok4 = 1;
+			timer->stop();
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -229,9 +260,81 @@ void MainWidget::state_changed()
 		default:
 			break;
 		}
+		
 		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
 		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
 		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
 	}
 	emit new_tm(tmp_new_tm);
+}
+
+//void MainWidget::run()
+//{
+//
+////задаем таймер, который каждые четыре секунды отгружает кадр, посмотреть как во втором серваке это реализовано
+//Скушать печеньку
+//}
+//void MainWidget::new_KVIT(int _kvit, int line_num)
+//{
+//	data_includer.includeKVIT(frame.get(), _kvit, line_num);
+//}
+//
+void MainWidget::new_SCHBK(QVariantList words)
+{
+	 
+	//std::bitset<32> schbk_set(SCHBK);
+	BYTE_ARRAY schbk_arr = BYTE_ARRAY(new BYTE[32]);
+	for (int i = 0; i < 16; i++)
+	{
+
+			schbk_arr[i] = words.at(i).toInt() & 0xF0;
+		
+			schbk_arr[2*i] = words.at(i).toInt() & 0xF;
+	}
+	data_includer.includeSCHBK((unsigned char*)(frame.data()), schbk_arr.get(), 32);
+}
+
+void MainWidget::clean_frame_data(QString REZH)
+{
+	int i = 0;
+	QFile frame_file(QCoreApplication::applicationDirPath() + "/" + REZH + ".dat"); //уточнить имя файла и путь к нему!
+	
+	if (!frame_file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return ;
+
+	QStringList tmp_list;
+	QTextStream in_frame(&frame_file);
+	tmp_list = in_frame.readAll().split("\n");
+	clean_frame = QByteArray();
+	clean_frame.resize(tmp_list.count());
+	i = 0;
+	for (QStringList::iterator itr = tmp_list.begin(); itr != tmp_list.end(); itr++, i++)
+	{
+		clean_frame[i] = itr->toInt();
+	}
+	frame_file.close();
+	frame = clean_frame;
+}
+
+void MainWidget::send_frame()
+{
+	if (current_rezh == REZH_FRAME::OFF_REZH)
+		return;
+
+	QString mode;
+	switch (current_rezh)
+	{
+	case REZH_FRAME::VTF:
+		mode = "ВТФ";
+		break;
+
+	case REZH_FRAME::PI8:
+		mode = "ПИ8";
+		break;
+	case REZH_FRAME::PI15:
+		mode = "ПИ15";
+		break;
+	}
+	
+	frame_slot_thr.get_frame_bus_obj()->make_new_frame(mode, frame);
 }

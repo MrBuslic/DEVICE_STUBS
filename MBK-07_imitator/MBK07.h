@@ -15,6 +15,8 @@
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
+#include "../buses_imitator/power_bus_rpc.h"
+//#include "../buses_imitator/frame_bus_rpc.h"
 
 enum FSMU_numbB
 {
@@ -36,13 +38,15 @@ enum STAB
 	KG1_STAB = 1,
 	KG2_STAB = 2,
 	HIGH_STAB = 3,
+	OFF_STAB = 4
 
 };
 enum ANTENNA
 {
 	OHA = 0,
 	MHAPY = 1,
-	MHAMY = 2
+	MHAMY = 2,
+	ANT_OFF = 3
 };
 enum full_mode
 {
@@ -79,7 +83,7 @@ class MBK07_widg : public QWidget
 
 public:
 	MBK07_widg(QWidget *parent = 0);
-	//~MBK07_widg();
+	~MBK07_widg();
 	
 
 private:
@@ -95,7 +99,6 @@ private:
 	FSVU_numbB current_FSVU = FSVU_OFF;
 	STAB current_stab;
 	ANTENNA current_antenna;
-
 
 	bool IM = false;
 
@@ -124,9 +127,12 @@ private:
 	QList<QCheckBox*> set_list_mu2;
 	QList<QLineEdit*> sub_le_list;
 
-	void paint_buttons();
-	void write_words();
 	void set_new_tm();
+	void imit_on();
+	void imit_off();
+	void update_graphics();
+	void set_power_back();
+	void change_power();
 protected:
 	
 public slots:
@@ -134,7 +140,13 @@ public slots:
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
+	void get_power(double volt);
+	//void get_frame(int frame);
+signals:
+	void push_frame();
 private:
+	void msg_to_log(const QString& _msg);
+
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
 	QTextDocument* _doc;
@@ -145,20 +157,29 @@ private:
 	QTimer log_timer;
 	QStringList log_buffer;
 	QMutex log_mutex;
-	void msg_to_log(const QString& _msg);
+	bool ab_state = true;
+	QString name = "лай-07";
+	int bus = 0;
+	int power = 0;
+	int fsmu_v = 0x033B;
+	int fsvu_v = 0x0292;
 
+	QMap<int, QString> mode_names;
+	QMap<int, LITERA> lit_map;
+	QMap<int, QString> stab_names;
+	QMap<int, QString> ant_names;
+	
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
-	QMap<int, QString> mode_names;
-	QMap<int, LITERA> lit_map;
-	QMap<int, QString> stab_names;
-	QMap<int, QString> ant_names;
-	bool ab_state = true;
+//	RPC_frame_bus_SLOT_Thread frame_slot_thr;
+//	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
 };
 
 #endif // MBK07_H

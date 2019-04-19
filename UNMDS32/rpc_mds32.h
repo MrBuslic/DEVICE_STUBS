@@ -24,7 +24,7 @@ class RpcMDS32Widget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcMDS32Widget(int slot_port, int signal_port);
+	RpcMDS32Widget(int mds_num);
 public slots:
 
 	void auto_scroll_clicked(int _state);

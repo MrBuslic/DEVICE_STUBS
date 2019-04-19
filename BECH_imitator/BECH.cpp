@@ -23,7 +23,7 @@ BECH_widg::BECH_widg(QWidget *parent)
 
 	mode_names.insert(0, "ПИ-15");
 	mode_names.insert(1, "ПИ-8");
-	mode_names.insert(2, "Ошибка");
+	mode_names.insert(2, "");
 
 	OG_start_warm.insert(OG_1, 0);
 	OG_start_warm.insert(OG_2, 0);
@@ -95,25 +95,21 @@ BECH_widg::BECH_widg(QWidget *parent)
 	All_vblay->addWidget(KP_gb);
 	All_vblay->addLayout(FINIK_REZH_hlay);
 
-
 	inter_tmr = new QTimer(this);
 	connect(inter_tmr, &QTimer::timeout, this, &BECH_widg::BECH_interrupt_setup);
-	inter_tmr->start(1000);
 
-
-	warm_og = new QTimer(this);
-	warm_og->start(tm_towarm);
-	warm_og->setSingleShot(true);
-	connect(warm_og, &QTimer::timeout, this, &BECH_widg::set_warm_og);
-	connect(warm_og, &QTimer::stop, this, &BECH_widg::set_warm_og);
-	OG_start_warm[OG_1] = (QDateTime::currentMSecsSinceEpoch());
+	warm_og_tmr = new QTimer(this);
+	warm_og_tmr->setSingleShot(true);
+	connect(warm_og_tmr, &QTimer::timeout, this, &BECH_widg::set_warm_og);
 
 	AbOn_tmr = new QTimer(this);
-	AbOn_tmr->start(5000);
 	AbOn_tmr->setSingleShot(true);
 	connect(AbOn_tmr, &QTimer::timeout, this, &BECH_widg::omni_connect);
 
-	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
+	Power_tmr = new QTimer(this);
+	Power_tmr->setSingleShot(true);
+	connect(Power_tmr, &QTimer::timeout, this, &BECH_widg::set_change_power);
+
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
@@ -152,14 +148,27 @@ BECH_widg::BECH_widg(QWidget *parent)
 		this->deleteLater();
 		return;
 	}
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); // вот тут падает
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); // вот тут падает
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
+	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	flag = false;
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
-
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -183,8 +192,6 @@ BECH_widg::BECH_widg(QWidget *parent)
 	All_vblay->addWidget(edit);
 	All_vblay->addWidget(auto_scroll_box);
 
-	update_graphics();
-	set_new_tm();
 }
 
 void BECH_widg::BECH_interrupt_setup()
@@ -198,14 +205,96 @@ void BECH_widg::BECH_interrupt_setup()
 
 void BECH_widg::BECH_interrupt_run()
 {
-	//	QString t_msg = QString("Выдаю сигнал на канале %1 линии %2 с амплитудой %3 и длительностью %4").arg(n).arg(chan).arg(u).arg(t);
-	//	msg_to_log(t_msg);
 	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan, u, t);
+}
+
+void BECH_widg::get_power(double volt)
+{
+	_volt = volt;
+	if (volt >= 20.0)
+		imit_on();
+	else
+		if (volt == 0) imit_off();
+}
+
+void BECH_widg::set_power_back()
+{
+	double curr;
+	if (power_vt != 0)
+	{
+		curr = (double)power_vt / _volt;
+	}
+	else
+		curr = 0;
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
+
+void BECH_widg::imit_off()
+{
+	msg_to_log("Питание отключено");
+	current_OG = OG_ERR;
+	current_FINIK = FINIK_ERR;
+	current_FINIK_REZH = FINIK_REZH_ERR;
+	current_KP = KP_OFF;
+	current_LKA = LKA_OFF;
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	flag = false;
+	update_graphics();
+	inter_tmr->stop();
+}
+
+void BECH_widg::imit_on()
+{
+	msg_to_log("Питание включено");
+	current_OG = OG_1;
+	current_FINIK = FINIK_1;
+	current_FINIK_REZH = FINIK_REZH_PI8;
+	AbOn_tmr->start(5000);
+	change_power(true);
+	update_graphics();
+	update_time();
+	set_new_tm();
+	inter_tmr->start(1000);
+}
+
+void BECH_widg::set_change_power()
+{
+	change_power(false);
+}
+
+void BECH_widg::change_power(bool switch_og)
+{
+	if (switch_og)//генератор переключился?
+	{
+		power_vt = 60;
+		Power_tmr->start(tm_towarm);
+		set_power_back();
+	}
+	else
+	{
+		switch (power_vt)
+		{
+		case 0:
+			power_vt = 60;
+			Power_tmr->start(tm_towarm);
+			set_power_back();
+			break;
+		case 60:
+			power_vt = 35;
+			set_power_back();
+			break;
+		case 35:
+			power_vt = 60;
+			Power_tmr->start(tm_towarm);
+			set_power_back();
+			break;
+		}
+	}
+	switch_og = false;
 }
 
 void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
-
 	int uu = 0;
 	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 	//	msg_to_log(_msg);
@@ -228,7 +317,7 @@ void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_
 		break;
 	}
 	update_graphics();
-	//	set_new_tm();
+	set_new_tm();
 }
 
 
@@ -283,16 +372,18 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		if (reset != 15)
 		{
 			char finik_rezh_ch = tmp_word & 0x30;
-			//	char lka_ch = 1; мат ком
-			//	char kp_ch = 1; мат ком
 			char tmp = tmp_word & 3;
 			if ((tmp_word & 3) > 0)
 			{
-				if (current_OG != OG_ERR)
+				if (current_OG != OG((tmp_word & 3) - 1))
 				{
+					if (warm_og_tmr->isActive())
+						warm_og_tmr->stop();
 					set_warm_og();
+					current_OG = OG((tmp_word & 3) - 1);
+					update_time();
+					change_power(true);
 				}
-				current_OG = OG((tmp_word & 3) - 1);
 			}
 			if ((tmp_word & 0xC) >> 2 > 0)
 				current_FINIK = FINIK(((tmp_word & 0xC) >> 2) - 1);
@@ -314,35 +405,31 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		}
 
 		update_graphics();
-		update_time();
 		set_new_tm();
 	}
 }
 
 void BECH_widg::set_warm_og()
 {
-	if (OG_finish_warm[current_OG] != 0)
+	ready_og = false;
+	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+	OG_finish_warm[current_OG] = msecs_time;
+	if (OG_start_warm[current_OG] == 0) OG_start_warm[current_OG] = OG_finish_warm[current_OG] - standart_tm;
+	if (((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= (standart_tm - warm_er)) || ((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= (standart_tm + warm_er)))
 	{
-		qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
-		OG_finish_warm[current_OG] = msecs_time;
-		if ((OG_finish_warm[current_OG] - OG_start_warm[current_OG]) >= standart_tm)
-		{
-			ready_og = true;
-			msg_to_log("Прогрелся ОГ № " + QString::number(current_OG + 1));
-			set_new_tm();
-		}
-		else
-		{
-			ready_og = false;
-			msg_to_log("Прогревание ОГ № " + QString::number(current_OG + 1) + " прервано");
-		}
+		ready_og = true;
+		msg_to_log("Прогрелся ОГ № " + QString::number(current_OG + 1));
+		set_new_tm();
+	}
+	else
+	{
+		msg_to_log("Прогревание ОГ № " + QString::number(current_OG + 1) + " прервано");
 	}
 }
 
 void BECH_widg::update_time()
 {
 	ready_og = false;
-	warm_og->stop();
 	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
 	if (OG_finish_warm[current_OG] == 0) // Если ОГ не нагревался вообще
 	{
@@ -352,7 +439,8 @@ void BECH_widg::update_time()
 	}
 	else // Если нагревался
 	{
-		if (OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= standart_tm) // Если ОГ нагрелся полностью
+		// Если ОГ нагрелся полностью
+		if ((OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= (standart_tm - warm_er)) || (OG_finish_warm[current_OG] - OG_start_warm[current_OG] >= (standart_tm - warm_er)))
 		{
 			if (msecs_time - OG_finish_warm[current_OG] >= (standart_tm * cooling_cof)) // Если после полного нагрева ОГ прошло достаточно времени, чтобы тот полностью охладился
 			{
@@ -385,9 +473,9 @@ void BECH_widg::update_time()
 				tm_towarm = OG_finish_warm[current_OG] - msecs_time;
 			}
 		}
-		if (tm_towarm != 0)
-			warm_og->start(tm_towarm);
 	}
+	if (tm_towarm != 0)
+		warm_og_tmr->start(tm_towarm);
 }
 
 void BECH_widg::omni_connect()
@@ -478,4 +566,19 @@ void BECH_widg::set_new_tm()
 	if (ready_og) _word += 0x8000;
 	tmp_list.push_back(_word);
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
+}
+
+BECH_widg::~BECH_widg()
+{
+	slot_thr.quit();
+	signal_thr.quit();
+
+	mku_slot_thr.quit();
+	mku_signal_thr.quit();
+
+	interrupt_slot_thr.quit();
+	interrupt_signal_thr.quit();
+
+	power_slot_thr.quit();
+	power_signal_thr.quit();
 }

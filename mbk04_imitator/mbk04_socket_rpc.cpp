@@ -2,6 +2,7 @@
 
 int Socket_RPC_SLOT_Object::obj_num = 0;
 int Socket_RPC_SIGNAL_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -77,6 +78,7 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
 		operators_map["new_ku(int, int, double)"] = &Socket_RPC_SLOT_Object::new_ku;
+		operators_map["send_frame()"] = &Socket_RPC_SLOT_Object::send_frame;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -261,8 +263,10 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("new_tm(int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_tm  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << nw;
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_tm").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		SRPCSignalClass::Instance().toLog(QString("new_tm  call_number %2 nw =  %1").arg(RPCSignalClass::QVariantToString(nw)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -282,7 +286,8 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
 		tmp_stream << QString("state_changed_signal()");
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal state_changed_signal").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal state_changed_signal  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
@@ -338,6 +343,22 @@ int Socket_RPC_SIGNAL_Object::obj_num = 0;
 			int length = _values.at(1).value<int>();
 			double u = _values.at(2).value<double>();
 			app->new_ku(ku_n, length, u);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::send_frame(QVariantList& _values)
+	{
+		try
+		{
+			app->send_frame();
 			return 0;
 		}
 		catch(const std::exception &)

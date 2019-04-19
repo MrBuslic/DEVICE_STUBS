@@ -1,4 +1,4 @@
-#include "buses.h"
+#include "frame_bus.h"
 #include <QApplication>
 #include <QTextCodec>
 
@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 //	LogWidget log_w;
 //	log_w.show();
 
-	BusesWidget buses_widget;
+	FrameBusWidget buses_widget;
 	buses_widget.show();
 
     return app.exec();

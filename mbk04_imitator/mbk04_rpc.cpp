@@ -116,6 +116,8 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("mbk04 new signal " + op_name);
 
@@ -123,7 +125,7 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 			{
 				int nw;
 				tmp_stream >> nw;
-				SRPCSignalClass::Instance().toLog("mbk04 " + op_name +" nw = "+RPCSignalClass::QVariantToString(nw));
+				SRPCSignalClass::Instance().toLog("mbk04 " + op_name +" call_number "+ QString::number(call_number) + " nw = "+RPCSignalClass::QVariantToString(nw));
 				emit new_tm(nw);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
@@ -133,7 +135,7 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 			if (op_name == "state_changed_signal()")
 			{
@@ -146,7 +148,7 @@ void RPC_mbk04_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("mbk04 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}
@@ -178,6 +180,13 @@ void RPC_mbk04_SLOT_Object::new_ku(int ku_n, int length, double u)
 	SRPCSignalClass::Instance().toLog(QString("mbk04 dynamic_call new_ku %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("new_ku(int, int, double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mbk04 dynamic_call finished new_ku");
+}
+void RPC_mbk04_SLOT_Object::send_frame()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("mbk04 dynamic_call send_frame %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("send_frame()", tmp_list);
+	SRPCSignalClass::Instance().toLog("mbk04 dynamic_call finished send_frame");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

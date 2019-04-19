@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include "mds32_socket_rpc.h"
 #include <bitset>
+#include "rpc_ports.h"
 
 union mds_chan
 {
@@ -25,7 +26,7 @@ union mds_chan
 			 ch_8 : 1;
 	};
 };
-RpcMDS32Widget::RpcMDS32Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true)
+RpcMDS32Widget::RpcMDS32Widget(int mds_num) : QWidget(), auto_scroll(true)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -69,13 +70,13 @@ RpcMDS32Widget::RpcMDS32Widget(int slot_port, int signal_port) : QWidget(), auto
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
-	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->set_params(ip_str, MDS_SLOT+mds_num);
 	rpc_slot_srv->start();
 	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
-	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->set_params(ip_str, MDS_SIGNAL+mds_num);
 	rpc_signal_srv->start();
-	setWindowTitle(QString("mds32 %1").arg(slot_port - 30019));
+	setWindowTitle(QString("mds32 %1").arg(mds_num - 30019));
 }
 
 void RpcMDS32Widget::check_box_clicked()
