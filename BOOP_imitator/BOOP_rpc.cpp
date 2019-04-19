@@ -111,16 +111,16 @@ void RPC_BOOP_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
- RPC_BOOP_SLOT_Object::void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+ RPC_BOOP_SLOT_Object::void new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word)
 {
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(dt);
-	tmp_list << QVariant(mko);
+	tmp_list << QVariant(MKO);
 	tmp_list << QVariant(line);
-	tmp_list << QVariant(cwd);
+	tmp_list << QVariant(command_word);
 	tmp_list << QVariant(words);
-	tmp_list << QVariant(os);
+	tmp_list << QVariant(respond_word);
 	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call void new_message %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("void new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);

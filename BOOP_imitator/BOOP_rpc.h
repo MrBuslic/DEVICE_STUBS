@@ -11,7 +11,7 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	 void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+	 void new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word);
 	////////////////////////////////////
 };
 

@@ -2,9 +2,8 @@
 #include <QMessageBox>
 #include "rpc_ports.h"
 
-class MKOWord
+union MKOWord
 {
-public:
 	MKOWord(quint16 raw_word)
 	{
 		this->command_word = raw_word;
@@ -227,6 +226,10 @@ BOOP::BOOP()
 	  return;
   }
 
+  connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)), Qt::QueuedConnection);
+
+  slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
+
   mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
   mku_slot_thr.start();
 
@@ -242,6 +245,7 @@ BOOP::BOOP()
 }
 BOOP::~BOOP()
 {
+	slot_thr.get_omnibus_obj()->switch_ab(1, 9, false);
 	slot_thr.quit();
 	signal_thr.quit();
 
@@ -251,13 +255,13 @@ BOOP::~BOOP()
 
 void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word) 
 {
-	MKOWord *parsed_word = new MKOWord(command_word);
+	MKOWord parsed_word(command_word);
 
-	if ((MKO == this->MKO) && (parsed_word->address == this->address))
+	if ((MKO == this->MKO) && (parsed_word.address == this->address))
 	{
 
-		QString _message = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(parsed_word->subaddress).arg(parsed_word->command_word);
-		// msg_to_log(_message);
+		QString _message = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(parsed_word.subaddress).arg(parsed_word.command_word);
+		logArea->append(_message);
 
 		// Do something
 	}

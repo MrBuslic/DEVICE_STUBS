@@ -265,12 +265,12 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariant dt = _values.at(0).value<QVariant>();
-			int mko = _values.at(1).value<int>();
+			int MKO = _values.at(1).value<int>();
 			int line = _values.at(2).value<int>();
-			int cwd = _values.at(3).value<int>();
+			int command_word = _values.at(3).value<int>();
 			QVariantList words = _values.at(4).value<QVariantList>();
-			int os = _values.at(5).value<int>();
-			 res = app->void new_message(dt, mko, line, cwd, words, os);
+			int respond_word = _values.at(5).value<int>();
+			 res = app->void new_message(dt, MKO, line, command_word, words, respond_word);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
