@@ -9,12 +9,12 @@ union MKOWord
 		this->command_word = raw_word;
 	}
 
-	quint16 command_word;			
+	quint16 command_word;
 
 	struct {
 		quint16 words_count : 5,
-				subaddress : 5,   
-				transaction_direction : 1,      
+				subaddress : 5,
+				transaction_direction : 1,
 				address : 5;
 	};
 };
@@ -214,7 +214,7 @@ BOOP::BOOP()
 
 
   slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-  slot_thr.start(); 
+  slot_thr.start();
 
   signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
   signal_thr.start();
@@ -253,18 +253,31 @@ BOOP::~BOOP()
 	mku_signal_thr.quit();
 }
 
-void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word) 
+void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word)
 {
+	if (respond_word = -1)
+		return;
+
 	MKOWord parsed_word(command_word);
 
-	if ((MKO == this->MKO) && (parsed_word.address == this->address))
-	{
+	if ((MKO != this->MKO) || (parsed_word.address != this->address))
+		return;
 
-		QString _message = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(parsed_word.subaddress).arg(parsed_word.command_word);
-		logArea->append(_message);
+	int _checksum = 0;
+	for (int i = 0; i < words_count - 1; i++)
+		_checksum += words.at(i).toInt();
 
-		// Do something
-	}
+	if (_checksum != words.last().toInt())
+		return;
+
+	QString _message = QString("[%1] принял сигнал на подадресе %2 c КС %3")
+		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
+										 .arg(parsed_word.subaddress, parsed_word.command_word);
+
+	logArea->append(_message);
+
+	// Do something
+
 }
 void BOOP::new_data(int mko, int address, int subaddress, QVariantList words)
 {
