@@ -33,24 +33,24 @@ PowerWidget::PowerWidget(QWidget *parent)
 
 void PowerWidget::tmp_funk()
 {
-	set_u(0, 27.0);
-	set_u(1, 27.0);
-	set_u(2, 27.0);
+	set_u(K1, 27.0);
+	set_u(NK, 27.0);
+	set_u(K2, 27.0);
 }
 
 void PowerWidget::set_u(int bus, double volt) //
 {
 	switch (bus)
 	{
-	case 0:
+	case NK:
 		nk_volt = volt;
 		emit u_on_nk(volt);
 		break;
-	case 1:
+	case K1:
 		k1_volt = volt;
 		emit u_on_k1(volt);
 		break;
-	case 2:
+	case K2:
 		k2_volt = volt;
 		emit u_on_k2(volt);
 		break;
@@ -62,7 +62,7 @@ void PowerWidget::get_i(int bus, double& curr)
 	double tmp_curr = 0;
 	switch (bus)
 	{
-	case 0:
+	case NK:
 		for (QMap<QString, double>::iterator itr = nk_curr_map.begin(); itr != nk_curr_map.end(); itr++)
 		{
 			tmp_curr += itr.value();
@@ -70,7 +70,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		curr = tmp_curr;
 		nk_curr = tmp_curr;
 		break;
-	case 1:
+	case K1:
 		for (QMap<QString, double>::iterator itr = k1_curr_map.begin(); itr != k1_curr_map.end(); itr++)
 		{
 			tmp_curr += itr.value();
@@ -78,7 +78,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		curr = tmp_curr;
 		k1_curr = tmp_curr;
 		break;
-	case 2:
+	case K2:
 		for (QMap<QString, double>::iterator itr = k2_curr_map.begin(); itr != k2_curr_map.end(); itr++)
 		{
 			tmp_curr += itr.value();
@@ -93,13 +93,13 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 {
 	switch (bus)
 	{
-	case 0:
+	case NK:
 		nk_curr_map[name] = curr;
 		break;
-	case 1:
+	case K1:
 		k1_curr_map[name] = curr;
 		break;
-	case 2:
+	case K2:
 		k2_curr_map[name] = curr;
 		break;
 
