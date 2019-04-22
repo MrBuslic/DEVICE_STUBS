@@ -53,6 +53,7 @@ private:
 	RPC_kp50_SLOT_Thread kp50_slot_thr;
 	RPC_kp50_SIGNAL_Thread kp50_signal_thr;
 signals:
+	void update_graphics_signal();
 	void power_out(int n, double _u);
 };
 
