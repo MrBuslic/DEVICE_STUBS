@@ -34,6 +34,7 @@ BECH_widg::BECH_widg(QWidget *parent)
 	OG_finish_warm.insert(OG_3, 0);
 
 	ready_og = false;
+	flag_on = false;
 	tm_towarm = standart_tm;
 	cooling_cof = 4;
 
@@ -210,11 +211,12 @@ void BECH_widg::BECH_interrupt_run()
 
 void BECH_widg::get_power(double _volt)
 {
-	volt = volt;
+	volt = _volt;
 	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt == 0) imit_off();
+		if (volt < 1)
+			imit_off();
 }
 
 void BECH_widg::set_power_back()
@@ -231,6 +233,10 @@ void BECH_widg::set_power_back()
 
 void BECH_widg::imit_off()
 {
+	if (!flag_on)
+		return;
+
+	flag_on = false;
 	msg_to_log("Питание отключено");
 	current_OG = OG_ERR;
 	current_FINIK = FINIK_ERR;
@@ -245,6 +251,9 @@ void BECH_widg::imit_off()
 
 void BECH_widg::imit_on()
 {
+	if (flag_on)
+		return;
+	flag_on = true;
 	msg_to_log("Питание включено");
 	current_OG = OG_1;
 	current_FINIK = FINIK_1;
