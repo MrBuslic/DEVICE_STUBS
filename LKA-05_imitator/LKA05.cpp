@@ -97,6 +97,10 @@ LKA05_widg::LKA05_widg()
 	v_l->addLayout(h_layout_MU);
 	v_l->addLayout(MU_glayout);
 
+	AbOn_tmr = new QTimer(this);
+	AbOn_tmr->setSingleShot(true);
+	connect(AbOn_tmr, &QTimer::timeout, this, &LKA05_widg::omni_connect);
+
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
@@ -137,6 +141,19 @@ LKA05_widg::LKA05_widg()
 		return;
 	}
 
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); // вот тут падает
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); // вот тут падает
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
 	QString ip_str = "127.0.0.1";
 	int slot_port = LKA05_SLOT;
 	int signal_port = LKA05_SIGNAL;
@@ -151,18 +168,22 @@ LKA05_widg::LKA05_widg()
 
 	MKO = 1;
 	adr = 4;
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
-
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
 	connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
 
-	
+	for (int i = 0; i < 3; i++)
+	{
+		mvku_modules[i].switch_cur_dev(CURRENT_DEV(3));
+		mvmk_modules[i].switch_cur_dev(CURRENT_DEV(3));
+	}
+//	mu_module.switch_cur_dev(CURRENT_DEV(3)); не может быть откл
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV(3));
 	paint_buttons();
 	set_new_tm();
 }
@@ -170,6 +191,56 @@ LKA05_widg::LKA05_widg()
 LKA05_widg::~LKA05_widg()
 {
 
+}
+
+void LKA05_widg::imit_off()
+{
+	msg_to_log("Питание отключено");
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	flag = false;
+	paint_buttons(); //	update_graphics();
+//	inter_tmr->stop();
+}
+
+void LKA05_widg::imit_on()
+{
+	msg_to_log("Питание включено");
+	AbOn_tmr->start(11000);
+	change_power();//я думаю тут не нужен бул
+	paint_buttons(); //	update_graphics();
+//	update_time();
+	set_new_tm();
+//	inter_tmr->start(1000);
+}
+
+void LKA05_widg::omni_connect()
+{
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	flag = true;
+	set_new_tm();
+}
+
+void LKA05_widg::change_power()
+{
+	power = 9;
+	set_power_back();
+}
+
+void LKA05_widg::set_power_back()
+{
+	double curr;
+	curr = (double)power / volt;
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
+
+
+void LKA05_widg::get_power(double _volt)
+{
+	volt = _volt;
+	if (volt >= 20.0)
+		imit_on();
+	else
+		if (volt == 0) imit_off();
 }
 
 QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
@@ -182,6 +253,18 @@ QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
 	set_list.push_back(cb);
 	return cb;
 }
+
+void LKA05_widg::msg_to_log(const QString& _msg)
+{
+	{
+		QMutexLocker lock(&log_mutex);
+		log_buffer << _msg;
+	}
+	_cursor->insertText(_msg + "\n");
+	if (auto_scroll)
+		_scroll_bar->setValue(_scroll_bar->maximum());
+}
+
 void LKA05_widg::new_ku_732(int ku_n, int length, double u, int line)
 {
 
@@ -377,6 +460,21 @@ void LKA05_widg::paint_buttons()
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
+	//switch (mu_module.get_current_dev())
+	//{
+	//case OFF:
+	//	MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	break;
+	//case MAIN:
+	//	MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//	MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	break;
+	//case RESERVE:
+	//	MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//	MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
+	//	break;
+	//};
 	for (int i = 0; i < 3; i++)
 	{
 		switch (mvku_modules[i].get_current_dev())

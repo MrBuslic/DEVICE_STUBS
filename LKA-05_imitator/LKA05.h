@@ -15,6 +15,7 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../mbk04_imitator/mbk04_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
+#include "../buses_imitator/power_bus_rpc.h"
 
 class LKA05_widg : public QWidget
 {
@@ -55,7 +56,6 @@ private:
 	QGridLayout *MU_glayout;
 	QGridLayout *MPVN_glayout;
 	bool flag;
-	//// window choose settings
 	QPushButton * okBut;
 	QDialog *dlg;
 	QGroupBox* CheckButtonsBox;
@@ -67,8 +67,24 @@ private:
 	void paint_buttons();
 	void new_data_mv (int saddr);
 
-	//int switch_dev;
+	void msg_to_log(const QString& _msg);
+	QStringList log_buffer;
+	QMutex log_mutex;
+	QScrollBar* _scroll_bar;
+	QTextCursor* _cursor;
+	bool auto_scroll;
 
+	QString name = "À ¿05";
+	int bus = 2;
+	int power = 0;
+	double volt;
+	QTimer *AbOn_tmr;
+	void imit_off();
+	void imit_on();
+	void change_power();
+	void omni_connect();
+	void get_power(double _volt);
+	void set_power_back();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
 	void new_tm(int tm); 
@@ -90,6 +106,9 @@ private:
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
+
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 };
 
 #endif // LKA05_H
