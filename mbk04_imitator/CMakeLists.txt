@@ -48,11 +48,12 @@ SET(BKUPI_SOURCES main.cpp mbk04Widget.cpp)
 link_directories(${QT_LIBRARY_DIR} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
 SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.cpp mbk04_socket_rpc.h mbk04_socket_rpc.cpp)
+SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(mbk04_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES})
+add_executable(mbk04_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES}  ${POWER_RPC_SOURCES})
 target_link_libraries (mbk04_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc frame_converter) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc frame_converter ) 
 
 if(WIN32)
   qt5_use_modules(mbk04_imitator Core Widgets Network Gui)

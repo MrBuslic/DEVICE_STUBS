@@ -188,6 +188,14 @@ void RPC_mbk04_SLOT_Object::send_frame()
 	dynamic_call("send_frame()", tmp_list);
 	SRPCSignalClass::Instance().toLog("mbk04 dynamic_call finished send_frame");
 }
+void RPC_mbk04_SLOT_Object::get_power(double volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(volt);
+	SRPCSignalClass::Instance().toLog(QString("mbk04 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_power(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mbk04 dynamic_call finished get_power");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
