@@ -124,12 +124,13 @@ private:
 	QVariantList list_to_R14732;
 	QString name = "МБК-02";
 	int bus = 1;
-	double power_i = 0.0;
+	int power = 0;
+	int volt = 0;
 	int ready_chanel = false;
 	int tm_towarm;
 	///погрешность нагрева
 	int warm_er = 500;
-	int standart_tm = 360000;
+	int standart_tm = 360000;//6 минут
 	int cooling_cof = 4;
 
 	void msg_to_log(const QString& _msg);

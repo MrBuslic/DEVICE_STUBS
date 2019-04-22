@@ -5,7 +5,7 @@
 #include <QMap>
 #include <QXmlStreamReader>
 #include "ui_bkupi.h"
-#include "../../../main_server/main_server_rpc.h"
+//#include "../../../main_server/main_server_rpc.h"
 //namespace Ui {
 //	class bkupi_widg;
 //}
@@ -101,7 +101,7 @@ private:
 	QVariantList toVariant(QList<unsigned short> _words);
 private:
 	QMap<int, AB_data> ab_data;
-	RPC_main_server_SLOT_Thread server_thr;
+	//RPC_main_server_SLOT_Thread server_thr;
 
 	Ui::bkupi_widg *ui;
 	QXmlStreamReader xml_reader;

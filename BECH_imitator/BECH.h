@@ -97,6 +97,7 @@ private:
 	QDialog *dlg;
 	bool flag;
 	bool ready_og;
+	bool flag_on;
 
 	void update_graphics();//обновление графики
 	void set_new_tm();//составление ОК-ов
@@ -151,7 +152,7 @@ private:
 	double t;
 	QString name = "БЭЧ";//Имя устройства
 	int bus  = 2;//номер шины для шины питания(power_bus)
-	int _volt;//Принятое напряжение
+	int volt;//Принятое напряжение
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;

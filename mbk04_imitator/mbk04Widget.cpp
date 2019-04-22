@@ -1,12 +1,8 @@
 #include "mbk04Widget.h"
 #include "rpc_ports.h"
 #include <bitset>
-//#include "MonitorDBController.hpp"
-//#include "ProtocolDBController.hpp"
-//#include "FrameDBController.hpp"
-//#include "instruments.h"
+
 #include "mbk04_socket_rpc.h"
-//#include "frame_bus_rpc"
 #include <QTimer>
 #include <qmessagebox.h>
 
@@ -94,6 +90,21 @@ MainWidget::MainWidget()
 		this->deleteLater();
 		return;
 	}
+
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); // вот тут падает
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); // вот тут падает
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
+
 	QString ip_str = "127.0.0.1"; 
 	int slot_port = MBK04_SLOT;
 	int signal_port = MBK04_SIGNAL;
@@ -106,7 +117,7 @@ MainWidget::MainWidget()
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
-	
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 }
 
 
@@ -162,6 +173,30 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		else if (tmp_cwd.subadr == 6)
 		{
 			new_SCHBK(words);
+		}
+		else if (tmp_cwd.subadr == 7)
+		{
+			
+			
+			if (current_mode == "ВТФ")
+			{
+				frame_str_count = 592;
+				frame_per_msec = 11000 / frame_str_count;
+			}
+			else if (current_mode == "ПИ8")
+			{
+				frame_str_count = 636;
+				frame_per_msec = 4000 / frame_str_count;
+			}
+			else if (current_mode == "ПИ15")
+			{
+				frame_str_count = 2396;
+				frame_per_msec = 4000 / frame_str_count;
+			}
+
+			
+			new_kvit(words.at(0).toInt(), (str_num_timer.elapsed() / frame_per_msec) );
+
 		}
 
 	}
@@ -221,8 +256,10 @@ void MainWidget::state_changed()
 			new_ok2 = 0;
 			new_ok3 = 0;
 			new_ok4 = 1;
-			clean_frame_data("vtf");
+			current_mode = "ВТФ";
+			clean_frame_data(current_mode);
 			timer->start(11000);
+			str_num_timer.start();
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
@@ -231,7 +268,9 @@ void MainWidget::state_changed()
 			new_ok2 = 0;
 			new_ok3 = 1;
 			new_ok4 = 0;
-			clean_frame_data("pi8");
+			current_mode = "ПИ8";
+			str_num_timer.start();
+			clean_frame_data(current_mode);
 			timer->start(4000);
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
@@ -241,7 +280,9 @@ void MainWidget::state_changed()
 			new_ok2 = 1;
 			new_ok3 = 0;
 			new_ok4 = 0;
-			clean_frame_data("pi15");
+			current_mode = "ПИ15";
+			str_num_timer.start();
+			clean_frame_data(current_mode);
 			timer->start(4000);
 			ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -252,6 +293,8 @@ void MainWidget::state_changed()
 			new_ok3 = 1;
 			new_ok4 = 1;
 			timer->stop();
+			current_mode = "ВЫКЛ";
+			str_num_timer.elapsed();
 			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -289,9 +332,17 @@ void MainWidget::new_SCHBK(QVariantList words)
 
 			schbk_arr[i] = words.at(i).toInt() & 0xF0;
 		
-			schbk_arr[2*i] = words.at(i).toInt() & 0xF;
+			schbk_arr[2*i] = words.at(i).toInt() & 0x0F;
 	}
 	data_includer.includeSCHBK((unsigned char*)(frame.data()), schbk_arr.get(), 32);
+}
+
+void MainWidget::new_kvit(int _kvit, int line_num)
+{
+
+	//перевести frame в BYTE и отправить в includeKVIT
+	data_includer.includeKVIT((unsigned char*)(frame.data()), _kvit, line_num);
+
 }
 
 void MainWidget::clean_frame_data(QString REZH)
@@ -321,20 +372,28 @@ void MainWidget::send_frame()
 	if (current_rezh == REZH_FRAME::OFF_REZH)
 		return;
 
-	QString mode;
-	switch (current_rezh)
-	{
-	case REZH_FRAME::VTF:
-		mode = "ВТФ";
-		break;
+	frame_slot_thr.get_frame_bus_obj()->make_new_frame(current_mode, frame);
+}
 
-	case REZH_FRAME::PI8:
-		mode = "ПИ8";
-		break;
-	case REZH_FRAME::PI15:
-		mode = "ПИ15";
-		break;
-	}
+void MainWidget::get_power(double volt)
+{
+	if (volt >= 20.0)
+		imit_on();
+	else
+		if (volt == 0) imit_off();
+}
+
+void MainWidget::imit_on()
+{
+	current_dev = CURRENT_DEV::MAIN;
+	emit state_changed_signal();
+
 	
-	frame_slot_thr.get_frame_bus_obj()->make_new_frame(mode, frame);
+}
+
+void MainWidget::imit_off()
+{
+
+	current_dev = CURRENT_DEV::OFF;
+	emit state_changed_signal();
 }

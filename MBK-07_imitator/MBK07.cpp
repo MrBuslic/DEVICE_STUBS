@@ -176,8 +176,8 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 
 	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
-	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	flag = false;
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
@@ -205,8 +205,17 @@ void MBK07_widg::change_power()
 {
 	//Надо подправить - при включении не выставлены каналы ФСМУ и ФСВУ
 	//power = 0.5;
-	if (current_FSMU != FSMU_OFF) power = 150;
-	if (current_FSVU != FSVU_OFF) power = 180;
+	if (current_FSMU != FSMU_OFF) 
+	{
+		power = 150;
+		if (current_FSVU != FSVU_OFF) 
+			power = 180;
+	}
+	else
+	{
+		power = 0;
+	}
+	set_power_back();
 }
 
 void MBK07_widg::imit_on()
@@ -216,9 +225,10 @@ void MBK07_widg::imit_on()
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag = true;
 	change_power();
-	set_power_back();
 	set_new_tm();
 	power = 150;
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	flag = true;
 }
 
 void MBK07_widg::imit_off()
@@ -236,42 +246,47 @@ void MBK07_widg::imit_off()
 	flag = false;
 
 	set_new_tm();
-	power = 0.0;
 	update_graphics();
 }
 
 void MBK07_widg::set_power_back()
 {
 	double curr;
-	curr = (double)power/volt;
+	if (volt != 0)
+		curr = (double)power / volt;
+	else
+		curr = 0.0;
 	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
 }
 
 void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
-	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-	msg_to_log(_msg);
-
-	int tmp_mshm = mshm;
-	int tmp_pshm = pshm - 8;
-
-	switch (tmp_mshm)
+	if (volt != 0)
 	{
-	case 0:
-		current_FSMU = FSMU_numbB(tmp_pshm);
-		break;
-	case 1:
-		current_stab = STAB(tmp_pshm);
-		break;
-	case 2:
-		current_FSVU = FSVU_numbB(tmp_pshm);
-		break;
-	case 3:
-		current_antenna = ANTENNA(tmp_pshm);
-		break;
+		QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+		msg_to_log(_msg);
+
+		int tmp_mshm = mshm;
+		int tmp_pshm = pshm - 8;
+
+		switch (tmp_mshm)
+		{
+		case 0:
+			current_FSMU = FSMU_numbB(tmp_pshm);
+			break;
+		case 1:
+			current_stab = STAB(tmp_pshm);
+			break;
+		case 2:
+			current_FSVU = FSVU_numbB(tmp_pshm);
+			break;
+		case 3:
+			current_antenna = ANTENNA(tmp_pshm);
+			break;
+		}
+		update_graphics();
+		set_new_tm();
 	}
-	update_graphics();
-	set_new_tm();
 }
 
 

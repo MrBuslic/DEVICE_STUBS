@@ -106,6 +106,7 @@ public:
 	QVariant new_message(QVariantList& _values);
 	QVariant new_ku(QVariantList& _values);
 	QVariant send_frame(QVariantList& _values);
+	QVariant get_power(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

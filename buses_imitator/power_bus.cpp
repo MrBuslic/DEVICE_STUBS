@@ -25,7 +25,7 @@ PowerWidget::PowerWidget(QWidget *parent)
 
 //мй - лай-07, лай-04, лай-02, асо
 //й1 - кйю-05, юям, ащв, жай
-//й2 - лп-733, лп-732
+//й2 - 14п733, 14п732
 
 
 void PowerWidget::set_u(int bus, double volt) //
