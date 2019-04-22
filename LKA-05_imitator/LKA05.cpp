@@ -177,15 +177,16 @@ LKA05_widg::LKA05_widg()
 	connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
 	connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
 
+	flag_on = true;
 	for (int i = 0; i < 3; i++)
 	{
 		mvku_modules[i].switch_cur_dev(CURRENT_DEV(3));
 		mvmk_modules[i].switch_cur_dev(CURRENT_DEV(3));
 	}
-//	mu_module.switch_cur_dev(CURRENT_DEV(3)); не может быть откл
+	mu_module.switch_cur_dev(CURRENT_DEV(3));
 	mpvn_modules[0].switch_cur_dev(CURRENT_DEV(3));
 	paint_buttons();
-	set_new_tm();
+//	set_new_tm();
 }
 
 LKA05_widg::~LKA05_widg()
@@ -195,16 +196,20 @@ LKA05_widg::~LKA05_widg()
 
 void LKA05_widg::imit_off()
 {
-	msg_to_log("Питание отключено");
+	if (!flag_on)
+		return;
+//	msg_to_log("Питание отключено");
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	flag = false;
+	flag_on = false;
 	paint_buttons(); //	update_graphics();
 //	inter_tmr->stop();
 }
 
 void LKA05_widg::imit_on()
 {
-	msg_to_log("Питание включено");
+	if (flag_on)
+		return;
+//	msg_to_log("Питание включено");
 	AbOn_tmr->start(11000);
 	change_power();//я думаю тут не нужен бул
 	paint_buttons(); //	update_graphics();
@@ -216,8 +221,8 @@ void LKA05_widg::imit_on()
 void LKA05_widg::omni_connect()
 {
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
-	set_new_tm();
+	flag_on = true;
+//	set_new_tm();
 }
 
 void LKA05_widg::change_power()
@@ -240,7 +245,8 @@ void LKA05_widg::get_power(double _volt)
 	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt == 0) imit_off();
+		if (volt < 1) 
+			imit_off();
 }
 
 QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
@@ -254,16 +260,6 @@ QCheckBox* LKA05_widg::add_set(QString name, QString data, bool is_main)
 	return cb;
 }
 
-void LKA05_widg::msg_to_log(const QString& _msg)
-{
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
-}
 
 void LKA05_widg::new_ku_732(int ku_n, int length, double u, int line)
 {
@@ -450,7 +446,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 
 void LKA05_widg::paint_buttons()
 {
-	if (mu_module.get_current_dev() == MAIN)
+	/*if (mu_module.get_current_dev() == MAIN)
 	{
 		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -459,22 +455,22 @@ void LKA05_widg::paint_buttons()
 	{
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
-	}
-	//switch (mu_module.get_current_dev())
-	//{
-	//case OFF:
-	//	MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	break;
-	//case MAIN:
-	//	MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//	MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	break;
-	//case RESERVE:
-	//	MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//	MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
-	//	break;
-	//};
+	}*/
+	switch (mu_module.get_current_dev())
+	{
+	case OFF:
+		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case MAIN:
+		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
+		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case RESERVE:
+		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
+		break;
+	};
 	for (int i = 0; i < 3; i++)
 	{
 		switch (mvku_modules[i].get_current_dev())

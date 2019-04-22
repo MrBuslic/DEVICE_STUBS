@@ -54,8 +54,8 @@ public:
 	}
 	void switch_cur_dev(CURRENT_DEV _dev)
 	{
-		if (_dev == OFF)
-			return;
+		//if (_dev == OFF)
+		//	return;
 		current_dev = _dev;
 	}
 	CURRENT_DEV get_current_dev()

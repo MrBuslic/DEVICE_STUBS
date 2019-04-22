@@ -55,7 +55,7 @@ private:
 	QGridLayout *MB_glayout;
 	QGridLayout *MU_glayout;
 	QGridLayout *MPVN_glayout;
-	bool flag;
+	bool flag_on;
 	QPushButton * okBut;
 	QDialog *dlg;
 	QGroupBox* CheckButtonsBox;
@@ -66,13 +66,6 @@ private:
 
 	void paint_buttons();
 	void new_data_mv (int saddr);
-
-	void msg_to_log(const QString& _msg);
-	QStringList log_buffer;
-	QMutex log_mutex;
-	QScrollBar* _scroll_bar;
-	QTextCursor* _cursor;
-	bool auto_scroll;
 
 	QString name = "À ¿05";
 	int bus = 2;
