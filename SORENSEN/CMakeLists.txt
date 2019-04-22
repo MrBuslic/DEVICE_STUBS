@@ -1,4 +1,4 @@
-project(UNKP50)
+project(SORENSEN)
 cmake_minimum_required(VERSION 2.8)
 
 #enable_language(C)
@@ -27,21 +27,13 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNKP50_SOURCES unkp50.cpp kp50_rpc.h kp50_rpc.cpp)
+
+set(AG7972_SOURCES main.cpp SORENSEN.h SORENSEN.cpp)
+SET(KP50_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../UNKP50/kp50_rpc.h ${PROJECT_SOURCE_DIR}/../UNKP50/kp50_rpc.cpp)
+
 include_directories($ENV{VISA_HOME}include)
 
-add_library(unkp50_32 SHARED ${UNKP50_HEADERS} ${UNKP50_SOURCES} export.def)
-target_link_libraries(unkp50_32 socket_rpc)
-
-
-SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
-set(RPC_KP50_SOURCES rpc_kp50.h rpc_kp50.cpp kp50_main.cpp kp50_socket_rpc.h kp50_socket_rpc.cpp )
-add_executable(rpc_kp50 WIN32 ${RPC_KP50_SOURCES} ${POWER_RPC_SOURCES})
-set_target_properties(rpc_kp50 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
-target_link_libraries(rpc_kp50 ${QT_LIBRARIES} socket_rpc)
-qt5_use_modules(rpc_kp50 Core Widgets Gui Network)
-
-ADD_CUSTOM_COMMAND(TARGET rpc_kp50
-	PRE_BUILD
-	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/rpc_kp50.h ${PROJECT_SOURCE_DIR} kp50
-)
+add_executable(sorensen WIN32 ${AG7972_SOURCES} ${KP50_RPC_SOURCES})
+set_target_properties(sorensen PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
+target_link_libraries(sorensen ${QT_LIBRARIES} socket_rpc)
+qt5_use_modules(sorensen Core Widgets Gui Network)

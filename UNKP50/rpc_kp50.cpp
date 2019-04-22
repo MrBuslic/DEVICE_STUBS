@@ -1,12 +1,14 @@
-#include "rpc_foi.h"
+#include "rpc_kp50.h"
 #include <QFile>
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
-#include "foi_socket_rpc.h"
+#include "kp50_socket_rpc.h"
+#include "rpc_ports.h"
+#include <qmessagebox.h>
 
-RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
+RpcKP50Widget::RpcKP50Widget() : QWidget(), auto_scroll(true), u_in(0)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -20,7 +22,7 @@ RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcFoiWidget::auto_scroll_clicked);
+	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcKP50Widget::auto_scroll_clicked);
 	v_lay->addWidget(edit);
 	v_lay->addWidget(auto_scroll_box);
 
@@ -28,13 +30,36 @@ RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
 	QDir dir("d:/logs");
 	if (!dir.exists())
 		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcFoiWidget::log_timer_ontimer);
+	connect(&log_timer, &QTimer::timeout, this, &RpcKP50Widget::log_timer_ontimer);
 	log_timer.start(200);
 
+
+	chans_states.insert(KPCHANNEL_1, false);
+	chans_states.insert(KPCHANNEL_2, false);
+	chans_states.insert(KPCHANNEL_3, false);
+
+	chan_names.insert(KPCHANNEL_1, "НК");
+	chan_names.insert(KPCHANNEL_2, "К1");
+	chan_names.insert(KPCHANNEL_3, "К2");
+
+
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); 
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); 
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30001;
-	int signal_port = 30002;
-	Socket_RPC_SLOT_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Thread;
+	int slot_port = KP50_SLOT;
+	int signal_port = KP50_SIGNAL;
+	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
@@ -44,36 +69,76 @@ RpcFoiWidget::RpcFoiWidget() : QWidget(), auto_scroll(true)
 	rpc_signal_srv->start();
 }
 
-int RpcFoiWidget::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
+int RpcKP50Widget::unkp50_switch_channel(int n, bool on)
 {
-	n = _n;
-	chan = _chan;
-	u = _u;
-	t = _t;
+	if (n == 0)
+		for (int i = KPCHANNEL_1; i < KPLAST; i++)
+			switch_channel(i, on);
+	else
+		switch_channel(n, on);
 	return 0;
 }
 
-int RpcFoiWidget::unfoi_run()
+void RpcKP50Widget::log_msg(const QString& _msg)
 {
-	emit foi_interrupt(n, chan, u, t);
-	QString _msg = QString("%1 выдаю сигнал на канале %2 линии %3 с амплитудой %4 и длительностью %5").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(n).arg(chan).arg(u).arg(t);
 	{
 		QMutexLocker lock(&log_mutex);
 		log_buffer << _msg;
 	}
-	_cursor->insertText(_msg+"\n");
+	_cursor->insertText(_msg + "\n");
+
+
 	if (auto_scroll)
 		_scroll_bar->setValue(_scroll_bar->maximum());
-	return 0;
 }
 
-void RpcFoiWidget::auto_scroll_clicked(int _state)
+void RpcKP50Widget::set_u_in(double _u)
+{
+	u_in = _u;
+	for (int i = KPCHANNEL_1; i < KPLAST; i++)
+	{
+		if (chans_states[i])
+			power_slot_thr.get_power_bus_obj()->set_u(i, u_in);
+	}
+}
+
+void RpcKP50Widget::switch_channel(int n, bool on)
+{
+	chans_states[n] = on;
+	log_msg(QString("%1 шина %2 %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(chan_names[n]).arg(on ? "подключена" : "отключена"));
+	power_slot_thr.get_power_bus_obj()->set_u(n, on ? u_in : 0);
+
+}
+
+bool RpcKP50Widget::unkp50_channel_state_Q(int n)
+{
+	return chans_states[n];
+}
+
+double RpcKP50Widget::unkp50_meas_I(int n)
+{
+	double curr;
+	power_slot_thr.get_power_bus_obj()->get_i(n, curr);
+	return curr;
+}
+
+double RpcKP50Widget::unkp50_meas_Uin(int n)
+{
+	return u_in;
+}
+
+double RpcKP50Widget::unkp50_meas_Uout(int n)
+{
+	return chans_states[n] ? u_in : 0;
+}
+
+void RpcKP50Widget::auto_scroll_clicked(int _state)
 {
 	auto_scroll = (_state != 0);
 }
 
 
-void RpcFoiWidget::log_timer_ontimer()
+void RpcKP50Widget::log_timer_ontimer()
 {
 	QStringList tmp_buffer;
 	{

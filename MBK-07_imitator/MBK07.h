@@ -159,7 +159,7 @@ private:
 	QMutex log_mutex;
 	bool ab_state = true;
 	QString name = "лай-07";
-	int bus = 0;
+	int bus = 1;
 	int power = 0;
 	double volt;
 	int fsmu_v = 0x033B;

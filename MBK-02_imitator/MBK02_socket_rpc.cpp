@@ -78,6 +78,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
 		operators_map["new_ku_732(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku_732;
+		operators_map["set_new_mbk02_tm()"] = &Socket_RPC_SLOT_Object::set_new_mbk02_tm;
 		operators_map["new_KPI(QVariantList)"] = &Socket_RPC_SLOT_Object::new_KPI;
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["update_tm(int)"] = &Socket_RPC_SLOT_Object::update_tm;
@@ -121,6 +122,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return;
 		disconnect(app, SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(msg_to_14R732(QVariantList)));
 		disconnect(app, SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_tm(int, int)));
+		disconnect(app, SIGNAL(set_new_power_tm(int, QVariantList)), this, SLOT(set_new_power_tm(int, QVariantList)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(MBK02_widg* _app)
 	{
@@ -129,6 +131,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		data_map.insert("msg_to_14R732(QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_tm(int, int)), Qt::DirectConnection);
 		data_map.insert("set_new_tm(int, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(set_new_power_tm(int, QVariantList)), this, SLOT(set_new_power_tm(int, QVariantList)), Qt::DirectConnection);
+		data_map.insert("set_new_power_tm(int, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -306,6 +310,31 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal set_new_tm finished").arg(objectName()));
 	}
+	void Socket_RPC_SIGNAL_Object::set_new_power_tm(int sadr, QVariantList words)
+	{
+		auto& descriptor = *data_map["set_new_power_tm(int, QVariantList)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("set_new_power_tm(int, QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal set_new_power_tm  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << sadr;
+		SRPCSignalClass::Instance().toLog(QString("set_new_power_tm  call_number %2 sadr =  %1").arg(RPCSignalClass::QVariantToString(sadr)).arg(call_number));
+		tmp_stream << words;
+		SRPCSignalClass::Instance().toLog(QString("set_new_power_tm  call_number %2 words =  %1").arg(RPCSignalClass::QVariantToString(words)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal set_new_power_tm sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal set_new_power_tm finished").arg(objectName()));
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -351,6 +380,22 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			double u = _values.at(2).value<double>();
 			int line = _values.at(3).value<int>();
 			app->new_ku_732(ku_n, length, u, line);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::set_new_mbk02_tm(QVariantList& _values)
+	{
+		try
+		{
+			app->set_new_mbk02_tm();
 			return 0;
 		}
 		catch(const std::exception &)

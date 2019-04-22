@@ -2,6 +2,7 @@
 #include <unfoi.h>
 #include <windows.h>
 #include "foi_rpc.h"
+#include "rpc_ports.h"
 
 #ifndef SINGLETON_DEF
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
@@ -36,14 +37,14 @@ switch (fdwReason)      // Дерево разбора уведомлений
 
 	if (!slot_thr.isRunning())
 	{
-		slot_thr.set_connection_params("127.0.0.1", 30001);
+		slot_thr.set_connection_params("127.0.0.1", FOI_SLOT);
 		slot_thr.start();
 	}
 	//if (!slot_thr.wait_connected(3))
 	//	return false;
 	if (!signal_thr.isRunning())
 	{
-		signal_thr.set_connection_params("127.0.0.1", 30002);
+		signal_thr.set_connection_params("127.0.0.1", FOI_SIGNAL);
 		signal_thr.start();
 	}
 	//if (!signal_thr.wait_connected(3))

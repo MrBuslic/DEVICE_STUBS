@@ -1,5 +1,5 @@
-#ifndef RPC_FOI_H
-#define RPC_FOI_H
+#ifndef RPC_KP50_H
+#define RPC_KP50_H
 #ifdef WIN32
 #include "winsock2.h"
 #endif
@@ -16,20 +16,37 @@
 #include <qlayout.h>
 #include <loki/Singleton.h>
 
+#include "../buses_imitator/power_bus_rpc.h"
+
+enum KP50_CHANNELS
+{
+	KPALL_CHANNELS,
+	KPCHANNEL_1,
+	KPCHANNEL_2,
+	KPCHANNEL_3,
+	KPLAST
+};
+
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
-class RpcFoiWidget : public QWidget
+class RpcKP50Widget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcFoiWidget();
+	RpcKP50Widget();
 public slots:
 
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 
-	int unfoi_chan_setup(int _n, short _chan, double _u, double _t);
-	int unfoi_run();
+	void set_u_in(double _u);
+
+	int unkp50_switch_channel(int n, bool on);
+	bool unkp50_channel_state_Q(int n);
+
+	double unkp50_meas_I(int n);
+	double unkp50_meas_Uin(int n);
+	double unkp50_meas_Uout(int n);
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -42,12 +59,14 @@ private:
 	QStringList log_buffer;
 	QMutex log_mutex;
 
-	int n;
-	short chan;
-	double u;
-	double t;
-signals:
-	void foi_interrupt(int _n, short _chan, double _u, double _t);
+	void switch_channel(int n, bool on);
+	void log_msg(const QString& msg);
+	double u_in;
+	QMap<int, bool> chans_states;
+	QMap<int, QString> chan_names;
+
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 };
 
-#endif //RPC_FOI_H
+#endif //RPC_KP50_H

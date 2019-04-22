@@ -15,6 +15,7 @@ add_subdirectory(buses_imitator)
 
 
 add_subdirectory(AG7972)
+add_subdirectory(SORENSEN)
 add_subdirectory(IBEP_imitator)
 add_subdirectory(HPE1472)
 add_subdirectory(OMNIBUSBOX)

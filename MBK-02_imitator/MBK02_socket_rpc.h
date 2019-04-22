@@ -37,6 +37,7 @@ signals:
 public slots:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
+	void set_new_power_tm(int sadr, QVariantList words);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();

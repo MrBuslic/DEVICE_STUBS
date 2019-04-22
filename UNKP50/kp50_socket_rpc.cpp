@@ -40,7 +40,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcFoiWidget* _app) : QTcpServer(), app(_app)
+	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcKP50Widget* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
@@ -60,7 +60,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		exec();
 	}
 
-	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(RpcFoiWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(RpcKP50Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
 	void Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
@@ -71,15 +71,19 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(RpcFoiWidget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(RpcKP50Widget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
 	setObjectName(QString("kp50_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
-		operators_map["unfoi_chan_setup(int, short, double, double)"] = &Socket_RPC_SLOT_Object::unfoi_chan_setup;
-		operators_map["unfoi_run()"] = &Socket_RPC_SLOT_Object::unfoi_run;
+		operators_map["set_u_in(double)"] = &Socket_RPC_SLOT_Object::set_u_in;
+		operators_map["unkp50_switch_channel(int, bool)"] = &Socket_RPC_SLOT_Object::unkp50_switch_channel;
+		operators_map["unkp50_channel_state_Q(int)"] = &Socket_RPC_SLOT_Object::unkp50_channel_state_Q;
+		operators_map["unkp50_meas_I(int)"] = &Socket_RPC_SLOT_Object::unkp50_meas_I;
+		operators_map["unkp50_meas_Uin(int)"] = &Socket_RPC_SLOT_Object::unkp50_meas_Uin;
+		operators_map["unkp50_meas_Uout(int)"] = &Socket_RPC_SLOT_Object::unkp50_meas_Uout;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -117,13 +121,10 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(foi_interrupt(int, short, double, double)), this, SLOT(foi_interrupt(int, short, double, double)));
 	}
-	void Socket_RPC_SIGNAL_Object::set_app(RpcFoiWidget* _app)
+	void Socket_RPC_SIGNAL_Object::set_app(RpcKP50Widget* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(foi_interrupt(int, short, double, double)), this, SLOT(foi_interrupt(int, short, double, double)), Qt::DirectConnection);
-		data_map.insert("foi_interrupt(int, short, double, double)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -253,35 +254,6 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::foi_interrupt(int _n, short _chan, double _u, double _t)
-	{
-		auto& descriptor = *data_map["foi_interrupt(int, short, double, double)"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("foi_interrupt(int, short, double, double)");
-		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal foi_interrupt  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << _n;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _n =  %1").arg(RPCSignalClass::QVariantToString(_n)).arg(call_number));
-		tmp_stream << _chan;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _chan =  %1").arg(RPCSignalClass::QVariantToString(_chan)).arg(call_number));
-		tmp_stream << _u;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _u =  %1").arg(RPCSignalClass::QVariantToString(_u)).arg(call_number));
-		tmp_stream << _t;
-		SRPCSignalClass::Instance().toLog(QString("foi_interrupt  call_number %2 _t =  %1").arg(RPCSignalClass::QVariantToString(_t)).arg(call_number));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal foi_interrupt sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal foi_interrupt finished").arg(objectName()));
-	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -328,16 +300,32 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unfoi_chan_setup(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::set_u_in(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int _n = _values.at(0).value<int>();
-			short _chan = _values.at(1).value<short>();
-			double _u = _values.at(2).value<double>();
-			double _t = _values.at(3).value<double>();
-			int res = app->unfoi_chan_setup(_n, _chan, _u, _t);
+			double _u = _values.at(0).value<double>();
+			app->set_u_in(_u);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unkp50_switch_channel(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int n = _values.at(0).value<int>();
+			bool on = _values.at(1).value<bool>();
+			int res = app->unkp50_switch_channel(n, on);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -350,21 +338,80 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unfoi_run(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::unkp50_channel_state_Q(QVariantList& _values)
 	{
 		try
 		{
-			int res = app->unfoi_run();
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int n = _values.at(0).value<int>();
+			bool res = app->unkp50_channel_state_Q(n);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
 		catch(const std::exception &)
 		{
-			return 1;
+			return false;
 		}
 		catch(...)
 		{
-			return 1;
+			return false;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unkp50_meas_I(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int n = _values.at(0).value<int>();
+			double res = app->unkp50_meas_I(n);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 0.0;
+		}
+		catch(...)
+		{
+			return 0.0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unkp50_meas_Uin(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int n = _values.at(0).value<int>();
+			double res = app->unkp50_meas_Uin(n);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 0.0;
+		}
+		catch(...)
+		{
+			return 0.0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unkp50_meas_Uout(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int n = _values.at(0).value<int>();
+			double res = app->unkp50_meas_Uout(n);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 0.0;
+		}
+		catch(...)
+		{
+			return 0.0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

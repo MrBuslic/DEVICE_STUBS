@@ -73,6 +73,11 @@ void RPC_MBK02_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		SRPCSignalClass::Instance().toLog("set_new_tm connected");
 		emit connect_signal("set_new_tm(int, int)", true);
 	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_power_tm)) {
+		SRPCSignalClass::Instance().toLog("set_new_power_tm connected");
+		emit connect_signal("set_new_power_tm(int, QVariantList)", true);
+	}
 }
 
 void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -85,6 +90,11 @@ void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_tm)) {
 		SRPCSignalClass::Instance().toLog("set_new_tm disconnected");
 		//emit connect_signal("set_new_tm(int, int)", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_power_tm)) {
+		SRPCSignalClass::Instance().toLog("set_new_power_tm disconnected");
+		//emit connect_signal("set_new_power_tm(int, QVariantList)", false);
 	}
 }
 
@@ -156,6 +166,25 @@ void RPC_MBK02_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("MBK02 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
+			if (op_name == "set_new_power_tm(int, QVariantList)")
+			{
+				int sadr;
+				tmp_stream >> sadr;
+				SRPCSignalClass::Instance().toLog("MBK02 " + op_name +" call_number "+ QString::number(call_number) + " sadr = "+RPCSignalClass::QVariantToString(sadr));
+				QVariantList words;
+				tmp_stream >> words;
+				SRPCSignalClass::Instance().toLog("MBK02 " + op_name +" call_number "+ QString::number(call_number) + " words = "+RPCSignalClass::QVariantToString(words));
+				emit set_new_power_tm(sadr, words);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("MBK02 signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 		}
 	}
 }
@@ -188,13 +217,11 @@ void RPC_MBK02_SLOT_Object::new_ku_732(int ku_n, int length, double u, int line)
 	dynamic_call("new_ku_732(int, int, double, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("MBK02 dynamic_call finished new_ku_732");
 }
-void RPC_MBK02_SLOT_Object::set_new_mbk02_tm(int ku_n, int line)
+void RPC_MBK02_SLOT_Object::set_new_mbk02_tm()
 {
 	QVariantList tmp_list;
-	tmp_list << QVariant(ku_n);
-	tmp_list << QVariant(line);
 	SRPCSignalClass::Instance().toLog(QString("MBK02 dynamic_call set_new_mbk02_tm %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("set_new_mbk02_tm(int, int)", tmp_list);
+	dynamic_call("set_new_mbk02_tm()", tmp_list);
 	SRPCSignalClass::Instance().toLog("MBK02 dynamic_call finished set_new_mbk02_tm");
 }
 void RPC_MBK02_SLOT_Object::new_KPI(QVariantList KPI_list)

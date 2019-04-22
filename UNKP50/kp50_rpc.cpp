@@ -64,18 +64,10 @@ void RPC_kp50_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
 
 void RPC_kp50_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_kp50_SIGNAL_Object::foi_interrupt)) {
-		SRPCSignalClass::Instance().toLog("foi_interrupt connected");
-		emit connect_signal("foi_interrupt(int, short, double, double)", true);
-	}
 }
 
 void RPC_kp50_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_kp50_SIGNAL_Object::foi_interrupt)) {
-		SRPCSignalClass::Instance().toLog("foi_interrupt disconnected");
-		//emit connect_signal("foi_interrupt(int, short, double, double)", false);
-	}
 }
 
 void RPC_kp50_SIGNAL_Object::read_data()
@@ -111,31 +103,6 @@ void RPC_kp50_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("kp50 new signal " + op_name);
 
-			if (op_name == "foi_interrupt(int, short, double, double)")
-			{
-				int _n;
-				tmp_stream >> _n;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _n = "+RPCSignalClass::QVariantToString(_n));
-				short _chan;
-				tmp_stream >> _chan;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _chan = "+RPCSignalClass::QVariantToString(_chan));
-				double _u;
-				tmp_stream >> _u;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _u = "+RPCSignalClass::QVariantToString(_u));
-				double _t;
-				tmp_stream >> _t;
-				SRPCSignalClass::Instance().toLog("kp50 " + op_name +" call_number "+ QString::number(call_number) + " _t = "+RPCSignalClass::QVariantToString(_t));
-				emit foi_interrupt(_n, _chan, _u, _t);
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("kp50 signal finished " + op_name +" call_number "+ QString::number(call_number));
-			}
 		}
 	}
 }
@@ -159,31 +126,70 @@ void RPC_kp50_SLOT_Object::log_timer_ontimer()
 	dynamic_call("log_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("kp50 dynamic_call finished log_timer_ontimer");
 }
-int RPC_kp50_SLOT_Object::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
+void RPC_kp50_SLOT_Object::set_u_in(double _u)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(_u);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call set_u_in %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_u_in(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kp50 dynamic_call finished set_u_in");
+}
+int RPC_kp50_SLOT_Object::unkp50_switch_channel(int n, bool on)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
-	tmp_list << QVariant(_n);
-	tmp_list << QVariant(_chan);
-	tmp_list << QVariant(_u);
-	tmp_list << QVariant(_t);
-	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unfoi_chan_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unfoi_chan_setup(int, short, double, double)", tmp_list);
+	tmp_list << QVariant(n);
+	tmp_list << QVariant(on);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unkp50_switch_channel %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unkp50_switch_channel(int, bool)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unfoi_chan_setup %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unkp50_switch_channel %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kp50_SLOT_Object::unfoi_run()
+bool RPC_kp50_SLOT_Object::unkp50_channel_state_Q(int n)
 {
-	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
-	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unfoi_run %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unfoi_run()", tmp_list);
+	tmp_list << QVariant(n);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unkp50_channel_state_Q %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unkp50_channel_state_Q(int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unfoi_run %1").arg(tmp_ret_params));
-	return res.toInt();
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unkp50_channel_state_Q %1").arg(tmp_ret_params));
+	return res.toBool();
+}
+double RPC_kp50_SLOT_Object::unkp50_meas_I(int n)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(n);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unkp50_meas_I %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unkp50_meas_I(int)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unkp50_meas_I %1").arg(tmp_ret_params));
+	return res.toDouble();
+}
+double RPC_kp50_SLOT_Object::unkp50_meas_Uin(int n)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(n);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unkp50_meas_Uin %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unkp50_meas_Uin(int)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unkp50_meas_Uin %1").arg(tmp_ret_params));
+	return res.toDouble();
+}
+double RPC_kp50_SLOT_Object::unkp50_meas_Uout(int n)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(n);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call unkp50_meas_Uout %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unkp50_meas_Uout(int)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call finished unkp50_meas_Uout %1").arg(tmp_ret_params));
+	return res.toDouble();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

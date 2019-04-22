@@ -520,7 +520,7 @@ void MBK02_widg::update_tm(int sadr)
 		break;
 	case 26:
 		QVariantList tmp_list;
-		int f_word, s_word = 0;
+		int f_word = 0, s_word = 0;
 		switch (current_chanel)
 		{
 		case CHANEL_1:

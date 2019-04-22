@@ -27,6 +27,7 @@ enum CHANEL
 	CHANEL_ERR = 2,
 	CHANEL_OFF = 3
 };
+
 enum ANTENNA
 {
 	MHA1PY = 0,
@@ -35,6 +36,7 @@ enum ANTENNA
 	MHA2MY = 3,
 	MHAOFF = 4
 };
+
 enum KPI_STATE
 {
 	LITER_PAUSE = 0x138CE20, 
@@ -42,12 +44,12 @@ enum KPI_STATE
 	ONE = 0xFA0,
 	STEP = 0x27100
 };
+
 class MBK02_widg : public QWidget
 {
 	Q_OBJECT
 
 public:
-	//	explicit LKA05_widg(QWidget *parent = 0);
 	MBK02_widg(QWidget *parent = 0);
 	~MBK02_widg();
 
@@ -103,7 +105,7 @@ public slots:
 signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
-	void set_new_power_tm(int sadr, QVariantList);
+	void set_new_power_tm(int sadr, QVariantList words);
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -121,11 +123,12 @@ private:
 	bool signal_con = false;
 	QVariantList list_to_R14732;
 	QString name = "МБК-02";
-	int bus = 0;
+	int bus = 1;
 	double power_i = 0.0;
 	int ready_chanel = false;
 	int tm_towarm;
-	int warm_er = 500;//погрешность нагрева
+	///погрешность нагрева
+	int warm_er = 500;
 	int standart_tm = 360000;
 	int cooling_cof = 4;
 

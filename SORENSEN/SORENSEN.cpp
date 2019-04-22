@@ -1,16 +1,16 @@
-#include "AG7972.h"
+#include "SORENSEN.h"
 #include <QFile>
 #include <QTextStream>
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
+#include <qmessagebox.h>
+#include "rpc_ports.h"
 
-AG7972Widget::AG7972Widget() : QWidget(), u(0.0), i(0.0)
+SORENSENWidget::SORENSENWidget() : QWidget(), u(0.0), i(0.0)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	v_lay->addWidget(new QLabel("Сопротивление нагрузки:"));
-	R_edit = new QLineEdit();
-	v_lay->addWidget(R_edit);
+
 	u_label = new QLabel("Установленное напряжение: 0.0В");
 	v_lay->addWidget(u_label);
 	i_label = new QLabel("Установленный ток ограничения: 0.0А");
@@ -22,19 +22,32 @@ AG7972Widget::AG7972Widget() : QWidget(), u(0.0), i(0.0)
 	i_meas_label = new QLabel("Измеренный ток: 0.0А");
 	v_lay->addWidget(i_meas_label);
 
+	kp50_slot_thr.set_connection_params("127.0.0.1", KP50_SLOT);
+	kp50_slot_thr.start(); 
+
+	kp50_signal_thr.set_connection_params("127.0.0.1", KP50_SIGNAL);
+	kp50_signal_thr.start();
+
+	if (!kp50_slot_thr.wait_connected(3) || !kp50_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с kp50 от sorensen");
+		this->deleteLater();
+		return;
+	}
+
+
 	server = new QTcpServer();
 	connect(server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
-	connect(R_edit, SIGNAL(editingFinished()), this, SLOT(update_graphics()));
 	server->listen(QHostAddress::Any, 5025);
 }
 
-void AG7972Widget::tcp_slot()
+void SORENSENWidget::tcp_slot()
 {
 	socket = server->nextPendingConnection(); 
 	connect(socket, SIGNAL(readyRead()), this, SLOT(read_data()));
 }
 
-void AG7972Widget::update_graphics()
+void SORENSENWidget::update_graphics()
 {
 	calc_meas();
 	u_label->setText(QString("Установленное напряжение : %1В").arg(u));
@@ -44,7 +57,7 @@ void AG7972Widget::update_graphics()
 	i_meas_label->setText(QString("Измеренный ток : %1А").arg(i_meas));
 }
 
-void AG7972Widget::read_data()
+void SORENSENWidget::read_data()
 {
 	QByteArray read_data;
 	while(socket->bytesAvailable())
@@ -54,7 +67,7 @@ void AG7972Widget::read_data()
 	}
 
 	QString command(read_data.toStdString().c_str());
-	//command.chop(4);
+	command.chop(2);
 	QStringList params;
 	QString command_string;
 	if (command.contains(" "))
@@ -73,16 +86,21 @@ void AG7972Widget::read_data()
 	if (command_string == "OUTP")
 	{
 		if (params.at(0) == "ON")
+		{
 			state = true;
+			kp50_slot_thr.get_kp50_obj()->set_u_in(u);
+		}
 		else
+		{
 			state = false;
+		}
 
 	}
 	if (command_string == "MEAS:VOLT?")
 	{
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(tmp_arr);
-		tmp_stream << u_meas;
+		tmp_stream << (state ? u : 0);
 		socket->write(tmp_arr);
 		socket->waitForBytesWritten();
 	}
@@ -90,7 +108,7 @@ void AG7972Widget::read_data()
 	{
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(tmp_arr);
-		tmp_stream << "IMITATOR POWER SOURCE";
+		tmp_stream << "SORENSEN IMITATOR POWER SOURCE";
 		socket->write(tmp_arr);
 		socket->waitForBytesWritten();
 	}
@@ -116,6 +134,11 @@ void AG7972Widget::read_data()
 	if (command_string == "MEAS:CURR?")
 	{
 		/*выводить измеренное curr, переменную создал*/
+		i_meas = 0;
+		i_meas += kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(1);
+		i_meas += kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(2);
+		i_meas += kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(3);
+
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(tmp_arr);
 		tmp_stream << i_meas;
@@ -143,18 +166,20 @@ void AG7972Widget::read_data()
 	update_graphics();
 }
 
-void AG7972Widget::calc_meas()
+void SORENSENWidget::calc_meas()
 {
 	if (!state)
+	{
 		u_meas = 0;
+		i_meas = 0;
+	}
 	else
 	{
-		double tmp_r = R_edit->text().toDouble();
-		i_meas = u / tmp_r;
-		if (i_meas > i)
-			u_meas = tmp_r * i;
-		else
-			u_meas = u;
+		u_meas = u;
+		i_meas = 0;
+		i_meas += kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(1);
+		i_meas += kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(2);
+		i_meas += kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(3);
 	}
 }
 

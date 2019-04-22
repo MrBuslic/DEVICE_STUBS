@@ -21,22 +21,12 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
-	tmp_time = new QTimer(this);
-	connect(tmp_time, &QTimer::timeout, this, &PowerWidget::tmp_funk);
-	tmp_time->start(30000);
-	tmp_time->setSingleShot(true);
 }
 
 //мй - лай-07, лай-04, лай-02, асо
 //й1 - кйю-05, юям, ащв, жай
 //й2 - лп-733, лп-732
 
-void PowerWidget::tmp_funk()
-{
-	set_u(K1, 27.0);
-	set_u(NK, 27.0);
-	set_u(K2, 27.0);
-}
 
 void PowerWidget::set_u(int bus, double volt) //
 {
