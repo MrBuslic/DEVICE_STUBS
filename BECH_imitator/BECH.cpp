@@ -208,9 +208,9 @@ void BECH_widg::BECH_interrupt_run()
 	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan, u, t);
 }
 
-void BECH_widg::get_power(double volt)
+void BECH_widg::get_power(double _volt)
 {
-	_volt = volt;
+	volt = volt;
 	if (volt >= 20.0)
 		imit_on();
 	else
@@ -222,7 +222,7 @@ void BECH_widg::set_power_back()
 	double curr;
 	if (power_vt != 0)
 	{
-		curr = (double)power_vt / _volt;
+		curr = (double)power_vt / volt;
 	}
 	else
 		curr = 0;
@@ -295,29 +295,32 @@ void BECH_widg::change_power(bool switch_og)
 
 void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
-	int uu = 0;
-	//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-	//	msg_to_log(_msg);
-	int tmp_mshm = mshm;
-	int tmp_pshm = pshm;
-
-	switch (tmp_mshm)
+	if (volt != 0)
 	{
-	case 3:
-		current_LKA = LKA_1;
-		break;
-	case 4:
-		current_LKA = LKA_2;
-		break;
-	case 8:
-		current_KP = KP_1;
-		break;
-	case 9:
-		current_KP = KP_2;
-		break;
+		int uu = 0;
+		//	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+		//	msg_to_log(_msg);
+		int tmp_mshm = mshm;
+		int tmp_pshm = pshm;
+
+		switch (tmp_mshm)
+		{
+		case 3:
+			current_LKA = LKA_1;
+			break;
+		case 4:
+			current_LKA = LKA_2;
+			break;
+		case 8:
+			current_KP = KP_1;
+			break;
+		case 9:
+			current_KP = KP_2;
+			break;
+		}
+		update_graphics();
+		set_new_tm();
 	}
-	update_graphics();
-	set_new_tm();
 }
 
 

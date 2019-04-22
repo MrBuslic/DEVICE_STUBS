@@ -143,7 +143,7 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+	//connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 	connect(kpi_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
@@ -165,8 +165,9 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
 }
 
-void MBK02_widg::get_power(double volt)
+void MBK02_widg::get_power(double _volt)
 {
+	volt = _volt;
 	if (volt >= 20.0)
 		imit_on();
 	else
@@ -177,38 +178,37 @@ void MBK02_widg::change_power(bool switch_chanel)
 {
 	if (switch_chanel)
 	{
-		power_i = 1;
+		power = 27;
 		set_power_back();
 	}
 	else
 	{
-		if (power_i == 0)
+		switch (power)
 		{
-			power_i = 1;
+		case 0:
+			power = 27;
 			set_power_back();
-		}
-		else
-		{
-			if (power_i == 1)
-			{
-				power_i = 0.63;
-				set_power_back();
-			}
-			else
-			{
-				if (power_i = 0.63)
-				{
-					power_i = 1;
-					set_power_back();
-				}
-			}
+			break;
+		case 27:
+			power = 17;
+			set_power_back();
+			break;
+		case 17:
+			power = 27;
+			set_power_back();
+			break;
 		}
 	}
 }
 
 void MBK02_widg::set_power_back()
 {
-	power_slot_thr.get_power_bus_obj()->set_i(bus, name, power_i);
+	double curr;
+	if (volt != 0)
+		curr = (double)power / volt;
+	else
+		curr = 0.0;
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
 }
 
 void MBK02_widg::imit_on()
@@ -216,7 +216,7 @@ void MBK02_widg::imit_on()
 	msg_to_log("Питание включено");
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
-	warm_chanel_tmr->start(standart_tm);//6 min
+	warm_chanel_tmr->start(standart_tm);
 	t_ant_ch->start(5000);
 	change_power(true);
 	_update_time();
@@ -234,25 +234,28 @@ void MBK02_widg::imit_off()
 
 void MBK02_widg::new_ku_732(int ku_n, int length, double u, int line)
 {
-	int tmp_ku_n = ku_n;
-	if (current_chanel != tmp_ku_n)
+	if (volt != 0)
 	{
-		switch (tmp_ku_n)
+		int tmp_ku_n = ku_n;
+		if (current_chanel != tmp_ku_n)
 		{
-		case CHANEL_1:
-			current_ant = MHA1MY;
-			break;
-		case CHANEL_2:
-			current_ant = MHA2MY;
-			break;
+			switch (tmp_ku_n)
+			{
+			case CHANEL_1:
+				current_ant = MHA1MY;
+				break;
+			case CHANEL_2:
+				current_ant = MHA2MY;
+				break;
+			}
+			set_warm_chanel();
+			current_chanel = CHANEL(tmp_ku_n);
+			if (!t_ant_ch->isActive())
+				t_ant_ch->start(5000);
+			update_graphics();
+			_update_time();
+			update_tm(1);
 		}
-		set_warm_chanel();
-		current_chanel = CHANEL(tmp_ku_n);
-		if (!t_ant_ch->isActive())
-		t_ant_ch->start(5000);
-		update_graphics();
-		_update_time();
-		update_tm(1);
 	}
 }
 

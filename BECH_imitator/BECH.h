@@ -151,7 +151,7 @@ private:
 	double t;
 	QString name = "БЭЧ";//Имя устройства
 	int bus  = 2;//номер шины для шины питания(power_bus)
-	int _volt;//Принятое напряжение
+	int volt;//Принятое напряжение
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
