@@ -14,6 +14,7 @@
 #include <QTimer>
 #include <QTime>
 #include <qplaintextedit.h>
+#include <qsettings.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
@@ -95,7 +96,6 @@ private:
 	const int adr = 5;
 	QPushButton * okBut;
 	QDialog *dlg;
-	bool flag;
 	bool ready_og;
 	bool flag_on;
 
@@ -136,6 +136,7 @@ private:
 	QTimer *warm_og_tmr;
 	QTimer *AbOn_tmr;
 	QTimer *Power_tmr;
+	QSettings LKA_sett;
 
 	QMap<int, QString> mode_names;
 	QMap<OG, qint64> OG_start_warm;//Мап старта прогрева

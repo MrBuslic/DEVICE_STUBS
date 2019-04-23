@@ -177,7 +177,6 @@ MBK07_widg::MBK07_widg(QWidget *parent)
 	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	flag = false;
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
@@ -220,19 +219,19 @@ void MBK07_widg::change_power()
 
 void MBK07_widg::imit_on()
 {
+	if (flag_on)
+		return;
 	msg_to_log("Питание включено");
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
 	change_power();
 	set_new_tm();
-	power = 150;
-	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
 }
 
 void MBK07_widg::imit_off()
 {
+	if (!flag_on)
+		return;
 	msg_to_log("Питание отключено");
 	current_antenna = ANT_OFF;
 	current_FSMU = FSMU_OFF;
@@ -243,7 +242,6 @@ void MBK07_widg::imit_off()
 	current_stab = OFF_STAB;
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	flag = false;
 
 	set_new_tm();
 	update_graphics();

@@ -63,8 +63,8 @@ private:
 
 	const int MKO = 1;
 	const int adr = 2;
+	bool flag_on;
 	QVariantList words;
-	bool flag;
 	QPushButton * okBut;
 	QDialog *dlg;
 

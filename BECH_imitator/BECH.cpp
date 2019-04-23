@@ -16,7 +16,7 @@ union MKOWord
 	};
 };
 
-BECH_widg::BECH_widg(QWidget *parent)
+BECH_widg::BECH_widg(QWidget *parent) : LKA_sett(QCoreApplication::applicationDirPath() + "/bech.ini", QSettings::IniFormat)
 {
 	widg = new QWidget(this);
 	setWindowTitle("БЭЧ");
@@ -166,7 +166,6 @@ BECH_widg::BECH_widg(QWidget *parent)
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	flag = false;
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
@@ -177,6 +176,7 @@ BECH_widg::BECH_widg(QWidget *parent)
 		QDir().mkdir("d:/logs");
 	connect(&log_timer, &QTimer::timeout, this, &BECH_widg::log_timer_ontimer);
 	log_timer.start(200);
+
 
 	edit = new QTextEdit(this);
 	_scroll_bar = edit->verticalScrollBar();
@@ -244,7 +244,6 @@ void BECH_widg::imit_off()
 	current_KP = KP_OFF;
 	current_LKA = LKA_OFF;
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	flag = false;
 	update_graphics();
 	inter_tmr->stop();
 }
@@ -258,6 +257,21 @@ void BECH_widg::imit_on()
 	current_OG = OG_1;
 	current_FINIK = FINIK_1;
 	current_FINIK_REZH = FINIK_REZH_PI8;
+
+	if (!LKA_sett.contains("LKA"))
+	{
+		current_LKA = LKA_1;
+		LKA_sett.setValue("LKA", 1);
+		current_KP = KP_1;
+		LKA_sett.setValue("KP", 1);
+		LKA_sett.sync();
+	}
+	else
+	{
+		current_LKA = LKA(LKA_sett.value("LKA").toInt() - 1);
+		current_KP = KP(LKA_sett.value("KP").toInt() - 1);
+	}
+
 	AbOn_tmr->start(5000);
 	change_power(true);
 	update_graphics();
@@ -316,17 +330,22 @@ void BECH_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_
 		{
 		case 3:
 			current_LKA = LKA_1;
+			LKA_sett.setValue("LKA", 1);
 			break;
 		case 4:
 			current_LKA = LKA_2;
+			LKA_sett.setValue("LKA", 2);
 			break;
 		case 8:
 			current_KP = KP_1;
+			LKA_sett.setValue("KP", 1);
 			break;
 		case 9:
 			current_KP = KP_2;
+			LKA_sett.setValue("KP", 2);
 			break;
 		}
+		LKA_sett.sync();
 		update_graphics();
 		set_new_tm();
 	}
@@ -493,7 +512,6 @@ void BECH_widg::update_time()
 void BECH_widg::omni_connect()
 {
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
 	set_new_tm();
 }
 

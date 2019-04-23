@@ -97,11 +97,10 @@ private:
 	PSP current_PSP = PSP_OFF;
 	FSMU_numbB current_FSMU = FSMU_OFF;
 	FSVU_numbB current_FSVU = FSVU_OFF;
-	STAB current_stab;
-	ANTENNA current_antenna;
+	STAB current_stab = OFF_STAB;
+	ANTENNA current_antenna = ANT_OFF;
 
 	bool IM = false;
-
 	bool pi8_fast = false;
 
 	QList<QPushButton*> FSMU_blocks;
@@ -119,9 +118,9 @@ private:
 	QHBoxLayout *FSVU_hblayout;
 	QHBoxLayout *FSMU_hblayout;
 	QHBoxLayout *All_vblayout;
-	bool flag;
 	QPushButton * okBut;
 	QDialog *dlg;
+	bool flag_on;
 
 	QList<QCheckBox*> set_list;
 	QList<QCheckBox*> set_list_mu2;

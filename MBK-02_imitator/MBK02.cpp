@@ -213,6 +213,8 @@ void MBK02_widg::set_power_back()
 
 void MBK02_widg::imit_on()
 {
+	if (flag_on)
+		return;
 	msg_to_log("Питание включено");
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
@@ -225,6 +227,8 @@ void MBK02_widg::imit_on()
 
 void MBK02_widg::imit_off()
 {
+	if (!flag_on)
+		return;
 	msg_to_log("Питание отключено");
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
