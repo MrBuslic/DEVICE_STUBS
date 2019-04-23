@@ -222,12 +222,12 @@ void BECH_widg::get_power(double _volt)
 void BECH_widg::set_power_back()
 {
 	double curr;
-	if (power_vt != 0)
+	if (power_vt >= 1)
 	{
 		curr = (double)power_vt / volt;
 	}
 	else
-		curr = 0;
+		curr = 0.0;
 	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
 }
 

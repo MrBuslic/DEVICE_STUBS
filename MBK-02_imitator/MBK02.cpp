@@ -171,7 +171,7 @@ void MBK02_widg::get_power(double _volt)
 	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt == 0) imit_off();
+		if (volt < 1) imit_off();
 }
 
 void MBK02_widg::change_power(bool switch_chanel)
@@ -204,7 +204,7 @@ void MBK02_widg::change_power(bool switch_chanel)
 void MBK02_widg::set_power_back()
 {
 	double curr;
-	if (volt != 0)
+	if (volt >= 1)
 		curr = (double)power / volt;
 	else
 		curr = 0.0;
