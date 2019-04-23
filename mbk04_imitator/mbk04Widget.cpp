@@ -380,14 +380,15 @@ void MainWidget::get_power(double volt)
 	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt == 0) imit_off();
+	if (volt < 0) 
+		imit_off();
 }
 
 void MainWidget::imit_on()
 {
 	current_dev = CURRENT_DEV::MAIN;
 	emit state_changed_signal();
-
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, double(0.2));
 	
 }
 
