@@ -13,6 +13,7 @@
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
+#include "../buses_imitator/power_bus_rpc.h"
 #include "../MBK-02_imitator/MBK02_rpc.h"
 
 class R732_widg : public QWidget
@@ -20,7 +21,7 @@ class R732_widg : public QWidget
     Q_OBJECT
 public:
 	R732_widg();
-	~R732_widg() {}
+	~R732_widg();
 private:
 	QPushButton *MU1;
 	QPushButton *MU2;
@@ -28,15 +29,16 @@ private:
 	QPushButton *reserve_MPVN;
 	QPushButton* main_MVKU;
 	QPushButton* reserve_MVKU;
-
-	QGroupBox *MVKU_gb;
-	QGroupBox *MPVN_gb;
-
-	QGridLayout *MU_glayout;
+	QPushButton* vchm0;
+	QPushButton* vchm1;
+	QPushButton* vchm2;
+	QPushButton* vchm3;
+	QList<QPushButton*> vchm_btns_lst;
 
 	MU_MODULE mu_module;
 	QList<MV_MODULE> mpvn_modules;
 	QList<MV_MODULE> mvku_modules;
+	VCHM_MODULE vchm_module;
 
 	RPC_omnibus_SLOT_Thread omni_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omni_signal_thr;
@@ -47,16 +49,38 @@ private:
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SLOT_Thread mku_signal_thr;
 
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
+
 	int MKO;
 	int adr;
-	bool flag;
 	int num_ku;
+
+	int bus;
+	double power;
+	double volt;
+	bool power_on;
+	QString name;
+
+	unsigned short mko_counter;
 
 	void paint_buttons();
 	void new_data_mv();
+	void set_new_tm();
+	QVariantList get_mko_counter_word();
+	QTimer vchm_on_timer;
+	QList<int> vchm_chanels_init;
+	bool vchm_is_init;
+
+	void imit_on();
+	void imit_off();
+	void set_power_back();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void set_new_mbk02_tm(int sadr, int word);
+	void get_power(double volt);
+private slots:
+	void set_vchm_on();
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 };
