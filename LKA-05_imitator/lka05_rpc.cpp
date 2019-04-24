@@ -226,6 +226,14 @@ void RPC_lka05_SLOT_Object::new_ku_732(int ku_n, int length, double u, int line)
 	dynamic_call("new_ku_732(int, int, double, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_ku_732");
 }
+void RPC_lka05_SLOT_Object::get_power(double _volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(_volt);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_power(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished get_power");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

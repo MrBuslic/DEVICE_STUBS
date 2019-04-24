@@ -14,7 +14,7 @@ union MKOWord
 	};
 };
 
-MBK07_widg::MBK07_widg(QWidget *parent)
+MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 {
 	widg = new QWidget(this);
 	setWindowTitle("МБК-07");
@@ -222,7 +222,7 @@ void MBK07_widg::imit_on()
 	if (flag_on)
 		return;
 	msg_to_log("Питание включено");
-
+	flag_on = true;
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	change_power();
 	set_new_tm();
@@ -232,6 +232,7 @@ void MBK07_widg::imit_off()
 {
 	if (!flag_on)
 		return;
+	flag_on = false;
 	msg_to_log("Питание отключено");
 	current_antenna = ANT_OFF;
 	current_FSMU = FSMU_OFF;

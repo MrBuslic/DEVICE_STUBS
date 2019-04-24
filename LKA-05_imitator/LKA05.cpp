@@ -14,7 +14,7 @@ union MKOWord
 	};
 };
 
-LKA05_widg::LKA05_widg()
+LKA05_widg::LKA05_widg() : flag_on(false)
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -174,17 +174,16 @@ LKA05_widg::LKA05_widg()
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
-	connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
-	connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
+	//connect(this, &LKA05_widg::new_ku, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_ku);
+	//connect(this, &LKA05_widg::new_mk, mku_slot_thr.get_mku_bus_obj().get(), &RPC_mku_bus_SLOT_Object::make_mk);
 
-	flag_on = true;
 	for (int i = 0; i < 3; i++)
 	{
-		mvku_modules[i].switch_cur_dev(CURRENT_DEV(3));
-		mvmk_modules[i].switch_cur_dev(CURRENT_DEV(3));
+		mvku_modules[i].switch_cur_dev(CURRENT_DEV::OFF);
+		mvmk_modules[i].switch_cur_dev(CURRENT_DEV::OFF);
 	}
-	mu_module.switch_cur_dev(CURRENT_DEV(3));
-	mpvn_modules[0].switch_cur_dev(CURRENT_DEV(3));
+	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	paint_buttons();
 //	set_new_tm();
 }
@@ -201,6 +200,13 @@ void LKA05_widg::imit_off()
 //	msg_to_log("Питание отключено");
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	flag_on = false;
+	for (int i = 0; i < 3; i++)
+	{
+		mvku_modules[i].switch_cur_dev(CURRENT_DEV::OFF);
+		mvmk_modules[i].switch_cur_dev(CURRENT_DEV::OFF);
+	}
+	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	paint_buttons(); //	update_graphics();
 //	inter_tmr->stop();
 }
@@ -209,20 +215,29 @@ void LKA05_widg::imit_on()
 {
 	if (flag_on)
 		return;
+	flag_on = true;
 //	msg_to_log("Питание включено");
 	AbOn_tmr->start(11000);
 	change_power();//я думаю тут не нужен бул
 	paint_buttons(); //	update_graphics();
 //	update_time();
-	set_new_tm();
 //	inter_tmr->start(1000);
 }
 
 void LKA05_widg::omni_connect()
 {
+	AbOn_tmr->stop();
+	for (int i = 0; i < 3; i++)
+	{
+		mvku_modules[i].switch_cur_dev(CURRENT_DEV::MAIN);
+		mvmk_modules[i].switch_cur_dev(CURRENT_DEV::MAIN);
+	}
+	mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	paint_buttons();
+	set_new_tm();
 	flag_on = true;
-//	set_new_tm();
 }
 
 void LKA05_widg::change_power()
@@ -379,7 +394,8 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
 							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
 							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
-							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom), 3, 3);
+							mku_slot_thr.get_mku_bus_obj()->make_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom - param_mshm.dt_kom), 3, 3);
+							//emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom-param_mshm.dt_kom), 3, 3);
 							max_p++;
 						}
 						else 
@@ -413,7 +429,8 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 							if ((full_num_ku >= 16) && (full_num_ku <= 18)) //Команды в МБК04 не заведены на внешнюю шину и выдаются напрямую
 								mbk04_slot_thr.get_mbk04_obj()->new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom);
 							else
-								emit new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
+								mku_slot_thr.get_mku_bus_obj()->make_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
+								//emit new_ku(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
 							max_ku++;
 						}
 						else

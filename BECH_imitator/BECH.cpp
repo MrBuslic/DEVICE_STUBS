@@ -235,7 +235,6 @@ void BECH_widg::imit_off()
 {
 	if (!flag_on)
 		return;
-
 	flag_on = false;
 	msg_to_log("Питание отключено");
 	current_OG = OG_ERR;

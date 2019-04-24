@@ -14,6 +14,7 @@ public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_tm(int tm);
 	void new_ku_732(int ku_n, int length, double u, int line);
+	void get_power(double _volt);
 	////////////////////////////////////
 };
 

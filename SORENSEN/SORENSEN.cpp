@@ -22,8 +22,13 @@ SORENSENWidget::SORENSENWidget() : QWidget(), u(0.0), i(0.0)
 	i_meas_label = new QLabel("Измеренный ток: 0.0А");
 	v_lay->addWidget(i_meas_label);
 
+	server = new QTcpServer();
+	connect(server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
+	connect(this, &SORENSENWidget::update_graphics_signal, this, &SORENSENWidget::update_graphics);
+	server->listen(QHostAddress::Any, 5025);
+
 	kp50_slot_thr.set_connection_params("127.0.0.1", KP50_SLOT);
-	kp50_slot_thr.start(); 
+	kp50_slot_thr.start();
 
 	kp50_signal_thr.set_connection_params("127.0.0.1", KP50_SIGNAL);
 	kp50_signal_thr.start();
@@ -34,12 +39,6 @@ SORENSENWidget::SORENSENWidget() : QWidget(), u(0.0), i(0.0)
 		this->deleteLater();
 		return;
 	}
-
-
-	server = new QTcpServer();
-	connect(server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
-	connect(this, &SORENSENWidget::update_graphics_signal, this, &SORENSENWidget::update_graphics);
-	server->listen(QHostAddress::Any, 5025);
 }
 
 void SORENSENWidget::tcp_slot()

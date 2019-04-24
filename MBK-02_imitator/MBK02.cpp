@@ -15,7 +15,7 @@ union MKOWord
 	};
 };
 
-MBK02_widg::MBK02_widg(QWidget *parent)
+MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 {
 	widg = new QWidget(this);
 	setWindowTitle("МБК-02");
@@ -215,6 +215,7 @@ void MBK02_widg::imit_on()
 {
 	if (flag_on)
 		return;
+	flag_on = true;
 	msg_to_log("Питание включено");
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
@@ -229,6 +230,7 @@ void MBK02_widg::imit_off()
 {
 	if (!flag_on)
 		return;
+	flag_on = false;
 	msg_to_log("Питание отключено");
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
@@ -296,7 +298,6 @@ void MBK02_widg::set_warm_chanel()
 	if (((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm - warm_er)) || ((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm + warm_er)))
 	{
 		ready_chanel = true;
-		t_ant_ch->stop();
 		update_tm(1);
 		msg_to_log("Прогрелся комплект № " + QString::number(current_chanel + 1));
 		change_power(false);

@@ -76,12 +76,12 @@ private:
 	void imit_on();
 	void change_power();
 	void omni_connect();
-	void get_power(double _volt);
 	void set_power_back();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
 	void new_tm(int tm); 
 	void new_ku_732(int ku_n, int length, double u, int line);
+	void get_power(double _volt);
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
