@@ -232,6 +232,8 @@ void MBK02_widg::imit_off()
 		return;
 	flag_on = false;
 	msg_to_log("Питание отключено");
+	warm_chanel_tmr->stop();
+	set_warm_chanel();
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
 	current_lit = 0;

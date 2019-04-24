@@ -268,23 +268,26 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 		int tmp_mshm = mshm;
 		int tmp_pshm = pshm - 8;
 
-		switch (tmp_mshm)
+		if ((pshm >= 8) && (pshm <= 11) && (mshm >= 0) && (mshm <= 3))
 		{
-		case 0:
-			current_FSMU = FSMU_numbB(tmp_pshm);
-			break;
-		case 1:
-			current_stab = STAB(tmp_pshm);
-			break;
-		case 2:
-			current_FSVU = FSVU_numbB(tmp_pshm);
-			break;
-		case 3:
-			current_antenna = ANTENNA(tmp_pshm);
-			break;
+			switch (tmp_mshm)
+			{
+			case 0:
+				current_FSMU = FSMU_numbB(tmp_pshm);
+				break;
+			case 1:
+				current_stab = STAB(tmp_pshm);
+				break;
+			case 2:
+				current_FSVU = FSVU_numbB(tmp_pshm);
+				break;
+			case 3:
+				current_antenna = ANTENNA(tmp_pshm);
+				break;
+			}
+			update_graphics();
+			set_new_tm();
 		}
-		update_graphics();
-		set_new_tm();
 	}
 }
 

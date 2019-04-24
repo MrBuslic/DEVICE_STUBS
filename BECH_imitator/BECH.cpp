@@ -237,6 +237,8 @@ void BECH_widg::imit_off()
 		return;
 	flag_on = false;
 	msg_to_log("Питание отключено");
+	warm_og_tmr->stop();
+	set_warm_og();
 	current_OG = OG_ERR;
 	current_FINIK = FINIK_ERR;
 	current_FINIK_REZH = FINIK_REZH_ERR;
