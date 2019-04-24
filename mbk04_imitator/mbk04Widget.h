@@ -49,7 +49,7 @@ private:
 	QPushButton* vtf_btn;
 	QString name = "лай-04";
 	int bus = 1;
-
+	bool power_flag;
 	static const int MKO = 1;
 	static const int adr = 4;
 	int flag;

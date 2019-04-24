@@ -103,7 +103,7 @@ MainWidget::MainWidget()
 		this->deleteLater();
 		return;
 	}
-
+	power_flag = false;
 
 	QString ip_str = "127.0.0.1"; 
 	int slot_port = MBK04_SLOT;
@@ -152,6 +152,9 @@ void MainWidget::new_ku(int ku_n, int length, double u)
 
 void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
+	if (!power_flag)
+		return;
+
 	MKOWord tmp_cwd;
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
@@ -162,9 +165,9 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		{
 			switch (words.at(0).toInt())
 			{
-			case 1: current_rezh = REZH_FRAME::PI15; break;
-			case 2: current_rezh = REZH_FRAME::PI8; break;
-			case 4: current_rezh = REZH_FRAME::VTF; break;
+			case 1: current_rezh = REZH_FRAME::PI15; imit_on(); break;
+			case 2: current_rezh = REZH_FRAME::PI8;  imit_on(); break;
+			case 4: current_rezh = REZH_FRAME::VTF;	 imit_on(); break;
 			case 7: current_rezh = REZH_FRAME::OFF_REZH; break;
 			default:
 				break;
@@ -378,16 +381,19 @@ void MainWidget::send_frame()
 void MainWidget::get_power(double volt)
 {
 	if (volt >= 20.0)
-		imit_on();
+		power_flag = true;
+
 	else
 	if (volt < 0) 
+	{
 		imit_off();
+		power_flag = false;
+	}
 }
 
 void MainWidget::imit_on()
 {
-	current_dev = CURRENT_DEV::MAIN;
-	emit state_changed_signal();
+
 	power_slot_thr.get_power_bus_obj()->set_i(bus, name, double(0.2));
 	
 }
@@ -396,5 +402,6 @@ void MainWidget::imit_off()
 {
 
 	current_dev = CURRENT_DEV::OFF;
+	current_rezh = REZH_FRAME::OFF_REZH;
 	emit state_changed_signal();
 }
