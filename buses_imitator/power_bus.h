@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <qmap.h>
+#include <QPushButton>
 
 enum POWER_BUSES
 {
@@ -22,6 +23,9 @@ public slots:
 	void get_i(int bus, double& curr);
 
 	void set_i(int bus, QString name, double curr);
+private slots:
+	void set_on();
+	void set_off();
 signals:
 	void u_on_nk(double volt);
 	void u_on_k1(double volt);
@@ -38,6 +42,9 @@ private:
 	QMap<QString, double> nk_curr_map;
 	QMap<QString, double> k1_curr_map;
 	QMap<QString, double> k2_curr_map;
+
+	QPushButton* on_btn;
+	QPushButton* off_btn;
 };
 
 #endif // POWER_BUS_H

@@ -237,7 +237,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 									if (i == nk)
 										tmp_chans << 0;
 									else
-										tmp_chans << vchm_chanels_init[i];
+										tmp_chans << vchm_module.get_working(i);
 							vchm_module.set_working_chanels(tmp_chans, false);
 							vchm_on_timer.start(48000);
 							vchm_is_init = true;
@@ -455,9 +455,12 @@ void R732_widg::imit_on()
 	power = 16;
 	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	power_on = true;
 	mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
+	mvku_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
 	set_power_back();
 	set_new_tm();
 	paint_buttons();
@@ -467,12 +470,17 @@ void R732_widg::imit_off()
 {
 	disconnect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	disconnect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
+	disconnect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	power = 0;
 	power_on = false;
 	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	vchm_module.set_working_chanels(QList<int>() << 0 << 0 << 0 << 0);
+	vchm_chanels_init.clear();
+	vchm_chanels_init << 0 << 0 << 0 << 0;
+	vchm_module.set_working_chanels(vchm_chanels_init);
+	set_power_back();
 	set_new_tm();
 	paint_buttons();
 }
@@ -480,11 +488,25 @@ void R732_widg::imit_off()
 void R732_widg::set_power_back()
 {
 	double curr;
-	if (volt < 0.1)
+	if (volt > 0.1)
 		curr = power / volt;
 	else
 		curr = 0.0;
 	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
+
+void R732_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	if (pshm != 0)
+		return;
+	if (mshm == 1)
+		mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
+	else if (mshm == 2)
+		mu_module.switch_cur_dev(CURRENT_DEV::RESERVE);
+	else
+		return;
+	paint_buttons();
+	set_new_tm();
 }
 
 MU_MODULE::MU_MODULE() : current_dev(MAIN)

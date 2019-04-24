@@ -7,8 +7,9 @@
 
 PowerWidget::PowerWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget(this);
-
+	LogWidget* log_w = new LogWidget();
+	log_w->show();
+	setFixedSize(250, 80);
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = POWER_SLOT;
@@ -21,11 +22,19 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
+
+	on_btn = new QPushButton("–í–∫–ª", this);
+	off_btn = new QPushButton("–û—Ç–∫–ª", this);
+	QVBoxLayout* lay = new QVBoxLayout(this);
+	lay->addWidget(on_btn);
+	lay->addWidget(off_btn);
+	connect(on_btn, &QPushButton::clicked, this, &PowerWidget::set_on);
+	connect(off_btn, &QPushButton::clicked, this, &PowerWidget::set_off);
 }
 
-//Õ  - Ã¡ -07, Ã¡ -04, Ã¡ -02, ¡”œ
-// 1 - À ¿-05, ¿—Õ, ¡›◊, ÷¡ 
-// 2 - 14–733, 14–732
+//–ù–ö - –ú–ë–ö-07, –ú–ë–ö-04, –ú–ë–ö-02, –ë–£–ü
+//–ö1 - –õ–ö–ê-05, –ê–°–ù, –ë–≠–ß, –¶–ë–ö
+//–ö2 - 14–†733, 14–†732
 
 
 void PowerWidget::set_u(int bus, double volt) //
@@ -93,5 +102,21 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 		k2_curr_map[name] = curr;
 		break;
 
+	}
+}
+
+void PowerWidget::set_on()
+{
+	for (int i = 1; i < 4; i++)
+	{
+		set_u(i, 27);
+	}
+}
+
+void PowerWidget::set_off()
+{
+	for (int i = 1; i < 4; i++)
+	{
+		set_u(i, 0);
 	}
 }
