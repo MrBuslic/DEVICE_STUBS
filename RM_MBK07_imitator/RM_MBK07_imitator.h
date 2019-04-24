@@ -10,6 +10,8 @@
 #include <QList>
 #include <QMessageBox>
 #include <QUDPSocket>
+#include <QTCPSocket>
+#include <QTcpServer>
 #include <QSettings>
 #include <QVector>
 #include "../../ServerSide/MBK07/KPAdefines.h"
@@ -34,19 +36,29 @@ private:
 	QLabel *rezhim_label;
 	QLabel *liters_label;
 	QLabel *antenna_label;
-
+	
 	QTextEdit *log_edit;
 	QScrollBar* _scroll_bar;
 
 	QGridLayout *gridLayout;
 
 	QUdpSocket _sock;
-	QUdpSocket _ag_sock;
+	QTcpSocket* _ag_sock = nullptr;
+	QTcpServer serv_sock;
+	QString mode;
+	QString PSP;
+	QString IM;
+	QString FM;
+	QString tmp_mode;
 	/// Проверка контрольной суммы
 	bool checkCS(const char *sockbuf);
 	/// Формирование ответа
 	void CmdToSockbuf(short CmdID, short CmdLen, char* sockbuf);
 	QVector<int> commands;
+	/// Установленная частота на генераторе
+	double GHz;
+	/// Литера
+	int currLit;
 	/// заполнение списока команд
 	void setCommandsVec()
 	{
@@ -56,12 +68,15 @@ private:
 	}
 	/// Проверка параметра и окраска соответствующего блока
 	bool selectBlock(QPushButton* btn, char data, bool set);
+	bool selectAntenna(char data);
+	bool isset(short x, short n);
 
 signals:
 
 public slots :
 	void error_Slot(QAbstractSocket::SocketError socketError);
 	void read();
+	void connect_ag();
 	void read_ag();
 
 };

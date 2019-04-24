@@ -5,7 +5,9 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 	widg = new QWidget(this);
 	setCentralWidget(widg);
 	setWindowTitle("Имитатор РМ МБК07");
-
+	PSP = "ПСП: ";
+	IM = "";
+	FM = "";
 	p20 = new QPushButton("П20", widg);
 	p20->setFixedWidth(150);
 	p20->setFixedHeight(100);
@@ -21,7 +23,7 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 
 	bloks_label = new QLabel("Блоки", widg);
 	rezhim_label = new QLabel("Режим: ", widg);
-	liters_label = new QLabel("Литеры: ", widg);
+	liters_label = new QLabel("Литера: ", widg);
 	antenna_label = new QLabel("Антенна: ", widg);
 
 	log_edit = new QTextEdit(widg);
@@ -43,21 +45,19 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 
 	setCommandsVec();
 	
-	QSettings settings("Cometa", "СПО МКПА МЦА");
-	QString ip = settings.value("IP_rm", "192.168.0.100").toString();
+	QSettings tmp_settings("Cometa", "СПО МКПА МЦА");
+	QString ip = tmp_settings.value("IP_rm", "192.168.0.100").toString();
 	if (ip == "localhost")	// QUdpSocket::bind не жрёт "localhost". Ему "127.0.0.1" подавай.
 		ip = "127.0.0.1";
 	bool t = _sock.bind(QHostAddress(ip), 10001);
 
-	QSettings tmp_settings("Cometa", "СПО МКПА МЦА");
-	ip = tmp_settings.value("IP_gen", "192.168.1.224").toString();
-	if (ip == "localhost")	// QUdpSocket::bind не жрёт "localhost". Ему "127.0.0.1" подавай.
-		ip = "127.0.0.1";
-	t = _ag_sock.bind(QHostAddress(ip), 5025);
+	serv_sock.listen(QHostAddress("127.0.0.1"), 5025);
+
 
 	connect(&_sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error_Slot(QAbstractSocket::SocketError)));
 	connect(&_sock, &QUdpSocket::readyRead, this, &RM_MBK07_imitator::read);
-	connect(&_ag_sock, &QUdpSocket::readyRead, this, &RM_MBK07_imitator::read_ag);
+	connect(&serv_sock, &QTcpServer::newConnection, this, &RM_MBK07_imitator::connect_ag);
+	
 
 	//connect(_sock, SIGNAL(readyRead()), SLOT(read()));
 }
@@ -131,6 +131,31 @@ bool RM_MBK07_imitator::selectBlock(QPushButton * btn, char data, bool set)
 	return false;
 }
 
+bool RM_MBK07_imitator::selectAntenna(char data)
+{
+	if (data == '\01')
+	{
+		antenna_label->setText("Антенна: ОНА");
+		return true;
+	}
+	if (data == '\00')
+	{
+		antenna_label->setText("Антенна: МНА_плюс_У");
+		return true;
+	}
+	if (data == '\02')
+	{
+		antenna_label->setText("Антенна: МНА_минус_У");
+		return true;
+	}
+	return false;
+}
+
+bool RM_MBK07_imitator::isset(short x, short n)
+{
+	return (x & ((short)1 << n)) != 0;
+}
+
 void RM_MBK07_imitator::read()
 {
 	qint64 received_bytes = _sock.bytesAvailable();
@@ -150,54 +175,113 @@ void RM_MBK07_imitator::read()
 	if (!checkCS(const_sockbuf))
 	{
 		short cmdLen = 0x0002;
-		short cmdResponse = (0x03 << 8) + 0x00; // ОТВЕТ на любую команду в случае несовпадения КС принятой команды.
+		short cmdResponse = ERROR_CMD_CS; // ОТВЕТ на любую команду в случае несовпадения КС принятой команды.
 		readSize = 5;
 		sockbufResponse = new char[readSize];
 		CmdToSockbuf(cmdResponse, cmdLen, sockbufResponse);
 	}
 	else
 	{
-		short cmdLen = (const_sockbuf[0] << 8) + const_sockbuf[1];		// Длина данных в принятом пакете (первые 2 байта)	
-		short cmd = (const_sockbuf[2] << 8) + const_sockbuf[3];			// ИД команды
+		short cmdLen = (const_sockbuf[0] << 8) + (const_sockbuf[1] & 0xFF);		// Длина данных в принятом пакете (первые 2 байта)	
+		short cmd = (const_sockbuf[2] << 8) + (const_sockbuf[3] & 0xFF);			// ИД команды
 		short cmdResponse;
 		if (commands.contains(cmd))
 		{
 			cmdResponse = (const_sockbuf[3] << 8) + const_sockbuf[2];	// Ответ. Свапнуть байты команды
-			
+
+			short cmdMKO = (const_sockbuf[4] << 8) + (const_sockbuf[5] & 0xFF);	// код команд МКО
+			short dataMKO = (const_sockbuf[6] << 8) + (const_sockbuf[7] & 0xFF);
 			switch (cmd)
 			{
-			case(0x0070):
+			case(P12_POWER):
 				if(!selectBlock(p12, const_sockbuf[4], true))
-					cmdResponse = (0x03 << 8) + 0x03; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
+					cmdResponse = ERROR_CMD_PAR; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
 				break;
-			case(0x0071):
+			case(P20_POWER):
 				if(!selectBlock(p20, const_sockbuf[4], true))
-					cmdResponse = (0x03 << 8) + 0x03; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
+					cmdResponse = ERROR_CMD_PAR; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
 				break;
-			case(0x0072):
+			case(P21_POWER):
 				if(!selectBlock(p21, const_sockbuf[4], true))
-					cmdResponse = (0x03 << 8) + 0x03; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
+					cmdResponse = ERROR_CMD_PAR; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
 				break;
-			case(0x0050):
+			case(BERT_START):
 				if (const_sockbuf[4] == '\xAA')
 				{
 					if (const_sockbuf[10] == '\x11')
-						rezhim_label->setText("Режим: ПИ-15");
+						mode = "ПИ-15";
 					if (const_sockbuf[10] == '\x22')
-						rezhim_label->setText("Режим: ПИ-8");
+						mode = "ПИ-8";
 					if (const_sockbuf[10] == '\x33')
-						rezhim_label->setText("Режим: ВТФ");
+						mode = "ВТФ";
 					if (const_sockbuf[10] == '\x44')
-						rezhim_label->setText("Режим: произвольный");
+						mode = "произвольный";
+					rezhim_label->setText(QString("Режим: %1 %2 %3 %4").arg(mode).arg(PSP).arg(FM).arg(IM));
 				}
 
+				break;
+			case(PRBCH_CHANNEL_SWITCH):
+				if (!selectAntenna(const_sockbuf[4]))
+					cmdResponse = ERROR_CMD_PAR; // ОТВЕТ в случае обнаружения недопустимого значения параметра принятой команды.
+				break;
+			case(MKOCMD_SEND):
+				switch (cmdMKO)
+				{
+					case(MKOCMD_SETPSP):
+						if (dataMKO == MKO_PSP1)
+							PSP = "ПСП-1";
+						if (dataMKO == MKO_PSP2)
+							PSP = "ПСП-2";
+						if (dataMKO == MKO_PSP3)
+							PSP = "ПСП-3";
+						if (dataMKO == MKO_PSP4)
+							PSP = "ПСП-4";
+						rezhim_label->setText(QString("Режим: %1 %2 %3 %4").arg(mode).arg(PSP).arg(FM).arg(IM));
+						break;
+				// Литера по МКО не ставится
+				  /*case(MKOCMD_SETLIT):
+						if (dataMKO == MKO_LIT1)
+							liters_label->setText("Литера: 1");
+						if (dataMKO == MKO_LIT2)
+							liters_label->setText("Литера: 2");
+						if (dataMKO == MKO_LIT3)
+							liters_label->setText("Литера: 3");
+						if (dataMKO == MKO_LIT4)
+							liters_label->setText("Литера: 4");
+						if (dataMKO == MKO_LIT5)
+							liters_label->setText("Литера: 5");
+						if (dataMKO == MKO_LIT6)
+							liters_label->setText("Литера: 6");
+						if (dataMKO == MKO_LIT7)
+							liters_label->setText("Литера: 7");
+						if (dataMKO == MKO_LIT8)
+							liters_label->setText("Литера: 8");
+						qDebug() << QString("MKOCMD_SETLIT Режим: %1 %2 %3").arg(mode).arg(PSP).arg(IM);
+						break;*/
+					case(MKOCMD_SETMODE):
+						FM = "";
+						IM = "";
+						if (isset(dataMKO, 4) && isset(dataMKO, 12))
+							IM = "ИМ";
+						if(IM == "")	// Иначе если просто ставили ИМ, псп потеряется
+							PSP = "";
+						if (isset(dataMKO, 6) && isset(dataMKO, 14))
+							FM = "ФМ15 ";
+						if (!isset(dataMKO, 6) && !isset(dataMKO, 14))
+							FM = "ФМ1,5 ";
+
+						rezhim_label->setText(QString("Режим: %1 %2 %3 %4").arg(mode).arg(PSP).arg(FM).arg(IM));
+						break;
+					default:
+						break;
+				}
 				break;
 			default:
 				break;
 			}
 		}
 		else 
-			cmdResponse = (0x03 << 8) + 0x01; // ОТВЕТ в случае нераспознанния идентификатора принятой команды.
+			cmdResponse = ERROR_CMD_UNKN; // ОТВЕТ в случае нераспознанния идентификатора принятой команды.
 		sockbufResponse = new char[readSize];
 		CmdToSockbuf(cmdResponse, cmdLen, sockbufResponse);
 	}
@@ -209,18 +293,51 @@ void RM_MBK07_imitator::read()
 	delete sockbufResponse;
 }
 
+void RM_MBK07_imitator::connect_ag()
+{
+	if (_ag_sock)
+		if((_ag_sock->state() == QAbstractSocket::ConnectedState))
+		{
+			_ag_sock->close();
+			delete _ag_sock;
+			_ag_sock = nullptr;
+		}
+	_ag_sock = serv_sock.nextPendingConnection();
+	connect(_ag_sock, &QTcpSocket::readyRead, this, &RM_MBK07_imitator::read_ag);
+	//char c = '\x01';
+	//_ag_sock->write(&c);
+}
+
 void RM_MBK07_imitator::read_ag()
 {
-	qint64 received_bytes = _ag_sock.bytesAvailable();
-	char* sockbuf;
-	sockbuf = new char[received_bytes];
 
-	auto *host = new QHostAddress();
-	quint16 port = 0;
-	auto readSize = _ag_sock.readDatagram(sockbuf, received_bytes, host, &port);
+	QByteArray read_data;
+	QString ret_str;
 
-	_ag_sock.writeDatagram((char*)1, readSize, *host, port);
+	while (_ag_sock->bytesAvailable())
+	{
+		read_data += _ag_sock->read(_ag_sock->bytesAvailable());
+		//		Sleep(10);
+	}
+	QString command(read_data.toStdString().c_str());
+	command.chop(2);
 
-	delete sockbuf;
-	delete host;
+	QString command_pars = command.left(5);
+	
+	if (command_pars == "FREQ ")
+	{
+		GHz = command.mid(5, 4).toDouble();
+		const double ZERO_LIT = 2.56;
+		const double STEP_LIT = 0.02;
+		const double magic = 0.001;		// Для корректного округления. Иначе с 16-ой литеры расчитывает на 1 литеру меньше
+
+		int currLit = ((ZERO_LIT - GHz) + magic) / STEP_LIT;
+		liters_label->setText("Литера: " + QString::number(currLit));
+	}
+
+	if (command == "FREQ?")
+	{
+		QString s = QString::number(GHz*1e9);
+		_ag_sock->write(s.toStdString().c_str());
+	}
 }
