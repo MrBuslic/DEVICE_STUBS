@@ -424,13 +424,13 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 			}
 			if (tmp_correct)
 			{
-				if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI += "P";
+				if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI = "P";
 				else
 				{
-					if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
+					if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI = "1";
 					else
 					{
-						if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
+						if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI = "0";
 						else tmp_correct = false;
 					}
 				}
@@ -438,10 +438,16 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 					tmp_correct = false;
 				if (tmp_correct)
 				{
-					signal_con = true;
-					char tmp_l = tmp_str_KPI.toInt();
+					if (!signal_con)
+					{
+						t_ant_ch->stop();
+						signal_con = true;
+					}
 					if (tmp_str_KPI != "P")
+					{
+						char tmp_l = tmp_str_KPI.toInt();
 						list_to_R14732.push_back(tmp_l);
+					}
 					if (t_err_kpi->isActive()) t_err_kpi->stop();
 					update_graphics();
 				}
@@ -451,11 +457,12 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 			if (!tmp_correct && signal_con && !t_err_kpi->isActive())
 				t_err_kpi->start(5000);
 		}
-		msg_to_log(tmp_str_KPI);
+		//msg_to_log(tmp_str_KPI);
 		if (tmp_correct)
 		{
 			update_tm(26);
 			emit msg_to_14R732(list_to_R14732);
+			list_to_R14732.clear();
 		}
 	}
 }
