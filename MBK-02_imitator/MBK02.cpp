@@ -15,7 +15,7 @@ union MKOWord
 	};
 };
 
-MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
+MBK02_widg::MBK02_widg(QWidget *parent)
 {
 	widg = new QWidget(this);
 	setWindowTitle("МБК-02");
@@ -171,7 +171,7 @@ void MBK02_widg::get_power(double _volt)
 	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt < 1) imit_off();
+		if (volt == 0) imit_off();
 }
 
 void MBK02_widg::change_power(bool switch_chanel)
@@ -204,7 +204,7 @@ void MBK02_widg::change_power(bool switch_chanel)
 void MBK02_widg::set_power_back()
 {
 	double curr;
-	if (volt >= 1)
+	if (volt != 0)
 		curr = (double)power / volt;
 	else
 		curr = 0.0;
@@ -213,9 +213,6 @@ void MBK02_widg::set_power_back()
 
 void MBK02_widg::imit_on()
 {
-	if (flag_on)
-		return;
-	flag_on = true;
 	msg_to_log("Питание включено");
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
@@ -228,12 +225,7 @@ void MBK02_widg::imit_on()
 
 void MBK02_widg::imit_off()
 {
-	if (!flag_on)
-		return;
-	flag_on = false;
 	msg_to_log("Питание отключено");
-	warm_chanel_tmr->stop();
-	set_warm_chanel();
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
 	current_lit = 0;
@@ -300,6 +292,7 @@ void MBK02_widg::set_warm_chanel()
 	if (((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm - warm_er)) || ((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm + warm_er)))
 	{
 		ready_chanel = true;
+		t_ant_ch->stop();
 		update_tm(1);
 		msg_to_log("Прогрелся комплект № " + QString::number(current_chanel + 1));
 		change_power(false);
@@ -369,7 +362,7 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 	if (!ready_chanel) return;
 	else
 	{
-		current_lit = 2;
+		current_lit = 2; //ДЕБАГ!!!!!
 		int tmp_in, tmp_len, tmp_weak;
 		QString tmp_str_ant;
 		//t_ant_ch->stop();
@@ -379,7 +372,7 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 			msg_to_log("Литера не задана, либо задана нулевая литера");
 			return;
 		}
-		QString tmp_str_KPI;
+		QString tmp_str_KPI = "";
 		bool tmp_correct = true;
 		int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
 		int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
