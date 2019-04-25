@@ -384,7 +384,7 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 		int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
 		int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
 		int tmp_1 = LITER_PAUSE + (STEP * (current_lit - 1)) + ONE;
-		for (int i = 0; (i < tmp_len) && (!t_ant_ch->isActive()); i++)
+		for (int i = 0; (i < tmp_len); i++)
 		{
 			tmp_list = KPI_list.at(i).toList();
 			tmp_in = tmp_list.at(0).toInt();
@@ -396,33 +396,29 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 			case MHA1MY:
 				if (tmp_str_ant != "МНА1-Y")
 				{
-					t_err_kpi->start(5000);
 					tmp_correct = false;
 				}
 				break;
 			case MHA1PY:
 				if (tmp_str_ant != "МНА1+Y")
 				{
-					t_err_kpi->start(5000);
 					tmp_correct = false;
 				}
 				break;
 			case MHA2MY:
 				if (tmp_str_ant != "МНА2-Y")
 				{
-					t_err_kpi->start(5000);
 					tmp_correct = false;
 				}
 				break;
 			case MHA2PY:
 				if (tmp_str_ant != "МНА2+Y")
 				{
-					t_err_kpi->start(5000);
 					tmp_correct = false;
 				}
 				break;
 			default:
-				t_err_kpi->start(5000);
+
 				tmp_correct = false;
 				break;
 			}
@@ -446,11 +442,14 @@ void MBK02_widg::new_KPI(QVariantList KPI_list)
 					char tmp_l = tmp_str_KPI.toInt();
 					if (tmp_str_KPI != "P")
 						list_to_R14732.push_back(tmp_l);
-					if (t_err_kpi->isActive() || (i == tmp_len)) t_err_kpi->stop();
+					if (t_err_kpi->isActive()) t_err_kpi->stop();
 					update_graphics();
 				}
-				else t_err_kpi->start(5000);
+
+
 			}
+			if (!tmp_correct && signal_con && !t_err_kpi->isActive())
+				t_err_kpi->start(5000);
 		}
 		msg_to_log(tmp_str_KPI);
 		if (tmp_correct)
