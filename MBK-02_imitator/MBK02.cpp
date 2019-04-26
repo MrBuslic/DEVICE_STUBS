@@ -15,7 +15,7 @@ union MKOWord
 	};
 };
 
-MBK02_widg::MBK02_widg(QWidget *parent)
+MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 {
 	widg = new QWidget(this);
 	setWindowTitle("МБК-02");
@@ -170,7 +170,6 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
 
-	flag_on = false;
 	get_power(27.0); // ДЕБАГ напряжения
 }
 
@@ -194,7 +193,7 @@ void MBK02_widg::get_power(double _volt)
 	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt == 0) imit_off();
+		if (volt > 1) imit_off();
 }
 
 void MBK02_widg::change_power(bool switch_chanel)
@@ -227,7 +226,7 @@ void MBK02_widg::change_power(bool switch_chanel)
 void MBK02_widg::set_power_back()
 {
 	double curr;
-	if (volt != 0)
+	if (volt > 1)
 		curr = (double)power / volt;
 	else
 		curr = 0.0;
@@ -240,6 +239,8 @@ void MBK02_widg::imit_on()
 		return;
 	flag_on = true;
 	msg_to_log("Питание включено");
+	warm_chanel_tmr->stop();
+	set_warm_chanel();
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
 	warm_chanel_tmr->start(standart_tm);
