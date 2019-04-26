@@ -157,6 +157,14 @@ void RPC_r733_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd, 
 	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_message");
 }
+void RPC_r733_SLOT_Object::auto_scroll_clicked(int _state)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(_state);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("auto_scroll_clicked(int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished auto_scroll_clicked");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

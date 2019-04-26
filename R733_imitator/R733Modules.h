@@ -30,13 +30,30 @@ enum REGIME
 	VTF = 2,
 	RBK = 5
 };
-
 enum NUM_CHANNEL
 {
-	WORK_CHANNEL = 0,
-	CONTROL_CHANNEL = 1,
-	FSCH_CHANNEL = 2,
-	MBK07_CHANNEL = 3
+	CHANNEL_1 = 0,
+	CHANNEL_2,
+	CHANNEL_3,
+	CHANNEL_4
+};
+//enum NUM_CHANNEL
+//{
+//	WORK_CHANNEL = 0,
+//	CONTROL_CHANNEL = 1,
+//	FSCH_CHANNEL = 2,
+//	MBK07_CHANNEL = 3
+//};
+
+enum MAJORITAR
+{
+	C_1_MAJOR =1,
+	C_2_MAJOR = 1,
+	C_3_MAJOR = 1,
+	B_1_GSCH = 1,
+	B_2_GSCH = 1,
+	B_3_GSCH = 1,
+	B_4_GSCH = 1
 };
 
 //class UPI_MODULE : public R733_MODULE
@@ -184,6 +201,44 @@ private:
 
 	int ku_m = -1;
 	int ku_p = -1;
+};
+
+
+class UPI_MODULE 
+{
+public:
+	UPI_MODULE();
+	
+	/*enum NUM_CHANNEL
+	{
+		CHANNEL_1,
+		CHANNEL_2,
+		CHANNEL_3,
+		CHANNEL_4
+	};*/
+	void set_working_channels(QList<int> chanels_state, bool can_on = false);
+	bool get_working()
+	{
+		return working[num_channel];
+	}
+	void switch_num_chan(NUM_CHANNEL _dev)
+	{
+		num_channel = _dev;
+	}
+
+	void set_working(NUM_CHANNEL _dev, bool _flag)
+	{
+		working[_dev] = _flag;
+	}
+
+	NUM_CHANNEL get_current_dev()
+	{
+		return num_channel;
+	}
+
+private:
+	NUM_CHANNEL num_channel;
+	QMap<NUM_CHANNEL, bool> working;
 };
 
 #endif // R733_MODULES_H
