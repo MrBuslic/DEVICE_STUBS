@@ -255,7 +255,7 @@ BOOP::~BOOP()
 
 void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word)
 {
-	if (respond_word = -1)
+	if (respond_word == -1)
 		return;
 
 	MKOWord parsed_word(command_word);
@@ -264,7 +264,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		return;
 
 	int _checksum = 0;
-	for (int i = 0; i < words_count - 1; i++)
+	for (int i = 0; i < words.count() - 1; i++)
 		_checksum += words.at(i).toInt();
 
 	if (_checksum != words.last().toInt())
@@ -272,7 +272,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 
 	QString _message = QString("[%1] принял сигнал на подадресе %2 c КС %3")
 		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
-										 .arg(parsed_word.subaddress, parsed_word.command_word);
+										 .arg(parsed_word.subaddress).arg(parsed_word.command_word);
 
 	logArea->append(_message);
 
