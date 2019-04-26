@@ -169,7 +169,9 @@ MBK02_widg::MBK02_widg(QWidget *parent)
 	t_err_kpi = new QTimer(this);
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
-	get_power(27.0);
+
+	flag_on = false;
+	get_power(27.0); // ДЕБАГ напряжения
 }
 
 void MBK02_widg::break_warm()//дебаг кнопка
@@ -234,6 +236,9 @@ void MBK02_widg::set_power_back()
 
 void MBK02_widg::imit_on()
 {
+	if (flag_on)
+		return;
+	flag_on = true;
 	msg_to_log("Питание включено");
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
@@ -246,9 +251,14 @@ void MBK02_widg::imit_on()
 
 void MBK02_widg::imit_off()
 {
+	if (!flag_on)
+		return;
+	flag_on = false;
 	msg_to_log("Питание отключено");
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
+	current_lit = 0;
+	signal_con = false;
 	current_lit = 0;
 	update_graphics();
 }
@@ -672,6 +682,10 @@ void MBK02_widg::update_graphics()
 		case CHANEL_2:
 			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 			Chan2_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
+			break;
+		case CHANEL_OFF: 
+			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+			Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
 		}
 	}
