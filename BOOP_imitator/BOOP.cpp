@@ -2,9 +2,9 @@
 #include <QMessageBox>
 #include "rpc_ports.h"
 
-union MKOWord
+union MKOCommandWord
 {
-	MKOWord(quint16 raw_word)
+	MKOCommandWord(quint16 raw_word)
 	{
 		this->command_word = raw_word;
 	}
@@ -19,9 +19,43 @@ union MKOWord
 	};
 };
 
+union MKODataWords
+{
+    MKODataWords(QVariantList raw_words)
+    {
+        for (int i = 0; i < raw_words.size(); i++)
+            this->data_words[i] = static_cast<quint16>(raw_words.at(i).toInt());
+    }
+
+    quint16 data_words[6];
+
+    struct {
+    	quint16 upsilonServoPower : 1,
+				phiServoPower : 1,
+				upsilonAngleSensorPower : 1,
+				phiAngleSensorPower : 1,
+				upsilonRotationCommand : 1,
+				phiRotationCommand : 1,
+				: 10;
+
+    	quint16 upsilonPulseAmount : 15,
+				upsilonRotationDirection : 1;
+
+    	quint16 phiPulseAmount : 15,
+				phiRotationDirection : 1;
+
+    	quint16 uplsilonPulseFrequency: 9,
+				: 7;
+
+    	quint16 phiPulseFrequency: 9,
+				: 7;
+
+    	quint16 checksum;
+	};
+};
+
 BOOP::BOOP()
 {
-
   // Contains other containers
 
   // First stripe of the gui
@@ -258,9 +292,12 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 	if (respond_word == -1)
 		return;
 
-	MKOWord parsed_word(command_word);
+	MKOCommandWord parsed_command_word(command_word);
 
-	if ((MKO != this->MKO) || (parsed_word.address != this->address))
+	if ((MKO != this->MKO) || (parsed_command_word.address != this->address))
+		return;
+
+	if (parsed_command_word.words_count != 6 || words.count() != 6)
 		return;
 
 	int _checksum = 0;
@@ -270,11 +307,41 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 	if (_checksum != words.last().toInt())
 		return;
 
+	MKODataWords parsed_data_words(words);
+
 	QString _message = QString("[%1] принял сигнал на подадресе %2 c КС %3")
 		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
-										 .arg(parsed_word.subaddress).arg(parsed_word.command_word);
+										 .arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
+
+	if (parsed_data_words->upsilonServoPower)
+		upsilonServoPower->setChecked(true);
+	else
+		upsilonServoPower->setChecked(false);
+
+	if (parsed_data_words->phiServoPower)
+		phiServoPower->setChecked(true);
+	else
+		phiServoPower->setChecked(false);
+
+	if (parsed_data_words->upsilonAngleSensorPower)
+		upsilonAngleSensorPower->setChecked(true);
+	else
+		upsilonAngleSensorPower->setChecked(false);
+
+	if (parsed_data_words->phiAngleSensorPower)
+		phiAngleSensorPower->setChecked(true);
+	else
+		phiAngleSensorPower->setChecked(false);
 
 	logArea->append(_message);
+
+	// Do something
+
+}
+void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+	msg_to_log(_msg);
 
 	// Do something
 
