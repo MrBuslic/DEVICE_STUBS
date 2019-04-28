@@ -30,27 +30,110 @@ union MKODataWords
     quint16 data_words[6];
 
     struct {
-    	quint16 upsilonServoPower : 1,
-				phiServoPower : 1,
-				upsilonAngleSensorPower : 1,
-				phiAngleSensorPower : 1,
-				upsilonRotationCommand : 1,
-				phiRotationCommand : 1,
+    	quint16 upsilon_servo_power : 1,
+				phi_servo_power : 1,
+				upsilon_angle_sensor_power : 1,
+				phi_angle_sensor_power : 1,
+				upsilon_rotation_command : 1,
+				phi_rotation_command : 1,
 				: 10;
 
-    	quint16 upsilonPulseAmount : 15,
-				upsilonRotationDirection : 1;
+    	quint16 upsilon_pulse_amount : 15,
+				upsilon_rotation_direction : 1;
 
-    	quint16 phiPulseAmount : 15,
-				phiRotationDirection : 1;
+    	quint16 phi_pulse_amount : 15,
+				phi_rotation_direction : 1;
 
-    	quint16 uplsilonPulseFrequency: 9,
+    	quint16 uplsilon_pulse_frequency: 9,
 				: 7;
 
-    	quint16 phiPulseFrequency: 9,
+    	quint16 phi_pulse_frequency: 9,
 				: 7;
 
     	quint16 checksum;
+	};
+};
+
+union BOOPRespondWord
+{
+	BOOPRespondWord()
+	{
+		// Form respond word
+	}
+
+	quint16 respond_word;
+
+	struct {
+		quint16 terminal_device_malfunction : 1,
+				: 1,
+				caller_malfunction : 1,
+				caller_busyness : 1,
+				: 5,
+				respond_word_transaction : 1,
+				message_error : 1,
+				terminal_device_address : 5;
+	};
+};
+
+union BOOPDataWords
+{
+	BOPPDataWords()
+	{
+		// Form data words
+	}
+
+	quint16 data_words[13];
+
+	struct {
+		quint16 upsilon_servo_power_status : 1,
+				phi_servo_power_status : 1,
+				upsilon_angle_sensor_power_status : 1,
+				phi_angle_sensor_power_status : 1,
+				upsilon_channel_work_status : 1,
+				phi_channel_work_status : 1,
+				previous_message_error : 1,
+				half_set_engage : 1,
+				temperature : 8;
+
+		quint16 upsilon_pulse_amount : 15,
+				upsilon_rotation_direction : 1;
+
+		quint16 phi_pulse_amount : 15,
+				phi_rotation_direction : 1;
+
+		quint16 uplsilon_pulse_frequency : 9,
+				: 7;
+
+		quint16 phi_pulse_frequency : 9,
+				: 7;
+
+		quint16 upsilon_angle;
+
+		quint16 phi_angle;
+
+		quint16 upsilon_pulse_summ : 15,
+				usplison_summ_sign : 1;
+
+		quint16 phi_pulse_summ : 15,
+				phi_summ_sign : 1;
+
+		// Self-control bits
+		quint16 bit19 : 1,
+				bit18 : 1,
+				bit17 : 1,
+				bit16 : 1,
+				bit15 : 1,
+				bit14 : 1,
+				bit13 : 1,
+				bit12 : 1,
+				: 7,
+				bit4 : 1;
+
+		quint16 upsilon_min_angle;
+
+		quint16 phi_min_angle;
+
+		quint16 checksum;
 	};
 };
 
@@ -246,7 +329,6 @@ BOOP::BOOP()
   this->setLayout(mainLayout);
   this->show();
 
-
   slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
   slot_thr.start();
 
@@ -313,22 +395,22 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
 										 .arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
 
-	if (parsed_data_words->upsilonServoPower)
+	if (parsed_data_words->upsilon_servo_power)
 		upsilonServoPower->setChecked(true);
 	else
 		upsilonServoPower->setChecked(false);
 
-	if (parsed_data_words->phiServoPower)
+	if (parsed_data_words->phi_servo_power)
 		phiServoPower->setChecked(true);
 	else
 		phiServoPower->setChecked(false);
 
-	if (parsed_data_words->upsilonAngleSensorPower)
+	if (parsed_data_words->upsilon_angle_sensor_power)
 		upsilonAngleSensorPower->setChecked(true);
 	else
 		upsilonAngleSensorPower->setChecked(false);
 
-	if (parsed_data_words->phiAngleSensorPower)
+	if (parsed_data_words->phi_angle_sensor_power)
 		phiAngleSensorPower->setChecked(true);
 	else
 		phiAngleSensorPower->setChecked(false);
