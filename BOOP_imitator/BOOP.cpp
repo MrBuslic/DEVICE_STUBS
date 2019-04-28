@@ -179,13 +179,22 @@ BOOP::BOOP()
 
   // Self-diagnostic block
 
-  //  // First self-diagnostic column
+	//  // First self-diagnostic column
 
-  bit19 = new QCheckBox("Исправность управляющего микроконвертора", this);
-  bit18 = new QCheckBox("Исправность микроконвертора-драйвера ШД", this);
-  bit17 = new QCheckBox("Исправность интерфейса SPI с ОУ МКО", this);
-  bit16 = new QCheckBox("Исправность интерфейса с ДУ (канал υ)", this);
-  bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
+	bit19 = new QCheckBox("Исправность управляющего микроконвертора", this);
+	bit19->setChecked(true);
+
+	bit18 = new QCheckBox("Исправность микроконвертора-драйвера ШД", this);
+	bit18->setChecked(true);
+
+	bit17 = new QCheckBox("Исправность интерфейса SPI с ОУ МКО", this);
+	bit17->setChecked(true);
+
+	bit16 = new QCheckBox("Исправность интерфейса с ДУ (канал υ)", this);
+	bit16->setChecked(true);
+
+	bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
+	bit15->setChecked(true);
 
   QVBoxLayout *firstDiagnosticColumn = new QVBoxLayout();
   firstDiagnosticColumn->addWidget(bit19);
@@ -194,12 +203,19 @@ BOOP::BOOP()
   firstDiagnosticColumn->addWidget(bit16);
   firstDiagnosticColumn->addWidget(bit15);
 
-  //  // Second self-diagnostic column
+	//  // Second self-diagnostic column
 
-  bit14 = new QCheckBox("Исправность ОУ МКО (основной канал)", this);
-  bit13 = new QCheckBox("Исправность ОУ МКО (резервный канал)", this);
-  bit12 = new QCheckBox("Исправность термодатчика", this);
-  bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
+	bit14 = new QCheckBox("Исправность ОУ МКО (основной канал)", this);
+	bit14->setChecked(true);
+
+	bit13 = new QCheckBox("Исправность ОУ МКО (резервный канал)", this);
+	bit13->setChecked(true);
+
+	bit12 = new QCheckBox("Исправность термодатчика", this);
+	bit12->setChecked(true);
+
+	bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
+	bit4->setChecked(true);
 
   QVBoxLayout *secondDiagnosticColumn = new QVBoxLayout();
   secondDiagnosticColumn->addWidget(bit14);
@@ -325,9 +341,10 @@ BOOP::BOOP()
   mainLayout->addLayout(thirdStripe);
   mainLayout->addWidget(logArea);
 
-  this->setWindowTitle("Блок управления приводами");
-  this->setLayout(mainLayout);
-  this->show();
+	this->setWindowTitle("Блок управления приводами");
+	this->setLayout(mainLayout);
+	this->setFocus();
+	this->show();
 
   slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
   slot_thr.start();
