@@ -126,6 +126,20 @@ int RPC_mkprm_SLOT_Object::unmkprm_get_strings(int strings, QVariantList& string
 	SRPCSignalClass::Instance().toLog(QString("mkprm dynamic_call finished unmkprm_get_strings %1").arg(tmp_ret_params));
 	return res.toInt();
 }
+void RPC_mkprm_SLOT_Object::unmkprm_start()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("mkprm dynamic_call unmkprm_start %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unmkprm_start()", tmp_list);
+	SRPCSignalClass::Instance().toLog("mkprm dynamic_call finished unmkprm_start");
+}
+void RPC_mkprm_SLOT_Object::unmkprm_stop()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("mkprm dynamic_call unmkprm_stop %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unmkprm_stop()", tmp_list);
+	SRPCSignalClass::Instance().toLog("mkprm dynamic_call finished unmkprm_stop");
+}
 void RPC_mkprm_SLOT_Object::new_frame(QString mode, QVariant _frame_data)
 {
 	QVariantList tmp_list;

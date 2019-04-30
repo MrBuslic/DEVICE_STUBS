@@ -102,6 +102,8 @@ public:
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant unmkprm_get_strings(QVariantList& _values);
+	QVariant unmkprm_start(QVariantList& _values);
+	QVariant unmkprm_stop(QVariantList& _values);
 	QVariant new_frame(QVariantList& _values);
 public slots:
 	void read_data();

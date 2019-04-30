@@ -118,6 +118,7 @@ MainWidget::MainWidget()
 	rpc_signal_srv->start();
 	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
+	params_mode_map = fp.getParams();
 }
 
 
@@ -172,6 +173,7 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			default:
 				break;
 			};
+			emit state_changed_signal();
 		}
 		else if (tmp_cwd.subadr == 6)
 		{
@@ -203,7 +205,7 @@ void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 		}
 
 	}
-	emit state_changed_signal();
+	
 
 
 
@@ -333,9 +335,9 @@ void MainWidget::new_SCHBK(QVariantList words)
 	for (int i = 0; i < 16; i++)
 	{
 
-			schbk_arr[i] = words.at(i).toInt() & 0xF0;
+			schbk_arr[2*i] = (words.at(i).toInt() & 0xFF00) >> 8;
 		
-			schbk_arr[2*i] = words.at(i).toInt() & 0x0F;
+			schbk_arr[2*i+1] = words.at(i).toInt() & 0x00FF;
 	}
 	data_includer.includeSCHBK((unsigned char*)(frame.data()), schbk_arr.get(), 32);
 }
@@ -362,6 +364,8 @@ void MainWidget::clean_frame_data(QString REZH)
 	clean_frame = QByteArray();
 	clean_frame.resize(tmp_list.count());
 	i = 0;
+	data_includer.setModeParams(params_mode_map[REZH]);
+
 	for (QStringList::iterator itr = tmp_list.begin(); itr != tmp_list.end(); itr++, i++)
 	{
 		clean_frame[i] = itr->toInt();

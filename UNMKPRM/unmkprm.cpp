@@ -111,11 +111,19 @@ ViStatus _VI_FUNC unmkprm_mode_cycle (
 
 ViStatus _VI_FUNC unmkprm_start (
 							ViSession mvi
-							){ return 0; }
+							)
+{ 
+	Srpc_buffer_class::Instance().mkprm_slot_thr.get_mkprm_obj()->unmkprm_start();
+	return 0; 
+}
 
 ViStatus _VI_FUNC unmkprm_stop (
 							ViSession mvi
-							){ return 0; }
+							)
+{
+	Srpc_buffer_class::Instance().mkprm_slot_thr.get_mkprm_obj()->unmkprm_stop();
+	return 0; 
+}
 
 ViStatus _VI_FUNC unmkprm_inp_type (
 							ViSession mvi, 

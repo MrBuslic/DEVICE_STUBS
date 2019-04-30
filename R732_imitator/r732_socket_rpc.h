@@ -104,6 +104,8 @@ public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant new_message(QVariantList& _values);
 	QVariant set_new_mbk02_tm(QVariantList& _values);
+	QVariant get_power(QVariantList& _values);
+	QVariant new_mk(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

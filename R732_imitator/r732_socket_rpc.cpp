@@ -78,6 +78,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
 		operators_map["set_new_mbk02_tm(int, int)"] = &Socket_RPC_SLOT_Object::set_new_mbk02_tm;
+		operators_map["get_power(double)"] = &Socket_RPC_SLOT_Object::get_power;
+		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_mk;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -323,6 +325,50 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			int sadr = _values.at(0).value<int>();
 			int word = _values.at(1).value<int>();
 			app->set_new_mbk02_tm(sadr, word);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::get_power(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			double volt = _values.at(0).value<double>();
+			app->get_power(volt);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::new_mk(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int mshm = _values.at(0).value<int>();
+			int pshm = _values.at(1).value<int>();
+			int length_m = _values.at(2).value<int>();
+			int length_p = _values.at(3).value<int>();
+			double u_m = _values.at(4).value<double>();
+			double u_p = _values.at(5).value<double>();
+			int dt = _values.at(6).value<int>();
+			int line_m = _values.at(7).value<int>();
+			int line_p = _values.at(8).value<int>();
+			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 			return 0;
 		}
 		catch(const std::exception &)

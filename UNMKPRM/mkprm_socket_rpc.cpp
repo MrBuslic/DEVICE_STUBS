@@ -77,6 +77,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["unmkprm_get_strings(int, QVariantList&)"] = &Socket_RPC_SLOT_Object::unmkprm_get_strings;
+		operators_map["unmkprm_start()"] = &Socket_RPC_SLOT_Object::unmkprm_start;
+		operators_map["unmkprm_stop()"] = &Socket_RPC_SLOT_Object::unmkprm_stop;
 		operators_map["new_frame(QString, QVariant)"] = &Socket_RPC_SLOT_Object::new_frame;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -281,6 +283,38 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unmkprm_start(QVariantList& _values)
+	{
+		try
+		{
+			app->unmkprm_start();
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unmkprm_stop(QVariantList& _values)
+	{
+		try
+		{
+			app->unmkprm_stop();
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 	QVariant Socket_RPC_SLOT_Object::new_frame(QVariantList& _values)

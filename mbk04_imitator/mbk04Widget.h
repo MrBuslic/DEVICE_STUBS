@@ -17,6 +17,7 @@
 #include "../../lib/frame_converter/FrameDataIncluder.h"
 #include "../buses_imitator/frame_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
+#include "frameSettings.hpp"
 
 enum REZH_BUF_ZAP
 {
@@ -59,6 +60,9 @@ private:
 	QString current_mode;
 	QByteArray *buffer1, *buffer2;
 	FrameDataIncluder data_includer;
+	FrameParams fp;
+	FrameParams::frameParmsMap params_mode_map;
+
 	QByteArray frame;
 	QByteArray clean_frame;
 	QTimer * timer;

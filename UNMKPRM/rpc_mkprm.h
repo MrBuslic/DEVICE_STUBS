@@ -29,9 +29,13 @@ public:
 	RpcMKPRMWidget();
 public slots:
 	int unmkprm_get_strings(int strings, QVariantList& string_data);
+	void unmkprm_start();
+	void unmkprm_stop();
 	void new_frame(QString mode, QVariant _frame_data);
 private:
 	QVariantList frame_data;
+
+	bool working;
 
 	FrameParams fp;
 	FrameParams::frameParmsMap params_mode_map;

@@ -22,7 +22,23 @@ FrameBusWidget::FrameBusWidget(QWidget *parent)
 	rpc_signal_srv->start();
 }
 
-void FrameBusWidget::make_new_frame(QString mode, QVariant frame_data)
+void FrameBusWidget::make_new_frame_04(QString mode, QVariant frame_data)
 {
-	emit new_frame(mode, frame_data);
+	emit new_frame_04(mode, frame_data);
 }
+
+void FrameBusWidget::make_new_frame_733(QString mode, QVariant frame_data)
+{
+	emit new_frame_733(mode, frame_data);
+}
+
+void FrameBusWidget::make_new_frame_07(QString mode, int psp, int lit, QVariant frame_data)
+{
+	emit new_frame_07(mode, psp, lit, frame_data);
+}
+
+void FrameBusWidget::make_new_frame_rm07(QString mode, QVariant frame_data)
+{
+	emit new_frame_rm07(mode, frame_data);
+}
+

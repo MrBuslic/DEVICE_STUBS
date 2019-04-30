@@ -10,7 +10,7 @@
 
 #include <qmessagebox.h>
 
-RpcMKPRMWidget::RpcMKPRMWidget() : QWidget()
+RpcMKPRMWidget::RpcMKPRMWidget() : QWidget(), working(false)
 {
 	LogWidget* log_widg = new LogWidget(this);
 
@@ -62,6 +62,8 @@ int RpcMKPRMWidget::unmkprm_get_strings(int strings, QVariantList& string_data)
 
 void RpcMKPRMWidget::new_frame(QString mode, QVariant _frame_data)
 {
+	if (!working)
+		return;
 	QByteArray& frame_arr = _frame_data.toByteArray();
 
 	const QList<int>& par_rez = params_mode_map[mode];
@@ -76,8 +78,16 @@ void RpcMKPRMWidget::new_frame(QString mode, QVariant _frame_data)
 		QByteArray tmp_arr = frame_arr.mid(i* (par_rez[1] + par_rez[26]) + par_rez[26], par_rez[1]);
 		frame_data << QVariant(tmp_str_num_arr + tmp_arr);
 	}
-	//frame_data
 
-	//frame_data = _frame_data;
 }
 
+void RpcMKPRMWidget::unmkprm_start()
+{
+	working = true;
+	frame_data.clear();
+}
+
+void RpcMKPRMWidget::unmkprm_stop()
+{
+	working = false;
+}
