@@ -129,8 +129,8 @@ public:
 	}
 	void switch_cur_dev(CURRENT_DEV _dev)
 	{
-		if (_dev == OFF)
-			return;
+	//	if (_dev == OFF)
+	//		return;
 		current_dev = _dev;
 	}
 	CURRENT_DEV get_current_dev()
@@ -202,6 +202,28 @@ private:
 	int ku_m = -1;
 	int ku_p = -1;
 };
+
+class VCHM_MODULE
+{
+public:
+	VCHM_MODULE();
+	enum VCHM_CHANEL
+	{
+		VCHM0 = 0,
+		VCHM1,
+		VCHM2,
+		VCHM3
+	};
+
+	void set_working_chanels(QList<int> chanels_state, bool can_on = false);
+	bool get_working(int chanel)
+	{
+		return working[VCHM_CHANEL(chanel)];
+	}
+private:
+	QMap<VCHM_CHANEL, bool> working;
+};
+
 
 
 class UPI_MODULE 

@@ -19,6 +19,7 @@ R733_widg::R733_widg()
 {
 	mpvn_modules << MV_MODULE(5, 0);
 	mvku_modules << MV_MODULE(2, 0);
+	vchm_chanels_init << 0 << 0 << 0 << 0;
 
 	mode_names.insert(REGIME::PI15, "ПИ15");
 	mode_names.insert(REGIME::PI8, "ПИ8");
@@ -137,10 +138,10 @@ R733_widg::R733_widg()
 	//}
 
 	mbk04_slot_thr.set_connection_params("127.0.0.1", MBK04_SLOT);
-	mbk04_slot_thr.start(); // вот тут падает
+	mbk04_slot_thr.start(); 
 
 	mbk04_signal_thr.set_connection_params("127.0.0.1", MBK04_SIGNAL);
-	mbk04_signal_thr.start(); // вот тут падает
+	mbk04_signal_thr.start(); 
 
 	if (!mbk04_slot_thr.wait_connected(3) || !mbk04_signal_thr.wait_connected(3))
 	{
@@ -150,16 +151,27 @@ R733_widg::R733_widg()
 	}
 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
-	mku_slot_thr.start(); // вот тут падает
+	mku_slot_thr.start(); 
 
 	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
-	mku_signal_thr.start(); // вот тут падает
+	mku_signal_thr.start();
 
 	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
 		//this->deleteLater();
 		//return;
+	}
+
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start();
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start();
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
 	}
 
 	QString ip_str = "127.0.0.1";
@@ -176,18 +188,86 @@ R733_widg::R733_widg()
 
 	MKO = 1;
 	adr = 6;
-	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	flag = true;
+//	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	flag_on = false;
 
-	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k2(double)), this, SLOT(get_power(double)));
 	//	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
 	//		regime_upi = REGIME::PI8;
 	//			QString _msg = QString("Режим работы модуля УПИ: %1").arg(mode_names[regime_upi]);
 	//			msg_to_log(_msg);
-
-		paint_buttons();
+	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
+	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	paint_buttons();
 		//set_new_tm();
 }
+
+void R733_widg::get_power(double _volt)
+{
+	volt = _volt;
+	if (volt >= 20.0)
+		imit_on();
+	else if (volt < 1)
+			imit_off();
+
+}
+
+void R733_widg::omni_connect()
+{
+	AbOn_tmr->stop();
+	mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
+	mvku_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
+	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	paint_buttons();
+	set_new_tm();
+}
+
+void R733_widg::set_power_back()
+{
+	double curr;
+	if (volt > 0.1)
+		curr = power / volt;
+	else
+		curr = 0.0;
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
+
+void R733_widg::change_power()
+{
+	power = 16; //i don't know power
+	set_power_back();
+}
+
+void R733_widg::imit_on()
+{
+	if (flag_on)
+		return;
+	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	AbOn_tmr->start(1000); //need time here?
+	change_power();
+	paint_buttons();
+	flag_on = true;
+}
+
+void R733_widg::imit_off()
+{
+	if (!flag_on)
+		return;
+	disconnect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	power = 0;
+	flag_on = false;
+	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
+	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	set_power_back();
+//	set_new_tm();
+	paint_buttons();
+}
+
 
 void UPI_MODULE::set_working_channels(QList<int> chanels_state, bool can_on)
 {
@@ -211,40 +291,138 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
-				if (tmp_cwd.subadr == 17)
+		if (tmp_cwd.subadr == 17)
+		{
+			bool need_mvku_renew = false;
+			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			{
+				int vchm_flag = (itr->toInt() & 0x8000) >> 15;
+				switch (vchm_flag)
 				{
-					bool need_mvku_renew = false;
-					bool need_mvmk_renew = false;
-					for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+				case 0:
+				{
+					int bus_reset = (itr->toInt() & 0x3);
+					int switch_dev = (itr->toInt() & 0xC0) >> 6;
+					int com = (itr->toInt() & 0x7000) >> 12;
+					switch (com)
 					{
-						int bus_reset = (itr->toInt() & 0x3);
-										int read_input = (itr->toInt() & 0x1);
-		
-						int switch_dev = (itr->toInt() & 0xC0) >> 6;
-						int com = (itr->toInt() & 0x7000) >> 12; //меняю с 0х3000 на 011100...
-						int nim = (itr->toInt() & 0x0300) >> 8;
-						switch (com)
+					case 1:
+						continue;
+					case 2:
+						if (switch_dev)
+							mvku_modules[0].switch_cur_dev(CURRENT_DEV(switch_dev));
+						if (bus_reset)
 						{
-						case 1:
-							continue;
-						case 2:
-							if (switch_dev)
-								mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-							if (bus_reset)
+							mvku_modules[0].set_ku_p(-1);
+							need_mvku_renew = true;
+						}
+						break;
+					case 3:
+						continue;
+					case 5:
+						if (switch_dev)
+							mpvn_modules[0].switch_cur_dev(CURRENT_DEV(switch_dev));
+						break;
+					};
+					break;
+				}
+				case 1:
+				{
+					int vchm_chanels_on = (itr->toInt() & 0x1000) >> 12;
+					switch (vchm_chanels_on)
+					{
+					case 0:
+					{
+						int chanels = (itr->toInt() & 0xF);
+						if (!vchm_is_init)
+						{
+							vchm_chanels_init.clear();
+							vchm_chanels_init << (chanels & 0x1);
+							vchm_chanels_init << ((chanels & 0x2) >> 1);
+							vchm_chanels_init << ((chanels & 0x4) >> 2);
+							vchm_chanels_init << ((chanels & 0x8) >> 3);
+							vchm_module.set_working_chanels(vchm_chanels_init, false);
+							if (vchm_chanels_init.contains(1))
 							{
-								mvku_modules[nim].set_ku_p(-1);
-								need_mvku_renew = true;
+								vchm_on_timer.start(48000);
+								vchm_is_init = true;
 							}
-							break;
-						case 3:
-							continue;
-						case 5:
-							if (switch_dev)
-								mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
-							break;
-						};
+						}
+						break;
 					}
-					paint_buttons();
+					case 1:
+					{
+						int pshk = (itr->toInt() & 0x800) >> 11;
+						int nk = (itr->toInt() & 0x600) >> 9;
+						int comand = (itr->toInt() & 0x3C) >> 2;
+						switch (comand)
+						{
+						case 0xC:
+							//команда подключения процессора 
+							break;
+						case 0x7:
+						{
+							QList<int> tmp_chans;
+							if (pshk)
+								tmp_chans << 0 << 0 << 0 << 0;
+							else
+								for (int i = 0; i < 4; i++)
+									if (i == nk)
+										tmp_chans << 0;
+									else
+										tmp_chans << vchm_module.get_working(i);
+							vchm_module.set_working_chanels(tmp_chans, false);
+							vchm_on_timer.start(48000);
+							vchm_is_init = true;
+						}
+						}
+						break;
+					}
+					}
+					break;
+				}
+				};
+			}
+			paint_buttons();
+			set_new_tm();
+			if (need_mvku_renew)
+				new_data_mv();
+
+		}
+				//if (tmp_cwd.subadr == 17)
+				//{
+				//	bool need_mvku_renew = false;
+				//	bool need_mvmk_renew = false;
+				//	for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+				//	{
+				//		int bus_reset = (itr->toInt() & 0x3);
+				//						int read_input = (itr->toInt() & 0x1);
+		
+				//		int switch_dev = (itr->toInt() & 0xC0) >> 6;
+				//		int com = (itr->toInt() & 0x7000) >> 12; //меняю с 0х3000 на 011100...
+				//		int nim = (itr->toInt() & 0x0300) >> 8;
+				//		switch (com)
+				//		{
+				//		case 1:
+				//			continue;
+				//		case 2:
+				//			if (switch_dev)
+				//				mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+				//			if (bus_reset)
+				//			{
+				//				mvku_modules[nim].set_ku_p(-1);
+				//				need_mvku_renew = true;
+				//			}
+				//			break;
+				//		case 3:
+				//			continue;
+				//		case 5:
+				//			if (switch_dev)
+				//				mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+				//			break;
+				//		};
+				//	}
+				//	paint_buttons();
 	//				set_new_tm();
 	//				if (need_mvku_renew)
 	//					new_data_mv(29);
@@ -252,7 +430,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 	//				if (need_mvmk_renew)
 	//					new_data_mv(28);
 		
-				}
+	//			}
 		//		if (tmp_cwd.subadr == 28) //MK
 		//		{
 		//			int max_p;
@@ -306,7 +484,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 						MV_DEV& param_ku = mvku_modules[nim].get_settings();
 						mvku_modules[nim].set_ku_p(num_ku);
 						int full_num_ku = num_ku + nim * 8;
-						//mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3); поменять 
+						mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);  
 					}
 
 				}
@@ -451,6 +629,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 
 
 
+
 void R733_widg::new_data_mv()
 {
 	QVariantList new_words;
@@ -462,9 +641,19 @@ void R733_widg::new_data_mv()
 	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 29, new_words);
 }
 
+void R733_widg::set_new_tm()
+{
+	QVariantList tm_words;
+	tm_words << mu_module.get_tm();
+	tm_words << mvku_modules[0].get_tm();
+	tm_words << mpvn_modules[0].get_tm();
+	//tm_words << get_mko_counter_word();
+	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
+}
+
 void R733_widg::paint_buttons()
 {
-	if (mu_module.get_current_dev() == MAIN)
+	/*if (mu_module.get_current_dev() == MAIN)
 	{
 		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -473,7 +662,22 @@ void R733_widg::paint_buttons()
 	{
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
-	}
+	}*/
+	switch (mu_module.get_current_dev())
+	{
+	case OFF:
+		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case MAIN:
+		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
+		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case RESERVE:
+		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
+		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
+		break;
+	};
 	switch (mvku_modules[0].get_current_dev())
 	{
 	case OFF:
@@ -488,7 +692,7 @@ void R733_widg::paint_buttons()
 		main_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
-
+	
 	};
 
 	switch (mpvn_modules[0].get_current_dev())
@@ -506,6 +710,15 @@ void R733_widg::paint_buttons()
 		reserve_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
 	};
+	for (int i = 0; i < 4; i++)
+	{
+		if (vchm_module.get_working(i))
+			VCH_list[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		else
+			VCH_list[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	}
+	//for (int i = 0; i < 4; i++)
+	//	if (upi_module)
 }
 
 MU_MODULE::MU_MODULE() : current_dev(MAIN)
@@ -579,4 +792,27 @@ UPI_MODULE::UPI_MODULE()
 	working.insert(CHANNEL_3, false);
 	working.insert(CHANNEL_4, false);
 
+}
+
+
+VCHM_MODULE::VCHM_MODULE()
+{
+	working.insert(VCHM0, false);
+	working.insert(VCHM1, false);
+	working.insert(VCHM2, false);
+	working.insert(VCHM3, false);
+}
+
+void VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
+{
+	if (chanels_state.size() < 4)
+		return;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (!chanels_state[i])
+			working[VCHM_CHANEL(i)] = chanels_state[i];
+		else if (can_on)
+			working[VCHM_CHANEL(i)] = chanels_state[i];
+	}
 }

@@ -47,7 +47,9 @@ SET(R733_SOURCES main.cpp R733.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS}  $ENV{MONGO_HOME}/lib)
 
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.h ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp  r733_socket_rpc.h r733_socket_rpc.cpp)
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.h 
+${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp  r733_socket_rpc.h r733_socket_rpc.cpp
+${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
 
 add_executable(R733_imitator ${MY_WIN_FLAG} ${R733_HEADERS} ${R733_SOURCES} ${RPC_SOURCES})
 target_link_libraries (R733_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}

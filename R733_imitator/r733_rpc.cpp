@@ -165,6 +165,14 @@ void RPC_r733_SLOT_Object::auto_scroll_clicked(int _state)
 	dynamic_call("auto_scroll_clicked(int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished auto_scroll_clicked");
 }
+void RPC_r733_SLOT_Object::get_power(double volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(volt);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_power(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished get_power");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

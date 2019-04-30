@@ -13,6 +13,7 @@ public:
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void auto_scroll_clicked(int _state);
+	void get_power(double volt);
 	////////////////////////////////////
 };
 
