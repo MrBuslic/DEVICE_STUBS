@@ -79,6 +79,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
 		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["get_power(double)"] = &Socket_RPC_SLOT_Object::get_power;
+		operators_map["new_frame_04(QString, QVariant)"] = &Socket_RPC_SLOT_Object::new_frame_04;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -341,6 +342,25 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			double volt = _values.at(0).value<double>();
 			app->get_power(volt);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::new_frame_04(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString mode = _values.at(0).value<QString>();
+			QVariant frame_data = _values.at(1).value<QVariant>();
+			app->new_frame_04(mode, frame_data);
 			return 0;
 		}
 		catch(const std::exception &)

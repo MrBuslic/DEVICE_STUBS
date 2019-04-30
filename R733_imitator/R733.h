@@ -16,7 +16,7 @@
 #include "../buses_imitator/power_bus_rpc.h"
 //#include "../MBK-02_imitator/MBK02_rpc.h"
 #include "../mbk04_imitator/mbk04_rpc.h"
-
+#include "../buses_imitator/frame_bus_rpc.h"
 class R733_widg : public QWidget
 {
     Q_OBJECT
@@ -54,13 +54,16 @@ private:
 	RPC_omnibus_SIGNAL_Thread omni_signal_thr;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
-	RPC_mku_bus_SLOT_Thread mku_signal_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
 	RPC_mbk04_SLOT_Thread mbk04_slot_thr;
 	RPC_mbk04_SIGNAL_Thread mbk04_signal_thr;
 
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
+
+	RPC_frame_bus_SLOT_Thread frame_slot_thr;
+	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
 
 	int MKO;
 	int adr;
@@ -105,10 +108,14 @@ private:
 	QList<int> vchm_chanels_init;
 	bool vchm_is_init;
 	QTimer vchm_on_timer;
+
+	QString regime;
+
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void auto_scroll_clicked(int _state);
 	void get_power(double volt);
+	void new_frame_04(QString mode, QVariant frame_data);
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 };

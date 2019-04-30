@@ -174,6 +174,19 @@ R733_widg::R733_widg()
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
 	}
 
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start();
+
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start();
+
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus");
+		this->deleteLater();
+		return;
+	}
+
 	QString ip_str = "127.0.0.1";
 	int slot_port = 30208/*R733_SLOT*/;
 	int signal_port = 30209/*R733_SIGNAL*/; //изменить порт
@@ -246,6 +259,7 @@ void R733_widg::imit_on()
 	if (flag_on)
 		return;
 	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
 	AbOn_tmr->start(1000); //need time here?
 	change_power();
 	paint_buttons();
@@ -532,7 +546,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					}
 				}
 			}
-
+			regime = mode_names[regime_upi];
 			QString _msg = QString("Режим работы модуля УПИ: %1").arg(mode_names[regime_upi]);
 			msg_to_log(_msg);
 		}
@@ -815,4 +829,12 @@ void VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
 		else if (can_on)
 			working[VCHM_CHANEL(i)] = chanels_state[i];
 	}
+}
+
+
+void R733_widg::new_frame_04(QString mode, QVariant frame_data)
+{
+	if (regime == mode)
+		frame_slot_thr.get_frame_bus_obj()->make_new_frame_733(mode, frame_data);
+		//emit make_new_frame_733(mode, frame_data);
 }

@@ -173,6 +173,15 @@ void RPC_r733_SLOT_Object::get_power(double volt)
 	dynamic_call("get_power(double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished get_power");
 }
+void RPC_r733_SLOT_Object::new_frame_04(QString mode, QVariant frame_data)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mode);
+	tmp_list << QVariant(frame_data);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call new_frame_04 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_frame_04(QString, QVariant)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_frame_04");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
