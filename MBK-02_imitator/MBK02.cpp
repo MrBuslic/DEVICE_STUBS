@@ -52,7 +52,6 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	All_vblay->addWidget(Channels_gbox);
 	All_vblay->addWidget(Signal_gbox);
 	All_vblay->addWidget(Sup_gbox);
-	All_vblay->addWidget(non_warm);
 	All_glay->addLayout(Ant_vblay, 0, 0);
 	All_glay->addLayout(Lit_vblay, 0, 1);
 
@@ -169,8 +168,6 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	t_err_kpi = new QTimer(this);
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
-
-	get_power(27.0); // ДЕБАГ напряжения
 }
 
 void MBK02_widg::break_warm()//дебаг кнопка
@@ -392,7 +389,6 @@ void MBK02_widg::_update_time()
 void MBK02_widg::new_KPI(QVariantList KPI_list)
 {
 	if (!ready_chanel) return;
-	current_lit = 2; //ДЕБАГ!!!!!
 	int tmp_in, tmp_len, tmp_weak;
 	QString tmp_str_ant;
 	//t_ant_ch->stop();
