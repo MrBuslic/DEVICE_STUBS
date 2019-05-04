@@ -161,12 +161,12 @@ BOOP::BOOP()
   //  // Half-set selection block
 
   mainSetButton = new QPushButton("Основной полукомплект", this);
-  mainSetButton->setCheckable(true);
   mainSetButton->setFixedWidth(180);
+	mainSetButton->setFlat(true);
 
   reserveSetButton = new QPushButton("Резервный полукомплект", this);
-  reserveSetButton->setCheckable(true);
   reserveSetButton->setFixedWidth(180);
+	reserveSetButton->setFlat(true);
 
   QHBoxLayout *halfSetBlock = new QHBoxLayout();
   halfSetBlock->addWidget(mainSetButton);
@@ -340,6 +340,19 @@ BOOP::BOOP()
   mainLayout->addLayout(secondStripe);
   mainLayout->addLayout(thirdStripe);
   mainLayout->addWidget(logArea);
+
+	// Styles
+
+  this->setStyleSheet("QPushButton {"
+                      "min-height: 20px;"
+                      "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #bbdfc4, stop: 1 #8ec69c);"
+                      "color: #000000;"
+                      "border: 1px solid #008000; }"
+
+                      "QPushButton:flat {"
+                      "background-color: #fcfcfc;"
+                      "color: #4e4e4e;"
+                      "border: 1px solid #808080;");
 
 	this->setWindowTitle("Блок управления приводами");
 	this->setLayout(mainLayout);
