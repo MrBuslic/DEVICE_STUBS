@@ -30,7 +30,7 @@ private:
 	QPushButton *reserve_MPVN;
 	QPushButton* main_MVKU;
 	QPushButton* reserve_MVKU;
-
+	QPushButton* regime_mod_upi;
 	QCheckBox* auto_scroll_box;
 
 	QList<QPushButton*>  VCH_list;
@@ -39,8 +39,9 @@ private:
 	QGroupBox *MPVN_gb;
 	QGroupBox *VCH_gb;
 	QGroupBox *UPI_gb;
-
-	QGridLayout *MU_glayout;
+	QGroupBox *MU_gb;
+	QGroupBox *REGIME_MOD_UPI;
+	QGridLayout *block_glayout;
 
 	REGIME regime_upi;
 
