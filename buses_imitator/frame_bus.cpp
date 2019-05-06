@@ -37,9 +37,9 @@ void FrameBusWidget::make_new_frame_733(QString mode, QVariant frame_data)
 	emit new_frame_733(mode, frame_data);
 }
 
-void FrameBusWidget::make_new_frame_07(QString mode, int psp, int lit, QVariant frame_data)
+void FrameBusWidget::make_new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data)
 {
-	emit new_frame_07(mode, psp, lit, frame_data);
+	emit new_frame_07(mode, psp, lit, fm, ant, frame_data);
 }
 
 void FrameBusWidget::make_new_frame_rm07(QString mode, QVariant frame_data)

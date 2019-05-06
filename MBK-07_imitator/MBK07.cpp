@@ -23,7 +23,7 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 
 	mode_names.insert(full_mode::PI15, "ПИ15");
 	mode_names.insert(full_mode::PI8, "ПИ8");
-	mode_names.insert(full_mode::WTF8, "ВТФ8");
+	mode_names.insert(full_mode::WTF8, "ВТФ");
 	mode_names.insert(full_mode::ERR, "");
 
 	stab_names.insert(STAB::LOW_STAB, "НС");
@@ -32,9 +32,9 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	stab_names.insert(STAB::KG2_STAB, "КГ 2");
 	stab_names.insert(STAB::OFF_STAB, "");
 
-	ant_names.insert(ANTENNA::OHA, "OHA");
-	ant_names.insert(ANTENNA::MHAPY, "MHA+Y");
-	ant_names.insert(ANTENNA::MHAMY, "MHA-Y");
+	ant_names.insert(ANTENNA::OHA, "ОНА");
+	ant_names.insert(ANTENNA::MHAPY, "МНА+Y");
+	ant_names.insert(ANTENNA::MHAMY, "МНА-Y");
 	ant_names.insert(ANTENNA::ANT_OFF, "");
 
 	for (int i = 0; i < 9; i++)
@@ -169,7 +169,7 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 
 	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus");
 		this->deleteLater();
 		return;
 	}
@@ -204,7 +204,7 @@ void MBK07_widg::get_frame(QString mode, QVariant frame_data)
 {
 	if (mode_names.value(full_mode(current_mode)) == mode)
 	{	
-		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, frame_data);
+		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, pi8_fast ? 2 : 1, ant_names[current_antenna], frame_data);
 	}
 
 }

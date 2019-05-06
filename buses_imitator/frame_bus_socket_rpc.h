@@ -37,7 +37,7 @@ signals:
 public slots:
 	void new_frame_04(QString mode, QVariant frame_data);
 	void new_frame_733(QString mode, QVariant frame_data);
-	void new_frame_07(QString mode, int psp, int lit, QVariant frame_data);
+	void new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
 	void new_frame_rm07(QString mode, QVariant frame_data);
 
 	void send_signal_slot(QByteArray* _arr);

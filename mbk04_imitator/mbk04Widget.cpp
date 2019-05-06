@@ -383,7 +383,7 @@ void MainWidget::send_frame()
 	if (current_rezh == REZH_FRAME::OFF_REZH)
 		return;
 
-	frame_slot_thr.get_frame_bus_obj()->make_new_frame(current_mode, frame);
+	frame_slot_thr.get_frame_bus_obj()->make_new_frame_04(current_mode, frame);
 }
 
 void MainWidget::get_power(double volt)

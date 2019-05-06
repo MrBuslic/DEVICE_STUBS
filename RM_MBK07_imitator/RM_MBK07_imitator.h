@@ -51,6 +51,8 @@ private:
 	QString PSP;
 	QString IM;
 	QString FM;
+	int fm;
+	QString ant;
 	QString tmp_mode;
 	/// Проверка контрольной суммы
 	bool checkCS(const char *sockbuf);
@@ -85,7 +87,7 @@ public slots :
 	void read();
 	void connect_ag();
 	void read_ag();
-	void new_frame_07(QString mode_in, int psp_in, int lit_in, QVariant frame_data);
+	void new_frame_07(QString mode_in, int psp_in, int lit_in, int _fm, QString _ant, QVariant frame_data);
 
 };
 

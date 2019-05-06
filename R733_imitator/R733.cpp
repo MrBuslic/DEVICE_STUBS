@@ -817,7 +817,6 @@ void R733_widg::new_frame_04(QString mode, QVariant frame_data)
 		frame_slot_thr.get_frame_bus_obj()->make_new_frame_733(mode, frame_data);
 		//emit make_new_frame_733(mode, frame_data);
 }
-}
 
 void R733_widg::closeEvent(QCloseEvent *event)
 {

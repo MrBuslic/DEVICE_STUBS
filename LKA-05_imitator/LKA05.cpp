@@ -207,6 +207,8 @@ void LKA05_widg::imit_off()
 {
 	if (!flag_on)
 		return;
+	if (AbOn_tmr->isActive())
+		AbOn_tmr->stop();
 //	msg_to_log("Питание отключено");
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	flag_on = false;

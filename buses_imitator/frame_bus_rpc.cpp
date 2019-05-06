@@ -76,7 +76,7 @@ void RPC_frame_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_07)) {
 		SRPCSignalClass::Instance().toLog("new_frame_07 connected");
-		emit connect_signal("new_frame_07(QString, int, int, QVariant)", true);
+		emit connect_signal("new_frame_07(QString, int, int, int, QString, QVariant)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_rm07)) {
@@ -99,7 +99,7 @@ void RPC_frame_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_07)) {
 		SRPCSignalClass::Instance().toLog("new_frame_07 disconnected");
-		//emit connect_signal("new_frame_07(QString, int, int, QVariant)", false);
+		//emit connect_signal("new_frame_07(QString, int, int, int, QString, QVariant)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_rm07)) {
@@ -179,7 +179,7 @@ void RPC_frame_bus_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("frame_bus signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
-			if (op_name == "new_frame_07(QString, int, int, QVariant)")
+			if (op_name == "new_frame_07(QString, int, int, int, QString, QVariant)")
 			{
 				QString mode;
 				tmp_stream >> mode;
@@ -190,10 +190,16 @@ void RPC_frame_bus_SIGNAL_Object::read_data()
 				int lit;
 				tmp_stream >> lit;
 				SRPCSignalClass::Instance().toLog("frame_bus " + op_name +" call_number "+ QString::number(call_number) + " lit = "+RPCSignalClass::QVariantToString(lit));
+				int fm;
+				tmp_stream >> fm;
+				SRPCSignalClass::Instance().toLog("frame_bus " + op_name +" call_number "+ QString::number(call_number) + " fm = "+RPCSignalClass::QVariantToString(fm));
+				QString ant;
+				tmp_stream >> ant;
+				SRPCSignalClass::Instance().toLog("frame_bus " + op_name +" call_number "+ QString::number(call_number) + " ant = "+RPCSignalClass::QVariantToString(ant));
 				QVariant frame_data;
 				tmp_stream >> frame_data;
 				SRPCSignalClass::Instance().toLog("frame_bus " + op_name +" call_number "+ QString::number(call_number) + " frame_data = "+RPCSignalClass::QVariantToString(frame_data));
-				emit new_frame_07(mode, psp, lit, frame_data);
+				emit new_frame_07(mode, psp, lit, fm, ant, frame_data);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -249,15 +255,17 @@ void RPC_frame_bus_SLOT_Object::make_new_frame_733(QString mode, QVariant frame_
 	dynamic_call("make_new_frame_733(QString, QVariant)", tmp_list);
 	SRPCSignalClass::Instance().toLog("frame_bus dynamic_call finished make_new_frame_733");
 }
-void RPC_frame_bus_SLOT_Object::make_new_frame_07(QString mode, int psp, int lit, QVariant frame_data)
+void RPC_frame_bus_SLOT_Object::make_new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(mode);
 	tmp_list << QVariant(psp);
 	tmp_list << QVariant(lit);
+	tmp_list << QVariant(fm);
+	tmp_list << QVariant(ant);
 	tmp_list << QVariant(frame_data);
 	SRPCSignalClass::Instance().toLog(QString("frame_bus dynamic_call make_new_frame_07 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("make_new_frame_07(QString, int, int, QVariant)", tmp_list);
+	dynamic_call("make_new_frame_07(QString, int, int, int, QString, QVariant)", tmp_list);
 	SRPCSignalClass::Instance().toLog("frame_bus dynamic_call finished make_new_frame_07");
 }
 void RPC_frame_bus_SLOT_Object::make_new_frame_rm07(QString mode, QVariant frame_data)

@@ -35,9 +35,9 @@ enum FSVU_numbB
 enum STAB
 {
 	LOW_STAB = 0,
-	KG1_STAB = 1,
-	KG2_STAB = 2,
-	HIGH_STAB = 3,
+	HIGH_STAB = 1,
+	KG1_STAB = 2,
+	KG2_STAB = 3,
 	OFF_STAB = 4
 
 };
@@ -53,7 +53,7 @@ enum full_mode
 	ERR = 0,
 	PI15 = 1,
 	PI8 = 2,
-	WTF8 = 3	
+	WTF8 = 4	
 };
 enum PSP
 {

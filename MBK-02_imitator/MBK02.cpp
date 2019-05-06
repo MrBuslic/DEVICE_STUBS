@@ -246,8 +246,6 @@ void MBK02_widg::imit_on()
 		return;
 	flag_on = true;
 	msg_to_log("Питание включено");
-	warm_chanel_tmr->stop();
-	set_warm_chanel();
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
 	warm_chanel_tmr->start(standart_tm);
@@ -262,6 +260,8 @@ void MBK02_widg::imit_off()
 	if (!flag_on)
 		return;
 	flag_on = false;
+	warm_chanel_tmr->stop();
+	set_warm_chanel();
 	msg_to_log("Питание отключено");
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
