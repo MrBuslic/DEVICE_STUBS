@@ -133,12 +133,18 @@ public:
 	};
 
 	void set_working_chanels(QList<int> chanels_state, bool can_on = false);
+	void set_working_proc(int chanel, int state);
 	bool get_working(int chanel)
 	{
 		return working[VCHM_CHANEL(chanel)];
 	}
+	bool get_proc_working(int chanel)
+	{
+		return proc_working[VCHM_CHANEL(chanel)];
+	}
 private:
 	QMap<VCHM_CHANEL, bool> working;
+	QMap<VCHM_CHANEL, bool> proc_working;
 };
 
 #endif // R732_MODULES_H
