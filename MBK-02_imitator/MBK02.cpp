@@ -168,6 +168,16 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	t_err_kpi = new QTimer(this);
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("mbk02_geometry").toByteArray());
+}
+
+void MBK02_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("mbk02_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 void MBK02_widg::break_warm()//дебаг кнопка
@@ -236,8 +246,6 @@ void MBK02_widg::imit_on()
 		return;
 	flag_on = true;
 	msg_to_log("Питание включено");
-	warm_chanel_tmr->stop();
-	set_warm_chanel();
 	current_chanel = CHANEL_1;
 	current_ant = MHA1MY;
 	warm_chanel_tmr->start(standart_tm);
@@ -252,6 +260,8 @@ void MBK02_widg::imit_off()
 	if (!flag_on)
 		return;
 	flag_on = false;
+	warm_chanel_tmr->stop();
+	set_warm_chanel();
 	msg_to_log("Питание отключено");
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;

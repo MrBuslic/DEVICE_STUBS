@@ -37,6 +37,8 @@ private:
 
 	bool working;
 
+	int string_number;
+
 	FrameParams fp;
 	FrameParams::frameParmsMap params_mode_map;
 

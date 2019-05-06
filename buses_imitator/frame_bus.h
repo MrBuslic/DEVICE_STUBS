@@ -14,13 +14,16 @@ public:
 public slots:
 	void make_new_frame_04(QString mode, QVariant frame_data);
 	void make_new_frame_733(QString mode, QVariant frame_data);
-	void make_new_frame_07(QString mode, int psp, int lit, QVariant frame_data);
+	void make_new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
 	void make_new_frame_rm07(QString mode, QVariant frame_data);
+
+protected:
+	void closeEvent(QCloseEvent *event);
 
 signals:
 	void new_frame_04(QString mode, QVariant frame_data);
 	void new_frame_733(QString mode, QVariant frame_data);
-	void new_frame_07(QString mode, int psp, int lit, QVariant frame_data);
+	void new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
 	void new_frame_rm07(QString mode, QVariant frame_data);
 };
 

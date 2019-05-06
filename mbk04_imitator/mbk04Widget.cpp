@@ -119,6 +119,10 @@ MainWidget::MainWidget()
 	connect(this, &MainWidget::state_changed_signal, this, &MainWidget::state_changed);
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 	params_mode_map = fp.getParams();
+
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("mbk04_geometry").toByteArray());
 }
 
 
@@ -379,7 +383,7 @@ void MainWidget::send_frame()
 	if (current_rezh == REZH_FRAME::OFF_REZH)
 		return;
 
-	frame_slot_thr.get_frame_bus_obj()->make_new_frame(current_mode, frame);
+	frame_slot_thr.get_frame_bus_obj()->make_new_frame_04(current_mode, frame);
 }
 
 void MainWidget::get_power(double volt)
@@ -408,4 +412,11 @@ void MainWidget::imit_off()
 	current_dev = CURRENT_DEV::OFF;
 	current_rezh = REZH_FRAME::OFF_REZH;
 	emit state_changed_signal();
+}
+
+void MainWidget::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("mbk04_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }

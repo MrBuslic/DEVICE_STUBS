@@ -83,6 +83,8 @@ private:
 	void imit_off();
 	void set_power_back();
 	void restart_vchm_proc(int chanel);
+protected:
+	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void set_new_mbk02_tm(int sadr, int word);

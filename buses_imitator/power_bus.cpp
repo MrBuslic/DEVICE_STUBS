@@ -1,6 +1,8 @@
 #include "power_bus.h"
 #include "rpc_loger.h"
 #include <QMessageBox>
+#include <qsettings.h>
+#include <qapplication.h>
 
 #include "rpc_ports.h"
 #include "power_bus_socket_rpc.h"
@@ -30,6 +32,9 @@ PowerWidget::PowerWidget(QWidget *parent)
 	lay->addWidget(off_btn);
 	connect(on_btn, &QPushButton::clicked, this, &PowerWidget::set_on);
 	connect(off_btn, &QPushButton::clicked, this, &PowerWidget::set_off);
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("power_geometry").toByteArray());
 }
 
 //НК - МБК-07, МБК-04, МБК-02, БУП
@@ -119,4 +124,10 @@ void PowerWidget::set_off()
 	{
 		set_u(i, 0);
 	}
+}
+void PowerWidget::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("power_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }

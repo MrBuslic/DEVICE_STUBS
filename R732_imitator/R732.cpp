@@ -157,6 +157,9 @@ R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bu
 	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
 
 	paint_buttons();
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("732_geometry").toByteArray());
 }
 
 R732_widg::~R732_widg()
@@ -167,6 +170,13 @@ R732_widg::~R732_widg()
 	mbk02_signal_thr.quit();
 	mku_slot_thr.quit();
 	mku_signal_thr.quit();
+}
+
+void R732_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("732_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)

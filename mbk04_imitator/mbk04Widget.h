@@ -71,7 +71,8 @@ private:
 	int frame_per_msec;
 	void imit_on();
 	void imit_off();
-
+protected:
+	void closeEvent(QCloseEvent *event);
 private:
 	void new_SCHBK(QVariantList words);
 	void clean_frame_data(QString REZH);

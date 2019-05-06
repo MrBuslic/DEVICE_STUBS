@@ -10,13 +10,13 @@ KPRD_imitator::KPRD_imitator()
 
 	pause_btn = new QPushButton("П", widg);
 	pause_btn->setFixedWidth(150);
-	pause_btn->setFixedHeight(100);
+	pause_btn->setFixedHeight(50);
 	zero_btn = new QPushButton("0", widg);
 	zero_btn->setFixedWidth(150);
-	zero_btn->setFixedHeight(100);
+	zero_btn->setFixedHeight(50);
 	one_btn = new QPushButton("1", widg);
 	one_btn->setFixedWidth(150);
-	one_btn->setFixedHeight(100);
+	one_btn->setFixedHeight(50);
 
 	generetors_label = new QLabel("Генераторы", widg);
 	pause_kod_label = new QLabel("Код: ", widg);
@@ -99,6 +99,17 @@ KPRD_imitator::KPRD_imitator()
 		//this->deleteLater();
 		return;
 	}
+
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("kprd_geometry").toByteArray());
+}
+
+void KPRD_imitator::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("kprd_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 KPRD_imitator::~KPRD_imitator()

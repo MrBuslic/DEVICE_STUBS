@@ -22,6 +22,8 @@ include_directories(${Qt5Network_INCLUDES})
 include_directories(${Boost_INCLUDE_DIRS})
 #include_directories("../../lib/socket_rpc/include")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
+include_directories("${PROJECT_SOURCE_DIR}/../../lib/socket_rpc/include")
+
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
@@ -40,13 +42,15 @@ FILE(GLOB HEADERS *.h *.hpp)
   
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.cpp)
+
 #SET(RPC_SOURCES  ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.h ${PROJECT_SOURCE_DIR}/../UNOLS/ols_rpc.cpp kprd_socket_rpc.h kprd_socket_rpc.cpp)
 
 #SET(KPI_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/kpi_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/kpi_bus_rpc.cpp)
 
-add_executable(RM_MBK07_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} )#${RPC_SOURCES} ${KPI_RPC_SOURCES})
+add_executable(RM_MBK07_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES})
 target_link_libraries (RM_MBK07_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS}) # socket_rpc) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
 if(WIN32)
   qt5_use_modules(RM_MBK07_imitator Core Widgets Network Gui)
