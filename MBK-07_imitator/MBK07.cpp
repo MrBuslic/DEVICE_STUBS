@@ -161,18 +161,18 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	}
 
 
-	//frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
-	//frame_slot_thr.start(); // вот тут падает
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start(); // вот тут падает
 
-	//frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
-	//frame_signal_thr.start(); // вот тут падает
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start(); // вот тут падает
 
-	//if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
-	//	this->deleteLater();
-	//	return;
-	//}
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
 
 	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
@@ -180,7 +180,7 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
-	//connect(frame_signal_thr.get_obj().get(), SIGNAL(), this, SLOT(get_frame()));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_733(QString, QVariant)), this, SLOT(get_frame(QString, QVariant)));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -188,6 +188,15 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 		QDir().mkdir("d:/logs");
 	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
 	log_timer.start(200);
+
+}
+
+void MBK07_widg::get_frame(QString mode, QVariant frame_data)
+{
+	if (mode_names.value(full_mode(current_mode)) == mode)
+	{	
+		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, frame_data);
+	}
 
 }
 
