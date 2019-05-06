@@ -190,6 +190,14 @@ void RPC_r732_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p
 	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r732 dynamic_call finished new_mk");
 }
+void RPC_r732_SLOT_Object::new_kpi(QVariantList kpi)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(kpi);
+	SRPCSignalClass::Instance().toLog(QString("r732 dynamic_call new_kpi %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_kpi(QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r732 dynamic_call finished new_kpi");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

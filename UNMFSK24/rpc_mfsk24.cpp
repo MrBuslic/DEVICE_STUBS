@@ -7,8 +7,9 @@
 #include <QLabel>
 #include "mfsk24_socket_rpc.h"
 #include <QVector>
+#include "rpc_ports.h"
 
-RpcMFSK24Widget::RpcMFSK24Widget(int slot_port, int signal_port) : QWidget(), auto_scroll(true)
+RpcMFSK24Widget::RpcMFSK24Widget(int mfsk_num) : QWidget(), auto_scroll(true)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
@@ -52,13 +53,13 @@ RpcMFSK24Widget::RpcMFSK24Widget(int slot_port, int signal_port) : QWidget(), au
 	QString ip_str = "127.0.0.1";
 	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
-	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->set_params(ip_str, MFSK_SLOT+ mfsk_num);
 	rpc_slot_srv->start();
 	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
-	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->set_params(ip_str, MFSK_SIGNAL+ mfsk_num);
 	rpc_signal_srv->start();
-	setWindowTitle(QString("mfsk24 %1").arg(slot_port - 30009));
+	setWindowTitle(QString("mfsk24 %1").arg(mfsk_num));
 }
 
 int RpcMFSK24Widget::unmfsk24_manual_group_cmd(int _state_chan, QVariantList _vec)

@@ -80,6 +80,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["set_new_mbk02_tm(int, int)"] = &Socket_RPC_SLOT_Object::set_new_mbk02_tm;
 		operators_map["get_power(double)"] = &Socket_RPC_SLOT_Object::get_power;
 		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_mk;
+		operators_map["new_kpi(QVariantList)"] = &Socket_RPC_SLOT_Object::new_kpi;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -369,6 +370,24 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			int line_m = _values.at(7).value<int>();
 			int line_p = _values.at(8).value<int>();
 			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::new_kpi(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList kpi = _values.at(0).value<QVariantList>();
+			app->new_kpi(kpi);
 			return 0;
 		}
 		catch(const std::exception &)

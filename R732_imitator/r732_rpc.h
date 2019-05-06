@@ -15,6 +15,7 @@ public slots:
 	void set_new_mbk02_tm(int sadr, int word);
 	void get_power(double volt);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void new_kpi(QVariantList kpi);
 	////////////////////////////////////
 };
 

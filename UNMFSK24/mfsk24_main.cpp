@@ -14,13 +14,13 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, int)
 int main(int argc, char **argv)
 {
 #endif
-	if (argc < 2)
+	if (argc < 1)
 		return 1;
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 	QApplication app(argc, argv);
 	LogWidget log_widget;
 	log_widget.show();
-	RpcMFSK24Widget mfsk24_widget(MFSK_SLOT + QString(argv[1]).toInt(), MFSK_SIGNAL + QString(argv[1]).toInt());
+	RpcMFSK24Widget mfsk24_widget(QString(argv[1]).toInt());
 	mfsk24_widget.show();
 	return app.exec();
 }
