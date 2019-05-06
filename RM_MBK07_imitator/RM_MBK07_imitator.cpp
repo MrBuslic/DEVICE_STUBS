@@ -58,6 +58,15 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 	connect(&_sock, &QUdpSocket::readyRead, this, &RM_MBK07_imitator::read);
 	connect(&serv_sock, &QTcpServer::newConnection, this, &RM_MBK07_imitator::connect_ag);
 	
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start();
+
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start();
+
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в ");	// Mkprm?
+
 
 	//connect(_sock, SIGNAL(readyRead()), SLOT(read()));
 }
@@ -72,6 +81,7 @@ RM_MBK07_imitator::~RM_MBK07_imitator()
 	delete liters_label;
 	delete antenna_label;
 	delete _scroll_bar;
+	delete log_edit;
 	delete gridLayout;
 	delete widg;
 
@@ -209,9 +219,9 @@ void RM_MBK07_imitator::read()
 				if (const_sockbuf[4] == '\xAA')
 				{
 					if (const_sockbuf[10] == '\x11')
-						mode = "ПИ-15";
+						mode = "ПИ15";
 					if (const_sockbuf[10] == '\x22')
-						mode = "ПИ-8";
+						mode = "ПИ8";
 					if (const_sockbuf[10] == '\x33')
 						mode = "ВТФ";
 					if (const_sockbuf[10] == '\x44')
@@ -331,7 +341,7 @@ void RM_MBK07_imitator::read_ag()
 		const double STEP_LIT = 0.02;
 		const double magic = 0.001;		// Для корректного округления. Иначе с 16-ой литеры расчитывает на 1 литеру меньше
 
-		int currLit = ((ZERO_LIT - GHz) + magic) / STEP_LIT;
+		currLit = ((ZERO_LIT - GHz) + magic) / STEP_LIT;
 		liters_label->setText("Литера: " + QString::number(currLit));
 	}
 
@@ -340,4 +350,15 @@ void RM_MBK07_imitator::read_ag()
 		QString s = QString::number(GHz*1e9);
 		_ag_sock->write(s.toStdString().c_str());
 	}
+}
+
+void RM_MBK07_imitator::new_frame_07(QString mode_in, int psp_in, int lit_in, QVariant frame_data)
+{
+	if (IM == "ИМ")
+		return;
+	
+	if (mode == mode_in && PSP.right(1) == psp_in, currLit == lit_in)
+		frame_slot_thr.get_frame_bus_obj()->make_new_frame_rm07(mode_in, frame_data);
+
+	return;
 }

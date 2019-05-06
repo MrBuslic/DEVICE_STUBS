@@ -15,6 +15,8 @@
 #include <QSettings>
 #include <QVector>
 #include "../../ServerSide/MBK07/KPAdefines.h"
+#include "../buses_imitator/frame_bus_rpc.h"
+#include "rpc_ports.h"
 
 class RM_MBK07_imitator :
 	public QMainWindow
@@ -71,13 +73,18 @@ private:
 	bool selectAntenna(char data);
 	bool isset(short x, short n);
 
+	RPC_frame_bus_SLOT_Thread frame_slot_thr;
+	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
+
 signals:
+	void make_new_frame_rm07(QString mode, QVariant frame_data);
 
 public slots :
 	void error_Slot(QAbstractSocket::SocketError socketError);
 	void read();
 	void connect_ag();
 	void read_ag();
+	void new_frame_07(QString mode_in, int psp_in, int lit_in, QVariant frame_data);
 
 };
 

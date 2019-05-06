@@ -35,7 +35,10 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void new_frame(QString mode, QVariant frame_data);
+	void new_frame_04(QString mode, QVariant frame_data);
+	void new_frame_733(QString mode, QVariant frame_data);
+	void new_frame_07(QString mode, int psp, int lit, QVariant frame_data);
+	void new_frame_rm07(QString mode, QVariant frame_data);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -102,7 +105,10 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant make_new_frame(QVariantList& _values);
+	QVariant make_new_frame_04(QVariantList& _values);
+	QVariant make_new_frame_733(QVariantList& _values);
+	QVariant make_new_frame_07(QVariantList& _values);
+	QVariant make_new_frame_rm07(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
