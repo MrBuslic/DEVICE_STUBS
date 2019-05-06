@@ -31,6 +31,9 @@ signals:
 	void u_on_k1(double volt);
 	void u_on_k2(double volt);
 
+protected:
+	void closeEvent(QCloseEvent *event);
+
 private:
 	double nk_volt;
 	double k1_volt;

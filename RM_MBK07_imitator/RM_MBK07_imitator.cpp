@@ -1,5 +1,5 @@
 #include "RM_MBK07_imitator.h"
-
+#include <qapplication.h>
 RM_MBK07_imitator::RM_MBK07_imitator()  
 {
 	widg = new QWidget(this);
@@ -68,7 +68,16 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в ");	// Mkprm?
 
 
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("rmmbk07_geometry").toByteArray());
 	//connect(_sock, SIGNAL(readyRead()), SLOT(read()));
+}
+
+void RM_MBK07_imitator::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("rmmbk07_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 RM_MBK07_imitator::~RM_MBK07_imitator()

@@ -75,7 +75,8 @@ private:
 
 	RPC_frame_bus_SLOT_Thread frame_slot_thr;
 	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
-
+protected:
+	void closeEvent(QCloseEvent *event);
 signals:
 	void make_new_frame_rm07(QString mode, QVariant frame_data);
 

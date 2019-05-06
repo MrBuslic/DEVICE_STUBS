@@ -168,6 +168,16 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	t_err_kpi = new QTimer(this);
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("mbk02_geometry").toByteArray());
+}
+
+void MBK02_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("mbk02_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 void MBK02_widg::break_warm()//дебаг кнопка

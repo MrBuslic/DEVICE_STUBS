@@ -141,6 +141,8 @@ public slots:
 	void log_timer_ontimer();
 	void get_power(double volt);
 	void get_frame(QString mode, QVariant frame_data);
+protected:
+	void closeEvent(QCloseEvent *event);
 signals:
 	void push_frame();
 private:

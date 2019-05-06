@@ -108,6 +108,8 @@ signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
 	void set_new_power_tm(int sadr, QVariantList words);
+protected:
+	void closeEvent(QCloseEvent *event);
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;

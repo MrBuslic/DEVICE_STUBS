@@ -56,9 +56,6 @@ private:
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
-	RPC_mbk04_SLOT_Thread mbk04_slot_thr;
-	RPC_mbk04_SIGNAL_Thread mbk04_signal_thr;
-
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
@@ -116,6 +113,8 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void get_power(double volt);
 	void new_frame_04(QString mode, QVariant frame_data);
+protected:
+	void closeEvent(QCloseEvent *event);
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 };

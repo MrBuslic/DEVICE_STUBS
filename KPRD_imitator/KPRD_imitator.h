@@ -73,7 +73,8 @@ private:
 
 	RPC_kpi_bus_SLOT_Thread kpi_slot_thr;
 	RPC_kpi_bus_SIGNAL_Thread kpi_signal_thr;
-
+protected:
+	void closeEvent(QCloseEvent *event);
 signals:
 	void test(QVariantList maskList, QVariantList dataList);
 	//void sendKPI(QString kpiList);

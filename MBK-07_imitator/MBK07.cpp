@@ -189,6 +189,15 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
 	log_timer.start(200);
 
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("mbk07_geometry").toByteArray());
+}
+
+void MBK07_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("mbk07_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 void MBK07_widg::get_frame(QString mode, QVariant frame_data)

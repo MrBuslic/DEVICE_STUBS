@@ -124,32 +124,6 @@ R733_widg::R733_widg()
 		//return;
 	}
 
-	//mbk02_slot_thr.set_connection_params("127.0.0.1", MBK02_SLOT);
-	//mbk02_slot_thr.start(); // вот тут падает
-
-	//mbk02_signal_thr.set_connection_params("127.0.0.1", MBK02_SIGNAL);
-	//mbk02_signal_thr.start(); // вот тут падает
-
-	//if (!mbk02_slot_thr.wait_connected(3) || !mbk02_signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mbk02");
-	//	//this->deleteLater();
-	//	//return;
-	//}
-
-	mbk04_slot_thr.set_connection_params("127.0.0.1", MBK04_SLOT);
-	mbk04_slot_thr.start(); 
-
-	mbk04_signal_thr.set_connection_params("127.0.0.1", MBK04_SIGNAL);
-	mbk04_signal_thr.start(); 
-
-	if (!mbk04_slot_thr.wait_connected(3) || !mbk04_signal_thr.wait_connected(3))
-	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mbk04");
-		this->deleteLater();
-		return;
-	}
-
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
 	mku_slot_thr.start(); 
 
@@ -204,6 +178,9 @@ R733_widg::R733_widg()
 //	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag_on = false;
 
+	AbOn_tmr = new QTimer(this);
+	AbOn_tmr->setSingleShot(true);
+	connect(AbOn_tmr, &QTimer::timeout, this, &R733_widg::omni_connect);
 
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k2(double)), this, SLOT(get_power(double)));
 	//	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
@@ -214,6 +191,8 @@ R733_widg::R733_widg()
 	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	paint_buttons();
+		QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+		restoreGeometry(settings.value("733_geometry").toByteArray());
 		//set_new_tm();
 }
 
@@ -837,4 +816,12 @@ void R733_widg::new_frame_04(QString mode, QVariant frame_data)
 	if (regime == mode)
 		frame_slot_thr.get_frame_bus_obj()->make_new_frame_733(mode, frame_data);
 		//emit make_new_frame_733(mode, frame_data);
+}
+}
+
+void R733_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("733_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
