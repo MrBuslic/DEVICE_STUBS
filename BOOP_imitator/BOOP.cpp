@@ -2,9 +2,9 @@
 #include <QMessageBox>
 #include "rpc_ports.h"
 
-union MKOWord
+union MKOCommandWord
 {
-	MKOWord(quint16 raw_word)
+	MKOCommandWord(quint16 raw_word)
 	{
 		this->command_word = raw_word;
 	}
@@ -19,9 +19,126 @@ union MKOWord
 	};
 };
 
+union MKODataWords
+{
+    MKODataWords(QVariantList raw_words)
+    {
+        for (int i = 0; i < raw_words.size(); i++)
+            this->data_words[i] = static_cast<quint16>(raw_words.at(i).toInt());
+    }
+
+    quint16 data_words[6];
+
+    struct {
+    	quint16 upsilon_servo_power : 1,
+				phi_servo_power : 1,
+				upsilon_angle_sensor_power : 1,
+				phi_angle_sensor_power : 1,
+				upsilon_rotation_command : 1,
+				phi_rotation_command : 1,
+				: 10;
+
+    	quint16 upsilon_pulse_amount : 15,
+				upsilon_rotation_direction : 1;
+
+    	quint16 phi_pulse_amount : 15,
+				phi_rotation_direction : 1;
+
+    	quint16 uplsilon_pulse_frequency: 9,
+				: 7;
+
+    	quint16 phi_pulse_frequency: 9,
+				: 7;
+
+    	quint16 checksum;
+	};
+};
+
+union BOOPRespondWord
+{
+	BOOPRespondWord()
+	{
+		// Form respond word
+	}
+
+	quint16 respond_word;
+
+	struct {
+		quint16 terminal_device_malfunction : 1,
+				: 1,
+				caller_malfunction : 1,
+				caller_busyness : 1,
+				: 5,
+				respond_word_transaction : 1,
+				message_error : 1,
+				terminal_device_address : 5;
+	};
+};
+
+union BOOPDataWords
+{
+	BOPPDataWords()
+	{
+		// Form data words
+	}
+
+	quint16 data_words[13];
+
+	struct {
+		quint16 upsilon_servo_power_status : 1,
+				phi_servo_power_status : 1,
+				upsilon_angle_sensor_power_status : 1,
+				phi_angle_sensor_power_status : 1,
+				upsilon_channel_work_status : 1,
+				phi_channel_work_status : 1,
+				previous_message_error : 1,
+				half_set_engage : 1,
+				temperature : 8;
+
+		quint16 upsilon_pulse_amount : 15,
+				upsilon_rotation_direction : 1;
+
+		quint16 phi_pulse_amount : 15,
+				phi_rotation_direction : 1;
+
+		quint16 uplsilon_pulse_frequency : 9,
+				: 7;
+
+		quint16 phi_pulse_frequency : 9,
+				: 7;
+
+		quint16 upsilon_angle;
+
+		quint16 phi_angle;
+
+		quint16 upsilon_pulse_summ : 15,
+				usplison_summ_sign : 1;
+
+		quint16 phi_pulse_summ : 15,
+				phi_summ_sign : 1;
+
+		// Self-control bits
+		quint16 bit19 : 1,
+				bit18 : 1,
+				bit17 : 1,
+				bit16 : 1,
+				bit15 : 1,
+				bit14 : 1,
+				bit13 : 1,
+				bit12 : 1,
+				: 7,
+				bit4 : 1;
+
+		quint16 upsilon_min_angle;
+
+		quint16 phi_min_angle;
+
+		quint16 checksum;
+	};
+};
+
 BOOP::BOOP()
 {
-
   // Contains other containers
 
   // First stripe of the gui
@@ -44,12 +161,12 @@ BOOP::BOOP()
   //  // Half-set selection block
 
   mainSetButton = new QPushButton("Основной полукомплект", this);
-  mainSetButton->setCheckable(true);
   mainSetButton->setFixedWidth(180);
+	mainSetButton->setFlat(true);
 
   reserveSetButton = new QPushButton("Резервный полукомплект", this);
-  reserveSetButton->setCheckable(true);
   reserveSetButton->setFixedWidth(180);
+	reserveSetButton->setFlat(true);
 
   QHBoxLayout *halfSetBlock = new QHBoxLayout();
   halfSetBlock->addWidget(mainSetButton);
@@ -62,13 +179,22 @@ BOOP::BOOP()
 
   // Self-diagnostic block
 
-  //  // First self-diagnostic column
+	//  // First self-diagnostic column
 
-  bit19 = new QCheckBox("Исправность управляющего микроконвертора", this);
-  bit18 = new QCheckBox("Исправность микроконвертора-драйвера ШД", this);
-  bit17 = new QCheckBox("Исправность интерфейса SPI с ОУ МКО", this);
-  bit16 = new QCheckBox("Исправность интерфейса с ДУ (канал υ)", this);
-  bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
+	bit19 = new QCheckBox("Исправность управляющего микроконвертора", this);
+	bit19->setChecked(true);
+
+	bit18 = new QCheckBox("Исправность микроконвертора-драйвера ШД", this);
+	bit18->setChecked(true);
+
+	bit17 = new QCheckBox("Исправность интерфейса SPI с ОУ МКО", this);
+	bit17->setChecked(true);
+
+	bit16 = new QCheckBox("Исправность интерфейса с ДУ (канал υ)", this);
+	bit16->setChecked(true);
+
+	bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
+	bit15->setChecked(true);
 
   QVBoxLayout *firstDiagnosticColumn = new QVBoxLayout();
   firstDiagnosticColumn->addWidget(bit19);
@@ -77,12 +203,19 @@ BOOP::BOOP()
   firstDiagnosticColumn->addWidget(bit16);
   firstDiagnosticColumn->addWidget(bit15);
 
-  //  // Second self-diagnostic column
+	//  // Second self-diagnostic column
 
-  bit14 = new QCheckBox("Исправность ОУ МКО (основной канал)", this);
-  bit13 = new QCheckBox("Исправность ОУ МКО (резервный канал)", this);
-  bit12 = new QCheckBox("Исправность термодатчика", this);
-  bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
+	bit14 = new QCheckBox("Исправность ОУ МКО (основной канал)", this);
+	bit14->setChecked(true);
+
+	bit13 = new QCheckBox("Исправность ОУ МКО (резервный канал)", this);
+	bit13->setChecked(true);
+
+	bit12 = new QCheckBox("Исправность термодатчика", this);
+	bit12->setChecked(true);
+
+	bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
+	bit4->setChecked(true);
 
   QVBoxLayout *secondDiagnosticColumn = new QVBoxLayout();
   secondDiagnosticColumn->addWidget(bit14);
@@ -102,7 +235,7 @@ BOOP::BOOP()
   // // // First upsilon channel controls strip
 
   QLabel *upsilonAngleLabel = new QLabel("Угол: ", this);
-  upsilonAngleValue = new QLabel("FFFh", this);
+  upsilonAngleValue = new QLabel("0000", this);
 
   QHBoxLayout *upsilonAngleIndicatorBloc = new QHBoxLayout();
   upsilonAngleIndicatorBloc->addWidget(upsilonAngleLabel);
@@ -150,7 +283,7 @@ BOOP::BOOP()
   // // // First Phi channel controls strip
 
   QLabel *phiAngleLabel = new QLabel("Угол: ", this);
-  phiAngleValue = new QLabel("FFFh", this);
+  phiAngleValue = new QLabel("0000", this);
 
   QHBoxLayout *phiAngleIndicatorBloc = new QHBoxLayout();
   phiAngleIndicatorBloc->addWidget(phiAngleLabel);
@@ -208,10 +341,23 @@ BOOP::BOOP()
   mainLayout->addLayout(thirdStripe);
   mainLayout->addWidget(logArea);
 
-  this->setWindowTitle("Блок управления приводами");
-  this->setLayout(mainLayout);
-  this->show();
+	// Styles
 
+  this->setStyleSheet("QPushButton {"
+                      "min-height: 20px;"
+                      "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #bbdfc4, stop: 1 #8ec69c);"
+                      "color: #000000;"
+                      "border: 1px solid #008000; }"
+
+                      "QPushButton:flat {"
+                      "background-color: #fcfcfc;"
+                      "color: #4e4e4e;"
+                      "border: 1px solid #808080;");
+
+	this->setWindowTitle("Блок управления приводами");
+	this->setLayout(mainLayout);
+	this->setFocus();
+	this->show();
 
   slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
   slot_thr.start();
@@ -258,9 +404,12 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 	if (respond_word == -1)
 		return;
 
-	MKOWord parsed_word(command_word);
+	MKOCommandWord parsed_command_word(command_word);
 
-	if ((MKO != this->MKO) || (parsed_word.address != this->address))
+	if ((MKO != this->MKO) || (parsed_command_word.address != this->address))
+		return;
+
+	if (parsed_command_word.words_count != 6 || words.count() != 6)
 		return;
 
 	int _checksum = 0;
@@ -270,11 +419,68 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 	if (_checksum != words.last().toInt())
 		return;
 
+	MKODataWords parsed_data_words(words);
+
 	QString _message = QString("[%1] принял сигнал на подадресе %2 c КС %3")
 		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
-										 .arg(parsed_word.subaddress).arg(parsed_word.command_word);
+										 .arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
+
+	if (parsed_data_words->upsilon_servo_power)
+		upsilonServoPower->setChecked(true);
+	else
+		upsilonServoPower->setChecked(false);
+
+	if (parsed_data_words->phi_servo_power)
+		phiServoPower->setChecked(true);
+	else
+		phiServoPower->setChecked(false);
+
+	if (parsed_data_words->upsilon_angle_sensor_power)
+		upsilonAngleSensorPower->setChecked(true);
+	else
+		upsilonAngleSensorPower->setChecked(false);
+
+	if (parsed_data_words->phi_angle_sensor_power)
+		phiAngleSensorPower->setChecked(true);
+	else
+		phiAngleSensorPower->setChecked(false);
+
+	if (parsed_data_words->upsilon_rotation_command)
+	{
+		int _upsilon_current_angle = upsilonAngleValue->text().toInt(nullptr, 16);
+		int _upsilon_rotation_angle;
+		int _upsilon_new_angle;
+
+		if (parsed_data_words->upsilon_rotation_direction)
+			_upsilon_rotation_angle = parsed_data_words->upsilon_pulse_amount;
+		else
+			_upsilon_rotation_angle = parsed_data_words->~upsilon_pulse_amount;
+
+		_upsilon_new_angle = current_angle + pulse_amount & 0xFFFF;
+		upsilonAngleValue->setText(QString("%1").arg(_upsilon_new_angle, 0, 16).toUpper());
+	}
+
+	if (parsed_data_words->phi_rotation_command)
+	{
+		int _phi_current_angle = phiAngleValue->text().toInt(nullptr, 16);
+		int _phi_rotation_angle;
+		int _phi_new_angle;
+
+		if (parsed_data_words->phi_rotation_direction)
+			_phi_rotation_angle = parsed_data_words->phi_pulse_amount;
+		else
+			_phi_rotation_angle = parsed_data_words->~phi_pulse_amount;
+
+		_phi_new_angle = current_angle + pulse_amount & 0xFFFF;
+		phiAngleValue->setText(QString("%1").arg(_phi_new_angle, 0, 16).toUpper());
+	}
 
 	logArea->append(_message);
+}
+void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+	msg_to_log(_msg);
 
 	// Do something
 
