@@ -202,11 +202,10 @@ void MBK07_widg::closeEvent(QCloseEvent *event)
 
 void MBK07_widg::get_frame(QString mode, QVariant frame_data)
 {
-	if (mode_names.value(full_mode(current_mode)) == mode)
-	{	
+	if ((mode_names.value(full_mode(current_mode)) == mode) && (current_FSMU != FSMU_OFF))
+	{
 		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, pi8_fast ? 2 : 1, ant_names[current_antenna], frame_data);
 	}
-
 }
 
 void MBK07_widg::get_power(double _volt)
@@ -222,10 +221,10 @@ void MBK07_widg::change_power()
 {
 	//Надо подправить - при включении не выставлены каналы ФСМУ и ФСВУ
 	//power = 0.5;
-	if (current_FSMU != FSMU_OFF) 
+	if (current_FSMU != FSMU_OFF)
 	{
 		power = 150;
-		if (current_FSVU != FSVU_OFF) 
+		if (current_FSVU != FSVU_OFF)
 			power = 180;
 	}
 	else
@@ -280,12 +279,12 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 {
 	if (volt != 0)
 	{
+		if ((pshm == 11) && (mshm == 3)) return;
 		QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 		msg_to_log(_msg);
 
 		int tmp_mshm = mshm;
 		int tmp_pshm = pshm - 8;
-
 		if ((pshm >= 8) && (pshm <= 11) && (mshm >= 0) && (mshm <= 3))
 		{
 			switch (tmp_mshm)
