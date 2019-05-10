@@ -256,9 +256,11 @@ BOOP::BOOP()
 
   decreaseUpsilonAngle = new QPushButton("−", this);
   decreaseUpsilonAngle->setFixedWidth(40);
+	decreaseUpsilonAngle->setFlat(true);
 
   increaseUpsilonAngle = new QPushButton("+", this);
   increaseUpsilonAngle->setFixedWidth(40);
+	increaseUpsilonAngle->setFlat(true);
 
   upsilonAngleServoPower = new QCheckBox("Питание ШД", this);
   upsilonAngleServoPower->setFixedWidth(84);
@@ -304,9 +306,11 @@ BOOP::BOOP()
 
   QPushButton *decreasePhiAngle = new QPushButton("−", this);
   decreasePhiAngle->setFixedWidth(40);
+	decreasePhiAngle->setFlat(true);
 
   QPushButton *increasePhiAngle = new QPushButton("+", this);
   increasePhiAngle->setFixedWidth(40);
+	increasePhiAngle->setFlat(true);
 
   QCheckBox *phiAngleServoPower = new QCheckBox("Питание ШД", this);
   phiAngleServoPower->setFixedWidth(84);
@@ -484,14 +488,21 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 	if (pshm != 1 || mshm < 5 || mshm > 7)
 		return;
 
-	if (mshm == 5)
+	if (mshm == 5) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
+		mainSetButton->setFlat(false);
+	}
 
-	if (mshm == 6)
+	if (mshm == 6) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
+		reserveSetButton->setFlat(false);
+	}
 
-	if (mshm == 7)
+	if (mshm == 7) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, false);
+		mainSetButton->setFlat(true);
+		reserveSetButton->setFlat(false);
+	}
 
 	logArea->append(_message);
 }
