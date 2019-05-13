@@ -256,9 +256,11 @@ BOOP::BOOP()
 
   decreaseUpsilonAngle = new QPushButton("−", this);
   decreaseUpsilonAngle->setFixedWidth(40);
+	decreaseUpsilonAngle->setFlat(true);
 
   increaseUpsilonAngle = new QPushButton("+", this);
   increaseUpsilonAngle->setFixedWidth(40);
+	increaseUpsilonAngle->setFlat(true);
 
   upsilonAngleServoPower = new QCheckBox("Питание ШД", this);
   upsilonAngleServoPower->setFixedWidth(84);
@@ -304,9 +306,11 @@ BOOP::BOOP()
 
   QPushButton *decreasePhiAngle = new QPushButton("−", this);
   decreasePhiAngle->setFixedWidth(40);
+	decreasePhiAngle->setFlat(true);
 
   QPushButton *increasePhiAngle = new QPushButton("+", this);
   increasePhiAngle->setFixedWidth(40);
+	increasePhiAngle->setFlat(true);
 
   QCheckBox *phiAngleServoPower = new QCheckBox("Питание ШД", this);
   phiAngleServoPower->setFixedWidth(84);
@@ -373,8 +377,6 @@ BOOP::BOOP()
   }
 
   connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)), Qt::QueuedConnection);
-
-  slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 
   mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
   mku_slot_thr.start();
@@ -473,11 +475,30 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 }
 void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
-	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-	//msg_to_log(_msg);
+	QString _message = QString("%1 принял МК МШ%2 ПШ%3")
+										 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
+										 .arg(mshm).arg(pshm);
 
-	// Do something
+	if (pshm != 1 || mshm < 5 || mshm > 7)
+		return;
 
+	if (mshm == 5) {
+		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
+		mainSetButton->setFlat(false);
+	}
+
+	if (mshm == 6) {
+		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
+		reserveSetButton->setFlat(false);
+	}
+
+	if (mshm == 7) {
+		slot_thr.get_omnibus_obj()->switch_ab(1, 9, false);
+		mainSetButton->setFlat(true);
+		reserveSetButton->setFlat(false);
+	}
+
+	logArea->append(_message);
 }
 void BOOP::new_data(int mko, int address, int subaddress, QVariantList words)
 {
