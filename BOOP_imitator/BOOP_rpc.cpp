@@ -127,6 +127,25 @@ void RPC_BOOP_SIGNAL_Object::read_data()
 	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call finished void new_message %1").arg(tmp_ret_params));
 	return res;
 }
+ RPC_BOOP_SLOT_Object::void new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(line_m);
+	tmp_list << QVariant(line_p);
+	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call void new_matrix_command %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("void new_matrix_command(int, int, int, int, double, double, int, int, int)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call finished void new_matrix_command %1").arg(tmp_ret_params));
+	return res;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

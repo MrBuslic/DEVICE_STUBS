@@ -77,7 +77,7 @@ union BOOPRespondWord
 
 union BOOPDataWords
 {
-	BOPPDataWords()
+	BOOPDataWords()
 	{
 		// Form data words
 	}
@@ -425,54 +425,48 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
 										 .arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
 
-	if (parsed_data_words->upsilon_servo_power)
-		upsilonServoPower->setChecked(true);
+	if (parsed_data_words.upsilon_servo_power)
+		upsilonAngleServoPower->setChecked(true);
 	else
-		upsilonServoPower->setChecked(false);
+		upsilonAngleServoPower->setChecked(false);
 
-	if (parsed_data_words->phi_servo_power)
-		phiServoPower->setChecked(true);
+	if (parsed_data_words.phi_servo_power)
+		phiAngleServoPower->setChecked(true);
 	else
-		phiServoPower->setChecked(false);
+		phiAngleServoPower->setChecked(false);
 
-	if (parsed_data_words->upsilon_angle_sensor_power)
+	if (parsed_data_words.upsilon_angle_sensor_power)
 		upsilonAngleSensorPower->setChecked(true);
 	else
 		upsilonAngleSensorPower->setChecked(false);
 
-	if (parsed_data_words->phi_angle_sensor_power)
+	if (parsed_data_words.phi_angle_sensor_power)
 		phiAngleSensorPower->setChecked(true);
 	else
 		phiAngleSensorPower->setChecked(false);
 
-	if (parsed_data_words->upsilon_rotation_command)
+	if (parsed_data_words.upsilon_rotation_command)
 	{
 		int _upsilon_current_angle = upsilonAngleValue->text().toInt(nullptr, 16);
-		int _upsilon_rotation_angle;
-		int _upsilon_new_angle;
 
-		if (parsed_data_words->upsilon_rotation_direction)
-			_upsilon_rotation_angle = parsed_data_words->upsilon_pulse_amount;
+		if (parsed_data_words.upsilon_rotation_direction)
+			_upsilon_current_angle += parsed_data_words.upsilon_pulse_amount;
 		else
-			_upsilon_rotation_angle = parsed_data_words->~upsilon_pulse_amount;
+			_upsilon_current_angle -= parsed_data_words.upsilon_pulse_amount;
 
-		_upsilon_new_angle = current_angle + pulse_amount & 0xFFFF;
-		upsilonAngleValue->setText(QString("%1").arg(_upsilon_new_angle, 0, 16).toUpper());
+		upsilonAngleValue->setText(QString("%1").arg(_upsilon_current_angle, 0, 16).toUpper());
 	}
 
-	if (parsed_data_words->phi_rotation_command)
+	if (parsed_data_words.phi_rotation_command)
 	{
 		int _phi_current_angle = phiAngleValue->text().toInt(nullptr, 16);
-		int _phi_rotation_angle;
-		int _phi_new_angle;
 
-		if (parsed_data_words->phi_rotation_direction)
-			_phi_rotation_angle = parsed_data_words->phi_pulse_amount;
+		if (parsed_data_words.phi_rotation_direction)
+			_phi_current_angle += parsed_data_words.phi_pulse_amount;
 		else
-			_phi_rotation_angle = parsed_data_words->~phi_pulse_amount;
+			_phi_current_angle -= parsed_data_words.phi_pulse_amount;
 
-		_phi_new_angle = current_angle + pulse_amount & 0xFFFF;
-		phiAngleValue->setText(QString("%1").arg(_phi_new_angle, 0, 16).toUpper());
+		phiAngleValue->setText(QString("%1").arg(_phi_current_angle, 0, 16).toUpper());
 	}
 
 	logArea->append(_message);
@@ -480,7 +474,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-	msg_to_log(_msg);
+	//msg_to_log(_msg);
 
 	// Do something
 

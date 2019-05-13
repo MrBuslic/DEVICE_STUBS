@@ -12,6 +12,7 @@ public:
 	////////////////////////////////////
 public slots:
 	 void new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word);
+	 void new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	////////////////////////////////////
 };
 
