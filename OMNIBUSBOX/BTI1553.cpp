@@ -268,7 +268,11 @@ BTI1553API MSGADDR __stdcall BTI1553_RTCreateMsg(ULONG configval,BOOL mcflag,INT
 BTI1553API MSGADDR __stdcall BTI1553_RTGetMsg(BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTReset(INT taval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTResponseTimeSet(INT resptime,INT taval,INT channum,HCORE handleval){ return 0; }
-BTI1553API ERRVAL __stdcall BTI1553_RTSetMode(ULONG configval,INT taval,INT channum,HCORE handleval){ return 0; }
+BTI1553API ERRVAL __stdcall BTI1553_RTSetMode(ULONG configval,INT taval,INT channum,HCORE handleval)
+{
+	Srpc_buffer_class::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab(channum, taval, configval != RTCFG1553_DISABLE);
+	return 0;
+}
 BTI1553API USHORT __stdcall BTI1553_RTSWDRd(INT taval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTSWDWr(USHORT swdval,INT taval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTSyncDefine(BOOL enableflag,USHORT syncmask,USHORT pinpolarity,INT taval,ULONG rcvsamask,ULONG xmtsamask,ULONG rcvmcmask,ULONG xmtmcmask,INT channum,HCORE handleval){ return 0; }
