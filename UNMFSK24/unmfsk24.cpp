@@ -14,18 +14,29 @@ public:
 	QList<RPC_mfsk24_SLOT_Thread*> mfsk24_slot_thr;
 	QList<RPC_mfsk24_SIGNAL_Thread*> mfsk24_signal_thr;
 	friend struct Loki::CreateUsingNew<rpc_buffer_class>; 
+	int num_add;
 private:
 	rpc_buffer_class()
 	{
-		for (int i = 0; i < 2; i++)
+		QString commapp = QCoreApplication::applicationName();
+		if (commapp == "comapp1")
+		{
+			num_add = 0;
+		}
+		else
+		{
+			num_add = 5;
+		}
+
+		for (int i = 0; i < 4; i++)
 		{
 			RPC_mfsk24_SLOT_Thread* slot_thr = new RPC_mfsk24_SLOT_Thread;
-			slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT + i);
+			slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT + i + num_add);
 			slot_thr->start();
 			//if (!slot_thr.wait_connected(3))
 			//	return false;
 			RPC_mfsk24_SIGNAL_Thread* signal_thr = new RPC_mfsk24_SIGNAL_Thread;
-			signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL + i);
+			signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL + i + num_add);
 			signal_thr->start();
 			//if (!signal_thr.wait_connected(3))
 			//	return false;
@@ -120,7 +131,7 @@ ViStatus _VI_FUNC unmfsk24_start (ViSession line, ViInt16 _VI_FAR state[]){
 		for (int i = 0; i < 24; i++)
 			tmp_state << state[i];
 	}
-	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1 ]->get_mfsk24_obj()->unmfsk24_start(tmp_state);
+	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_start(tmp_state);
 }
 
 ViStatus _VI_FUNC unmfsk24_gstart_q (ViSession mvi, ViInt16 *state){ return 0; }
