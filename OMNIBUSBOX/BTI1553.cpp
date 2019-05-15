@@ -10,54 +10,12 @@
 #include <BTI1553.H>
 #define _WIN32
 
+#include "BufferClass1553.h"
 #include "omnibus_rpc.h"
 #include "instruments.h"
 #include <QApplication>
 #include "rpc_ports.h"
-//структура командного слова сообщения МКО
-//
-union MkoWord
-{
-	quint16 cw;				 // командное слово целиком
-	struct
-	{
-		quint16 count : 5,    // число сл.данных / команда
-	subadr : 5,   // подадрес
-		 tr : 1,       // направление передачи(1-чт.ОУ)
-		  adr : 5;
-	};
-};
 
-struct MsgAddr
-{
-	int addr;
-	int saddr;
-	int mko;
-};
-
-class rpc_buffer_class
-{
-
-public:
-	rpc_buffer_class() { msg_ind = 0; }
-	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
-	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
-	int create_addr(int addr, int saddr, int mko)
-	{
-		MsgAddr tmp_msg;
-		tmp_msg.addr = addr;
-		tmp_msg.saddr = saddr;
-		tmp_msg.mko = mko;
-		msg_ind++;
-		msg_addrs.insert(msg_ind, tmp_msg);
-		return msg_ind;
-	}
-	QMap<int, MsgAddr> msg_addrs;
-private:
-	int msg_ind;
-};
-
-SINGLETON_DEF(rpc_buffer_class);
 
 // Объявляем функцию DllMain
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
@@ -89,8 +47,6 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 			signal_thr.start();
 		}
 		signal_thr.wait_connected(3);
-
-
 
 		break; // успешная инициализация
 
@@ -220,7 +176,27 @@ BTI1553API INT __stdcall BTI1553_ListDataRd(LPUSHORT buf,INT count,LISTADDR list
 BTI1553API INT __stdcall BTI1553_ListDataWr(LPUSHORT buf,INT count,LISTADDR listaddr,HCORE handleval){ return 0; }
 BTI1553API BOOL __stdcall BTI1553_ListMultiBlockRd(LPUSHORT buf,LPINT blkcountptr,LISTADDR listaddr,HCORE handleval)
 { 
-	return 0;
+	rpc_buffer_class& tmp_buf(Srpc_buffer_class::Instance());
+	QMutexLocker lock(&(tmp_buf.msg_mutex));
+	QMap<int, LstAddr>::iterator itr = tmp_buf.lst_addrs.find(listaddr);
+	if (itr == tmp_buf.lst_addrs.end())
+		return false;
+	if (itr->words.isEmpty())
+		return false;
+
+	MSGFIELDS1553* out_data = reinterpret_cast<MSGFIELDS1553*>(buf);
+	*blkcountptr = itr->words.count();
+	for (int i =0; i < itr->words.count(); i++)
+	{
+		QVariantList& tmp_data = itr->words.at(i).toList();
+		out_data[i].datacount = tmp_data.count();
+		for (int j = 0; j < tmp_data.count(); j++)
+		{
+			out_data[i].data[j] = tmp_data.at(j).toInt();
+		}
+	}
+	
+	return true;
 }
 BTI1553API BOOL __stdcall BTI1553_ListMultiBlockWr(LPUSHORT buf,INT blkcount,LISTADDR listaddr,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_MonConfig(ULONG configval,INT channum,HCORE handleval){ return 0; }
@@ -256,14 +232,23 @@ BTI1553API INT __stdcall BTI1553_PlayStatus(INT channum,HCORE handleval){ return
 BTI1553API USHORT __stdcall BTI1553_PlayWr(LPUSHORT buf,USHORT bufcount,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTConfig(ULONG configval,INT taval,INT channum,HCORE handleval)
 {
+	if (!Srpc_buffer_class::Instance().signal_connected)
+	{
+		Srpc_buffer_class::Instance().signal_connected = true;
+		RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
+		QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	}
 	Srpc_buffer_class::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab(channum, taval, configval != RTCFG1553_DISABLE);
 	return 0;
 }
-BTI1553API LISTADDR __stdcall BTI1553_RTCreateList(ULONG listconfigval,INT count,ULONG msgconfigval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval){ return 0; }
+BTI1553API LISTADDR __stdcall BTI1553_RTCreateList(ULONG listconfigval,INT count,ULONG msgconfigval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval)
+{ 
+	return Srpc_buffer_class::Instance().create_list_addr(taval, saval, channum, count, trflag ? 1 : 0);
+}
 BTI1553API MSGADDR __stdcall BTI1553_RTCreateMsg(ULONG configval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval)
 {
 
-	return Srpc_buffer_class::Instance().create_addr(taval, saval, channum);
+	return Srpc_buffer_class::Instance().create_msg_addr(taval, saval, channum);
 }
 BTI1553API MSGADDR __stdcall BTI1553_RTGetMsg(BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTReset(INT taval,INT channum,HCORE handleval){ return 0; }
