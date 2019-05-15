@@ -1,0 +1,13 @@
+00000000 A _DYNAMIC_LINK
+1fc80000 R SpoVersionCode
+1fc80000 A __bss_start
+1fc80000 t __gnu_compiled_c
+1fc80000 A _edata
+1fc80000 A _end
+1fc80000 A _fbss
+1fc80000 D _fdata
+1fc80000 T _ftext
+1fc80000 t gcc2_compiled.
+1fc80004 R SpoVersionStr
+1fc80048 A _etext
+1fc88000 A _gp

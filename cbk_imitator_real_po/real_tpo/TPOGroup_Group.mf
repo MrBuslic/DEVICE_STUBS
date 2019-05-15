@@ -1,0 +1,34 @@
+.PHONY : clean_TPOGroup_Group TPOGroup_Group
+.PHONY : VersionProject.e MainProject.e VecProject.e BcuProject.e 
+
+clean_TPOGroup_Group ::
+	@make -C D:/Roman/TPO/Source/ clean PRJ=VersionProject CMD=clean
+	@make -C D:/Roman/TPO/Source/ clean PRJ=MainProject CMD=clean
+	@make -C D:/Roman/TPO/Source/ clean PRJ=VecProject CMD=clean
+	@make -C D:/Roman/TPO/Source/ clean PRJ=BcuProject CMD=clean
+
+TPOGroup_Group :: VersionProject.e MainProject.e VecProject.e BcuProject.e 
+
+VersionProject.e :: D:/Roman/TPO/Source/VersionProject.e
+
+D:/Roman/TPO/Source/VersionProject.e ::
+	@make PRJ=VersionProject -C D:/Roman/TPO/Source/ VersionProject.e
+
+MainProject.e :: D:/Roman/TPO/Source/MainProject.e
+
+D:/Roman/TPO/Source/MainProject.e ::D:/Roman/TPO/Source/VersionProject.e 
+D:/Roman/TPO/Source/MainProject.e ::
+	@make PRJ=MainProject -C D:/Roman/TPO/Source/ MainProject.e
+
+VecProject.e :: D:/Roman/TPO/Source/VecProject.e
+
+D:/Roman/TPO/Source/VecProject.e ::D:/Roman/TPO/Source/MainProject.e 
+D:/Roman/TPO/Source/VecProject.e ::
+	@make PRJ=VecProject -C D:/Roman/TPO/Source/ VecProject.e
+
+BcuProject.e :: D:/Roman/TPO/Source/BcuProject.e
+
+D:/Roman/TPO/Source/BcuProject.e ::D:/Roman/TPO/Source/MainProject.e 
+D:/Roman/TPO/Source/BcuProject.e ::
+	@make PRJ=BcuProject -C D:/Roman/TPO/Source/ BcuProject.e
+

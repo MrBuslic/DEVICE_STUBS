@@ -1,0 +1,14 @@
+MAKEDIR=D:/SUBMIC/TSRP/CDS/MAKE
+PROJECTDIR=D:/Roman/TPO/Source
+BcuProject_Prep=0
+
+BcuProject_Added_CppFlags=-D__MACHINE__=__CBK__
+BcuProject_Added_CFlags=-ansi; -D__MACHINE__=__CBK__
+BcuProject_Added_AsFlags=
+BcuProject_Added_LdFlags=
+
+BcuProject_Include=$(SubMicPath)/Target/BOS/BOS_h; $(SubMicPath)/Target/BRPO/BRPO_h; $(SubMicPath)/Target/OPO/OPO_h; $(SubMicPath)/Target/Target_h; $(SubMicPath)/TSRP/CDS/Include;
+BcuProject_Lib=
+
+BcuProject_Prf=D:/Roman/TPO/Source/BcuUnit.c 
+BcuProject_Dep=D:/Roman/TPO/Source/MainProject.e 

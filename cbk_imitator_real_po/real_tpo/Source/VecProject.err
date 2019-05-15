@@ -1,0 +1,5 @@
+
+D:\Roman\TPO\Source>echo off 
+CBK :       SubMicPath = S:    [S: = D:\SubMic]
+make: *** No rule to make target `D:/Roman/TPO/Source/MainProject.e', needed by `VecProject.e'.  Stop.
+make.exe: *** [build] Error 0x2

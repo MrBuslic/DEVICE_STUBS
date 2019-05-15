@@ -1,0 +1,73 @@
+#########################################################################
+# Командный файл для загрузки СПО.
+#
+# Этот командный файл запускается из 'boot.dbg' для загрузки и
+# запуска СПО.
+#
+# Отредактируйте этот файл для загрузки отлаживаемых файлов и
+# расстановки точек останова.
+#
+# $Id: kdz_spoLoadCBK.dbg,v 5.5 2010/06/28 10:38:01 Владелец Exp $
+#########################################################################
+
+echo("=============================================")
+echo("проект CBK: файл spoloadCBK.dbg **********")
+
+UINT err
+MV_Enable 0   #для printf???
+echo_on
+echo("------------------------------------------------------------------")
+echo("---- Загрузка СПО ----")
+
+putenv("__VM3OFF=0")
+if($(vmMap)==0xF) {
+   putenv("__VM3__=0")
+   putenv("vmMap=0x7")
+   putenv("vmList=012")
+   putenv("__VM3OFF=1")
+}
+VM $(vmList)
+dinopros $(vmList)
+
+load D:\Roman\TPO\Source\MainProject.e
+load D:\Roman\TPO\Source\VecProject.e
+
+int  аdr;
+#### Признак необходимости печати
+#GETADR pkdz.e:need_printf
+#аdr=[0]0
+#set *~аdr=0
+
+echo("------------------------------------------------------------------")
+echo("---- Точки останова в СПО:")
+#base1  MainPrj.e:MainTask; ra1 stopr
+#add /1 MainPrj.e:IrqTask00
+
+base0  MainProject.e:MainTask; ra0 stopr
+# add /0 MainPrj.e:IrqTask
+# add /0 MainPrj.e:IrqTask00
+
+#add /0 pkdz.e:_startSPO
+#add /0 pkdz.e:end_tst
+#add /0 pkdz.e:endKDZ
+#add /0 pkdz.e:errorSPO
+
+#########################################################################
+# Запуск СПО через БОС:
+echo("------------------------------------------------------------------")
+echo("---- Запуск СПО через БОС ----")
+param bosRun$(__SUFFIX__).dbg; command $(SubMicPath)\ComFiles\ComSPO.dbg
+#########################################################################
+
+#set *a0000350=0xd0005678 #contin
+#go
+waitstop #ждём end_tst в любой ВМ
+#delete /1 bos.e:run_task
+
+if ("$(__VM3OFF)"!="0") vm 0123
+echo("------------------------------------------------------------------")
+command $(SubMicPath)\ComFiles\CBK\VerSum01CBK.dbg
+echo("------------------------------------------------------------------")
+
+final
+

@@ -1,0 +1,98 @@
+##########################################################################
+# Командный файл для запуска БОС (и СПО).
+#
+# Этот командный файл запускается из 'boot.dbg', если
+# ТОПСЕГ СПО присутствует в ПЗУ.
+#
+# Системный дескриптор СПО и Таблица векторов запуска  д.б. загружены  
+# до выполнения этого командного файла 
+#
+# $Id: kdz_bosRunCBK.dbg,v 5.8 2010/11/03 12:15:24 faina Exp $
+##########################################################################
+
+echo("=============================================")
+echo("проект CBK: файл bosRunCBK.dbg **********")
+
+echo_on
+
+int  аdr;
+int  err;
+int  аdrEl;
+int tmp
+
+command $(SubMicPath)\ComFiles\CBK\vmget.dbg
+
+attach $(SubMicPath)\Target\BRPO\$(__MACHINE__)\BRPO.e
+attach  $(SubMicPath)\Target\BOS\$(__MACHINE__)\bos.e
+Attach  $(SubMicPath)\Target\BDO\$(__MACHINE__)\BDO.e
+
+GetAdr bos.e:descSYS
+if("$(__VM0__)"=="1") аdr=[0]0
+if("$(__VM1__)"=="1") аdr=[0]1
+if("$(__VM2__)"=="1") аdr=[0]2
+if("$(__VM3__)"=="1") аdr=[0]3
+
+# установка адреса описателя СПО (для запуска из ОЗУ)
+аdrEl=аdr+0x18 
+#set *~аdrEl=0x90800
+
+# set pkdz.e:pSysDesc=0x90800  #!!!???
+
+GETADR bos.e:LockAllow
+if("$(__VM0__)"=="1") аdr=[0]0
+if("$(__VM1__)"=="1") аdr=[0]1
+if("$(__VM2__)"=="1") аdr=[0]2
+if("$(__VM3__)"=="1") аdr=[0]3
+set *~аdr=0x12345678
+
+GETADR bos.e:adrFunc_printf
+if("$(__VM0__)"=="1") аdr=[0]0
+if("$(__VM1__)"=="1") аdr=[0]1
+if("$(__VM2__)"=="1") аdr=[0]2
+if("$(__VM3__)"=="1") аdr=[0]3
+
+# load $(SubMicPath)\Target\BOS\$(__MACHINE__)\to_printf.e
+
+int  аdr_func;
+GETADR to_printf.e:_func_printf
+аdr_func=[0]
+set *~аdr=^аdr_func
+
+echo("Точки останова в БОС:")
+base1 bos.e:FatalError; ra1 stopr
+add /1 bos.e:FatalError
+
+# add /1 bos.e:radSpr_handler
+
+#add /1 bos.e:run_task
+#add /1 brpo.e:DBG_cmoCommand_0
+#add /1 brpo.e:DBG_intCons_0
+
+#Запрет загрузки СПО из ПЗУ
+set brpo.e:Arlosi.ldrmode=8
+set brpo.e:State.ldrmode=8
+
+dinopros $(vmList)
+go; 
+#waitstop #ждём run_task
+
+err=1
+#if("$(__VM0__)"=="1") if(stop==bos.e:run_task[0]) err=0
+#if("$(__VM1__)"=="1") if(stop==bos.e:run_task[1]) err=0
+#if("$(__VM2__)"=="1") if(stop==bos.e:run_task[2]) err=0
+#if("$(__VM3__)"=="1") if(stop==bos.e:run_task[3]) err=0
+#if(err!=0) {
+#   echo("ОШИБКА: Нет точки останова bos.e:run_task")
+#   final
+#}
+#stop
+#delete /1 bos.e:run_task
+
+#trace
+#traceall
+#starttr clear
+#rescit 
+#go
+
+end
+

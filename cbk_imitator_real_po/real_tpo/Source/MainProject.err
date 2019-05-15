@@ -1,0 +1,11 @@
+
+D:\Roman\TPO\Source>echo off 
+CBK :       SubMicPath = S:    [S: = D:\SubMic]
+ldmips -o MainProject.e -Map MainProject.map -EL -N  D:/Roman/TPO/Source/MainUnit.o D:/Roman/TPO/Source/DataUnit.o D:/Roman/TPO/Source/FuncUnit.o D:/Roman/TPO/Source/IrqHandlerUnit.o D:/Roman/TPO/Source/MkoXchgUnit.o D:/Roman/TPO/Source/ControlUnit.o D:/Roman/TPO/Source/CrcUnit.o D:/Roman/TPO/Source/CmdHandlerUnit.o D:/Roman/TPO/Source/DebugUnit.o D:/Roman/TPO/Source/CmdHandlerKoiUnit.o D:/Roman/TPO/Source/CmdHandlerErtiUnit.o D:/Roman/TPO/Source/IrqHandlerKoiUnit.o D:/Roman/TPO/Source/IrqHandlerErtiUnit.o D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o D:/Roman/TPO/Source/PacketMkoMsgUnit.o D:/Roman/TPO/Source/MkoMirrorUnit.o D:/Roman/TPO/Source/MkoStressTestUnit.o D:/Roman/TPO/Source/BkoiUnit.o D:/Roman/TPO/Source/BkoiTableUnit.o D:/Roman/TPO/Source/BaloiUnit_v10.o  S:/Target/BOS/CBK/LIB/libBOS.a  S:/TSRP/CDS/LIB/libR3.a  -Ttext 0x1fc80100 -Tdata 0x00080004 -e MainTask   
+D:/Roman/TPO/Source/CmdHandlerUnit.o: In function `KpaCommandFF':
+D:\Roman\TPO\Source/D:/Roman/TPO/Source/CmdHandlerUnit.c:2341: undefined reference to `SpoVersionCode'
+D:\Roman\TPO\Source/D:/Roman/TPO/Source/CmdHandlerUnit.c:2343: undefined reference to `SpoVersionCode'
+D:\Roman\TPO\Source/D:/Roman/TPO/Source/CmdHandlerUnit.c:2346: undefined reference to `SpoVersionStr'
+D:\Roman\TPO\Source/D:/Roman/TPO/Source/CmdHandlerUnit.c:2347: undefined reference to `SpoVersionStr'
+make: *** [MainProject.e] Error 0x1
+make.exe: *** [build] Error 0x2
