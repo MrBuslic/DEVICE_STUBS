@@ -11,6 +11,7 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
+	int unfoi_map_channels_setup(int _n, short _chan);
 	int unfoi_chan_setup(int _n, short _chan, double _u, double _t);
 	int unfoi_run();
 	////////////////////////////////////

@@ -27,13 +27,13 @@ class RpcFoiWidget : public QWidget
 public:
 	RpcFoiWidget();
 public slots:
-	int unfoi_map_setup(int _n, short _chan);//todo определить вид входных данных
+	int unfoi_map_channels_setup(int _n, short _chan);
 	int unfoi_chan_setup(int _n, short _chan, double _u, double _t);
 	int unfoi_run();
 private:
 	int n;
 	short chan;
-	QMap<int, int> mapChannels;//словарь исправности каналов
+	QMap<int, int> map_channels;//словарь исправности каналов
 
 	RPC_interrupt_bus_SLOT_Thread interrupt_slot_thr;
 	RPC_interrupt_bus_SIGNAL_Thread interrupt_signal_thr;

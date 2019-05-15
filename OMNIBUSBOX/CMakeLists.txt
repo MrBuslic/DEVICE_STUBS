@@ -13,7 +13,7 @@ find_package(Qt5Widgets)
 find_package(Qt5Network)
  find_package (Qt5Script)
 
- include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})
 include_directories($ENV{MONGO_HOME}/include)

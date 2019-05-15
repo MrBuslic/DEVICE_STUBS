@@ -23,6 +23,8 @@ public slots:
 	void get_i(int bus, double& curr);
 
 	void set_i(int bus, QString name, double curr);
+
+	void set_bus_state(int bus, int state);
 private slots:
 	void set_on();
 	void set_off();
@@ -45,6 +47,8 @@ private:
 	QMap<QString, double> nk_curr_map;
 	QMap<QString, double> k1_curr_map;
 	QMap<QString, double> k2_curr_map;
+
+	QMap<int, int> power_bus_state_map;//1 - work; 0 - break
 
 	QPushButton* on_btn;
 	QPushButton* off_btn;

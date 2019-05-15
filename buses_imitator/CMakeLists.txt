@@ -10,13 +10,10 @@ find_package (Qt5Gui)
 find_package(Qt5Widgets)
 find_package(Qt5Network)
 
-
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
 add_definitions(${Qt5Network_DEFINITIONS})
-
-
 
 include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})

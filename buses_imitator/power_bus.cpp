@@ -12,6 +12,7 @@ PowerWidget::PowerWidget(QWidget *parent)
 	LogWidget* log_w = new LogWidget();
 	log_w->show();
 	setFixedSize(250, 80);
+	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = POWER_SLOT;
@@ -44,8 +45,9 @@ PowerWidget::PowerWidget(QWidget *parent)
 
 void PowerWidget::set_u(int bus, double volt) //
 {
+	if (!power_bus_state_map[bus]) volt = 0;
 	switch (bus)
-	{
+	{	
 	case NK:
 		nk_volt = volt;
 		emit u_on_nk(volt);
@@ -63,6 +65,12 @@ void PowerWidget::set_u(int bus, double volt) //
 
 void PowerWidget::get_i(int bus, double& curr)
 {
+	if (!power_bus_state_map[bus])
+	{
+		curr = 0;
+		return;
+	}
+
 	double tmp_curr = 0;
 	switch (bus)
 	{
@@ -106,8 +114,12 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 	case K2:
 		k2_curr_map[name] = curr;
 		break;
-
 	}
+}
+
+void PowerWidget::set_bus_state(int bus, int state)
+{
+	power_bus_state_map[bus] = state;
 }
 
 void PowerWidget::set_on()

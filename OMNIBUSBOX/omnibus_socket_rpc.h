@@ -105,9 +105,11 @@ public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant log_timer_ontimer(QVariantList& _values);
+	QVariant switch_ab_os(QVariantList& _values);
 	QVariant switch_ab(QVariantList& _values);
 	QVariant set_new_data(QVariantList& _values);
 	QVariant send_msg(QVariantList& _values);
+	QVariant unomnibus_map_channels_setup(QVariantList& _values);
 	QVariant get_dt(QVariantList& _values);
 	QVariant message_to_log_slot(QVariantList& _values);
 public slots:

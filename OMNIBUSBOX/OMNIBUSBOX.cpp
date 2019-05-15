@@ -25,6 +25,7 @@ union MkoWord
 
 RpcOmnibusWidget::RpcOmnibusWidget() : QWidget(), auto_scroll(true)
 {
+	for (int i = 1; i <= 2; i++) map_channels[i] = 3;//инициализация мап исправных каналов
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	edit = new QTextEdit(this);
 	_scroll_bar = edit->verticalScrollBar();
@@ -105,6 +106,14 @@ void RpcOmnibusWidget::message_to_log_slot(QString _msg)
 		_scroll_bar->setValue(_scroll_bar->maximum());
 }
 
+void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os)
+{
+	abonents[mko][addr].os = _os;
+	QString _msg = QString("%1 абонент с адресом %2 на МКО %3 с ответным словом %4").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(addr).arg(mko).arg(_os);
+	emit message_to_log(_msg);
+}
+
+
 void RpcOmnibusWidget::switch_ab(int mko, int addr, bool _on)
 {
 	abonents[mko][addr].on = _on;
@@ -124,9 +133,16 @@ void RpcOmnibusWidget::set_new_data(int mko, int addr, int saddr, QVariantList w
 
 void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words, int& os)
 {
-	MkoWord tmp_cwd;
+	MkoWord tmp_cwd;	
 	tmp_cwd.cw = cwd;
+	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
 
+	if (!(map_channels[mko] & work_line))
+	{
+		QString _msg = QString("%1 МКО %2 канал %3 не работает").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mko).arg(line);
+		emit message_to_log(_msg);
+		return;
+	}
 	if (abonents[mko][tmp_cwd.adr].on)
 	{
 		os = abonents[mko][tmp_cwd.adr].os;
@@ -175,4 +191,10 @@ void RpcOmnibusWidget::log_timer_ontimer()
 	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
 		log_stream << *itr << "\n";
 	log_file.close();
+}
+
+int RpcOmnibusWidget::unomnibus_map_channels_setup(int _n, short _chan)
+{
+	map_channels[_n] = _chan;
+	return 0;
 }
