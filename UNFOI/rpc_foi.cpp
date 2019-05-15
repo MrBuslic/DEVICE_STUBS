@@ -51,10 +51,8 @@ int RpcFoiWidget::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
 {
 	n = _n;
 	chan = _chan;
-	/*
 	u = _u;
 	t = _t;
-	*/
 	return 0;
 }
 

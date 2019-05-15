@@ -32,6 +32,7 @@ public slots:
 	int unfoi_run();
 private:
 	int n;
+	double u, t;
 	short chan;
 	QMap<int, int> map_channels;//словарь исправности каналов
 
