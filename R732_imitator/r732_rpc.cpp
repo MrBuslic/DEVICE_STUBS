@@ -166,6 +166,38 @@ void RPC_r732_SLOT_Object::set_new_mbk02_tm(int sadr, int word)
 	dynamic_call("set_new_mbk02_tm(int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r732 dynamic_call finished set_new_mbk02_tm");
 }
+void RPC_r732_SLOT_Object::get_power(double volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(volt);
+	SRPCSignalClass::Instance().toLog(QString("r732 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_power(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r732 dynamic_call finished get_power");
+}
+void RPC_r732_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(line_m);
+	tmp_list << QVariant(line_p);
+	SRPCSignalClass::Instance().toLog(QString("r732 dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r732 dynamic_call finished new_mk");
+}
+void RPC_r732_SLOT_Object::new_kpi(QVariantList kpi)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(kpi);
+	SRPCSignalClass::Instance().toLog(QString("r732 dynamic_call new_kpi %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_kpi(QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r732 dynamic_call finished new_kpi");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

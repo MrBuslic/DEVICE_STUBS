@@ -414,8 +414,12 @@ BTICardAPI ERRVAL __stdcall BTICard_SeqClear(HCORE handleval){ return 0; }
 BTICardAPI USHORT __stdcall BTICard_SeqCommRd(LPUSHORT buf, USHORT bufcount, HCORE handleval){ return Srpc_buffer_class::Instance().get_msgs_size(); }
 BTICardAPI ERRVAL __stdcall BTICard_SeqConfig(ULONG configval,HCORE handleval)
 {
-	RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
-	QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	if (!Srpc_buffer_class::Instance().signal_connected)
+	{
+		Srpc_buffer_class::Instance().signal_connected = true;
+		RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
+		QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	}
 	return 0;
 }
 BTICardAPI ERRVAL __stdcall BTICard_SeqConfigEx(ULONG configval,ULONG seqcount,USHORT cardnum,HCORE handleval){ return 0; }

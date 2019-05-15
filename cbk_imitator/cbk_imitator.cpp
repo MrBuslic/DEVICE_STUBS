@@ -1,4 +1,5 @@
 #include "cbk_imitator.h"
+#include "rpc_ports.h"
 
 enum eControlChan
 {
@@ -86,6 +87,8 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 	QObject::connect(MFSK_RE, SIGNAL(clicked()), this, SLOT(reconnectMFSK()));
 
 	VM_init();
+	connectMDS();
+	connectMFSK();
 }
 
 QGroupBox *CBK_MainWindow::createVM1Group()
@@ -223,9 +226,10 @@ QGroupBox *CBK_MainWindow::createMDS32Group()
 
 	ipMDS_Edit = new QLineEdit();
 	ipMDS_Edit->setFixedSize(70, 25);
+	ipMDS_Edit->setText("127.0.0.1");
 	portMDS_Edit = new QLineEdit();
 	portMDS_Edit->setFixedSize(70, 25);
-
+	portMDS_Edit->setText(QString::number(MDS_SIGNAL));
 
 	MDS_ON = new QPushButton("Connect");
 	MDS_ON->setFixedWidth(100);
@@ -252,12 +256,13 @@ QGroupBox *CBK_MainWindow::createMFSK24Group()
 	portMFSK_Label = new QLabel("Порт сервера МФСК-24:");
 	portMFSK_Label->setFixedSize(130, 25);
 	portMFSK_Label->setAlignment(Qt::AlignLeft);
-
+	
 	ipMFSK_Edit = new QLineEdit();
 	ipMFSK_Edit->setFixedSize(70, 25);
+	ipMFSK_Edit->setText("127.0.0.1");
 	portMFSK_Edit = new QLineEdit();
 	portMFSK_Edit->setFixedSize(70, 25);
-
+	portMFSK_Edit->setText(QString::number(MFSK_SIGNAL));
 
 	MFSK_ON = new QPushButton("Connect");
 	MFSK_ON->setFixedWidth(100);
@@ -509,16 +514,16 @@ void CBK_MainWindow::read_settings()
 	VM4_Label->setText(str);
 	VM4_Label->setAlignment(Qt::AlignCenter);
 	m_settings->endGroup();
-	m_settings->beginGroup("Connection_Settings");
-	str = m_settings->value("MDS_Server_IP", l_str).toString();
-	ipMDS_Edit->setText(str);
-	str = m_settings->value("MDS_Server_Port", l_str).toString();
-	portMDS_Edit->setText(str);
-	str = m_settings->value("MFSK_Server_IP", l_str).toString();
-	ipMFSK_Edit->setText(str);
-	str = m_settings->value("MFSK_Server_Port", l_str).toString();
-	portMFSK_Edit->setText(str);
-	m_settings->endGroup();
+	//m_settings->beginGroup("Connection_Settings");
+	//str = m_settings->value("MDS_Server_IP", l_str).toString();
+	//ipMDS_Edit->setText(str);
+	//str = m_settings->value("MDS_Server_Port", l_str).toString();
+	//portMDS_Edit->setText(str);
+	//str = m_settings->value("MFSK_Server_IP", l_str).toString();
+	//ipMFSK_Edit->setText(str);
+	//str = m_settings->value("MFSK_Server_Port", l_str).toString();
+	//portMFSK_Edit->setText(str);
+	//m_settings->endGroup();
 }
 
 void CBK_MainWindow::closeEvent(QCloseEvent* event)

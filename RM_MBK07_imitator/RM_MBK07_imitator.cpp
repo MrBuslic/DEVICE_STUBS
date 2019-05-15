@@ -1,5 +1,5 @@
 #include "RM_MBK07_imitator.h"
-
+#include <qapplication.h>
 RM_MBK07_imitator::RM_MBK07_imitator()  
 {
 	widg = new QWidget(this);
@@ -51,15 +51,34 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 		ip = "127.0.0.1";
 	bool t = _sock.bind(QHostAddress(ip), 10001);
 
-	serv_sock.listen(QHostAddress("127.0.0.1"), 5025);
+	serv_sock.listen(QHostAddress("127.0.0.1"), 30302);
 
 
 	connect(&_sock, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error_Slot(QAbstractSocket::SocketError)));
 	connect(&_sock, &QUdpSocket::readyRead, this, &RM_MBK07_imitator::read);
 	connect(&serv_sock, &QTcpServer::newConnection, this, &RM_MBK07_imitator::connect_ag);
 	
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start();
 
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start();
+
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в ");	// Mkprm?
+
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_07(QString, int, int, int, QString, QVariant)), this, SLOT(new_frame_07(QString, int, int, int, QString, QVariant)));
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("rmmbk07_geometry").toByteArray());
 	//connect(_sock, SIGNAL(readyRead()), SLOT(read()));
+}
+
+void RM_MBK07_imitator::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("rmmbk07_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 RM_MBK07_imitator::~RM_MBK07_imitator()
@@ -72,6 +91,7 @@ RM_MBK07_imitator::~RM_MBK07_imitator()
 	delete liters_label;
 	delete antenna_label;
 	delete _scroll_bar;
+	delete log_edit;
 	delete gridLayout;
 	delete widg;
 
@@ -136,16 +156,19 @@ bool RM_MBK07_imitator::selectAntenna(char data)
 	if (data == '\01')
 	{
 		antenna_label->setText("Антенна: ОНА");
+		ant = "ОНА";
 		return true;
 	}
 	if (data == '\00')
 	{
 		antenna_label->setText("Антенна: МНА_плюс_У");
+		ant = "МНА+Y";
 		return true;
 	}
 	if (data == '\02')
 	{
 		antenna_label->setText("Антенна: МНА_минус_У");
+		ant = "МНА-Y";
 		return true;
 	}
 	return false;
@@ -209,9 +232,9 @@ void RM_MBK07_imitator::read()
 				if (const_sockbuf[4] == '\xAA')
 				{
 					if (const_sockbuf[10] == '\x11')
-						mode = "ПИ-15";
+						mode = "ПИ15";
 					if (const_sockbuf[10] == '\x22')
-						mode = "ПИ-8";
+						mode = "ПИ8";
 					if (const_sockbuf[10] == '\x33')
 						mode = "ВТФ";
 					if (const_sockbuf[10] == '\x44')
@@ -266,9 +289,15 @@ void RM_MBK07_imitator::read()
 						if(IM == "")	// Иначе если просто ставили ИМ, псп потеряется
 							PSP = "";
 						if (isset(dataMKO, 6) && isset(dataMKO, 14))
+						{
 							FM = "ФМ15 ";
+							fm = 2;
+						}
 						if (!isset(dataMKO, 6) && !isset(dataMKO, 14))
+						{
 							FM = "ФМ1,5 ";
+							fm = 1;
+						}
 
 						rezhim_label->setText(QString("Режим: %1 %2 %3 %4").arg(mode).arg(PSP).arg(FM).arg(IM));
 						break;
@@ -331,7 +360,7 @@ void RM_MBK07_imitator::read_ag()
 		const double STEP_LIT = 0.02;
 		const double magic = 0.001;		// Для корректного округления. Иначе с 16-ой литеры расчитывает на 1 литеру меньше
 
-		int currLit = ((ZERO_LIT - GHz) + magic) / STEP_LIT;
+		currLit = ((ZERO_LIT - GHz) + magic) / STEP_LIT;
 		liters_label->setText("Литера: " + QString::number(currLit));
 	}
 
@@ -340,4 +369,19 @@ void RM_MBK07_imitator::read_ag()
 		QString s = QString::number(GHz*1e9);
 		_ag_sock->write(s.toStdString().c_str());
 	}
+}
+
+void RM_MBK07_imitator::new_frame_07(QString mode_in, int psp_in, int lit_in, int _fm, QString _ant, QVariant frame_data)
+{
+	if (IM == "ИМ")
+		return;
+	if ((mode != mode_in) || (currLit != lit_in) || (ant != _ant))
+		return;
+
+	if ((mode == "ПИ8") && ((fm != _fm) || (PSP.right(1).toInt() != psp_in)))
+		return;
+
+	frame_slot_thr.get_frame_bus_obj()->make_new_frame_rm07(mode_in, frame_data);
+
+	return;
 }

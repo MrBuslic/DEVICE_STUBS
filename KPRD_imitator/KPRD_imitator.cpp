@@ -5,18 +5,24 @@
 KPRD_imitator::KPRD_imitator()  
 {
 	widg = new QWidget(this);
+	antenna_name_list << "МНА1+Y" << "МНА1-Y" << "МНА2+Y" << "МНА2-Y";
+	QMap<QString, QString>::iterator map_it;
+	QList<QString>::iterator list_it;
+	for (map_it = kprd_state_map.begin(), list_it = antenna_name_list.begin(); 
+		map_it != kprd_state_map.end(), list_it != antenna_name_list.end(); map_it++, list_it++) map_it.value = list_it;
+
 	setCentralWidget(widg);
 	setWindowTitle("Имитатор КПРД");
 
 	pause_btn = new QPushButton("П", widg);
 	pause_btn->setFixedWidth(150);
-	pause_btn->setFixedHeight(100);
+	pause_btn->setFixedHeight(50);
 	zero_btn = new QPushButton("0", widg);
 	zero_btn->setFixedWidth(150);
-	zero_btn->setFixedHeight(100);
+	zero_btn->setFixedHeight(50);
 	one_btn = new QPushButton("1", widg);
 	one_btn->setFixedWidth(150);
-	one_btn->setFixedHeight(100);
+	one_btn->setFixedHeight(50);
 
 	generetors_label = new QLabel("Генераторы", widg);
 	pause_kod_label = new QLabel("Код: ", widg);
@@ -99,6 +105,17 @@ KPRD_imitator::KPRD_imitator()
 		//this->deleteLater();
 		return;
 	}
+
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("kprd_geometry").toByteArray());
+}
+
+void KPRD_imitator::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("kprd_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 KPRD_imitator::~KPRD_imitator()
@@ -206,7 +223,7 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 		qulonglong attenuation_val = val1 + val2;
 		attenuation_label->setText("Ослабление: " + QString::number(attenuation_val));
 		qulonglong antenna_name = res << 12 >> 60;
-		QString antenna = set_antenna_label(antenna_name);
+		QString antenna = kprd_state_map[set_antenna_label(antenna_name)];
 
 		QVariantList KPI;
 
@@ -334,4 +351,9 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 	}	// for
 	log_edit->setText("Выдано: " + KPIString + "\n");
 	kpi_slot_thr.get_kpi_bus_obj()->make_KPI(kpi_list);
+}
+
+void KPRD_imitator::set_antenna_connection(QString antenna_name, QString connected_antenna_name)
+{
+	kprd_state_map[antenna_name] = connected_antenna_name;
 }

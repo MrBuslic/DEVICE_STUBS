@@ -193,6 +193,8 @@ BECH_widg::BECH_widg(QWidget *parent) : LKA_sett(QCoreApplication::applicationDi
 	All_vblay->addWidget(edit);
 	All_vblay->addWidget(auto_scroll_box);
 
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("bech_geometry").toByteArray());
 }
 
 void BECH_widg::BECH_interrupt_setup()
@@ -237,6 +239,8 @@ void BECH_widg::imit_off()
 		return;
 	flag_on = false;
 	msg_to_log("Питание отключено");
+	warm_og_tmr->stop();
+	set_warm_og();
 	current_OG = OG_ERR;
 	current_FINIK = FINIK_ERR;
 	current_FINIK_REZH = FINIK_REZH_ERR;
@@ -610,4 +614,11 @@ BECH_widg::~BECH_widg()
 
 	power_slot_thr.quit();
 	power_signal_thr.quit();
+}
+
+void BECH_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("bech_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }

@@ -76,7 +76,7 @@ RpcMDS32Widget::RpcMDS32Widget(int mds_num) : QWidget(), auto_scroll(true)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, MDS_SIGNAL+mds_num);
 	rpc_signal_srv->start();
-	setWindowTitle(QString("mds32 %1").arg(mds_num - 30019));
+	setWindowTitle(QString("mds32 %1").arg(mds_num));
 }
 
 void RpcMDS32Widget::check_box_clicked()

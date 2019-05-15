@@ -166,6 +166,9 @@ private:
 
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
+
+protected:
+	void closeEvent(QCloseEvent *event);
 };
 
 #endif // BECH_H

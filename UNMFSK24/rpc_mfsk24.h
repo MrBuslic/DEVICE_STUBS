@@ -24,7 +24,7 @@ class RpcMFSK24Widget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcMFSK24Widget(int slot_port, int signal_port);
+	RpcMFSK24Widget(int mfsk_num);
 public slots:
 
 	void auto_scroll_clicked(int _state);

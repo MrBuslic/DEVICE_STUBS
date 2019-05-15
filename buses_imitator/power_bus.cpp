@@ -1,14 +1,18 @@
 #include "power_bus.h"
 #include "rpc_loger.h"
 #include <QMessageBox>
+#include <qsettings.h>
+#include <qapplication.h>
 
 #include "rpc_ports.h"
 #include "power_bus_socket_rpc.h"
 
 PowerWidget::PowerWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget(this);
-
+	LogWidget* log_w = new LogWidget();
+	log_w->show();
+	setFixedSize(250, 80);
+	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = POWER_SLOT;
@@ -21,17 +25,29 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
+
+	on_btn = new QPushButton("–í–∫–ª", this);
+	off_btn = new QPushButton("–û—Ç–∫–ª", this);
+	QVBoxLayout* lay = new QVBoxLayout(this);
+	lay->addWidget(on_btn);
+	lay->addWidget(off_btn);
+	connect(on_btn, &QPushButton::clicked, this, &PowerWidget::set_on);
+	connect(off_btn, &QPushButton::clicked, this, &PowerWidget::set_off);
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("power_geometry").toByteArray());
 }
 
-//Õ  - Ã¡ -07, Ã¡ -04, Ã¡ -02, ¡”œ
-// 1 - À ¿-05, ¿—Õ, ¡›◊, ÷¡ 
-// 2 - 14–733, 14–732
+//–ù–ö - –ú–ë–ö-07, –ú–ë–ö-04, –ú–ë–ö-02, –ë–£–ü
+//–ö1 - –õ–ö–ê-05, –ê–°–ù, –ë–≠–ß, –¶–ë–ö
+//–ö2 - 14–†733, 14–†732
 
 
 void PowerWidget::set_u(int bus, double volt) //
 {
+	if (!power_bus_state_map[bus]) volt = 0;
 	switch (bus)
-	{
+	{	
 	case NK:
 		nk_volt = volt;
 		emit u_on_nk(volt);
@@ -49,6 +65,12 @@ void PowerWidget::set_u(int bus, double volt) //
 
 void PowerWidget::get_i(int bus, double& curr)
 {
+	if (!power_bus_state_map[bus])
+	{
+		curr = 0;
+		return;
+	}
+
 	double tmp_curr = 0;
 	switch (bus)
 	{
@@ -92,6 +114,32 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 	case K2:
 		k2_curr_map[name] = curr;
 		break;
-
 	}
+}
+
+void PowerWidget::set_bus_state(int bus, int state)
+{
+	power_bus_state_map[bus] = state;
+}
+
+void PowerWidget::set_on()
+{
+	for (int i = 1; i < 4; i++)
+	{
+		set_u(i, 27);
+	}
+}
+
+void PowerWidget::set_off()
+{
+	for (int i = 1; i < 4; i++)
+	{
+		set_u(i, 0);
+	}
+}
+void PowerWidget::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("power_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }

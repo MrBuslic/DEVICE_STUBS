@@ -23,7 +23,7 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 
 	mode_names.insert(full_mode::PI15, "ПИ15");
 	mode_names.insert(full_mode::PI8, "ПИ8");
-	mode_names.insert(full_mode::WTF8, "ВТФ8");
+	mode_names.insert(full_mode::WTF8, "ВТФ");
 	mode_names.insert(full_mode::ERR, "");
 
 	stab_names.insert(STAB::LOW_STAB, "НС");
@@ -32,9 +32,9 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	stab_names.insert(STAB::KG2_STAB, "КГ 2");
 	stab_names.insert(STAB::OFF_STAB, "");
 
-	ant_names.insert(ANTENNA::OHA, "OHA");
-	ant_names.insert(ANTENNA::MHAPY, "MHA+Y");
-	ant_names.insert(ANTENNA::MHAMY, "MHA-Y");
+	ant_names.insert(ANTENNA::OHA, "ОНА");
+	ant_names.insert(ANTENNA::MHAPY, "МНА+Y");
+	ant_names.insert(ANTENNA::MHAMY, "МНА-Y");
 	ant_names.insert(ANTENNA::ANT_OFF, "");
 
 	for (int i = 0; i < 9; i++)
@@ -161,18 +161,18 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	}
 
 
-	//frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
-	//frame_slot_thr.start(); // вот тут падает
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start(); // вот тут падает
 
-	//frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
-	//frame_signal_thr.start(); // вот тут падает
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start(); // вот тут падает
 
-	//if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
-	//	this->deleteLater();
-	//	return;
-	//}
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus");
+		this->deleteLater();
+		return;
+	}
 
 	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
@@ -180,7 +180,7 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
-	//connect(frame_signal_thr.get_obj().get(), SIGNAL(), this, SLOT(get_frame()));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_733(QString, QVariant)), this, SLOT(get_frame(QString, QVariant)));
 
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
@@ -189,6 +189,23 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	connect(&log_timer, &QTimer::timeout, this, &MBK07_widg::log_timer_ontimer);
 	log_timer.start(200);
 
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("mbk07_geometry").toByteArray());
+}
+
+void MBK07_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("mbk07_geometry", saveGeometry());
+	QWidget::closeEvent(event);
+}
+
+void MBK07_widg::get_frame(QString mode, QVariant frame_data)
+{
+	if ((mode_names.value(full_mode(current_mode)) == mode) && (current_FSMU != FSMU_OFF))
+	{
+		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, pi8_fast ? 2 : 1, ant_names[current_antenna], frame_data);
+	}
 }
 
 void MBK07_widg::get_power(double _volt)
@@ -204,10 +221,10 @@ void MBK07_widg::change_power()
 {
 	//Надо подправить - при включении не выставлены каналы ФСМУ и ФСВУ
 	//power = 0.5;
-	if (current_FSMU != FSMU_OFF) 
+	if (current_FSMU != FSMU_OFF)
 	{
 		power = 150;
-		if (current_FSVU != FSVU_OFF) 
+		if (current_FSVU != FSVU_OFF)
 			power = 180;
 	}
 	else
@@ -262,29 +279,32 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 {
 	if (volt != 0)
 	{
+		if ((pshm == 11) && (mshm == 3)) return;
 		QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 		msg_to_log(_msg);
 
 		int tmp_mshm = mshm;
 		int tmp_pshm = pshm - 8;
-
-		switch (tmp_mshm)
+		if ((pshm >= 8) && (pshm <= 11) && (mshm >= 0) && (mshm <= 3))
 		{
-		case 0:
-			current_FSMU = FSMU_numbB(tmp_pshm);
-			break;
-		case 1:
-			current_stab = STAB(tmp_pshm);
-			break;
-		case 2:
-			current_FSVU = FSVU_numbB(tmp_pshm);
-			break;
-		case 3:
-			current_antenna = ANTENNA(tmp_pshm);
-			break;
+			switch (tmp_mshm)
+			{
+			case 0:
+				current_FSMU = FSMU_numbB(tmp_pshm);
+				break;
+			case 1:
+				current_stab = STAB(tmp_pshm);
+				break;
+			case 2:
+				current_FSVU = FSVU_numbB(tmp_pshm);
+				break;
+			case 3:
+				current_antenna = ANTENNA(tmp_pshm);
+				break;
+			}
+			update_graphics();
+			set_new_tm();
 		}
-		update_graphics();
-		set_new_tm();
 	}
 }
 

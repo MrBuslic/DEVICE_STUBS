@@ -185,7 +185,17 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	paint_buttons();
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("lka05_geometry").toByteArray());
 //	set_new_tm();
+}
+
+void LKA05_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("lka05_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }
 
 LKA05_widg::~LKA05_widg()
@@ -197,6 +207,8 @@ void LKA05_widg::imit_off()
 {
 	if (!flag_on)
 		return;
+	if (AbOn_tmr->isActive())
+		AbOn_tmr->stop();
 //	msg_to_log("Питание отключено");
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	flag_on = false;

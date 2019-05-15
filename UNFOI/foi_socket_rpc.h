@@ -101,6 +101,7 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
+	QVariant unfoi_map_channels_setup(QVariantList& _values);
 	QVariant unfoi_chan_setup(QVariantList& _values);
 	QVariant unfoi_run(QVariantList& _values);
 public slots:

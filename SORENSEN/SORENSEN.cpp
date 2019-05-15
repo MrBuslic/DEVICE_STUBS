@@ -25,7 +25,7 @@ SORENSENWidget::SORENSENWidget() : QWidget(), u(0.0), i(0.0)
 	server = new QTcpServer();
 	connect(server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
 	connect(this, &SORENSENWidget::update_graphics_signal, this, &SORENSENWidget::update_graphics);
-	server->listen(QHostAddress::Any, 5025);
+	server->listen(QHostAddress::Any, SORENSEN_PORT);
 
 	kp50_slot_thr.set_connection_params("127.0.0.1", KP50_SLOT);
 	kp50_slot_thr.start();

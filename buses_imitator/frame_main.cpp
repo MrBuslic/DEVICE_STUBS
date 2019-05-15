@@ -19,8 +19,8 @@ int main(int argc, char **argv)
 //	LogWidget log_w;
 //	log_w.show();
 
-	FrameBusWidget buses_widget;
-	buses_widget.show();
+	FrameBusWidget frame_widget;
+	frame_widget.show();
 
     return app.exec();
 }

@@ -74,6 +74,13 @@ private:
 	RPC_kpi_bus_SLOT_Thread kpi_slot_thr;
 	RPC_kpi_bus_SIGNAL_Thread kpi_signal_thr;
 
+	QList<QString> antenna_name_list;
+	QMap<QString, QString> kprd_state_map;//мапа соединения каналов с антенами
+
+protected:
+	void closeEvent(QCloseEvent *event);
+
+
 signals:
 	void test(QVariantList maskList, QVariantList dataList);
 	//void sendKPI(QString kpiList);
@@ -81,6 +88,7 @@ signals:
 
 public slots:
 	void dataIn(QVariantList dataList, QVariantList maskList);
+	void set_antenna_connection(QString antenna_name, QString connected_antenna_name);
 
 
 };

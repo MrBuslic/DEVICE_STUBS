@@ -3,6 +3,88 @@ cmake_minimum_required(VERSION 2.8)
 
 enable_language(C)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+enable_language(C) #только 1 язык?
+enable_language(CXX)
+	
+add_definitions(${Qt5Core_DEFINITIONS})
+add_definitions(${Qt5Gui_DEFINITIONS})
+add_definitions(${Qt5Widgets_DEFINITIONS})
+add_definitions(${Qt5Network_DEFINITIONS})
+
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(Qt5Network)
+find_package(Qt5Script)
+find_package(Qt5ScriptTools)
+find_package(Qt5PrintSupport)
+
+include_directories($ENV{VISA_HOME}/include)
+include_directories($ENV{MONGO_HOME}/include)
+include_directories($ENV{MONGO_HOME}/include)
+include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
+include_directories($ENV{LOKI_HOME}/include)
+include_directories($ENV{OMNIBUS_HOME}/include)
+
+include_directories(${Qt5Core_INCLUDES})
+include_directories(${Qt5Script_INCLUDES})
+include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Qt5Gui_INCLUDES})
+include_directories(${Qt5Core_INCLUDES})
+include_directories(${Qt5Widgets_INCLUDES})
+include_directories(${Qt5Network_INCLUDES})
+include_directories(${Qt5PrintSupport_INCLUDES})
+include_directories(${Qt5ScriptTools_INCLUDES})
+include_directories(core/lexlib)
+include_directories(core/src)
+include_directories(core/Qt4)
+include_directories(core/qsci)	
+include_directories(core/lexers)
+include_directories(core/include)
+add_definitions(${Qt5PrintSupport_DEFINITIONS})
+add_definitions(-DQSCINTILLA_MAKE_DLL)
+add_definitions(-DQT)
+add_definitions(-DSCI_LEXER)
+add_definitions(-DSTATIC_LIBMONGOCLIENT)
+add_definitions(-DNOMINMAX)
+
+include_directories("../lib/socket_rpc/include")
+include_directories("../vendor/libgit2/include")
+include_directories("../lib/frame_converter")
+include_directories("../lib/my_git")
+include_directories("../lib/common_functions")
+include_directories("../lib/db_ctrl")
+include_directories("../lib/mongo_ctrl")
+include_directories("../vendor/QScintilla/core/Qt4")
+include_directories("../lib/socket_rpc/include")
+include_directories(${QT_QTSCRIPTTOOLS_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/../lib/mongo_ctrl_v3)
+include_directories("OMNIBUSBOX")
+include_directories("UNMDS32")
+include_directories("UNMFSK24")
+include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
+
+include_directories("BECH_imitator")
+include_directories("buses_imitator")
+
+include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
+	
+set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
+	
+if(WIN32)
+	set(MY_WIN_FLAG WIN32)
+	set(CMAKE_CXX_FLAGS "/EHa /Zc:wchar_t")
+	set(ADDITIONAL_LIBS ws2_32)
+else()
+	set(ADDITIONAL_LIBS pthread)
+endif()
+
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
+
 SET (TMP1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) 
 SET (TMP2 ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 SET (TMP3 ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -11,8 +93,8 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1})
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2}/stubs)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 
-add_subdirectory(buses_imitator)
 
+add_subdirectory(buses_imitator)
 
 add_subdirectory(AG7972)
 add_subdirectory(SORENSEN)
@@ -59,6 +141,29 @@ add_subdirectory(BOOP_imitator)
 add_subdirectory(R732_imitator)
 add_subdirectory(R733_imitator)
 add_subdirectory(RM_MBK07_imitator)
+
+#set(SOURCES "cbk_imitator/main.cpp")
+file(GLOB_RECURSE SOURCES *.cpp)
+file(GLOB_RECURSE HEADERS *.h)
+file(GLOB_RECURSE REMOVE_SOURCES "*main.cpp")
+list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
+list(APPEND SOURCES ${PROJECT_SOURCE_DIR}/main.cpp)
+#file(GLOB to_remove main.cpp)
+#list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
+#list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/cbk_imitator/main.cpp)
+
+add_executable(Stubs ${SOURCES} ${HEADERS})
+
+target_link_libraries (Stubs ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+                                      ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc qscintilla db_ctrl) 
+
+if(WIN32)
+	qt5_use_modules(Stubs Core Widgets Network Gui)
+	# SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+endif()
+
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3})
+
+QT5_ADD_RESOURCES(RESOURCES common_functions.qrc) #что делает?

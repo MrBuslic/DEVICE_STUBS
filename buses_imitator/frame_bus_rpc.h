@@ -11,7 +11,10 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void make_new_frame(QString mode, QVariant frame_data);
+	void make_new_frame_04(QString mode, QVariant frame_data);
+	void make_new_frame_733(QString mode, QVariant frame_data);
+	void make_new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
+	void make_new_frame_rm07(QString mode, QVariant frame_data);
 	////////////////////////////////////
 };
 
@@ -46,7 +49,10 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
-	void new_frame(QString mode, QVariant frame_data);
+	void new_frame_04(QString mode, QVariant frame_data);
+	void new_frame_733(QString mode, QVariant frame_data);
+	void new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
+	void new_frame_rm07(QString mode, QVariant frame_data);
 };
 
 class RPC_frame_bus_SIGNAL_Thread : public RPC_SIGNAL_Thread

@@ -157,6 +157,31 @@ void RPC_r733_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd, 
 	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_message");
 }
+void RPC_r733_SLOT_Object::auto_scroll_clicked(int _state)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(_state);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("auto_scroll_clicked(int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished auto_scroll_clicked");
+}
+void RPC_r733_SLOT_Object::get_power(double volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(volt);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_power(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished get_power");
+}
+void RPC_r733_SLOT_Object::new_frame_04(QString mode, QVariant frame_data)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mode);
+	tmp_list << QVariant(frame_data);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call new_frame_04 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_frame_04(QString, QVariant)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_frame_04");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

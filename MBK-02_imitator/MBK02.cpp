@@ -30,6 +30,8 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	Sig_pbut = new QPushButton("Отстутствует", this);
 	Sig_pbut->setMaximumWidth(165);
 
+	non_warm = new QPushButton("Отказаться от прогрева");
+
 	QLabel* Lit_lb = new QLabel("Литера");
 	QLabel* Ant_lb = new QLabel("Антенна");
 
@@ -56,6 +58,7 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	Chan_hblay->addWidget(Chan1_pbut);
 	Chan_hblay->addWidget(Chan2_pbut);
 	Sig_hblay->addWidget(Sig_pbut);
+	Sig_hblay->addWidget(non_warm);
 	Ant_vblay->addWidget(Ant_lb, 0, Qt::AlignHCenter);
 	Ant_vblay->addWidget(Ant_pbut);
 	Lit_vblay->addWidget(Lit_lb, 0, Qt::AlignHCenter);
@@ -148,6 +151,8 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 	connect(kpi_signal_thr.get_obj().get(), SIGNAL(new_KPI(QVariantList)), this, SLOT(new_KPI(QVariantList)));
 
+	connect(non_warm, &QPushButton::clicked, this, &MBK02_widg::break_warm);
+
 	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	QDir dir("d:/logs");
 	if (!dir.exists())
@@ -163,6 +168,30 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	t_err_kpi = new QTimer(this);
 	t_err_kpi->setSingleShot(true);
 	connect(t_err_kpi, &QTimer::timeout, this, &MBK02_widg::lose_cont);
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("mbk02_geometry").toByteArray());
+}
+
+void MBK02_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("mbk02_geometry", saveGeometry());
+	QWidget::closeEvent(event);
+}
+
+void MBK02_widg::break_warm()//дебаг кнопка
+{
+	qint64 msecs_time = (QDateTime::currentMSecsSinceEpoch());
+	warm_chanel_tmr->stop();
+	for (int i = 0; i < 2; i++)
+	{
+		chanel_finish_warm[CHANEL(i)] = msecs_time;
+		chanel_start_warm[CHANEL(i)] = chanel_finish_warm[CHANEL(i)] - standart_tm;
+	}
+	msg_to_log("Все комплекты прогреты");
+	ready_chanel = true;
+	change_power(false);
 }
 
 void MBK02_widg::get_power(double _volt)
@@ -204,7 +233,7 @@ void MBK02_widg::change_power(bool switch_chanel)
 void MBK02_widg::set_power_back()
 {
 	double curr;
-	if (volt >= 1)
+	if (volt > 1)
 		curr = (double)power / volt;
 	else
 		curr = 0.0;
@@ -231,9 +260,13 @@ void MBK02_widg::imit_off()
 	if (!flag_on)
 		return;
 	flag_on = false;
+	warm_chanel_tmr->stop();
+	set_warm_chanel();
 	msg_to_log("Питание отключено");
 	current_chanel = CHANEL_OFF;
 	current_ant = MHAOFF;
+	current_lit = 0;
+	signal_con = false;
 	current_lit = 0;
 	update_graphics();
 }
@@ -298,6 +331,7 @@ void MBK02_widg::set_warm_chanel()
 	if (((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm - warm_er)) || ((chanel_finish_warm[current_chanel] - chanel_start_warm[current_chanel]) >= (standart_tm + warm_er)))
 	{
 		ready_chanel = true;
+		t_ant_ch->stop();
 		update_tm(1);
 		msg_to_log("Прогрелся комплект № " + QString::number(current_chanel + 1));
 		change_power(false);
@@ -365,97 +399,97 @@ void MBK02_widg::_update_time()
 void MBK02_widg::new_KPI(QVariantList KPI_list)
 {
 	if (!ready_chanel) return;
-	else
+	int tmp_in, tmp_len, tmp_weak;
+	QString tmp_str_ant;
+	//t_ant_ch->stop();
+	tmp_len = KPI_list.length();
+	if (current_lit == 0)
 	{
-		current_lit = 2;
-		int tmp_in, tmp_len, tmp_weak;
-		QString tmp_str_ant;
-		//t_ant_ch->stop();
-		tmp_len = KPI_list.length();
-		if (current_lit == 0)
+		msg_to_log("Литера не задана, либо задана нулевая литера");
+		return;
+	}
+	QString tmp_str_KPI = "";
+	bool tmp_correct = true;
+	int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
+	int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
+	int tmp_1 = LITER_PAUSE + (STEP * (current_lit - 1)) + ONE;
+	for (int i = 0; (i < tmp_len); i++)
+	{
+		tmp_list = KPI_list.at(i).toList();
+		tmp_in = tmp_list.at(0).toInt();
+		tmp_str_ant = tmp_list.at(1).toString();
+		tmp_weak = tmp_list.at(2).toInt();
+		tmp_correct = true;
+		switch (current_ant)
 		{
-			msg_to_log("Литера не задана, либо задана нулевая литера");
-			return;
-		}
-		QString tmp_str_KPI;
-		bool tmp_correct = true;
-		int tmp_p = LITER_PAUSE + (STEP * (current_lit - 1));
-		int tmp_0 = LITER_PAUSE + (STEP * (current_lit - 1)) + ZERO;
-		int tmp_1 = LITER_PAUSE + (STEP * (current_lit - 1)) + ONE;
-		for (int i = 0; (i < tmp_len) && (!t_ant_ch->isActive()); i++)
-		{
-			tmp_list = KPI_list.at(i).toList();
-			tmp_in = tmp_list.at(0).toInt();
-			tmp_str_ant = tmp_list.at(1).toString();
-			tmp_weak = tmp_list.at(2).toInt();
-			tmp_correct = true;
-			switch (current_ant)
+		case MHA1MY:
+			if (tmp_str_ant != "МНА1-Y")
 			{
-			case MHA1MY:
-				if (tmp_str_ant != "МНА1-Y")
-				{
-					t_err_kpi->start(5000);
-					tmp_correct = false;
-				}
-				break;
-			case MHA1PY:
-				if (tmp_str_ant != "МНА1+Y")
-				{
-					t_err_kpi->start(5000);
-					tmp_correct = false;
-				}
-				break;
-			case MHA2MY:
-				if (tmp_str_ant != "МНА2-Y")
-				{
-					t_err_kpi->start(5000);
-					tmp_correct = false;
-				}
-				break;
-			case MHA2PY:
-				if (tmp_str_ant != "МНА2+Y")
-				{
-					t_err_kpi->start(5000);
-					tmp_correct = false;
-				}
-				break;
-			default:
-				t_err_kpi->start(5000);
 				tmp_correct = false;
-				break;
 			}
-			if (tmp_correct)
+			break;
+		case MHA1PY:
+			if (tmp_str_ant != "МНА1+Y")
 			{
-				if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI += "P";
-				else
-				{
-					if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI += "1";
-					else
-					{
-						if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI += "0";
-						else tmp_correct = false;
-					}
-				}
-				if ((tmp_weak < 50) || (tmp_weak > 100))
-					tmp_correct = false;
-				if (tmp_correct)
-				{
-					signal_con = true;
-					char tmp_l = tmp_str_KPI.toInt();
-					if (tmp_str_KPI != "P")
-						list_to_R14732.push_back(tmp_l);
-					if (t_err_kpi->isActive() || (i == tmp_len)) t_err_kpi->stop();
-					update_graphics();
-				}
-				else t_err_kpi->start(5000);
+				tmp_correct = false;
 			}
+			break;
+		case MHA2MY:
+			if (tmp_str_ant != "МНА2-Y")
+			{
+				tmp_correct = false;
+			}
+			break;
+		case MHA2PY:
+			if (tmp_str_ant != "МНА2+Y")
+			{
+				tmp_correct = false;
+			}
+			break;
+		default:
+
+			tmp_correct = false;
+			break;
 		}
-		msg_to_log(tmp_str_KPI);
 		if (tmp_correct)
 		{
-			update_tm(26);
-			emit msg_to_14R732(list_to_R14732);
+			if ((tmp_in >= (tmp_p - 7)) && (tmp_in <= (tmp_p + 7))) tmp_str_KPI = "P";
+			else
+			{
+				if ((tmp_in >= tmp_1 - 7) && (tmp_in <= tmp_1 + 7)) tmp_str_KPI = "1";
+				else
+				{
+					if ((tmp_in >= tmp_0 - 7) && (tmp_in <= tmp_0 + 7)) tmp_str_KPI = "0";
+					else tmp_correct = false;
+				}
+			}
+			if ((tmp_weak < 50) || (tmp_weak > 100))
+				tmp_correct = false;
+			if (tmp_correct)
+			{
+				if (!signal_con)
+				{
+					t_ant_ch->stop();
+					signal_con = true;
+				}
+				if (tmp_str_KPI != "P")
+				{
+					char tmp_l = tmp_str_KPI.toInt();
+					list_to_R14732.push_back(tmp_l);
+				}
+				if (t_err_kpi->isActive()) t_err_kpi->stop();
+				update_graphics();
+			}
 		}
+		if (!tmp_correct && signal_con && !t_err_kpi->isActive())
+			t_err_kpi->start(5000);
+	}
+	//msg_to_log(tmp_str_KPI);
+	if (!list_to_R14732.empty())
+	{
+		update_tm(26);
+		emit msg_to_14R732(list_to_R14732);
+		list_to_R14732.clear();
 	}
 }
 
@@ -655,6 +689,10 @@ void MBK02_widg::update_graphics()
 		case CHANEL_2:
 			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 			Chan2_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
+			break;
+		case CHANEL_OFF: 
+			Chan1_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
+			Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
 		}
 	}

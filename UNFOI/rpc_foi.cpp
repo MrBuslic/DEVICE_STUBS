@@ -12,7 +12,7 @@
 RpcFoiWidget::RpcFoiWidget() : QWidget()
 {
 	LogWidget* log_widg = new LogWidget(this);
-	for (int i = 1; i <= 12; i++) mapChannels[i] = 3;//инициализация словаря исправных каналов
+	for (int i = 1; i <= 12; i++) map_channels[i] = 3;//инициализация словаря исправных каналов
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = FOI_SLOT;
@@ -41,9 +41,9 @@ RpcFoiWidget::RpcFoiWidget() : QWidget()
 	}
 }
 
-int RpcFoiWidget::unfoi_map_setup(int _n, short _chan)
+int RpcFoiWidget::unfoi_map_channels_setup(int _n, short _chan)
 {
-	mapChannels[_n] = _chan;
+	map_channels[_n] = _chan;
 	return 0;
 }
 
@@ -63,13 +63,13 @@ int RpcFoiWidget::unfoi_run()
 	//SRPCSignalClass::Instance().toLog(QString("Выдаю сигнал на канале %1 линии %2 с амплитудой %3 и длительностью %4").arg(n).arg(chan).arg(u).arg(t));
 	//QMapIterator<int, int> it (mapChannels);
 	//QMap<int, int>::iterator it = mapChannels.begin();
-	if (mapChannels[n] & chan) {//todo обращение к индикатору исправности канала
+	if (map_channels[n] & chan) {//todo обращение к индикатору исправности канала
 		SRPCSignalClass::Instance().toLog(QString("Выдаю сигнал на канале %1 линии %2").arg(n).arg(chan));
 	}
 	else {
 		SRPCSignalClass::Instance().toLog(QString("Канал %1 не работает").arg(n));
 		return 0;
 	}
-	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan & mapChannels[n], 0, 0);//todo изменить функцию или выбрать значения по умолчанию
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan & map_channels[n], 0, 0);//todo изменить функцию или выбрать значения по умолчанию
 	return 0;
 }

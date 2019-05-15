@@ -76,7 +76,10 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("frame_bus_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["make_new_frame(QString, QVariant)"] = &Socket_RPC_SLOT_Object::make_new_frame;
+		operators_map["make_new_frame_04(QString, QVariant)"] = &Socket_RPC_SLOT_Object::make_new_frame_04;
+		operators_map["make_new_frame_733(QString, QVariant)"] = &Socket_RPC_SLOT_Object::make_new_frame_733;
+		operators_map["make_new_frame_07(QString, int, int, int, QString, QVariant)"] = &Socket_RPC_SLOT_Object::make_new_frame_07;
+		operators_map["make_new_frame_rm07(QString, QVariant)"] = &Socket_RPC_SLOT_Object::make_new_frame_rm07;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -114,13 +117,22 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(new_frame(QString, QVariant)), this, SLOT(new_frame(QString, QVariant)));
+		disconnect(app, SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
+		disconnect(app, SIGNAL(new_frame_733(QString, QVariant)), this, SLOT(new_frame_733(QString, QVariant)));
+		disconnect(app, SIGNAL(new_frame_07(QString, int, int, int, QString, QVariant)), this, SLOT(new_frame_07(QString, int, int, int, QString, QVariant)));
+		disconnect(app, SIGNAL(new_frame_rm07(QString, QVariant)), this, SLOT(new_frame_rm07(QString, QVariant)));
 	}
 	void Socket_RPC_SIGNAL_Object::set_app(FrameBusWidget* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(new_frame(QString, QVariant)), this, SLOT(new_frame(QString, QVariant)), Qt::DirectConnection);
-		data_map.insert("new_frame(QString, QVariant)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)), Qt::DirectConnection);
+		data_map.insert("new_frame_04(QString, QVariant)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_frame_733(QString, QVariant)), this, SLOT(new_frame_733(QString, QVariant)), Qt::DirectConnection);
+		data_map.insert("new_frame_733(QString, QVariant)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_frame_07(QString, int, int, int, QString, QVariant)), this, SLOT(new_frame_07(QString, int, int, int, QString, QVariant)), Qt::DirectConnection);
+		data_map.insert("new_frame_07(QString, int, int, int, QString, QVariant)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_frame_rm07(QString, QVariant)), this, SLOT(new_frame_rm07(QString, QVariant)), Qt::DirectConnection);
+		data_map.insert("new_frame_rm07(QString, QVariant)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -250,30 +262,113 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::new_frame(QString mode, QVariant frame_data)
+	void Socket_RPC_SIGNAL_Object::new_frame_04(QString mode, QVariant frame_data)
 	{
-		auto& descriptor = *data_map["new_frame(QString, QVariant)"].get();
+		auto& descriptor = *data_map["new_frame_04(QString, QVariant)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("new_frame(QString, QVariant)");
+		tmp_stream << QString("new_frame_04(QString, QVariant)");
 		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_frame  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_frame_04  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		tmp_stream << mode;
-		SRPCSignalClass::Instance().toLog(QString("new_frame  call_number %2 mode =  %1").arg(RPCSignalClass::QVariantToString(mode)).arg(call_number));
+		SRPCSignalClass::Instance().toLog(QString("new_frame_04  call_number %2 mode =  %1").arg(RPCSignalClass::QVariantToString(mode)).arg(call_number));
 		tmp_stream << frame_data;
-		SRPCSignalClass::Instance().toLog(QString("new_frame  call_number %2 frame_data =  %1").arg(RPCSignalClass::QVariantToString(frame_data)).arg(call_number));
+		SRPCSignalClass::Instance().toLog(QString("new_frame_04  call_number %2 frame_data =  %1").arg(RPCSignalClass::QVariantToString(frame_data)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
 		tmp_arr2 += tmp_arr;
 		descriptor.mutex.lock();
 		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame sended").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_04 sended").arg(objectName()));
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame finished").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_04 finished").arg(objectName()));
+	}
+	void Socket_RPC_SIGNAL_Object::new_frame_733(QString mode, QVariant frame_data)
+	{
+		auto& descriptor = *data_map["new_frame_733(QString, QVariant)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_frame_733(QString, QVariant)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_frame_733  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << mode;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_733  call_number %2 mode =  %1").arg(RPCSignalClass::QVariantToString(mode)).arg(call_number));
+		tmp_stream << frame_data;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_733  call_number %2 frame_data =  %1").arg(RPCSignalClass::QVariantToString(frame_data)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_733 sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_733 finished").arg(objectName()));
+	}
+	void Socket_RPC_SIGNAL_Object::new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data)
+	{
+		auto& descriptor = *data_map["new_frame_07(QString, int, int, int, QString, QVariant)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_frame_07(QString, int, int, int, QString, QVariant)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_frame_07  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << mode;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_07  call_number %2 mode =  %1").arg(RPCSignalClass::QVariantToString(mode)).arg(call_number));
+		tmp_stream << psp;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_07  call_number %2 psp =  %1").arg(RPCSignalClass::QVariantToString(psp)).arg(call_number));
+		tmp_stream << lit;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_07  call_number %2 lit =  %1").arg(RPCSignalClass::QVariantToString(lit)).arg(call_number));
+		tmp_stream << fm;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_07  call_number %2 fm =  %1").arg(RPCSignalClass::QVariantToString(fm)).arg(call_number));
+		tmp_stream << ant;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_07  call_number %2 ant =  %1").arg(RPCSignalClass::QVariantToString(ant)).arg(call_number));
+		tmp_stream << frame_data;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_07  call_number %2 frame_data =  %1").arg(RPCSignalClass::QVariantToString(frame_data)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_07 sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_07 finished").arg(objectName()));
+	}
+	void Socket_RPC_SIGNAL_Object::new_frame_rm07(QString mode, QVariant frame_data)
+	{
+		auto& descriptor = *data_map["new_frame_rm07(QString, QVariant)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_frame_rm07(QString, QVariant)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_frame_rm07  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << mode;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_rm07  call_number %2 mode =  %1").arg(RPCSignalClass::QVariantToString(mode)).arg(call_number));
+		tmp_stream << frame_data;
+		SRPCSignalClass::Instance().toLog(QString("new_frame_rm07  call_number %2 frame_data =  %1").arg(RPCSignalClass::QVariantToString(frame_data)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_rm07 sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_frame_rm07 finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,14 +382,75 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::make_new_frame(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::make_new_frame_04(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QString mode = _values.at(0).value<QString>();
 			QVariant frame_data = _values.at(1).value<QVariant>();
-			app->make_new_frame(mode, frame_data);
+			app->make_new_frame_04(mode, frame_data);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::make_new_frame_733(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString mode = _values.at(0).value<QString>();
+			QVariant frame_data = _values.at(1).value<QVariant>();
+			app->make_new_frame_733(mode, frame_data);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::make_new_frame_07(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString mode = _values.at(0).value<QString>();
+			int psp = _values.at(1).value<int>();
+			int lit = _values.at(2).value<int>();
+			int fm = _values.at(3).value<int>();
+			QString ant = _values.at(4).value<QString>();
+			QVariant frame_data = _values.at(5).value<QVariant>();
+			app->make_new_frame_07(mode, psp, lit, fm, ant, frame_data);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::make_new_frame_rm07(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString mode = _values.at(0).value<QString>();
+			QVariant frame_data = _values.at(1).value<QVariant>();
+			app->make_new_frame_rm07(mode, frame_data);
 			return 0;
 		}
 		catch(const std::exception &)

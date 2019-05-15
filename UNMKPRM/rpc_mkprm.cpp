@@ -10,7 +10,7 @@
 
 #include <qmessagebox.h>
 
-RpcMKPRMWidget::RpcMKPRMWidget() : QWidget()
+RpcMKPRMWidget::RpcMKPRMWidget() : QWidget(), working(false)
 {
 	LogWidget* log_widg = new LogWidget(this);
 
@@ -40,7 +40,7 @@ RpcMKPRMWidget::RpcMKPRMWidget() : QWidget()
 		return;
 	}
 
-	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame(QString, QVariant)), this, SLOT(new_frame(QString, QVariant)));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_rm07(QString, QVariant)), this, SLOT(new_frame(QString, QVariant)));
 
 	params_mode_map = fp.getParams();
 
@@ -62,6 +62,8 @@ int RpcMKPRMWidget::unmkprm_get_strings(int strings, QVariantList& string_data)
 
 void RpcMKPRMWidget::new_frame(QString mode, QVariant _frame_data)
 {
+	if (!working)
+		return;
 	QByteArray& frame_arr = _frame_data.toByteArray();
 
 	const QList<int>& par_rez = params_mode_map[mode];
@@ -71,13 +73,23 @@ void RpcMKPRMWidget::new_frame(QString mode, QVariant _frame_data)
 
 	for (int i = 0; i < par_rez[0]; i++)
 	{
-		tmp_str_num_arr[0] = i+2;
-		tmp_str_num_arr[1] = 0;
+		string_number++;
+		tmp_str_num_arr[0] = string_number &0xFF;
+		tmp_str_num_arr[1] = (string_number & 0xFF00) >> 8;
 		QByteArray tmp_arr = frame_arr.mid(i* (par_rez[1] + par_rez[26]) + par_rez[26], par_rez[1]);
 		frame_data << QVariant(tmp_str_num_arr + tmp_arr);
 	}
-	//frame_data
 
-	//frame_data = _frame_data;
 }
 
+void RpcMKPRMWidget::unmkprm_start()
+{
+	working = true;
+	string_number = 1;
+	frame_data.clear();
+}
+
+void RpcMKPRMWidget::unmkprm_stop()
+{
+	working = false;
+}

@@ -8,8 +8,10 @@
 MKUWidget::MKUWidget(QWidget *parent)
 {
 	LogWidget* log_w = new LogWidget(this);
-
-
+	for (int i = 1; i <= 8; i++) ku_map_channels[i] = 3;
+	for (int i = 1; i <= 20; i++) mshm_map_channels[i] = 3;
+	for (int i = 1; i <= 20; i++) pshm_map_channels[i] = 3;
+	
 	QString ip_str = "127.0.0.1";
 	int slot_port = MKU_SLOT;
 	int signal_port = MKU_SIGNAL;
@@ -36,4 +38,22 @@ void MKUWidget::make_ku_732(int ku_n, int length, double u, int line)
 void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
+}
+
+int MKUWidget::ku_map_channels_setup(int ku_n, short line)
+{
+	ku_map_channels[ku_n] = line;
+	return 0;
+}
+
+int MKUWidget::mshm_map_channels_setup(int mshm, short line_m)
+{
+	mshm_map_channels[mshm] = line_m;
+	return 0;
+}
+
+int MKUWidget::pshm_map_channels_setup(int pshm, short line_p)
+{
+	pshm_map_channels[pshm] = line_p;
+	return 0;
 }

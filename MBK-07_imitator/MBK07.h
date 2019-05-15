@@ -16,7 +16,7 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
-//#include "../buses_imitator/frame_bus_rpc.h"
+#include "../buses_imitator/frame_bus_rpc.h"
 
 enum FSMU_numbB
 {
@@ -35,9 +35,9 @@ enum FSVU_numbB
 enum STAB
 {
 	LOW_STAB = 0,
-	KG1_STAB = 1,
-	KG2_STAB = 2,
-	HIGH_STAB = 3,
+	HIGH_STAB = 1,
+	KG1_STAB = 2,
+	KG2_STAB = 3,
 	OFF_STAB = 4
 
 };
@@ -53,7 +53,7 @@ enum full_mode
 	ERR = 0,
 	PI15 = 1,
 	PI8 = 2,
-	WTF8 = 3	
+	WTF8 = 4	
 };
 enum PSP
 {
@@ -140,7 +140,9 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 	void get_power(double volt);
-	//void get_frame(int frame);
+	void get_frame(QString mode, QVariant frame_data);
+protected:
+	void closeEvent(QCloseEvent *event);
 signals:
 	void push_frame();
 private:
@@ -178,8 +180,8 @@ private:
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
-//	RPC_frame_bus_SLOT_Thread frame_slot_thr;
-//	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
+	RPC_frame_bus_SLOT_Thread frame_slot_thr;
+	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
 };
 
 #endif // MBK07_H

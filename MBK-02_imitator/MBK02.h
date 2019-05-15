@@ -82,6 +82,7 @@ private:
 	QPushButton *Chan2_pbut;
 	QPushButton *Sig_pbut;
 	QPushButton *Ant_pbut;
+	QPushButton *non_warm;
 	QLineEdit* Lit_le;
 
 	void log_timer_ontimer();
@@ -94,6 +95,7 @@ private:
 	void _update_time();
 	void set_warm_chanel();
 	void set_power_back();
+	void break_warm();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_ku_732(int ku_n, int length, double u, int line);
@@ -106,6 +108,8 @@ signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
 	void set_new_power_tm(int sadr, QVariantList words);
+protected:
+	void closeEvent(QCloseEvent *event);
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
