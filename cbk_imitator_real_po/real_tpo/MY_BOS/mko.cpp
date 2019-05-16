@@ -5,7 +5,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#include "mko_module.h"
+#include "mko_imit_for_sm_tpo.h"
 #include <QVariantList>
 #include "windows.h"
 
@@ -190,6 +190,10 @@ mkoPackIniStart(
 			if (trans_dir == 1)
 			{
 				DescMsgArray[i]->DescMsgRes->Len = words.size();
+				for (int j = 0; j < words.size(); j++)
+				{
+					DescMsgArray[i]->adrData[j] = words[j].toInt();
+				}
 			}
 			else if (trans_dir == 0)
 			{
@@ -205,7 +209,7 @@ mkoPackIniStart(
 			DescPack->DescPackRes->Eof = 1;
 			DescPack->DescPackRes->MissSW = 1;
 			DescPack->DescPackRes->nMsg = i;
-			return -1;
+			return 0;
 		}
 		else
 		{
@@ -214,6 +218,10 @@ mkoPackIniStart(
 			if (trans_dir == 1)
 			{
 				DescMsgArray[i]->DescMsgRes->Len = words.size();
+				for (int j = 0; j < words.size(); j++)
+				{
+					DescMsgArray[i]->adrData[j] = words[j].toInt();
+				}
 			}
 			else if (trans_dir == 0)
 			{
