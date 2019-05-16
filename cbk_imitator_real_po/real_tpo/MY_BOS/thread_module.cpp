@@ -64,8 +64,7 @@ void InterHandlerThread::run()
 
 void InterHandlerThread::process_interrupt(int n_)
 {
-	int mask = 1 << n_;
-	IrqTask(mask);
+	IrqTask(n_);
 	return;
 }
 

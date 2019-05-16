@@ -6,6 +6,7 @@ extern "C" {
 }
 #endif
 #include "task_thread.h"
+#include "interrupt_module.h"
 #include "thread_module.h"
 
 void TasksFactory::lock_mutex(int ind, int timeout)
@@ -105,7 +106,8 @@ extern "C" {
 		sprIMaskVec(
 		USHORT VecMask  /* вектор масок */
 		){
-			return 0;
+		SInterImitObject::Instance().set_IrqMask(VecMask);
+		return 0;
 		}
 
 	STATUS
