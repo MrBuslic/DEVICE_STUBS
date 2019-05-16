@@ -91,6 +91,9 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 	QObject::connect(Get_Time, SIGNAL(clicked()), this, SLOT(show_time()));
 	VM_init();
 	WorkState_init();
+
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("cbk_geometry").toByteArray());
 }
 
 QGroupBox *CBK_MainWindow::createVM1Group()
@@ -483,6 +486,9 @@ void CBK_MainWindow::change_PO_VM4(int index)
 
 void CBK_MainWindow::write_settings()
 {
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("cbk_geometry", saveGeometry());
+
 	m_settings->beginGroup("CBK_State");
 	m_settings->setValue("VM1_PO", VM1_Combo->currentIndex());
 	m_settings->setValue("VM1_Lab", VM1_Label->text());
@@ -791,7 +797,7 @@ void CBK_MainWindow::slot_vm_is_off(int n_vm)
 			if ((VMS.VMPowerState[i] == ON) && (i != (n_vm - 1)) && (VMS.VMPOState[i] == VACANT))
 			{
 				w_state.VM = i + 1;
-				VMS.VMPOState[i] == w_state.PO;
+				w_state.PO = VMS.VMPOState[i];
 				switch (i)
 				{
 				case 0:

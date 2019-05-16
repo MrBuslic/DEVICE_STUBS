@@ -186,15 +186,21 @@ BTI1553API BOOL __stdcall BTI1553_ListMultiBlockRd(LPUSHORT buf,LPINT blkcountpt
 
 	MSGFIELDS1553* out_data = reinterpret_cast<MSGFIELDS1553*>(buf);
 	*blkcountptr = itr->words.count();
-	for (int i =0; i < itr->words.count(); i++)
+	int i = 0;
+	while (!itr->words.isEmpty())
 	{
-		QVariantList& tmp_data = itr->words.at(i).toList();
+		QVariantList& tmp_data = itr->words.front().toList();
+
 		out_data[i].datacount = tmp_data.count();
 		for (int j = 0; j < tmp_data.count(); j++)
 		{
 			out_data[i].data[j] = tmp_data.at(j).toInt();
 		}
+
+		itr->words.pop_front();
+		i++;
 	}
+
 	
 	return true;
 }

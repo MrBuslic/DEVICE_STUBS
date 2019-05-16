@@ -280,13 +280,13 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 	if (volt != 0)
 	{
 		if ((pshm == 11) && (mshm == 3)) return;
-		QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
-		msg_to_log(_msg);
 
 		int tmp_mshm = mshm;
 		int tmp_pshm = pshm - 8;
 		if ((pshm >= 8) && (pshm <= 11) && (mshm >= 0) && (mshm <= 3))
 		{
+			QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
+			msg_to_log(_msg);
 			switch (tmp_mshm)
 			{
 			case 0:
@@ -538,7 +538,7 @@ void MBK07_widg::set_new_tm()
 	}
 	tm_msh_words.push_back(f_word);
 	tm_msh_words.push_back(s_word);
-	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 26, tm_words);
+	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 26, tm_msh_words);
 }
 
 MBK07_widg::~MBK07_widg()

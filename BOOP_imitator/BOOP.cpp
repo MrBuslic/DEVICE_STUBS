@@ -390,6 +390,9 @@ BOOP::BOOP()
 	  this->deleteLater();
 	  return;
   }
+
+  QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+  restoreGeometry(settings.value("boop_geometry").toByteArray());
 }
 BOOP::~BOOP()
 {
@@ -505,4 +508,11 @@ void BOOP::new_data(int mko, int address, int subaddress, QVariantList words)
 
 	// Do something
 
+}
+
+void BOOP::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("boop_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }

@@ -5,7 +5,7 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#include "mko_imit_for_sm_tpo.h"
+#include "mko_module.h"
 #include <QVariantList>
 #include "windows.h"
 

@@ -54,6 +54,7 @@ int RpcFoiWidget::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
 	u = _u;
 	t = _t;
 	return 0;
+
 }
 
 int RpcFoiWidget::unfoi_run()
@@ -68,6 +69,6 @@ int RpcFoiWidget::unfoi_run()
 		SRPCSignalClass::Instance().toLog(QString("Канал %1 не работает").arg(n));
 		return 0;
 	}
-	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan & map_channels[n], 0, 0);//todo изменить функцию или выбрать значения по умолчанию
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan & map_channels[n], u, t);//todo изменить функцию или выбрать значения по умолчанию
 	return 0;
 }

@@ -120,8 +120,10 @@ extern "C" {
 		cfgCBK->b0 = 0;
 		cfgCBK->m1 = 1;
 		cfgCBK->b1 = 0;
+		cfgCBK->no = 0;
 		cfgCBK->dv = 1;
 		cfgCBK->rg = CFGSYS_rgWork;
+
 		return 0;
 		}
 
