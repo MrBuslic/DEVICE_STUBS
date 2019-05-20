@@ -193,6 +193,8 @@ R733_widg::R733_widg()
 //	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag_on = false;
 
+	
+
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
 	connect(AbOn_tmr, &QTimer::timeout, this, &R733_widg::omni_connect);
@@ -205,6 +207,7 @@ R733_widg::R733_widg()
 	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
 	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	//upi_modules[0].switch_num_chan(NUM_CHANNEL::CHANNEL_1);
 	paint_buttons();
 		QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 		restoreGeometry(settings.value("733_geometry").toByteArray());
@@ -285,9 +288,9 @@ void UPI_MODULE::set_working_channels(QList<int> chanels_state, bool can_on)
 	for (int i = 0; i < 4; i++)
 	{
 		if (!chanels_state[i])
-			working[NUM_CHANNEL(i)] = chanels_state[i];
+			working[STATE_UPI(i)] = chanels_state[i];
 		else if (can_on)
-			working[NUM_CHANNEL(i)] = chanels_state[i];
+			working[STATE_UPI(i)] = chanels_state[i];
 	}
 }
 
@@ -543,50 +546,44 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			regime = mode_names[regime_upi];
 			QString _msg = QString("%1").arg(mode_names[regime_upi]);
 			//msg_to_log(_msg);
-			regime_mod_upi ->setText(_msg);
+			regime_mod_upi->setText(_msg);
 		}
 
 		if (tmp_cwd.subadr == 3)
 		{
+			rkm_channels.clear();
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
-
-				for (int i = 0; i <= 7; i++)
-				{
-					/*rrr = itr->toInt() & (0x0101 << i);
-					switch (rrr)
-					{
-					case 257:
-						majoritar[i] = MAJORITAR::C_1_MAJOR;
-						break;
-					case 514:
-						majoritar[i] = MAJORITAR::C_2_MAJOR;
-						break;
-					case 1028:
-						majoritar[i] = MAJORITAR::C_3_MAJOR;
-						break;
-					case 4112:
-						majoritar[i] = MAJORITAR::B_1_GSCH;
-						break;
-					case 8224:
-						majoritar[i] = MAJORITAR::B_2_GSCH;
-						break;
-					case 16448:
-						majoritar[i] = MAJORITAR::B_3_GSCH;
-						break;
-					case 32896:
-						majoritar[i] = MAJORITAR::B_4_GSCH;
-						break;
-					default:
-						break;
-
-					}*/
-				}
+				int rkm_1 = itr->toInt() & 0xFF;
+				int rkm_2 = ((itr->toInt() & 0xFF00) >> 8);
+				rkm = rkm_1 & rkm_2;
+				rkm_channels << (rkm & 0x1);
+				rkm_channels << ((rkm & 0x2) >> 1);
+				rkm_channels << ((rkm & 0x4) >> 2);
+				rkm_channels << ((rkm & 0x8) >> 3);
+				rkm_channels << ((rkm & 0x10) >> 4);
+				rkm_channels << ((rkm & 0x20) >> 5);
+				rkm_channels << ((rkm & 0x40) >> 6);
+				rkm_channels << ((rkm & 0x80) >> 7);
+				//upi_module.set_working_channels(rkm_channels);
 			}
+			int j_major = 1;
+			int j_gsch = 1;
 			for (int i = 0; i <= 7; i++)
 			{
-				//QString _msg = QString("Контроль каналов мажоритарных схем и блокировка каналов ГСЧ: %1").arg(major_names[majoritar[i]]);
-				//msg_to_log(_msg);
+				if ((0 <= i) && (i < 3))
+				{
+					msg = QString("Контроль %2 каналa мажоритарa: %1").arg(rkm_channels[i]).arg(j_major);
+					j_major++;
+				}
+				else if ((3 < i) && (i <= 7))
+				{
+					msg = QString("Блокировка %2 канала ГСЧ: %1").arg(rkm_channels[i]).arg(j_gsch);
+					j_gsch++;
+				}
+				else
+					msg = "";
+				msg_to_log(msg);
 			}
 		}
 		if (tmp_cwd.subadr == 4)
@@ -594,45 +591,84 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
 			{
 				channels_upi.clear();
-				for (int i = 0; i <= 7; i = i + 2)
+				rpk_1 = itr->toInt() & 0xFF;
+				rpk_2 = itr->toInt() >> 8;
+				if (rpk_1 == rpk_2)
 				{
-					rpk_1 = itr->toInt() & (0x11 << i);
-					rpk_2 = (itr->toInt() & 0x11) >> i + 8;
-					if (rpk_1 == rpk_2)
+					for (int i = 0; i <= 3; i++)
 					{
-						//for (int i = 0; i <= 3; i++)
-						//{
-						switch (rpk_1)
+						int pos = 2 * i;
+						rpk = (itr->toInt() >> (pos)) & 0x3;
+						if ((pos == 6) && (rpk == 3))
+							channels_upi << 10101; //канал под номером 4 не может работать с МБК07
+						switch (rpk)
 						{
 						case 0:
-							channels_upi << (rpk_1);
-							//upi_module.set_working_channels(channels_upi);
+							channels_upi << 1;
 							break;
 						case 1:
-							channels_upi << (rpk_1);
-							//upi_module.set_working_channels(channels_upi);
+							channels_upi << 2;
 							break;
 						case 2:
-							channels_upi << (rpk_1);
+							channels_upi << 3;
 							break;
 						case 3:
-
+							channels_upi << 4;
 							break;
 						default:
 							break;
 						}
-						upi_module.set_working_channels(channels_upi);
-						//}
-						for (int i = 0; i <= 3; i++)
-						{
-							QString _msg = QString("Контроль каналов мажоритарных схем и блокировка каналов ГСЧ: %1").arg(channel_names[channels_upi[i]]);
-							msg_to_log(_msg);
-						}
+					}
+
+					for (int j = 0; j <= 3; j++)
+					{
+						QList<QString> number_channel;
+						number_channel << "Рабочий канал модуля УПИ" << "Контрольный канал модуля УПИ" << "Номер канала ФСЧ" << "Номер канала МБК07";
+						msg = QString("%2: %1").arg(channels_upi[j]).arg(number_channel[j]);
+						msg_to_log(msg);
 					}
 				}
+				else
+				{
+					msg = QString("Подадрес 4. Регистр РПК: СД несимметрично");
+					msg_to_log(msg);
+				}
 			}
-
-
+		}
+		if (tmp_cwd.subadr == 5)
+		{
+			rbk_channels.clear();
+			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			{
+				int rbk_1 = itr->toInt() & 0xFF;
+				int rbk_2 = ((itr->toInt() & 0xFF00) >> 8);
+				rbk = rbk_1 & rbk_2;
+				rbk_channels << (rbk & 0x1);
+				rbk_channels << ((rbk & 0x2) >> 1);
+				rbk_channels << ((rbk & 0x4) >> 2);
+				rbk_channels << ((rbk & 0x8) >> 3);
+				rbk_channels << ((rbk & 0x10) >> 4);
+				rbk_channels << ((rbk & 0x20) >> 5);
+				rbk_channels << ((rbk & 0x40) >> 6);
+				rbk_channels << ((rbk & 0x80) >> 7);
+				//upi_module.set_working_channels(rkm_channels);
+			}
+			int j_major = 1;
+			int j_gsch = 1;
+			for (int i = 0; i <= 7; i++)
+			{
+				if ((0 <= i) && (i < 4))
+				{
+					msg = QString("Блокировка %2 информационного каналa и канала ФСЧ модуля УПИ: %1").arg(rbk_channels[i]).arg(j_major);
+					j_major++;
+				}
+				else /*if ((3 < i) && (i <= 7))*/
+				{
+					msg = QString("Блокировка 'Сбой' %2 выхода на МБК07: %1").arg(rbk_channels[i]).arg(j_gsch);
+					j_gsch++;
+				}
+				msg_to_log(msg);
+			}
 		}
 	}
 }
@@ -727,6 +763,13 @@ void R733_widg::paint_buttons()
 		else
 			VCH_list[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
+	for (int i = 0; i < 4; i++)
+	{
+		if (upi_module.get_working(i))
+			UPI_list[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		else
+			UPI_list[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	}
 	//for (int i = 0; i < 4; i++)
 	//	if (upi_module)
 }
@@ -797,11 +840,8 @@ void R733_widg::auto_scroll_clicked(int _state)
 
 UPI_MODULE::UPI_MODULE()
 {
-	working.insert(CHANNEL_1, false);
-	working.insert(CHANNEL_2, false);
-	working.insert(CHANNEL_3, false);
-	working.insert(CHANNEL_4, false);
-
+	working.insert(MAIN, false);
+	working.insert(OFF, false);
 }
 
 

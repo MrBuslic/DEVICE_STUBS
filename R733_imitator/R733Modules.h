@@ -56,6 +56,12 @@ enum MAJORITAR
 	B_4_GSCH = 1
 };
 
+//enum STATE_UPI
+//{
+//	MAIN = 1,
+//	OFF = 2
+//};
+
 //class UPI_MODULE : public R733_MODULE
 //{
 //public:
@@ -231,36 +237,34 @@ class UPI_MODULE
 public:
 	UPI_MODULE();
 	
-	/*enum NUM_CHANNEL
+	enum STATE_UPI
 	{
-		CHANNEL_1,
-		CHANNEL_2,
-		CHANNEL_3,
-		CHANNEL_4
-	};*/
+		MAIN = 1,
+		OFF = 2
+	};
 	void set_working_channels(QList<int> chanels_state, bool can_on = false);
-	bool get_working()
+	bool get_working(int channel)
 	{
 		return working[num_channel];
 	}
-	void switch_num_chan(NUM_CHANNEL _dev)
+	void switch_num_chan(STATE_UPI _dev)
 	{
 		num_channel = _dev;
 	}
 
-	void set_working(NUM_CHANNEL _dev, bool _flag)
+	void set_working(STATE_UPI _dev, bool _flag)
 	{
 		working[_dev] = _flag;
 	}
 
-	NUM_CHANNEL get_current_dev()
+	STATE_UPI get_current_dev()
 	{
 		return num_channel;
 	}
 
 private:
-	NUM_CHANNEL num_channel;
-	QMap<NUM_CHANNEL, bool> working;
+	STATE_UPI num_channel;
+	QMap<STATE_UPI, bool> working;
 };
 
 #endif // R733_MODULES_H

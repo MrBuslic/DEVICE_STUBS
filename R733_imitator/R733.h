@@ -49,6 +49,7 @@ private:
 	UPI_MODULE upi_module;
 	QList<MV_MODULE> mpvn_modules;
 	QList<MV_MODULE> mvku_modules;
+	QList<UPI_MODULE> upi_modules;
 	VCHM_MODULE vchm_module;
 
 	RPC_omnibus_SLOT_Thread omni_slot_thr;
@@ -71,6 +72,7 @@ private:
 	int rrr;
 	int rpk;
 	int rkm;
+	int rbk;
 	int rpk_1;
 	int rpk_2;
 	QTextDocument* _doc;
@@ -103,12 +105,15 @@ private:
 	void omni_connect();
 	void set_power_back();
 
+	QList<int> upi_state_channels;
 	QList<int> vchm_chanels_init;
+	QList<int> rkm_channels;
+	QList<int> rbk_channels;
 	bool vchm_is_init;
 	QTimer vchm_on_timer;
 
 	QString regime;
-
+	QString msg;
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void auto_scroll_clicked(int _state);
