@@ -79,6 +79,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["set_u(int, double)"] = &Socket_RPC_SLOT_Object::set_u;
 		operators_map["get_i(int, double&)"] = &Socket_RPC_SLOT_Object::get_i;
 		operators_map["set_i(int, QString, double)"] = &Socket_RPC_SLOT_Object::set_i;
+		operators_map["set_bus_state(int, int)"] = &Socket_RPC_SLOT_Object::set_bus_state;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -389,6 +390,25 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			QString name = _values.at(1).value<QString>();
 			double curr = _values.at(2).value<double>();
 			app->set_i(bus, name, curr);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::set_bus_state(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int bus = _values.at(0).value<int>();
+			int state = _values.at(1).value<int>();
+			app->set_bus_state(bus, state);
 			return 0;
 		}
 		catch(const std::exception &)

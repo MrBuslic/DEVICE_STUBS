@@ -104,6 +104,7 @@ public:
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant dataIn(QVariantList& _values);
+	QVariant set_antenna_connection(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

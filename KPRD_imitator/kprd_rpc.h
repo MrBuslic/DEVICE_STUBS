@@ -12,6 +12,7 @@ public:
 	////////////////////////////////////
 public slots:
 	void dataIn(QVariantList dataList, QVariantList maskList);
+	void set_antenna_connection(QString antenna_name, QString connected_antenna_name);
 	////////////////////////////////////
 };
 

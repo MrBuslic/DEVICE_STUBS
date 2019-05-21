@@ -107,6 +107,9 @@ public:
 	QVariant make_ku(QVariantList& _values);
 	QVariant make_ku_732(QVariantList& _values);
 	QVariant make_mk(QVariantList& _values);
+	QVariant ku_map_channels_setup(QVariantList& _values);
+	QVariant mshm_map_channels_setup(QVariantList& _values);
+	QVariant pshm_map_channels_setup(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

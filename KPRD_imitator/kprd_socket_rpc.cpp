@@ -77,6 +77,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["dataIn(QVariantList, QVariantList)"] = &Socket_RPC_SLOT_Object::dataIn;
+		operators_map["set_antenna_connection(QString, QString)"] = &Socket_RPC_SLOT_Object::set_antenna_connection;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -321,6 +322,25 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			QVariantList dataList = _values.at(0).value<QVariantList>();
 			QVariantList maskList = _values.at(1).value<QVariantList>();
 			app->dataIn(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::set_antenna_connection(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString antenna_name = _values.at(0).value<QString>();
+			QString connected_antenna_name = _values.at(1).value<QString>();
+			app->set_antenna_connection(antenna_name, connected_antenna_name);
 			return 0;
 		}
 		catch(const std::exception &)

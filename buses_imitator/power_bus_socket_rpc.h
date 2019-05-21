@@ -107,6 +107,7 @@ public:
 	QVariant set_u(QVariantList& _values);
 	QVariant get_i(QVariantList& _values);
 	QVariant set_i(QVariantList& _values);
+	QVariant set_bus_state(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

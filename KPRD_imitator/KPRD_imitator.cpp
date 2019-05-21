@@ -9,7 +9,7 @@ KPRD_imitator::KPRD_imitator()
 	QMap<QString, QString>::iterator map_it;
 	QList<QString>::iterator list_it;
 	for (map_it = kprd_state_map.begin(), list_it = antenna_name_list.begin(); 
-		map_it != kprd_state_map.end(), list_it != antenna_name_list.end(); map_it++, list_it++) map_it.value = list_it;
+		map_it != kprd_state_map.end(), list_it != antenna_name_list.end(); map_it++, list_it++) map_it.value() = *list_it;
 
 	setCentralWidget(widg);
 	setWindowTitle("Имитатор КПРД");

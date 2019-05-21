@@ -79,6 +79,9 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["make_ku(int, int, double, int)"] = &Socket_RPC_SLOT_Object::make_ku;
 		operators_map["make_ku_732(int, int, double, int)"] = &Socket_RPC_SLOT_Object::make_ku_732;
 		operators_map["make_mk(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::make_mk;
+		operators_map["ku_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::ku_map_channels_setup;
+		operators_map["mshm_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::mshm_map_channels_setup;
+		operators_map["pshm_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::pshm_map_channels_setup;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -433,6 +436,66 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 0;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::ku_map_channels_setup(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int ku_n = _values.at(0).value<int>();
+			short line = _values.at(1).value<short>();
+			int res = app->ku_map_channels_setup(ku_n, line);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::mshm_map_channels_setup(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int mshm = _values.at(0).value<int>();
+			short line_m = _values.at(1).value<short>();
+			int res = app->mshm_map_channels_setup(mshm, line_m);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::pshm_map_channels_setup(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int pshm = _values.at(0).value<int>();
+			short line_p = _values.at(1).value<short>();
+			int res = app->pshm_map_channels_setup(pshm, line_p);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

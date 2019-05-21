@@ -76,8 +76,8 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("BOOP_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["void new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::void new_message;
-		operators_map["void new_matrix_command(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::void new_matrix_command;
+		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
+		operators_map["new_matrix_command(int, int, int, int, double, double, int, int, int)"] = &Socket_RPC_SLOT_Object::new_matrix_command;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -260,7 +260,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::void new_message(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
 	{
 		try
 		{
@@ -271,20 +271,19 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			int command_word = _values.at(3).value<int>();
 			QVariantList words = _values.at(4).value<QVariantList>();
 			int respond_word = _values.at(5).value<int>();
-			 res = app->void new_message(dt, MKO, line, command_word, words, respond_word);
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
+			app->new_message(dt, MKO, line, command_word, words, respond_word);
+			return 0;
 		}
 		catch(const std::exception &)
 		{
-			return ;
+			return 0;
 		}
 		catch(...)
 		{
-			return ;
+			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::void new_matrix_command(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::new_matrix_command(QVariantList& _values)
 	{
 		try
 		{
@@ -298,17 +297,16 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			int dt = _values.at(6).value<int>();
 			int line_m = _values.at(7).value<int>();
 			int line_p = _values.at(8).value<int>();
-			 res = app->void new_matrix_command(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
+			app->new_matrix_command(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
+			return 0;
 		}
 		catch(const std::exception &)
 		{
-			return ;
+			return 0;
 		}
 		catch(...)
 		{
-			return ;
+			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

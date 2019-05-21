@@ -5,7 +5,7 @@
 #include <QMap>
 #include <QXmlStreamReader>
 #include "ui_bkupi.h"
-//#include "../../../main_server/main_server_rpc.h"
+//#include "../../main_server/main_server_rpc.h"
 //namespace Ui {
 //	class bkupi_widg;
 //}
