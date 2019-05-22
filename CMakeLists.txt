@@ -59,6 +59,12 @@ include_directories("../lib/db_ctrl")
 include_directories("../lib/mongo_ctrl")
 include_directories("../vendor/QScintilla/core/Qt4")
 include_directories("../lib/socket_rpc/include")
+
+include_directories ($ENV{SM_HOME}/target/BOS/BOS_h)
+include_directories ($ENV{SM_HOME}/target/BRPO/BRPO_h)
+include_directories ($ENV{SM_HOME}/target/OPO/OPO_h)
+include_directories ($ENV{SM_HOME}/target/target_h)
+
 include_directories(${QT_QTSCRIPTTOOLS_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../lib/mongo_ctrl_v3)
 include_directories("OMNIBUSBOX")
@@ -92,7 +98,6 @@ SET (TMP3 ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2}/stubs)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
-
 
 add_subdirectory(buses_imitator)
 

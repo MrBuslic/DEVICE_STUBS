@@ -71,8 +71,8 @@ void InterImitObject::get_new_interrupt(int _n, short _chan, double _u, double _
 	}
 	else
 	{
-		int mask = 1 << _n;
-		if (~IrqMask & mask == mask)
+		int mask = (1 << _n);
+		if (((~IrqMask) & mask) == mask)
 		{
 			emit need_handle_interrupt(mask);
 		}

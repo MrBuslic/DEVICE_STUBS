@@ -606,7 +606,14 @@ void CBK_MainWindow::mds32_send_sample(int channel, uint& buf, int& flag)
 		}
 		break;
 	}
-
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	{
+		buf = 1;
+		break;
+	}
 	default:
 		edit->append("The specified channel is not for us!");
 	}
