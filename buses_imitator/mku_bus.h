@@ -11,7 +11,6 @@ class MKUWidget : public QWidget
 public:
 	MKUWidget(QWidget *parent = 0);
 
-
 public slots:
 	void make_ku(int ku_n, int length, double u, int line);
 	void make_ku_732(int ku_n, int length, double u, int line);

@@ -69,11 +69,11 @@ RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), auto_scroll(true), measu
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
 
 	QString ip_str = "127.0.0.1";
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	mn8i_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new mn8i_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, MN8I_SLOT+mn8i_num);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	mn8i_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new mn8i_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, MN8I_SIGNAL+mn8i_num);
 	rpc_signal_srv->start();
@@ -303,6 +303,9 @@ void RpcMN8IWidget::form_impulse(int chan, double length, double u)
 
 void RpcMN8IWidget::new_ku(int ku_n, int length, double u, int line)
 {
+	if (!measuring)
+		return;
+
 	if (line & 1)
 		form_impulse(4, double(length) / 1000.0, u);
 	if (line & 2)
@@ -311,6 +314,9 @@ void RpcMN8IWidget::new_ku(int ku_n, int length, double u, int line)
 
 void RpcMN8IWidget::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
+	if (!measuring)
+		return;
+
 	if (line_m & 1)
 		form_impulse(0, double(length_m) / 1000.0, u_m);
 	if (line_m & 2)

@@ -51,11 +51,11 @@ RpcMFSK24Widget::RpcMFSK24Widget(int mfsk_num) : QWidget(), auto_scroll(true)
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	mfsk24_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new mfsk24_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, MFSK_SLOT+ mfsk_num);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	mfsk24_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new mfsk24_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, MFSK_SIGNAL+ mfsk_num);
 	rpc_signal_srv->start();

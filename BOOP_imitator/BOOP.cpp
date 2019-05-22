@@ -478,12 +478,12 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 }
 void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
-	QString _message = QString("%1 принял МК МШ%2 ПШ%3")
-										 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
-										 .arg(mshm).arg(pshm);
-
 	if (pshm != 1 || mshm < 5 || mshm > 7)
 		return;
+
+	QString _message = QString("%1 принял МК МШ%2 ПШ%3")
+		.arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
+		.arg(mshm).arg(pshm);
 
 	if (mshm == 5) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);

@@ -218,6 +218,15 @@ void RPC_power_bus_SLOT_Object::set_i(int bus, QString name, double curr)
 	dynamic_call("set_i(int, QString, double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("power_bus dynamic_call finished set_i");
 }
+void RPC_power_bus_SLOT_Object::set_bus_state(int bus, int state)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(bus);
+	tmp_list << QVariant(state);
+	SRPCSignalClass::Instance().toLog(QString("power_bus dynamic_call set_bus_state %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_bus_state(int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("power_bus dynamic_call finished set_bus_state");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

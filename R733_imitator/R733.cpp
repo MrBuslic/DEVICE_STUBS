@@ -179,11 +179,11 @@ R733_widg::R733_widg()
 	QString ip_str = "127.0.0.1";
 	int slot_port = 30208/*R733_SLOT*/;
 	int signal_port = 30209/*R733_SIGNAL*/; //изменить порт
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	r733_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new r733_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	r733_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new r733_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();

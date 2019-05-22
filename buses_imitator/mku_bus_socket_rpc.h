@@ -12,21 +12,13 @@
 #include <QWaitCondition>
 
 #include "rpc_loger.h"
-struct SignalData
-{
-	SignalData() : signal_needed(false) {}
-	SignalData(const SignalData&) {}
-	QWaitCondition cond;
-	QMutex mutex;
-	QVariantList signal_data;
-	bool signal_needed;
-};
-class Socket_RPC_SIGNAL_Object : public QObject
+#include "socket_rpc.h"
+class mku_bus_Socket_RPC_SIGNAL_Object : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SIGNAL_Object();
-	~Socket_RPC_SIGNAL_Object()
+	mku_bus_Socket_RPC_SIGNAL_Object();
+	~mku_bus_Socket_RPC_SIGNAL_Object()
 	{
 	}
 	void set_app(MKUWidget* _app);
@@ -53,11 +45,11 @@ private:
 };
 
 
-class Socket_RPC_SIGNAL_Server : public QObject
+class mku_bus_Socket_RPC_SIGNAL_Server : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
+	mku_bus_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
 	void set_app(MKUWidget* _app)
 	{
 		app = _app;
@@ -67,14 +59,14 @@ public slots:
 private:
 	QTcpServer* rpc_server;
 	MKUWidget* app;
-	QList<std::shared_ptr<Socket_RPC_SIGNAL_Object> > rpc_objects;
+	QList<std::shared_ptr<mku_bus_Socket_RPC_SIGNAL_Object> > rpc_objects;
 };
 
-class Socket_RPC_SIGNAL_Thread : public QThread
+class mku_bus_Socket_RPC_SIGNAL_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SIGNAL_Thread();
+	mku_bus_Socket_RPC_SIGNAL_Thread();
 	void set_app(MKUWidget* _app)
 	{
 		app = _app;
@@ -86,27 +78,30 @@ public:
 	}
 	void run();
 private:
-	Socket_RPC_SIGNAL_Server* rpc_srv;
+	mku_bus_Socket_RPC_SIGNAL_Server* rpc_srv;
 	MKUWidget* app;
 	QString conn_ip;
 	int conn_port;
 };
 
-class Socket_RPC_SLOT_Object : public QObject
+class mku_bus_Socket_RPC_SLOT_Object : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Object(MKUWidget* _app, int socketDescriptor);
-	~Socket_RPC_SLOT_Object()
+	mku_bus_Socket_RPC_SLOT_Object(MKUWidget* _app, int socketDescriptor);
+	~mku_bus_Socket_RPC_SLOT_Object()
 	{
 	}
-	typedef QVariant (Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
+	typedef QVariant (mku_bus_Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant make_ku(QVariantList& _values);
 	QVariant make_ku_732(QVariantList& _values);
 	QVariant make_mk(QVariantList& _values);
+	QVariant ku_map_channels_setup(QVariantList& _values);
+	QVariant mshm_map_channels_setup(QVariantList& _values);
+	QVariant pshm_map_channels_setup(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
@@ -118,36 +113,36 @@ private:
 	static int obj_num;
 };
 
-class Socket_RPC_SLOT_Thread : public QThread
+class mku_bus_Socket_RPC_SLOT_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Thread(MKUWidget* _app, int _socketDescriptor);
+	mku_bus_Socket_RPC_SLOT_Thread(MKUWidget* _app, int _socketDescriptor);
 	void run();
-	std::shared_ptr<Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
+	std::shared_ptr<mku_bus_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
 	private:
-	std::shared_ptr<Socket_RPC_SLOT_Object> rpc_obj;
+	std::shared_ptr<mku_bus_Socket_RPC_SLOT_Object> rpc_obj;
 	MKUWidget* app;
 	int socketDescriptor;
 };
 
-class Socket_RPC_SLOT_Server : public QTcpServer
+class mku_bus_Socket_RPC_SLOT_Server : public QTcpServer
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, MKUWidget* _app);
+	mku_bus_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, MKUWidget* _app);
 protected:
 	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
 private:
 	MKUWidget* app;
-	QList<std::shared_ptr<Socket_RPC_SLOT_Thread> > rpc_objects;
+	QList<std::shared_ptr<mku_bus_Socket_RPC_SLOT_Thread> > rpc_objects;
 };
 
-class Socket_RPC_SLOT_Server_Thread : public QThread
+class mku_bus_Socket_RPC_SLOT_Server_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Server_Thread();
+	mku_bus_Socket_RPC_SLOT_Server_Thread();
 	void set_app(MKUWidget* _app)
 	{
 		app = _app;
@@ -159,7 +154,7 @@ public:
 	}
 	void run();
 private:
-	Socket_RPC_SLOT_Server* rpc_srv;
+	mku_bus_Socket_RPC_SLOT_Server* rpc_srv;
 	MKUWidget* app;
 	QString conn_ip;
 	int conn_port;

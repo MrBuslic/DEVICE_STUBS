@@ -6,10 +6,10 @@ KPRD_imitator::KPRD_imitator()
 {
 	widg = new QWidget(this);
 	antenna_name_list << "МНА1+Y" << "МНА1-Y" << "МНА2+Y" << "МНА2-Y";
-	QMap<QString, QString>::iterator map_it;
+	
 	QList<QString>::iterator list_it;
-	for (map_it = kprd_state_map.begin(), list_it = antenna_name_list.begin(); 
-		map_it != kprd_state_map.end(), list_it != antenna_name_list.end(); map_it++, list_it++) map_it.value = list_it;
+	for (list_it = antenna_name_list.begin(); list_it != antenna_name_list.end(); list_it++)
+		kprd_state_map.insert(*list_it, *list_it);
 
 	setCentralWidget(widg);
 	setWindowTitle("Имитатор КПРД");
@@ -68,11 +68,11 @@ KPRD_imitator::KPRD_imitator()
 	QString ip_str = "127.0.0.1";
 	int slot_port = KPRD_SLOT;
 	int signal_port = KPRD_SIGNAL;
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	kprd_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new kprd_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	kprd_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new kprd_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();

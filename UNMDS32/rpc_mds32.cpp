@@ -68,11 +68,11 @@ RpcMDS32Widget::RpcMDS32Widget(int mds_num) : QWidget(), auto_scroll(true)
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	mds32_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new mds32_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, MDS_SLOT+mds_num);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	mds32_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new mds32_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, MDS_SIGNAL+mds_num);
 	rpc_signal_srv->start();

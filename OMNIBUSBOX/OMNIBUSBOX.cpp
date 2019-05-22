@@ -68,11 +68,11 @@ RpcOmnibusWidget::RpcOmnibusWidget() : QWidget(), auto_scroll(true)
 	//QString ip_str = "127.0.0.1";
 	int slot_port = OMNIBUS_SLOT;
 	int signal_port = OMNIBUS_SIGNAL;
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	omnibus_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new omnibus_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	omnibus_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new omnibus_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();

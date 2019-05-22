@@ -1,23 +1,23 @@
 	#include "mfsk24_socket_rpc.h"
 
-int Socket_RPC_SLOT_Object::obj_num = 0;
-int Socket_RPC_SIGNAL_Object::obj_num = 0;
-int Socket_RPC_SIGNAL_Object::call_number = 0;
+int mfsk24_Socket_RPC_SLOT_Object::obj_num = 0;
+int mfsk24_Socket_RPC_SIGNAL_Object::obj_num = 0;
+int mfsk24_Socket_RPC_SIGNAL_Object::call_number = 0;
 
-	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
+	mfsk24_Socket_RPC_SIGNAL_Thread::mfsk24_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
-		setObjectName("Socket_RPC_SIGNAL_Thread");
+		setObjectName("mfsk24_Socket_RPC_SIGNAL_Thread");
 	}
 
-	void Socket_RPC_SIGNAL_Thread::run()
+	void mfsk24_Socket_RPC_SIGNAL_Thread::run()
 	{
-		rpc_srv = new Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
+		rpc_srv = new mfsk24_Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
 		rpc_srv->set_app(app);
 		SRPCSignalClass::Instance().toLog("mfsk24 signal thread started");
 		exec();
 	}
 
-	Socket_RPC_SIGNAL_Server::Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
+	mfsk24_Socket_RPC_SIGNAL_Server::mfsk24_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
 	{
 		rpc_server = new QTcpServer;
 		connect(rpc_server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
@@ -26,63 +26,63 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void Socket_RPC_SIGNAL_Server::tcp_slot()
+	void mfsk24_Socket_RPC_SIGNAL_Server::tcp_slot()
 	{
 		SRPCSignalClass::Instance().toLog("mfsk24 signal client connected");
-		std::shared_ptr<Socket_RPC_SIGNAL_Object> tmp_obj(new Socket_RPC_SIGNAL_Object);
+		std::shared_ptr<mfsk24_Socket_RPC_SIGNAL_Object> tmp_obj(new mfsk24_Socket_RPC_SIGNAL_Object);
 		tmp_obj->set_app(app);
 		tmp_obj->set_socket(rpc_server->nextPendingConnection());
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Server_Thread::Socket_RPC_SLOT_Server_Thread() : QThread()
+	mfsk24_Socket_RPC_SLOT_Server_Thread::mfsk24_Socket_RPC_SLOT_Server_Thread() : QThread()
 	{
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcMFSK24Widget* _app) : QTcpServer(), app(_app)
+	mfsk24_Socket_RPC_SLOT_Server::mfsk24_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcMFSK24Widget* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
 	}
 
 
-	void Socket_RPC_SLOT_Server_Thread::run()
+	void mfsk24_Socket_RPC_SLOT_Server_Thread::run()
 	{
-		rpc_srv = new Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
+		rpc_srv = new mfsk24_Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
 		SRPCSignalClass::Instance().toLog("mfsk24 slot thread started");
 		exec();
 	}
 
-	void Socket_RPC_SLOT_Thread::run()
+	void mfsk24_Socket_RPC_SLOT_Thread::run()
 	{
-		rpc_obj = std::shared_ptr<Socket_RPC_SLOT_Object>(new Socket_RPC_SLOT_Object(app, socketDescriptor));
+		rpc_obj = std::shared_ptr<mfsk24_Socket_RPC_SLOT_Object>(new mfsk24_Socket_RPC_SLOT_Object(app, socketDescriptor));
 		exec();
 	}
 
-	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(RpcMFSK24Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	mfsk24_Socket_RPC_SLOT_Thread::mfsk24_Socket_RPC_SLOT_Thread(RpcMFSK24Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
-	void Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
+	void mfsk24_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
 		SRPCSignalClass::Instance().toLog("mfsk24 slot client connected");
-		std::shared_ptr<Socket_RPC_SLOT_Thread> tmp_obj(new Socket_RPC_SLOT_Thread(app, socketDescriptor));
+		std::shared_ptr<mfsk24_Socket_RPC_SLOT_Thread> tmp_obj(new mfsk24_Socket_RPC_SLOT_Thread(app, socketDescriptor));
 		tmp_obj->start();
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(RpcMFSK24Widget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	mfsk24_Socket_RPC_SLOT_Object::mfsk24_Socket_RPC_SLOT_Object(RpcMFSK24Widget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
 	setObjectName(QString("mfsk24_SLOT_Object_%1").arg(obj_num++));
-		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
+		operators_map["QuerySlots()"] = &mfsk24_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
-		operators_map["unmfsk24_manual_group_cmd(int, QVariantList)"] = &Socket_RPC_SLOT_Object::unmfsk24_manual_group_cmd;
-		operators_map["unmfsk24_state(QVariantList&)"] = &Socket_RPC_SLOT_Object::unmfsk24_state;
-		operators_map["unmfsk24_manual_cmd(int, int)"] = &Socket_RPC_SLOT_Object::unmfsk24_manual_cmd;
-		operators_map["unmfsk24_start(QVariantList)"] = &Socket_RPC_SLOT_Object::unmfsk24_start;
-		operators_map["unmfsk24_set_cmd_time(int, int)"] = &Socket_RPC_SLOT_Object::unmfsk24_set_cmd_time;
+		operators_map["auto_scroll_clicked(int)"] = &mfsk24_Socket_RPC_SLOT_Object::auto_scroll_clicked;
+		operators_map["log_timer_ontimer()"] = &mfsk24_Socket_RPC_SLOT_Object::log_timer_ontimer;
+		operators_map["unmfsk24_manual_group_cmd(int, QVariantList)"] = &mfsk24_Socket_RPC_SLOT_Object::unmfsk24_manual_group_cmd;
+		operators_map["unmfsk24_state(QVariantList&)"] = &mfsk24_Socket_RPC_SLOT_Object::unmfsk24_state;
+		operators_map["unmfsk24_manual_cmd(int, int)"] = &mfsk24_Socket_RPC_SLOT_Object::unmfsk24_manual_cmd;
+		operators_map["unmfsk24_start(QVariantList)"] = &mfsk24_Socket_RPC_SLOT_Object::unmfsk24_start;
+		operators_map["unmfsk24_set_cmd_time(int, int)"] = &mfsk24_Socket_RPC_SLOT_Object::unmfsk24_set_cmd_time;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -91,31 +91,31 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	Socket_RPC_SIGNAL_Object::Socket_RPC_SIGNAL_Object() : QObject()
+	mfsk24_Socket_RPC_SIGNAL_Object::mfsk24_Socket_RPC_SIGNAL_Object() : QObject()
 	{
 		setObjectName(QString("mfsk24_SIGNAL_Object_%1").arg(obj_num++));
 		connect(this, SIGNAL(send_signal(QByteArray*)), this, SLOT(send_signal_slot(QByteArray*)), Qt::BlockingQueuedConnection);
 	}
 
-	void Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
+	void mfsk24_Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
 	{
 		QMutexLocker locker(&signal_mutex);
 		emit send_signal(_arr);
 	}
 
-	void Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
+	void mfsk24_Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SLOT SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 	}
 
-	void Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
+	void mfsk24_Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
 	{
 		rpc_socket = _rpc_socket;
 		connect(rpc_socket, SIGNAL(readyRead()), this, SLOT(read_data()));
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	void Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
+	void mfsk24_Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
@@ -124,7 +124,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		disconnect(app, SIGNAL(mfsk24_state_change(int, int)), this, SLOT(mfsk24_state_change(int, int)));
 		disconnect(app, SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk24_impulse_change(QVariantList)));
 	}
-	void Socket_RPC_SIGNAL_Object::set_app(RpcMFSK24Widget* _app)
+	void mfsk24_Socket_RPC_SIGNAL_Object::set_app(RpcMFSK24Widget* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(mfsk24_()), this, SLOT(mfsk24_()), Qt::DirectConnection);
@@ -136,7 +136,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void Socket_RPC_SLOT_Object::read_data()
+	void mfsk24_Socket_RPC_SLOT_Object::read_data()
 	{
 		//LARGE_INTEGER _freq;
 		//LARGE_INTEGER tmp1;
@@ -200,13 +200,13 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString(" %1 %2 call_n %3 response sent %4 %5 %6").arg(objectName()).arg(op_name).arg(call_n).arg(tmp_arr2.size()).arg(tmp_arr3.size()).arg(tmp_arr3.data())); 
 	}
 
-	void Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
+	void mfsk24_Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
 	{
 		rpc_socket->write(*_arr);
 		rpc_socket->waitForBytesWritten(3000);
 	}
 
-	void Socket_RPC_SIGNAL_Object::read_data()
+	void mfsk24_Socket_RPC_SIGNAL_Object::read_data()
 	{
 		int tmp_size;
 		while (rpc_socket->bytesAvailable())
@@ -262,7 +262,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::mfsk24_()
+	void mfsk24_Socket_RPC_SIGNAL_Object::mfsk24_()
 	{
 		auto& descriptor = *data_map["mfsk24_()"].get();
 		if (!descriptor.signal_needed)
@@ -283,7 +283,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_ finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::mfsk24_state_change(int channel, int state)
+	void mfsk24_Socket_RPC_SIGNAL_Object::mfsk24_state_change(int channel, int state)
 	{
 		auto& descriptor = *data_map["mfsk24_state_change(int, int)"].get();
 		if (!descriptor.signal_needed)
@@ -308,7 +308,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mfsk24_state_change finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::mfsk24_impulse_change(QVariantList channels)
+	void mfsk24_Socket_RPC_SIGNAL_Object::mfsk24_impulse_change(QVariantList channels)
 	{
 		auto& descriptor = *data_map["mfsk24_impulse_change(QVariantList)"].get();
 		if (!descriptor.signal_needed)
@@ -333,7 +333,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
 	{
 		QString tmp_string;
 		int _count = operators_map.keys().count();
@@ -343,7 +343,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
 	{
 		try
 		{
@@ -361,7 +361,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
 	{
 		try
 		{
@@ -377,7 +377,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmfsk24_manual_group_cmd(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::unmfsk24_manual_group_cmd(QVariantList& _values)
 	{
 		try
 		{
@@ -397,7 +397,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmfsk24_state(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::unmfsk24_state(QVariantList& _values)
 	{
 		try
 		{
@@ -419,7 +419,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmfsk24_manual_cmd(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::unmfsk24_manual_cmd(QVariantList& _values)
 	{
 		try
 		{
@@ -439,7 +439,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmfsk24_start(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::unmfsk24_start(QVariantList& _values)
 	{
 		try
 		{
@@ -458,7 +458,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::unmfsk24_set_cmd_time(QVariantList& _values)
+	QVariant mfsk24_Socket_RPC_SLOT_Object::unmfsk24_set_cmd_time(QVariantList& _values)
 	{
 		try
 		{

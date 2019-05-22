@@ -58,11 +58,11 @@ RpcADS128Widget::RpcADS128Widget(int _ads_num) : QWidget(), auto_scroll(true),  
 		connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
 
 	QString ip_str = "127.0.0.1";
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	ads128_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new ads128_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, ADS_SLOT+ads_num);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	ads128_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new ads128_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, ADS_SIGNAL + ads_num);
 	rpc_signal_srv->start();

@@ -12,21 +12,13 @@
 #include <QWaitCondition>
 
 #include "rpc_loger.h"
-struct SignalData
-{
-	SignalData() : signal_needed(false) {}
-	SignalData(const SignalData&) {}
-	QWaitCondition cond;
-	QMutex mutex;
-	QVariantList signal_data;
-	bool signal_needed;
-};
-class Socket_RPC_SIGNAL_Object : public QObject
+#include "socket_rpc.h"
+class BOOP_Socket_RPC_SIGNAL_Object : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SIGNAL_Object();
-	~Socket_RPC_SIGNAL_Object()
+	BOOP_Socket_RPC_SIGNAL_Object();
+	~BOOP_Socket_RPC_SIGNAL_Object()
 	{
 	}
 	void set_app(BOOP* _app);
@@ -50,11 +42,11 @@ private:
 };
 
 
-class Socket_RPC_SIGNAL_Server : public QObject
+class BOOP_Socket_RPC_SIGNAL_Server : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
+	BOOP_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
 	void set_app(BOOP* _app)
 	{
 		app = _app;
@@ -64,14 +56,14 @@ public slots:
 private:
 	QTcpServer* rpc_server;
 	BOOP* app;
-	QList<std::shared_ptr<Socket_RPC_SIGNAL_Object> > rpc_objects;
+	QList<std::shared_ptr<BOOP_Socket_RPC_SIGNAL_Object> > rpc_objects;
 };
 
-class Socket_RPC_SIGNAL_Thread : public QThread
+class BOOP_Socket_RPC_SIGNAL_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SIGNAL_Thread();
+	BOOP_Socket_RPC_SIGNAL_Thread();
 	void set_app(BOOP* _app)
 	{
 		app = _app;
@@ -83,21 +75,21 @@ public:
 	}
 	void run();
 private:
-	Socket_RPC_SIGNAL_Server* rpc_srv;
+	BOOP_Socket_RPC_SIGNAL_Server* rpc_srv;
 	BOOP* app;
 	QString conn_ip;
 	int conn_port;
 };
 
-class Socket_RPC_SLOT_Object : public QObject
+class BOOP_Socket_RPC_SLOT_Object : public QObject
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Object(BOOP* _app, int socketDescriptor);
-	~Socket_RPC_SLOT_Object()
+	BOOP_Socket_RPC_SLOT_Object(BOOP* _app, int socketDescriptor);
+	~BOOP_Socket_RPC_SLOT_Object()
 	{
 	}
-	typedef QVariant (Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
+	typedef QVariant (BOOP_Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
@@ -114,36 +106,36 @@ private:
 	static int obj_num;
 };
 
-class Socket_RPC_SLOT_Thread : public QThread
+class BOOP_Socket_RPC_SLOT_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Thread(BOOP* _app, int _socketDescriptor);
+	BOOP_Socket_RPC_SLOT_Thread(BOOP* _app, int _socketDescriptor);
 	void run();
-	std::shared_ptr<Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
+	std::shared_ptr<BOOP_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
 	private:
-	std::shared_ptr<Socket_RPC_SLOT_Object> rpc_obj;
+	std::shared_ptr<BOOP_Socket_RPC_SLOT_Object> rpc_obj;
 	BOOP* app;
 	int socketDescriptor;
 };
 
-class Socket_RPC_SLOT_Server : public QTcpServer
+class BOOP_Socket_RPC_SLOT_Server : public QTcpServer
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, BOOP* _app);
+	BOOP_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, BOOP* _app);
 protected:
 	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
 private:
 	BOOP* app;
-	QList<std::shared_ptr<Socket_RPC_SLOT_Thread> > rpc_objects;
+	QList<std::shared_ptr<BOOP_Socket_RPC_SLOT_Thread> > rpc_objects;
 };
 
-class Socket_RPC_SLOT_Server_Thread : public QThread
+class BOOP_Socket_RPC_SLOT_Server_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	Socket_RPC_SLOT_Server_Thread();
+	BOOP_Socket_RPC_SLOT_Server_Thread();
 	void set_app(BOOP* _app)
 	{
 		app = _app;
@@ -155,7 +147,7 @@ public:
 	}
 	void run();
 private:
-	Socket_RPC_SLOT_Server* rpc_srv;
+	BOOP_Socket_RPC_SLOT_Server* rpc_srv;
 	BOOP* app;
 	QString conn_ip;
 	int conn_port;

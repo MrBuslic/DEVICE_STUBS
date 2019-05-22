@@ -157,11 +157,11 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 	QString ip_str = "127.0.0.1";
 	int slot_port = LKA05_SLOT;
 	int signal_port = LKA05_SIGNAL;
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	lka05_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new lka05_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	lka05_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new lka05_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();

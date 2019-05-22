@@ -46,7 +46,8 @@ void rpc_buffer_class::new_message(QVariant dt, int mko, int line, int cwd, QVar
 	if (itr == lst_addrs.end())
 		return;
 
-
 	itr->words << QVariant(words);
+	if (itr->words.count() > itr->lst_size)
+		itr->words.pop_front();
 }
 

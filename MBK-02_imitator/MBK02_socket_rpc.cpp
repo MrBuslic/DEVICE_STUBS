@@ -1,23 +1,23 @@
 	#include "MBK02_socket_rpc.h"
 
-int Socket_RPC_SLOT_Object::obj_num = 0;
-int Socket_RPC_SIGNAL_Object::obj_num = 0;
-int Socket_RPC_SIGNAL_Object::call_number = 0;
+int MBK02_Socket_RPC_SLOT_Object::obj_num = 0;
+int MBK02_Socket_RPC_SIGNAL_Object::obj_num = 0;
+int MBK02_Socket_RPC_SIGNAL_Object::call_number = 0;
 
-	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
+	MBK02_Socket_RPC_SIGNAL_Thread::MBK02_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
-		setObjectName("Socket_RPC_SIGNAL_Thread");
+		setObjectName("MBK02_Socket_RPC_SIGNAL_Thread");
 	}
 
-	void Socket_RPC_SIGNAL_Thread::run()
+	void MBK02_Socket_RPC_SIGNAL_Thread::run()
 	{
-		rpc_srv = new Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
+		rpc_srv = new MBK02_Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
 		rpc_srv->set_app(app);
 		SRPCSignalClass::Instance().toLog("MBK02 signal thread started");
 		exec();
 	}
 
-	Socket_RPC_SIGNAL_Server::Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
+	MBK02_Socket_RPC_SIGNAL_Server::MBK02_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
 	{
 		rpc_server = new QTcpServer;
 		connect(rpc_server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
@@ -26,63 +26,63 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void Socket_RPC_SIGNAL_Server::tcp_slot()
+	void MBK02_Socket_RPC_SIGNAL_Server::tcp_slot()
 	{
 		SRPCSignalClass::Instance().toLog("MBK02 signal client connected");
-		std::shared_ptr<Socket_RPC_SIGNAL_Object> tmp_obj(new Socket_RPC_SIGNAL_Object);
+		std::shared_ptr<MBK02_Socket_RPC_SIGNAL_Object> tmp_obj(new MBK02_Socket_RPC_SIGNAL_Object);
 		tmp_obj->set_app(app);
 		tmp_obj->set_socket(rpc_server->nextPendingConnection());
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Server_Thread::Socket_RPC_SLOT_Server_Thread() : QThread()
+	MBK02_Socket_RPC_SLOT_Server_Thread::MBK02_Socket_RPC_SLOT_Server_Thread() : QThread()
 	{
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, MBK02_widg* _app) : QTcpServer(), app(_app)
+	MBK02_Socket_RPC_SLOT_Server::MBK02_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, MBK02_widg* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
 	}
 
 
-	void Socket_RPC_SLOT_Server_Thread::run()
+	void MBK02_Socket_RPC_SLOT_Server_Thread::run()
 	{
-		rpc_srv = new Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
+		rpc_srv = new MBK02_Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
 		SRPCSignalClass::Instance().toLog("MBK02 slot thread started");
 		exec();
 	}
 
-	void Socket_RPC_SLOT_Thread::run()
+	void MBK02_Socket_RPC_SLOT_Thread::run()
 	{
-		rpc_obj = std::shared_ptr<Socket_RPC_SLOT_Object>(new Socket_RPC_SLOT_Object(app, socketDescriptor));
+		rpc_obj = std::shared_ptr<MBK02_Socket_RPC_SLOT_Object>(new MBK02_Socket_RPC_SLOT_Object(app, socketDescriptor));
 		exec();
 	}
 
-	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(MBK02_widg* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	MBK02_Socket_RPC_SLOT_Thread::MBK02_Socket_RPC_SLOT_Thread(MBK02_widg* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
-	void Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
+	void MBK02_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
 		SRPCSignalClass::Instance().toLog("MBK02 slot client connected");
-		std::shared_ptr<Socket_RPC_SLOT_Thread> tmp_obj(new Socket_RPC_SLOT_Thread(app, socketDescriptor));
+		std::shared_ptr<MBK02_Socket_RPC_SLOT_Thread> tmp_obj(new MBK02_Socket_RPC_SLOT_Thread(app, socketDescriptor));
 		tmp_obj->start();
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(MBK02_widg* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	MBK02_Socket_RPC_SLOT_Object::MBK02_Socket_RPC_SLOT_Object(MBK02_widg* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
 	setObjectName(QString("MBK02_SLOT_Object_%1").arg(obj_num++));
-		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
+		operators_map["QuerySlots()"] = &MBK02_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &Socket_RPC_SLOT_Object::new_message;
-		operators_map["new_ku_732(int, int, double, int)"] = &Socket_RPC_SLOT_Object::new_ku_732;
-		operators_map["set_new_mbk02_tm()"] = &Socket_RPC_SLOT_Object::set_new_mbk02_tm;
-		operators_map["new_KPI(QVariantList)"] = &Socket_RPC_SLOT_Object::new_KPI;
-		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["update_tm(int)"] = &Socket_RPC_SLOT_Object::update_tm;
-		operators_map["get_power(double)"] = &Socket_RPC_SLOT_Object::get_power;
+		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &MBK02_Socket_RPC_SLOT_Object::new_message;
+		operators_map["new_ku_732(int, int, double, int)"] = &MBK02_Socket_RPC_SLOT_Object::new_ku_732;
+		operators_map["set_new_mbk02_tm()"] = &MBK02_Socket_RPC_SLOT_Object::set_new_mbk02_tm;
+		operators_map["new_KPI(QVariantList)"] = &MBK02_Socket_RPC_SLOT_Object::new_KPI;
+		operators_map["auto_scroll_clicked(int)"] = &MBK02_Socket_RPC_SLOT_Object::auto_scroll_clicked;
+		operators_map["update_tm(int)"] = &MBK02_Socket_RPC_SLOT_Object::update_tm;
+		operators_map["get_power(double)"] = &MBK02_Socket_RPC_SLOT_Object::get_power;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -91,31 +91,31 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	Socket_RPC_SIGNAL_Object::Socket_RPC_SIGNAL_Object() : QObject()
+	MBK02_Socket_RPC_SIGNAL_Object::MBK02_Socket_RPC_SIGNAL_Object() : QObject()
 	{
 		setObjectName(QString("MBK02_SIGNAL_Object_%1").arg(obj_num++));
 		connect(this, SIGNAL(send_signal(QByteArray*)), this, SLOT(send_signal_slot(QByteArray*)), Qt::BlockingQueuedConnection);
 	}
 
-	void Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
+	void MBK02_Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
 	{
 		QMutexLocker locker(&signal_mutex);
 		emit send_signal(_arr);
 	}
 
-	void Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
+	void MBK02_Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SLOT SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 	}
 
-	void Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
+	void MBK02_Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
 	{
 		rpc_socket = _rpc_socket;
 		connect(rpc_socket, SIGNAL(readyRead()), this, SLOT(read_data()));
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	void Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
+	void MBK02_Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
@@ -124,7 +124,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		disconnect(app, SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_tm(int, int)));
 		disconnect(app, SIGNAL(set_new_power_tm(int, QVariantList)), this, SLOT(set_new_power_tm(int, QVariantList)));
 	}
-	void Socket_RPC_SIGNAL_Object::set_app(MBK02_widg* _app)
+	void MBK02_Socket_RPC_SIGNAL_Object::set_app(MBK02_widg* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(msg_to_14R732(QVariantList)), Qt::DirectConnection);
@@ -136,7 +136,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void Socket_RPC_SLOT_Object::read_data()
+	void MBK02_Socket_RPC_SLOT_Object::read_data()
 	{
 		//LARGE_INTEGER _freq;
 		//LARGE_INTEGER tmp1;
@@ -200,13 +200,13 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString(" %1 %2 call_n %3 response sent %4 %5 %6").arg(objectName()).arg(op_name).arg(call_n).arg(tmp_arr2.size()).arg(tmp_arr3.size()).arg(tmp_arr3.data())); 
 	}
 
-	void Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
+	void MBK02_Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
 	{
 		rpc_socket->write(*_arr);
 		rpc_socket->waitForBytesWritten(3000);
 	}
 
-	void Socket_RPC_SIGNAL_Object::read_data()
+	void MBK02_Socket_RPC_SIGNAL_Object::read_data()
 	{
 		int tmp_size;
 		while (rpc_socket->bytesAvailable())
@@ -262,7 +262,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::msg_to_14R732(QVariantList data)
+	void MBK02_Socket_RPC_SIGNAL_Object::msg_to_14R732(QVariantList data)
 	{
 		auto& descriptor = *data_map["msg_to_14R732(QVariantList)"].get();
 		if (!descriptor.signal_needed)
@@ -285,7 +285,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal msg_to_14R732 finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::set_new_tm(int sadr, int word)
+	void MBK02_Socket_RPC_SIGNAL_Object::set_new_tm(int sadr, int word)
 	{
 		auto& descriptor = *data_map["set_new_tm(int, int)"].get();
 		if (!descriptor.signal_needed)
@@ -310,7 +310,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal set_new_tm finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::set_new_power_tm(int sadr, QVariantList words)
+	void MBK02_Socket_RPC_SIGNAL_Object::set_new_power_tm(int sadr, QVariantList words)
 	{
 		auto& descriptor = *data_map["set_new_power_tm(int, QVariantList)"].get();
 		if (!descriptor.signal_needed)
@@ -337,7 +337,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
 	{
 		QString tmp_string;
 		int _count = operators_map.keys().count();
@@ -347,7 +347,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
 	{
 		try
 		{
@@ -370,7 +370,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::new_ku_732(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::new_ku_732(QVariantList& _values)
 	{
 		try
 		{
@@ -391,7 +391,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::set_new_mbk02_tm(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::set_new_mbk02_tm(QVariantList& _values)
 	{
 		try
 		{
@@ -407,7 +407,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::new_KPI(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::new_KPI(QVariantList& _values)
 	{
 		try
 		{
@@ -425,7 +425,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
 	{
 		try
 		{
@@ -443,7 +443,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::update_tm(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::update_tm(QVariantList& _values)
 	{
 		try
 		{
@@ -461,7 +461,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant Socket_RPC_SLOT_Object::get_power(QVariantList& _values)
+	QVariant MBK02_Socket_RPC_SLOT_Object::get_power(QVariantList& _values)
 	{
 		try
 		{

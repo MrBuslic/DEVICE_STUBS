@@ -1,23 +1,23 @@
 	#include "kprd_socket_rpc.h"
 
-int Socket_RPC_SLOT_Object::obj_num = 0;
-int Socket_RPC_SIGNAL_Object::obj_num = 0;
-int Socket_RPC_SIGNAL_Object::call_number = 0;
+int kprd_Socket_RPC_SLOT_Object::obj_num = 0;
+int kprd_Socket_RPC_SIGNAL_Object::obj_num = 0;
+int kprd_Socket_RPC_SIGNAL_Object::call_number = 0;
 
-	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
+	kprd_Socket_RPC_SIGNAL_Thread::kprd_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
-		setObjectName("Socket_RPC_SIGNAL_Thread");
+		setObjectName("kprd_Socket_RPC_SIGNAL_Thread");
 	}
 
-	void Socket_RPC_SIGNAL_Thread::run()
+	void kprd_Socket_RPC_SIGNAL_Thread::run()
 	{
-		rpc_srv = new Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
+		rpc_srv = new kprd_Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
 		rpc_srv->set_app(app);
 		SRPCSignalClass::Instance().toLog("kprd signal thread started");
 		exec();
 	}
 
-	Socket_RPC_SIGNAL_Server::Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
+	kprd_Socket_RPC_SIGNAL_Server::kprd_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
 	{
 		rpc_server = new QTcpServer;
 		connect(rpc_server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
@@ -26,57 +26,58 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void Socket_RPC_SIGNAL_Server::tcp_slot()
+	void kprd_Socket_RPC_SIGNAL_Server::tcp_slot()
 	{
 		SRPCSignalClass::Instance().toLog("kprd signal client connected");
-		std::shared_ptr<Socket_RPC_SIGNAL_Object> tmp_obj(new Socket_RPC_SIGNAL_Object);
+		std::shared_ptr<kprd_Socket_RPC_SIGNAL_Object> tmp_obj(new kprd_Socket_RPC_SIGNAL_Object);
 		tmp_obj->set_app(app);
 		tmp_obj->set_socket(rpc_server->nextPendingConnection());
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Server_Thread::Socket_RPC_SLOT_Server_Thread() : QThread()
+	kprd_Socket_RPC_SLOT_Server_Thread::kprd_Socket_RPC_SLOT_Server_Thread() : QThread()
 	{
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, KPRD_imitator* _app) : QTcpServer(), app(_app)
+	kprd_Socket_RPC_SLOT_Server::kprd_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, KPRD_imitator* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
 	}
 
 
-	void Socket_RPC_SLOT_Server_Thread::run()
+	void kprd_Socket_RPC_SLOT_Server_Thread::run()
 	{
-		rpc_srv = new Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
+		rpc_srv = new kprd_Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
 		SRPCSignalClass::Instance().toLog("kprd slot thread started");
 		exec();
 	}
 
-	void Socket_RPC_SLOT_Thread::run()
+	void kprd_Socket_RPC_SLOT_Thread::run()
 	{
-		rpc_obj = std::shared_ptr<Socket_RPC_SLOT_Object>(new Socket_RPC_SLOT_Object(app, socketDescriptor));
+		rpc_obj = std::shared_ptr<kprd_Socket_RPC_SLOT_Object>(new kprd_Socket_RPC_SLOT_Object(app, socketDescriptor));
 		exec();
 	}
 
-	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(KPRD_imitator* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	kprd_Socket_RPC_SLOT_Thread::kprd_Socket_RPC_SLOT_Thread(KPRD_imitator* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
-	void Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
+	void kprd_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
 		SRPCSignalClass::Instance().toLog("kprd slot client connected");
-		std::shared_ptr<Socket_RPC_SLOT_Thread> tmp_obj(new Socket_RPC_SLOT_Thread(app, socketDescriptor));
+		std::shared_ptr<kprd_Socket_RPC_SLOT_Thread> tmp_obj(new kprd_Socket_RPC_SLOT_Thread(app, socketDescriptor));
 		tmp_obj->start();
 		rpc_objects << tmp_obj;
 	}
 
-	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(KPRD_imitator* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	kprd_Socket_RPC_SLOT_Object::kprd_Socket_RPC_SLOT_Object(KPRD_imitator* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
 	setObjectName(QString("kprd_SLOT_Object_%1").arg(obj_num++));
-		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
+		operators_map["QuerySlots()"] = &kprd_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["dataIn(QVariantList, QVariantList)"] = &Socket_RPC_SLOT_Object::dataIn;
+		operators_map["dataIn(QVariantList, QVariantList)"] = &kprd_Socket_RPC_SLOT_Object::dataIn;
+		operators_map["set_antenna_connection(QString, QString)"] = &kprd_Socket_RPC_SLOT_Object::set_antenna_connection;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -85,31 +86,31 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	Socket_RPC_SIGNAL_Object::Socket_RPC_SIGNAL_Object() : QObject()
+	kprd_Socket_RPC_SIGNAL_Object::kprd_Socket_RPC_SIGNAL_Object() : QObject()
 	{
 		setObjectName(QString("kprd_SIGNAL_Object_%1").arg(obj_num++));
 		connect(this, SIGNAL(send_signal(QByteArray*)), this, SLOT(send_signal_slot(QByteArray*)), Qt::BlockingQueuedConnection);
 	}
 
-	void Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
+	void kprd_Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
 	{
 		QMutexLocker locker(&signal_mutex);
 		emit send_signal(_arr);
 	}
 
-	void Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
+	void kprd_Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SLOT SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 	}
 
-	void Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
+	void kprd_Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
 	{
 		rpc_socket = _rpc_socket;
 		connect(rpc_socket, SIGNAL(readyRead()), this, SLOT(read_data()));
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	void Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
+	void kprd_Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
@@ -117,7 +118,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		disconnect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)));
 		disconnect(app, SIGNAL(sendKPI(QVariantList)), this, SLOT(sendKPI(QVariantList)));
 	}
-	void Socket_RPC_SIGNAL_Object::set_app(KPRD_imitator* _app)
+	void kprd_Socket_RPC_SIGNAL_Object::set_app(KPRD_imitator* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)), Qt::DirectConnection);
@@ -127,7 +128,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void Socket_RPC_SLOT_Object::read_data()
+	void kprd_Socket_RPC_SLOT_Object::read_data()
 	{
 		//LARGE_INTEGER _freq;
 		//LARGE_INTEGER tmp1;
@@ -191,13 +192,13 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString(" %1 %2 call_n %3 response sent %4 %5 %6").arg(objectName()).arg(op_name).arg(call_n).arg(tmp_arr2.size()).arg(tmp_arr3.size()).arg(tmp_arr3.data())); 
 	}
 
-	void Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
+	void kprd_Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
 	{
 		rpc_socket->write(*_arr);
 		rpc_socket->waitForBytesWritten(3000);
 	}
 
-	void Socket_RPC_SIGNAL_Object::read_data()
+	void kprd_Socket_RPC_SIGNAL_Object::read_data()
 	{
 		int tmp_size;
 		while (rpc_socket->bytesAvailable())
@@ -253,7 +254,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void Socket_RPC_SIGNAL_Object::test(QVariantList maskList, QVariantList dataList)
+	void kprd_Socket_RPC_SIGNAL_Object::test(QVariantList maskList, QVariantList dataList)
 	{
 		auto& descriptor = *data_map["test(QVariantList, QVariantList)"].get();
 		if (!descriptor.signal_needed)
@@ -278,7 +279,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal test finished").arg(objectName()));
 	}
-	void Socket_RPC_SIGNAL_Object::sendKPI(QVariantList kpiList)
+	void kprd_Socket_RPC_SIGNAL_Object::sendKPI(QVariantList kpiList)
 	{
 		auto& descriptor = *data_map["sendKPI(QVariantList)"].get();
 		if (!descriptor.signal_needed)
@@ -303,7 +304,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
+	QVariant kprd_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
 	{
 		QString tmp_string;
 		int _count = operators_map.keys().count();
@@ -313,7 +314,7 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant Socket_RPC_SLOT_Object::dataIn(QVariantList& _values)
+	QVariant kprd_Socket_RPC_SLOT_Object::dataIn(QVariantList& _values)
 	{
 		try
 		{
@@ -321,6 +322,25 @@ int Socket_RPC_SIGNAL_Object::call_number = 0;
 			QVariantList dataList = _values.at(0).value<QVariantList>();
 			QVariantList maskList = _values.at(1).value<QVariantList>();
 			app->dataIn(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kprd_Socket_RPC_SLOT_Object::set_antenna_connection(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString antenna_name = _values.at(0).value<QString>();
+			QString connected_antenna_name = _values.at(1).value<QString>();
+			app->set_antenna_connection(antenna_name, connected_antenna_name);
 			return 0;
 		}
 		catch(const std::exception &)

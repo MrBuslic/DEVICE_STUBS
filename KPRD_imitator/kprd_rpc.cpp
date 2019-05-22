@@ -173,6 +173,15 @@ void RPC_kprd_SLOT_Object::dataIn(QVariantList dataList, QVariantList maskList)
 	dynamic_call("dataIn(QVariantList, QVariantList)", tmp_list);
 	SRPCSignalClass::Instance().toLog("kprd dynamic_call finished dataIn");
 }
+void RPC_kprd_SLOT_Object::set_antenna_connection(QString antenna_name, QString connected_antenna_name)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(antenna_name);
+	tmp_list << QVariant(connected_antenna_name);
+	SRPCSignalClass::Instance().toLog(QString("kprd dynamic_call set_antenna_connection %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_antenna_connection(QString, QString)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kprd dynamic_call finished set_antenna_connection");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

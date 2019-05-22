@@ -46,11 +46,11 @@ RpcMT8K4LWidget::RpcMT8K4LWidget(int slot_port, int signal_port) : QWidget(), au
 	log_timer.start(200);
 
 	QString ip_str = "127.0.0.1";
-	Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new Socket_RPC_SLOT_Server_Thread;
+	mt8k4l_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new mt8k4l_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
-	Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new Socket_RPC_SIGNAL_Thread;
+	mt8k4l_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new mt8k4l_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
