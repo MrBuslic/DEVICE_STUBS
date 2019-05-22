@@ -76,8 +76,8 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("BOOP_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &BOOP_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["void new_message(QVariant, int, int, int, QVariantList, int)"] = &BOOP_Socket_RPC_SLOT_Object::void new_message;
-		operators_map["void new_matrix_command(int, int, int, int, double, double, int, int, int)"] = &BOOP_Socket_RPC_SLOT_Object::void new_matrix_command;
+		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &BOOP_Socket_RPC_SLOT_Object::new_message;
+		operators_map["new_matrix_command(int, int, int, int, double, double, int, int, int)"] = &BOOP_Socket_RPC_SLOT_Object::new_matrix_command;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -260,7 +260,7 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant BOOP_Socket_RPC_SLOT_Object::void new_message(QVariantList& _values)
+	QVariant BOOP_Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
 	{
 		try
 		{
@@ -283,7 +283,7 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant BOOP_Socket_RPC_SLOT_Object::void new_matrix_command(QVariantList& _values)
+	QVariant BOOP_Socket_RPC_SLOT_Object::new_matrix_command(QVariantList& _values)
 	{
 		try
 		{
