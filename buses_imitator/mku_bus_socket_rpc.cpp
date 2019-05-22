@@ -82,6 +82,9 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["ku_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::ku_map_channels_setup;
 		operators_map["mshm_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
 		operators_map["pshm_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
+		operators_map["ku_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::ku_map_channels_setup;
+		operators_map["mshm_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::mshm_map_channels_setup;
+		operators_map["pshm_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::pshm_map_channels_setup;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();

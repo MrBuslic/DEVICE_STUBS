@@ -78,6 +78,7 @@ int kprd_Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["dataIn(QVariantList, QVariantList)"] = &kprd_Socket_RPC_SLOT_Object::dataIn;
 		operators_map["set_antenna_connection(QString, QString)"] = &kprd_Socket_RPC_SLOT_Object::set_antenna_connection;
+		operators_map["set_antenna_connection(QString, QString)"] = &Socket_RPC_SLOT_Object::set_antenna_connection;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
