@@ -88,7 +88,6 @@ private:
 	void log_timer_ontimer();
 	void reverse_ant();
 	void lose_cont();
-	void update_graphics();
 	void change_power(bool switch_chanel);
 	void imit_off();
 	void imit_on();
@@ -104,10 +103,12 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void update_tm(int sadr);
 	void get_power(double volt);
+	void update_graphics();
 signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
 	void set_new_power_tm(int sadr, QVariantList words);
+	void emit_update_graphics();
 protected:
 	void closeEvent(QCloseEvent *event);
 private:
