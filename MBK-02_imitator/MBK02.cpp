@@ -146,6 +146,8 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 
+	connect(this, &MBK02_widg::emit_update_graphics, this, &MBK02_widg::update_graphics);
+
 	//connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
@@ -635,14 +637,14 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			{
 				switch (first_byte)
 				{
-				case 0x20: current_lit = 1; break;
-				case 0x28: current_lit = 2; break;
-				case 0x30: current_lit = 3; break;
-				case 0x38: current_lit = 4; break;
-				case 0x40: current_lit = 5; break;
-				case 0x48: current_lit = 6; break;
-				case 0x50: current_lit = 7; break;
-				case 0x58: current_lit = 8; break;
+				case 0x18: current_lit = 1; break;
+				case 0x20: current_lit = 2; break;
+				case 0x28: current_lit = 3; break;
+				case 0x30: current_lit = 4; break;
+				case 0x38: current_lit = 5; break;
+				case 0x40: current_lit = 6; break;
+				case 0x48: current_lit = 7; break;
+				case 0x50: current_lit = 8; break;
 				}
 			}
 			update_tm(4);
@@ -669,7 +671,7 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				update_tm(1);
 			}
 		}
-		update_graphics();
+		emit emit_update_graphics();
 	}
 }
 void MBK02_widg::update_graphics()
