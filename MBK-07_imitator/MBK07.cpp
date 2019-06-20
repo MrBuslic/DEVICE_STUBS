@@ -52,6 +52,10 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 		FSVU_canals << new QPushButton(numb, this);
 	}
 
+	FSVU_state.insert(FSVU_numbB::FSVU_One, true);
+	FSVU_state.insert(FSVU_numbB::FSVU_Two, true);
+	FSVU_state.insert(FSVU_numbB::FSVU_Three, true);
+
 	All_vblayout = new QHBoxLayout();
 	QVBoxLayout *logs_lay = new QVBoxLayout(this);
 	FSMUFSVU_vblayout = new QVBoxLayout();
@@ -204,7 +208,7 @@ void MBK07_widg::closeEvent(QCloseEvent *event)
 
 void MBK07_widg::get_frame(QString mode, QVariant frame_data)
 {
-	if ((mode_names.value(int(current_mode)) == mode) && (current_FSMU != FSMU_OFF))
+	if ((mode_names.value(int(current_mode)) == mode) && (current_FSMU != FSMU_OFF) && (power > 100))
 	{
 		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, pi8_fast ? 2 : 1, ant_names[current_antenna], frame_data);
 	}
@@ -221,13 +225,15 @@ void MBK07_widg::get_power(double _volt)
 
 void MBK07_widg::change_power()
 {
-	//Надо подправить - при включении не выставлены каналы ФСМУ и ФСВУ
+	//Надо подправить - может ли работать ФСМУ без ФСВУ?
 	//power = 0.5;
 	if (current_FSMU != FSMU_OFF)
 	{
 		power = 150;
 		if (current_FSVU != FSVU_OFF)
+			if (FSVU_state[current_FSVU] == true)
 			power = 180;
+			else power = 30;
 	}
 	else
 	{
@@ -298,7 +304,20 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 				current_stab = STAB(tmp_pshm);
 				break;
 			case 2:
-				current_FSVU = FSVU_numbB(tmp_pshm);
+				//if (FSVU_state[tmp_pshm] == true)
+				//{
+				//	if (current_FSMU != FSMU_OFF)
+				//	{
+				//		FSVU_state[current_FSVU] = false;
+				//	}
+				//	current_FSVU = FSVU_numbB(tmp_pshm);
+				//}
+					if (current_FSMU != FSMU_OFF)
+					{
+						FSVU_state[current_FSVU] = false;
+					}
+					current_FSVU = FSVU_numbB(tmp_pshm);
+					change_power();
 				break;
 			case 3:
 				current_antenna = MBK07_ANTENNA(tmp_pshm);
@@ -415,9 +434,20 @@ void MBK07_widg::update_graphics()
 	}
 	for (int i = 0; i < 3; i++)
 	{
-		FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-		if (current_FSVU == i)
-			FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		if (FSVU_state[i] == true)
+		{
+			if (current_FSVU == i)
+				FSVU_canals[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+			else
+				FSVU_canals[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+		}
+		else
+		{
+			if (current_FSVU == i)
+				FSVU_canals[i]->setStyleSheet("background-color: rgb(200, 25, 25);");
+			else
+				FSVU_canals[i]->setStyleSheet("background-color: rgb(125, 25, 25);");
+		}	
 	}
 
 	QString res_mode;
