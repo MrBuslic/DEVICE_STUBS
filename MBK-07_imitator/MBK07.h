@@ -170,6 +170,7 @@ private:
 	QMap<int, LITERA> lit_map;
 	QMap<int, QString> stab_names;
 	QMap<int, QString> ant_names;
+	QMap<int, bool> FSVU_state;
 	
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
