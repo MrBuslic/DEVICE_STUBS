@@ -1,7 +1,6 @@
-#include "BufferClass1553.h"
+#include "BTI1553/BufferClass1553.h"
 
-
-int rpc_buffer_class::create_msg_addr(int addr, int saddr, int mko)
+int rpc_buffer_class_1553::create_msg_addr(int addr, int saddr, int mko)
 {
 	MsgAddr tmp_msg;
 	tmp_msg.addr = addr;
@@ -12,7 +11,7 @@ int rpc_buffer_class::create_msg_addr(int addr, int saddr, int mko)
 	return msg_ind;
 }
 
-int rpc_buffer_class::create_list_addr(int addr, int saddr, int mko, int list_size, int tr)
+int rpc_buffer_class_1553::create_list_addr(int addr, int saddr, int mko, int list_size, int tr)
 {
 	LstAddr tmp_lst;
 	tmp_lst.addr = addr;
@@ -21,7 +20,7 @@ int rpc_buffer_class::create_list_addr(int addr, int saddr, int mko, int list_si
 	tmp_lst.words = QVariantList();
 	tmp_lst.lst_size = list_size;
 
-	MkoWord tmp_KS;
+	MkoWord1553 tmp_KS;
 	tmp_KS.adr = addr;
 	tmp_KS.subadr = saddr;
 	tmp_KS.count = 0;
@@ -31,12 +30,12 @@ int rpc_buffer_class::create_list_addr(int addr, int saddr, int mko, int list_si
 	return tmp_KS.cw;
 }
 
-void rpc_buffer_class::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+void rpc_buffer_class_1553::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	if (os == -1)
 		return;
 
-	MkoWord tmp_cwd;
+	MkoWord1553 tmp_cwd;
 	tmp_cwd.cw = cwd;
 	tmp_cwd.count = 0;
 

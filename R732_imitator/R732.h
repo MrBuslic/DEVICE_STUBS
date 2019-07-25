@@ -40,10 +40,10 @@ private:
 	QPushButton* proc_vchm3;
 	QList<QPushButton*> proc_vchm_btns_lst;
 
-	MU_MODULE mu_module;
-	QList<MV_MODULE> mpvn_modules;
-	QList<MV_MODULE> mvku_modules;
-	VCHM_MODULE vchm_module;
+	R732_MU_MODULE mu_module;
+	QList<R732_MV_MODULE> mpvn_modules;
+	QList<R732_MV_MODULE> mvku_modules;
+	R732_VCHM_MODULE vchm_module;
 
 	RPC_omnibus_SLOT_Thread omni_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omni_signal_thr;

@@ -53,14 +53,31 @@ RpcOlsWidget::RpcOlsWidget(int ols_num) : QWidget(), auto_scroll(true)
 
 int RpcOlsWidget::unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer)
 {
-	rpc_ols_buffer = data_buffer;
+	rpc_ols_kf_buffer = data_buffer;
 	rpc_mask_buffer = mask_buffer;
 	return 0;
 }
-int RpcOlsWidget::unols_trigger_imm()
+/*
+int RpcOlsWidget::unols_read_data_kr(QVariantList data_buffer)
 {
-	emit new_ols_data(rpc_ols_buffer, rpc_mask_buffer);
+	rpc_ols_kr_buffer = data_buffer;
+}
+*/
+int RpcOlsWidget::unols_trigger_imm(int devise)//добавить параметр (выдача, приём)
+{
+	if (devise)//возможно обойтись без ветвления?
+	{
+		emit send_data(rpc_ols_kr_buffer);//добавить связь сигнала rpc_ols с КПИУ 
+	}
+	else {
+		emit new_ols_data(rpc_ols_kf_buffer, rpc_mask_buffer);
+	}
 	return 0;
+}
+
+void RpcOlsWidget::unols_read_data_kr(QVariantList& data_buffer)
+{
+	data_buffer = rpc_ols_kr_buffer;
 }
 
 void RpcOlsWidget::auto_scroll_clicked(int _state)
@@ -85,4 +102,10 @@ void RpcOlsWidget::log_timer_ontimer()
 	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
 		log_stream << *itr << "\n";
 	log_file.close();
+}
+
+int RpcOlsWidget::unols_mStart()
+{
+
+	return 0;
 }

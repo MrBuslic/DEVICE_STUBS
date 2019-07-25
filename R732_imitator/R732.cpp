@@ -18,8 +18,8 @@ union MKOWord
 R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bus(3), power(0), volt(0), power_on(false), name("14Р732"), ready_to_work_hard(false)
 {
 	vchm_chanels_init << 0 << 0 << 0 << 0;
-	mpvn_modules << MV_MODULE(5, 0);
-	mvku_modules << MV_MODULE(2, 0);
+	mpvn_modules << R732_MV_MODULE(5, 0);
+	mvku_modules << R732_MV_MODULE(2, 0);
 
 	//setFixedSize(572, 200);
 	setWindowTitle("14Р732");
@@ -152,9 +152,9 @@ R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bu
 	connect(MU1, &QPushButton::clicked, this, &R732_widg::set_mu_on);
 	connect(vchm_btns_lst[0], &QPushButton::clicked, this, &R732_widg::set_vchm_on);
 
-	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
+	mvku_modules[0].switch_cur_dev(R732_CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(R732_CURRENT_DEV::OFF);
+	mu_module.switch_cur_dev(R732_CURRENT_DEV::OFF);
 
 	paint_buttons();
 
@@ -211,7 +211,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 						continue;
 					case 2:
 						if (switch_dev)
-							mvku_modules[0].switch_cur_dev(CURRENT_DEV(switch_dev));
+							mvku_modules[0].switch_cur_dev(R732_CURRENT_DEV(switch_dev));
 						if (bus_reset)
 						{
 							mvku_modules[0].set_ku_p(-1);
@@ -222,7 +222,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 						continue;
 					case 5:
 						if (switch_dev)
-							mpvn_modules[0].switch_cur_dev(CURRENT_DEV(switch_dev));
+							mpvn_modules[0].switch_cur_dev(R732_CURRENT_DEV(switch_dev));
 						break;
 					};
 					break;
@@ -314,7 +314,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
 		//					break;
 		//				}
-		//				MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
+		//				R732_MV_MODULE& param_pshm = mvmk_modules[pshm / 4].get_settings();
 		//				for (int mshm = 0; mshm <= 11; mshm++)
 		//				{
 		//					num_vertic = (itr->toInt()&(1 << mshm));
@@ -322,7 +322,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//					{
 		//						if (max_p <= 4)
 		//						{
-		//							MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
+		//							R732_MV_MODULE& param_mshm = mvmk_modules[mshm / 4].get_settings();
 		//							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
 		//							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
 		//							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom - param_mshm.dt_kom), 3, 3);
@@ -349,7 +349,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					ku = (itr->toInt()&(1 << num_ku));
 					if (ku != 0 && nim == 0)
 					{
-						MV_DEV& param_ku = mvku_modules[nim].get_settings();
+						R732_MV_DEV& param_ku = mvku_modules[nim].get_settings();
 						mvku_modules[nim].set_ku_p(num_ku);
 						int full_num_ku = num_ku + nim * 8;
 						mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
@@ -416,51 +416,51 @@ QVariantList R732_widg::get_mko_counter_word()
 
 void R732_widg::paint_buttons()
 {
-	switch (mu_module.get_current_dev())
+	switch (mu_module.get_R732_CURRENT_DEV())
 	{
-	case OFF:
+	case R732_CURRENT_DEV::OFF:
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case MAIN:
+	case R732_CURRENT_DEV::MAIN:
 		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case RESERVE:
+	case R732_CURRENT_DEV::RESERVE:
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
 
 	};
 
-	switch (mvku_modules[0].get_current_dev())
+	switch (mvku_modules[0].get_R732_CURRENT_DEV())
 	{
-	case OFF:
+	case R732_CURRENT_DEV::OFF:
 		main_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case MAIN:
+	case R732_CURRENT_DEV::MAIN:
 		main_MVKU->setStyleSheet("background-color: rgb(142, 198, 156);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case RESERVE:
+	case R732_CURRENT_DEV::RESERVE:
 		main_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
 
 	};
 
-	switch (mpvn_modules[0].get_current_dev())
+	switch (mpvn_modules[0].get_R732_CURRENT_DEV())
 	{
-	case OFF:
+	case R732_CURRENT_DEV::OFF:
 		main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case MAIN:
+	case R732_CURRENT_DEV::MAIN:
 		main_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 		reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case RESERVE:
+	case R732_CURRENT_DEV::RESERVE:
 		main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
@@ -502,9 +502,9 @@ void R732_widg::set_mu_on()
 		connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 		omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 		ready_to_work_hard = true;
-		mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
-		mpvn_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
-		mvku_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
+		mu_module.switch_cur_dev(R732_CURRENT_DEV::MAIN);
+		mpvn_modules[0].switch_cur_dev(R732_CURRENT_DEV::MAIN);
+		mvku_modules[0].switch_cur_dev(R732_CURRENT_DEV::MAIN);
 		set_new_tm();
 		paint_buttons();
 	}
@@ -542,9 +542,9 @@ void R732_widg::imit_off()
 	power = 0;
 	power_on = false;
 	ready_to_work_hard = false;
-	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
-	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	mu_module.switch_cur_dev(R732_CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(R732_CURRENT_DEV::OFF);
+	mvku_modules[0].switch_cur_dev(R732_CURRENT_DEV::OFF);
 	vchm_chanels_init.clear();
 	vchm_chanels_init << 0 << 0 << 0 << 0;
 	vchm_module.set_working_chanels(vchm_chanels_init);
@@ -568,9 +568,9 @@ void R732_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_
 	if (pshm != 0)
 		return;
 	if (mshm == 1)
-		mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
+		mu_module.switch_cur_dev(R732_CURRENT_DEV::MAIN);
 	else if (mshm == 2)
-		mu_module.switch_cur_dev(CURRENT_DEV::RESERVE);
+		mu_module.switch_cur_dev(R732_CURRENT_DEV::RESERVE);
 	else
 		return;
 	paint_buttons();
@@ -619,44 +619,44 @@ void R732_widg::restart_vchm_proc(int chanel)
 	}
 }
 
-MU_MODULE::MU_MODULE() : current_dev(MAIN)
+R732_MU_MODULE::R732_MU_MODULE() : R732_CURRENT_DEV(R732_CURRENT_DEV::MAIN)
 {
-	working.insert(MAIN, true);
-	working.insert(RESERVE, true);
+	working.insert(R732_CURRENT_DEV::MAIN, true);
+	working.insert(R732_CURRENT_DEV::RESERVE, true);
 
-	ab_working.insert(MAIN, true);
-	ab_working.insert(RESERVE, true);
+	ab_working.insert(R732_CURRENT_DEV::MAIN, true);
+	ab_working.insert(R732_CURRENT_DEV::RESERVE, true);
 
 }
 
-MV_MODULE::MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(MAIN)
+R732_MV_MODULE::R732_MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), R732_CURRENT_DEV(R732_CURRENT_DEV::MAIN)
 {
-	devices.insert(MAIN, MV_DEV());
-	devices.insert(RESERVE, MV_DEV());
+	devices.insert(R732_CURRENT_DEV::MAIN, R732_MV_DEV());
+	devices.insert(R732_CURRENT_DEV::RESERVE, R732_MV_DEV());
 }
 
-unsigned short MU_MODULE::get_tm()
+unsigned short R732_MU_MODULE::get_tm()
 {
 	unsigned short _word = 0x1000;
 	if (!get_working())
 		_word += 4;
-	_word += 0x20 << current_dev;
+	_word += 0x20 << (unsigned short) R732_CURRENT_DEV;
 	return _word;
 }
 
-unsigned short MV_MODULE::get_tm()
+unsigned short R732_MV_MODULE::get_tm()
 {
 	unsigned short _word = (com << 12) + (nim << 8);
 	if (!get_working())
-		_word += 2 << current_dev;
-	if (current_dev == OFF)
+		_word += 2 << (unsigned short) R732_CURRENT_DEV;
+	if (R732_CURRENT_DEV == R732_CURRENT_DEV::OFF)
 		_word += 0xC0;
 	else
-		_word += 0x20 << current_dev;
+		_word += 0x20 << (unsigned short) R732_CURRENT_DEV;
 	return _word;
 }
 
-unsigned short MV_MODULE::get_data_mvku()
+unsigned short R732_MV_MODULE::get_data_mvku()
 {
 	unsigned short _word = (0 << 12) + (nim << 8);
 	if (!get_working())
@@ -666,7 +666,7 @@ unsigned short MV_MODULE::get_data_mvku()
 	return _word;
 }
 
-VCHM_MODULE::VCHM_MODULE()
+R732_VCHM_MODULE::R732_VCHM_MODULE()
 {
 	working.insert(VCHM0, false);
 	working.insert(VCHM1, false);
@@ -678,7 +678,7 @@ VCHM_MODULE::VCHM_MODULE()
 	proc_working.insert(VCHM3, false);
 }
 
-void VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
+void R732_VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
 {
 	if (chanels_state.size() < 4)
 		return;
@@ -698,7 +698,7 @@ void VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
 	}
 }
 
-void VCHM_MODULE::set_working_proc(int chanel, int state)
+void R732_VCHM_MODULE::set_working_proc(int chanel, int state)
 {
 	if (chanel > 3)
 		return;

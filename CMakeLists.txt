@@ -1,13 +1,12 @@
 project(Stubs)
 cmake_minimum_required(VERSION 2.8)
 
-enable_language(C)
-
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
-enable_language(C) #только 1 язык?
+
 enable_language(CXX)
-	
+
+add_definitions(-DUNICODE -D_UNICODE -DWIN32 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS)
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -21,12 +20,20 @@ find_package(Qt5Script)
 find_package(Qt5ScriptTools)
 find_package(Qt5PrintSupport)
 
+add_definitions(-DLOKI_CLASS_LEVEL_THREADING -DWINDOWS -D_WINDOWS)
+add_definitions(-DWIN32_LEAN_AND_MEAN)
+
 include_directories($ENV{VISA_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
 include_directories($ENV{LOKI_HOME}/include)
 include_directories($ENV{OMNIBUS_HOME}/include)
+include_directories($ENV{SM_HOME}/SM/target/BOS/BOS_h)
+include_directories($ENV{SM_HOME}/SM/target/BRPO/BRPO_h)
+include_directories($ENV{SM_HOME}/SM/target/OPO/OPO_h)
+include_directories($ENV{SM_HOME}/SM/target/target_h)
+include_directories (${PROJECT_SOURCE_DIR}/cbk_imitator_real_po/real_tpo/Source)
 
 include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Script_INCLUDES})
@@ -58,26 +65,29 @@ include_directories("../lib/common_functions")
 include_directories("../lib/db_ctrl")
 include_directories("../lib/mongo_ctrl")
 include_directories("../vendor/QScintilla/core/Qt4")
-include_directories("../lib/socket_rpc/include")
-
-include_directories ($ENV{SM_HOME}/target/BOS/BOS_h)
-include_directories ($ENV{SM_HOME}/target/BRPO/BRPO_h)
-include_directories ($ENV{SM_HOME}/target/OPO/OPO_h)
-include_directories ($ENV{SM_HOME}/target/target_h)
 
 include_directories(${QT_QTSCRIPTTOOLS_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../lib/mongo_ctrl_v3)
+include_directories(${PROJECT_SOURCE_DIR}/../ServerSide/MBK07)
+include_directories(${PROJECT_SOURCE_DIR}/../ServerSide/src/Devices/PUOP/OmniBus/omnibus_lib)
 include_directories("OMNIBUSBOX")
 include_directories("UNMDS32")
 include_directories("UNMFSK24")
+include_directories("buses_imitator")
+include_directories("LKA-05_imitator")
+include_directories("UNFOI")
+include_directories("UNOLS")
+include_directories("KPRD_imitator")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 
 include_directories("BECH_imitator")
 include_directories("buses_imitator")
+include_directories("cbk_imitator_real_po/real_tpo/MY_BOS")
 
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${Qt5Gui_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
 	
@@ -89,7 +99,7 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
 
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{OMNIBUS_HOME}/lib $ENV{MONGO_HOME}/lib)
 
 SET (TMP1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) 
 SET (TMP2 ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
@@ -132,6 +142,7 @@ add_subdirectory(SCHWARZ_stub)
 add_subdirectory(TEST1003)
 add_subdirectory(UNMVI102)
 
+
 #add_subdirectory(bkupi_imitator)
 add_subdirectory(tpo_imitator)
 add_subdirectory(spobu_imitator)
@@ -149,11 +160,11 @@ add_subdirectory(R733_imitator)
 add_subdirectory(RM_MBK07_imitator)
 
 #set(SOURCES "cbk_imitator/main.cpp")
-file(GLOB_RECURSE SOURCES *.cpp)
+file(GLOB_RECURSE SOURCES *.cpp *.c)
 file(GLOB_RECURSE HEADERS *.h)
 #file(GLOB_RECURSE REMOVE_SOURCES "*main.cpp")
-file(GLOB_RECURSE REMOVE_SOURCES "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp")
-file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h")#Выделить заголовочные файлы МКО в отдельную папку
+file(GLOB_RECURSE REMOVE_SOURCES "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp" "cbk_imitator/*.cpp" "spobu_imitator/*.cpp" "tpo_imitator/*.cpp" "*BUSES.cpp" "cbk_imitator_real_po/real_tpo/DebugUnit.c" "cbk_imitator_real_po/real_tpo/ProtoUnit1.c" "cbk_imitator_real_po/real_tpo/ProtoUnit2.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Erti.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Koi.c" "DllMain.cpp" "cbk_imitator_real_po/*.cpp" "cbk_imitator_real_po/*.c"  )
+file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h" "cbk_imitator/*.h" "spobu_imitator/*.h" "tpo_imitator/*.h" "*BUSES.h" "cbk_imitator_real_po/*.h")#Выделить заголовочные файлы МКО в отдельную папку
 #list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
 list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
 list(REMOVE_ITEM HEADERS ${REMOVE_HEADERS})
@@ -165,12 +176,20 @@ list(APPEND SOURCES ${PROJECT_SOURCE_DIR}/main.cpp)
 add_executable(Stubs ${SOURCES} ${HEADERS})
 
 target_link_libraries (Stubs ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc qscintilla db_ctrl) 
+                                      ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} BTICARD BTI1553 socket_rpc mongo_controller mongo_controller_v3 qscintilla db_ctrl git2 my_git common_functions unfoi_32 frame_converter) 
 
 if(WIN32)
 	qt5_use_modules(Stubs Core Widgets Network Gui)
 	# SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
+
+
+ADD_CUSTOM_COMMAND(TARGET Stubs
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/KPIU_server.h ${PROJECT_SOURCE_DIR} kpiu
+)
+
+
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})

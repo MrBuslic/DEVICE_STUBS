@@ -55,15 +55,15 @@ struct mezanin_struct
 	ViInt16 Type;
 };
 
-QList<mezanin_struct> mezanin_list;
-int mezanin_list_poiner = 0;
+QList<mezanin_struct> unmbase_mezanin_list;
+int unmbase_mezanin_list_pointer = 0;
 
-void mezanin_list_add(ViInt16 Present, ViInt16 Type)
+void unmbase_mezanin_list_add(ViInt16 Present, ViInt16 Type)
 {
 	mezanin_struct mez;
 	mez.Present = Present;
 	mez.Type = Type;
-	mezanin_list.push_back(mez);
+	unmbase_mezanin_list.push_back(mez);
 }
 
 
@@ -78,109 +78,109 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		// Сначала инициализируется НМ, потом НМ-АРМ затем МНУ
 		// НМ
 		/*
-		mezanin_list_add(1, 0x021);	// OSC5
-		mezanin_list_add(1, 0x021);
-		mezanin_list_add(1, 0x021);
-		mezanin_list_add(1, 0x021);
-		mezanin_list_add(1, 0x1A);	// MC
-		mezanin_list_add(1, 0x1A);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x021);	// OSC5
+		unmbase_mezanin_list_add(1, 0x021);
+		unmbase_mezanin_list_add(1, 0x021);
+		unmbase_mezanin_list_add(1, 0x021);
+		unmbase_mezanin_list_add(1, 0x1A);	// MC
+		unmbase_mezanin_list_add(1, 0x1A);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 		*/
 
-		mezanin_list_add(1, 0x021);	// OSC5
-		mezanin_list_add(0, 0);
-		mezanin_list_add(1, 0x1A);	// MC
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x021);	// OSC5
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x1A);	// MC
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 
-		mezanin_list_add(1, 0x9);	// MDS32
-		mezanin_list_add(1, 0x9);	// MDS32
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x9);	// MDS32
+		unmbase_mezanin_list_add(1, 0x9);	// MDS32
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 
-		mezanin_list_add(1, 0x5);	// MT8K4L
-		mezanin_list_add(1, 0x5);	// MT8K4L
-		mezanin_list_add(1, 0x5);	// MT8K4L
-		mezanin_list_add(1, 0x5);	// MT8K4L
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 
 		// НМУ
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 	}
 
 	if (commapp == "comapp2")
 	{
 		// Сначала инициализируется НМ, потом НМ-АРМ затем МНУ
 		// НМ
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(1, 0x17);	// MN8I
-		mezanin_list_add(1, 0x1F);	// MN3I
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(1, 0x17);	// MN8I
+		unmbase_mezanin_list_add(1, 0x1F);	// MN3I
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 
-		mezanin_list_add(1, 0x021);	// OSC5
-		mezanin_list_add(0, 0);
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x021);	// OSC5
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 		
 	}
 
 	if (commapp == "comappFrame")
 	{
-		mezanin_list_add(1, 0x36);	// MKPRM
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x36);	// MKPRM
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 
-		mezanin_list_add(1, 0x37);	// MBKUPI
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x37);	// MBKUPI
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 	}
 
 	if (commapp == "iksa_server")
 	{
-		mezanin_list_add(1, 0x0A);	// MFSK24
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
-		mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
 	}
 
 	return 0; 
@@ -519,9 +519,9 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                  
 	
 */
 	
-	*Present = mezanin_list.at(mezanin_list_poiner).Present;
-	*Type = mezanin_list.at(mezanin_list_poiner).Type;
-	mezanin_list_poiner++;
+	*Present = unmbase_mezanin_list.at(unmbase_mezanin_list_pointer).Present;
+	*Type = unmbase_mezanin_list.at(unmbase_mezanin_list_pointer).Type;
+	unmbase_mezanin_list_pointer++;
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/

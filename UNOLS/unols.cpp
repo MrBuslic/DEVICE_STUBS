@@ -4,8 +4,9 @@
 #include "rpc_ports.h"
 
 int unols_state = UNOLS_STOP;
+unols_mKRUserCallback _interrupt_handle;
 
-rpc_buffer_class::rpc_buffer_class()
+ols_rpc_buffer_class::ols_rpc_buffer_class()
 {
 	for (int i = 0; i < 5; i++)
 	{
@@ -25,50 +26,26 @@ rpc_buffer_class::rpc_buffer_class()
 	}
 }
 
-
-// Объявляем функцию DllMain
-
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-	DWORD fdwReason, LPVOID lpvReserved)
+/*
+void ols_rpc_buffer_class::unols_mKRLastFrameReceivedUserCallback(ViSession vi, ViUInt16 eventREG)
 {
-	Srpc_buffer_class::Instance();
-	switch (fdwReason)      // Дерево разбора уведомлений
-	{
-	case DLL_PROCESS_ATTACH: // Подключение DLL
-							 //MessageBox(NULL,"Подключение Заглушки UNMN8I для Мезонина МН8И","Использование заглушек!", MB_ICONINFORMATION);
-
-							 //if (lpvReserved)  // Определение способа загрузки
-							 // MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-							 //else
-							 //MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-							 //return 1; // успешная инициализация
-
-		break;
-
-	case DLL_PROCESS_DETACH: // Отключение DLL
-							 // Здесь – освобождаем память, закрываем
-							 // файлы и т.д.
-		break;
-
-	case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
-							// Здесь – если надо переходим на
-							// многопоточный режим работы с
-							// использованием средств синхронизации
-							// таких как критическая секция, мутанты,
-							// семафоры и т.д.
-		break;
-
-	case DLL_THREAD_DETACH:
-		//Уведомление о завершении потока
-		// Здесь – если надо освобождаем все ресурсы, 
-		// вязанные с завершившимся потоком. Какой именно
-		// поток завершился можно узнать просмотром списка
-		// потоков средствами TOOLHELP32
-		//MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
-		break;
-
-	}
-	return TRUE;    // Код возврата игнорируется
+OZU_buffer =
+}
+*/
+/*
+void ols_rpc_buffer_class::packet_ready()
+{
+if (rec_event & 0x04) {
+QObject* tmp_sender = sender();
+for (int i = 0; i < ols_signal_thr.count(); i++)
+if (ols_signal_thr[i]->get_obj().get() == tmp_sender)
+(*_interrupt_handle)(i, 0x04);
+}
+}
+*/
+void ols_rpc_buffer_class::packet_ready(unsigned int vi, QVariantList& data_buffer)
+{
+	Sols_rpc_buffer_class::Instance().ols_KR_buffer[vi - 1] = data_buffer;
 }
 
 #if defined(__cplusplus) || defined(__cplusplus__)
@@ -85,7 +62,8 @@ ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName,
 								ViBoolean 	id_query,
 								ViBoolean 	reset, 
 	ViPSession 	vi) {
-	*vi = 1;  return 0;
+	*vi = 1;  
+return 0;
 }
 /****************************************************************************
 		Функции конфигурации
@@ -111,7 +89,16 @@ ViStatus _VI_FUNC unols_set_mode (ViSession vi, ViInt16 devise, ViInt16 mode, Vi
 
 ViStatus _VI_FUNC unols_config_mode (ViSession vi, ViUInt16 devise,  
                                      ViUInt16 packs, ViUInt32 _VI_FAR periodPack[], 
-                                     ViUInt32 _VI_FAR seriesPack[]){ return 0; }
+                                     ViUInt32 _VI_FAR seriesPack[])
+{
+	Sols_rpc_buffer_class::Instance().pack_num = packs;
+	for (int i = 0; i < packs; i++) 
+	{
+		Sols_rpc_buffer_class::Instance().periods[i] = periodPack[i];
+		Sols_rpc_buffer_class::Instance().series[i] = seriesPack[i];
+	}
+	return 0; 
+}
 ViStatus _VI_FUNC unols_config_preTrig (ViSession vi, ViUInt16 statePreTrig){ return 0; }
 
 ViStatus _VI_FUNC unols_config_channel (ViSession vi, ViInt16 devise,
@@ -163,20 +150,17 @@ ViStatus _VI_FUNC unols_config_inpExt_Q (ViSession vi,  ViPInt16 st){ return 0; 
 		Функции управления/состояния
 *****************************************************************************/
 ViStatus _VI_FUNC unols_trigger (ViSession vi, ViInt16 devise){
-	if (devise == 2) {
-		Srpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_write_data_kf(Srpc_buffer_class::Instance().ols_buffer, Srpc_buffer_class::Instance().mask_buffer);
-		unols_state = UNOLS_WAIT;
-	}
+	if (devise == 2)
+		Sols_rpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_write_data_kf(Sols_rpc_buffer_class::Instance().ols_KF_buffer[vi - 1], Sols_rpc_buffer_class::Instance().mask_buffer[vi - 1]);
+	unols_state = UNOLS_WAIT;
 	return 0; 
 }  //todo (передача 2 буферов в rpc)
 
 ViStatus _VI_FUNC unols_trigger_imm (ViSession vi, ViInt16 devise){
-	if (devise == 2) {//Generator
-		Srpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_trigger_imm();
-		unols_state = UNOLS_STOP;
-	}
+	Sols_rpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_trigger_imm(devise);
+	unols_state = UNOLS_STOP;
 	return 0;
-}     //todo
+}
 
 ViStatus _VI_FUNC unols_stop (ViSession vi, ViInt16 devise){ return 0; }   
 ViStatus _VI_FUNC unols_reset_status (ViSession vi, ViInt16 devise, ViUInt16 maskEvent, ViUInt16 errorEvent){ return 0; } 
@@ -191,15 +175,37 @@ ViStatus _VI_FUNC unols_status_Q (ViSession vi, ViInt16 devise,
 ViStatus _VI_FUNC unols_countData (ViSession vi, ViInt16 devise, ViPUInt32 count){ return 0; }  
 
 ViStatus _VI_FUNC unols_write_allData (ViSession vi, ViInt16 devise, ViUInt32 period,
-                                       ViUInt32 offsetData, void* data){ return 0; }   
-ViStatus _VI_FUNC unols_read_allData (ViSession vi, ViInt16 devise, ViUInt32 period,
-                                    ViUInt32 offsetData, void* data){ return 0; }	 
+                                       ViUInt32 offsetData, void* data)
+{
+	if (devise == 1)
+	{
+		for (int i = 0; i < period; i++) 
+			Sols_rpc_buffer_class::Instance().ols_KR_buffer[vi - 1] << ((unsigned long long*)data)[i + offsetData];
+	}
+	return 0;
+}
+ViStatus _VI_FUNC unols_read_allData(ViSession vi, ViInt16 devise, ViUInt32 period,
+									ViUInt32 offsetData, void* data)
+{
+	if (devise == 1)
+	{
+		/*	QList<QVariant>::iterator it = Sols_rpc_buffer_class::Instance().ols_KR_buffer.begin();
+			for (int i = 0; i < period, it != Sols_rpc_buffer_class::Instance().ols_KR_buffer.end(); i++, it++)
+				((unsigned long long*)data)[i] = Sols_rpc_buffer_class::Instance().ols_KR_buffer[it + offsetData];
+				*/
+		Sols_rpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_read_data_kr(Sols_rpc_buffer_class::Instance().ols_KR_buffer[vi - 1]);
+		for (int i = 0; i < period; i++)
+			((unsigned long long*)data)[i] = Sols_rpc_buffer_class::Instance().ols_KR_buffer[vi - 1][i + offsetData].toULongLong();
+	}
+	return 0;
+}
+
 ViStatus _VI_FUNC unols_read_dataKF (ViSession vi, ViUInt32 period,    
                                     ViUInt32 offsetData, void* data, void* maska){ return 0; }									
 ViStatus _VI_FUNC unols_write_dataKF (ViSession vi, ViUInt32 period,   
                                     ViUInt32 offsetData, void* data, void* maska){
 	//как определить число каналов?
-	Srpc_buffer_class::Instance().put_data(period, data, maska);
+	Sols_rpc_buffer_class::Instance().put_data(vi, period, data, maska);
 //	kprd_list.put_data(period, data, maska);
 	return 0; }
 ViStatus _VI_FUNC unols_write_DataOZU (ViSession vi, ViInt16 devise, ViUInt32 period,
@@ -259,16 +265,29 @@ ViStatus _VI_FUNC unols_mConfig_handlerKF_Q (ViSession vi,  ViPAddr userCallback
 	
 *****************************************************************************/   
 // установка частоты
-ViStatus _VI_FUNC unols_mSet_freqKR   (ViSession vi,  ViInt32 freq){return 0;}   //    статусы ++  
-ViStatus _VI_FUNC unols_mSet_freqKR_Q (ViSession vi,  ViPInt32 freq){return 0;}//++   //    статусы ++  
+ViStatus _VI_FUNC unols_mSet_freqKR   (ViSession vi,  ViInt32 freq){
+	//нужен ли номер сеанса? в данный момент rec_freq общий для всех сеансов
+	Sols_rpc_buffer_class::Instance().rec_freq = freq;
+	return 0;}   //    статусы ++  
+ViStatus _VI_FUNC unols_mSet_freqKR_Q (ViSession vi,  ViPInt32 freq){return 0;}//++   //статусы ++  
 // параметры обмена (количество кадров)
-ViStatus _VI_FUNC unols_mConfig_modeKR   (ViSession vi,  ViInt32 packs){return 0;} 	 //    статусы ++  
+ViStatus _VI_FUNC unols_mConfig_modeKR   (ViSession vi,  ViInt32 packs)
+{
+	Sols_rpc_buffer_class::Instance().rec_packs = packs;
+	return 0;} 	 //    статусы ++  
 ViStatus _VI_FUNC unols_mConfig_modeKR_Q (ViSession vi,  ViPInt32 packs){return 0;}    //    статусы ++  
 // источник  запуска
 ViStatus _VI_FUNC unols_mSynhro_triggerKR  (ViSession vi,  ViInt32 sourse){return 0;}  
-ViStatus _VI_FUNC unols_mSynhro_triggerKR_Q (ViSession vi,  ViPInt32 sourse){return 0;}//++   
+ViStatus _VI_FUNC unols_mSynhro_triggerKR_Q (ViSession vi,  ViPInt32 sourse){return 0;}//++  
+
 // прерывание
-ViStatus _VI_FUNC unols_mConfig_handlerKR (ViSession vi,  ViAddr userCallback, ViUInt32 regEvent){return 0;} //    статусы ++  
+ViStatus _VI_FUNC unols_mConfig_handlerKR (ViSession vi,  ViAddr userCallback, ViUInt32 regEvent)//почему regEvent? recEvent ближе по значению к описанию в документации
+{
+	_interrupt_handle = reinterpret_cast<unols_mKRUserCallback>(userCallback);
+	Sols_rpc_buffer_class::Instance().rec_event = regEvent;
+//	QObject::connect(static_cast<RPC_ols_SIGNAL_Object*>(Sols_rpc_buffer_class::Instance().ols_signal_thr[vi - 1]->get_obj().get()), &RPC_ols_SIGNAL_Object::packet_ready, &Sols_rpc_buffer_class::Instance(), &ols_rpc_buffer_class::packet_ready);
+	return 0;} //    статусы ++  
+
 ViStatus _VI_FUNC unols_mConfig_handlerKR_Q (ViSession vi, ViPAddr userCallback, ViPUInt32 regEvent){return 0;}//++		//    статусы ++  
  
 // Запрос количества принятых (зарегистрированных) пакетов
@@ -276,7 +295,12 @@ ViStatus _VI_FUNC unols_mPacksKR_Q (ViSession vi, ViPUInt32 packs){return 0;}
 /****************************************************************************
 		Функции управления/состояния
 *****************************************************************************/
-ViStatus _VI_FUNC unols_mStart (ViSession vi, ViInt32 devise){return 0;}  
+ViStatus _VI_FUNC unols_mStart (ViSession vi, ViInt32 devise){
+	if (devise == 1) {
+		Sols_rpc_buffer_class::Instance().ols_slot_thr[vi - 1]->get_ols_obj()->unols_write_data_kf(Sols_rpc_buffer_class::Instance().ols_KR_buffer[vi - 1], Sols_rpc_buffer_class::Instance().mask_buffer[vi - 1]);
+		unols_state = UNOLS_WAIT;//нужно ли различать состояния режимов "универсальный" и "видео"?
+	}
+	return 0;}  
 ViStatus _VI_FUNC unols_mStop (ViSession vi, ViInt32 devise){return 0;}   
 ViStatus _VI_FUNC unols_mReset_status (ViSession vi, ViInt32 devise, ViUInt32 maskEvent){return 0;} 
 ViStatus _VI_FUNC unols_mReset_DDR (ViSession vi, ViInt32 devise){return 0;} 
@@ -294,7 +318,8 @@ ViStatus _VI_FUNC unols_mModuleType_Q (ViSession vi, ViPUInt32 type){return 0;}
 *****************************************************************************/
 ViStatus _VI_FUNC unols_mWrite_dataKF (ViSession vi,ViChar _VI_FAR file_name[], ViPUInt32 adr){return 0;} 
 // Чтение данных из ОЗУ ПРИЕМА 
-ViStatus _VI_FUNC unols_mRead_dataKR (ViSession vi, ViUInt32 packs, ViChar _VI_FAR directory_name[]){return 0;}
+ViStatus _VI_FUNC unols_mRead_dataKR (ViSession vi, ViUInt32 packs, ViChar _VI_FAR directory_name[]){
+	return 0;}
 
 
 /****************************************************************************

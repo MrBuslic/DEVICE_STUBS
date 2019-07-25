@@ -27,9 +27,11 @@ public:
 public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
-
+	//todo корректно ли называть функцию передачи данных через rpc как функцию записи формирования
 	int unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer);
-	int unols_trigger_imm();
+	int unols_trigger_imm(int devise);
+	void unols_read_data_kr(QVariantList& data_buffer);
+	int unols_mStart();	
 private:
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
@@ -42,7 +44,8 @@ private:
 	QStringList log_buffer;
 	QMutex log_mutex;
 
-	QVariantList rpc_ols_buffer;
+	QVariantList rpc_ols_kr_buffer;
+	QVariantList rpc_ols_kf_buffer;
 	QVariantList rpc_mask_buffer;
 	//добавить слот и сигнал для триггер им, в триггер им передавать данные. rpc_ols для передачи дальше
 	int n;
@@ -50,7 +53,9 @@ private:
 	double u;
 	double t;
 signals:
+	void send_data(QVariantList& data_buffer);
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
+	void packet_ready(QVariantList data_buffer);
 };
 
 #endif //RPC_OLS_H

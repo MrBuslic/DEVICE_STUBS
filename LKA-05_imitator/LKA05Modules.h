@@ -18,28 +18,28 @@ public:
 	virtual unsigned short get_tm() = 0;
 };
 
-enum CURRENT_DEV
+enum class LKA05_CURRENT_DEV
 {
 	MAIN = 1,
 	RESERVE = 2,
 	OFF = 3
 };
 
-class MU_MODULE : public LKA05_MODULE
+class LKA05_MU_MODULE : public LKA05_MODULE
 {
 public:
-	MU_MODULE();
+	LKA05_MU_MODULE();
 	virtual unsigned short get_tm();
-	void set_working(CURRENT_DEV _dev, bool _flag)
+	void set_working(LKA05_CURRENT_DEV _dev, bool _flag)
 	{
-		if (_dev == OFF)
+		if (_dev == LKA05_CURRENT_DEV::OFF)
 			return;
 
 		working[_dev] = _flag;
 	}
-	void set_ab_working(CURRENT_DEV _dev, bool _flag)
+	void set_ab_working(LKA05_CURRENT_DEV _dev, bool _flag)
 	{
-		if (_dev == OFF)
+		if (_dev == LKA05_CURRENT_DEV::OFF)
 			return;
 
 		ab_working[_dev] = _flag;
@@ -52,24 +52,24 @@ public:
 	{
 		return ab_working[current_dev];
 	}
-	void switch_cur_dev(CURRENT_DEV _dev)
+	void switch_cur_dev(LKA05_CURRENT_DEV _dev)
 	{
-		//if (_dev == OFF)
+		//if (_dev == LKA05_CURRENT_DEV::OFF)
 		//	return;
 		current_dev = _dev;
 	}
-	CURRENT_DEV get_current_dev()
+	LKA05_CURRENT_DEV get_current_dev()
 	{
 		return current_dev;
 	}
 private:
-	QMap<CURRENT_DEV, bool> working;
-	QMap<CURRENT_DEV, bool> ab_working;
-	CURRENT_DEV current_dev;
+	QMap<LKA05_CURRENT_DEV, bool> working;
+	QMap<LKA05_CURRENT_DEV, bool> ab_working;
+	LKA05_CURRENT_DEV current_dev;
 };
 
 
-struct MV_DEV
+struct LKA05_MV_DEV
 {
 	double u_kom = 27.0;
 	int dt_kom = 1;
@@ -77,10 +77,10 @@ struct MV_DEV
 	bool working = true;
 };
 
-class MV_MODULE : public LKA05_MODULE
+class LKA05_MV_MODULE : public LKA05_MODULE
 {
 public:
-	MV_MODULE(int _com, int _nim);
+	LKA05_MV_MODULE(int _com, int _nim);
 	virtual unsigned short get_tm();
 	virtual unsigned short get_data_mvku();
 	virtual unsigned short get_data_mvmk();
@@ -88,22 +88,22 @@ public:
 	{
 		return devices[current_dev].working;
 	}
-	void set_working(CURRENT_DEV _dev, bool _flag)
+	void set_working(LKA05_CURRENT_DEV _dev, bool _flag)
 	{
-		if (_dev == OFF)
+		if (_dev == LKA05_CURRENT_DEV::OFF)
 			return;
 
 		devices[_dev].working = _flag;
 	}
-	void switch_cur_dev(CURRENT_DEV _dev)
+	void switch_cur_dev(LKA05_CURRENT_DEV _dev)
 	{
 		current_dev = _dev;
 	}
-	CURRENT_DEV get_current_dev()
+	LKA05_CURRENT_DEV get_current_dev()
 	{
 		return current_dev;
 	}
-	MV_DEV& get_settings()
+	LKA05_MV_DEV& get_settings()
 	{
 		return devices[current_dev];
 	}
@@ -120,8 +120,8 @@ public:
 	}
 
 private:
-	QMap<CURRENT_DEV, MV_DEV> devices;
-	CURRENT_DEV current_dev;
+	QMap<LKA05_CURRENT_DEV, LKA05_MV_DEV> devices;
+	LKA05_CURRENT_DEV current_dev;
 	int com;
 	int nim;
 

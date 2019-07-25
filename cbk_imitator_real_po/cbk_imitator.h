@@ -5,8 +5,8 @@
 #include "real_tpo\MY_BOS\thread_module.h"
 #include <QtWidgets>
 
-enum {ON, OFF, CRASH};
-enum {SPOBU, TPO, VACANT, UNDEFINED};
+enum PowerState{ON, OFF, CRASH};
+enum POState{SPOBU, TPO, VACANT, UNDEFINED};
 
 struct VM_State
 {

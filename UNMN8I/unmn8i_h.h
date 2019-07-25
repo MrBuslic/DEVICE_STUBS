@@ -10,22 +10,19 @@ typedef ViStatus(_VI_FUNCH * UNMN8IIntHandle)(ViSession mvi,
 	ViInt32 reason, ViPBoolean levelUp,
 	ViPBoolean levelDown, ViAddr userdata);
 
-
-
-
-class rpc_buffer_class : public QObject
+class mn8i_rpc_buffer_class : public QObject
 {
 	Q_OBJECT
 public:
 	QList<RPC_mn8i_SLOT_Thread*> mn8i_slot_thr;
 	QList<RPC_mn8i_SIGNAL_Thread*> mn8i_signal_thr;
-	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+	friend struct Loki::CreateUsingNew<mn8i_rpc_buffer_class>;
 private:
-	rpc_buffer_class();
+	mn8i_rpc_buffer_class();
 public slots:
 	void packet_ready();
 };
 
-SINGLETON_DEF(rpc_buffer_class);
+SINGLETON_DEF(mn8i_rpc_buffer_class);
 
 #endif

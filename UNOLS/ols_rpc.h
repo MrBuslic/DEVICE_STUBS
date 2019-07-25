@@ -14,7 +14,9 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 	int unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer);
-	int unols_trigger_imm();
+	int unols_trigger_imm(int devise);
+	void unols_read_data_kr(QVariantList& data_buffer);
+	int unols_mStart();
 	////////////////////////////////////
 };
 
@@ -49,7 +51,9 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
+	void send_data(QVariantList& data_buffer);
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
+	void packet_ready(QVariantList data_buffer);
 };
 
 class RPC_ols_SIGNAL_Thread : public RPC_SIGNAL_Thread

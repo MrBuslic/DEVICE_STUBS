@@ -79,7 +79,9 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["auto_scroll_clicked(int)"] = &ols_Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["log_timer_ontimer()"] = &ols_Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["unols_write_data_kf(QVariantList, QVariantList)"] = &ols_Socket_RPC_SLOT_Object::unols_write_data_kf;
-		operators_map["unols_trigger_imm()"] = &ols_Socket_RPC_SLOT_Object::unols_trigger_imm;
+		operators_map["unols_trigger_imm(int)"] = &ols_Socket_RPC_SLOT_Object::unols_trigger_imm;
+		operators_map["unols_read_data_kr(QVariantList&)"] = &ols_Socket_RPC_SLOT_Object::unols_read_data_kr;
+		operators_map["unols_mStart()"] = &ols_Socket_RPC_SLOT_Object::unols_mStart;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -117,13 +119,19 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
+		disconnect(app, SIGNAL(send_data(QVariantList&)), this, SLOT(send_data(QVariantList&)));
 		disconnect(app, SIGNAL(new_ols_data(QVariantList, QVariantList)), this, SLOT(new_ols_data(QVariantList, QVariantList)));
+		disconnect(app, SIGNAL(packet_ready(QVariantList)), this, SLOT(packet_ready(QVariantList)));
 	}
 	void ols_Socket_RPC_SIGNAL_Object::set_app(RpcOlsWidget* _app)
 	{
 		app = _app;
+		connect(app, SIGNAL(send_data(QVariantList&)), this, SLOT(send_data(QVariantList&)), Qt::DirectConnection);
+		data_map.insert("send_data(QVariantList&)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(new_ols_data(QVariantList, QVariantList)), this, SLOT(new_ols_data(QVariantList, QVariantList)), Qt::DirectConnection);
 		data_map.insert("new_ols_data(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(packet_ready(QVariantList)), this, SLOT(packet_ready(QVariantList)), Qt::DirectConnection);
+		data_map.insert("packet_ready(QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -253,6 +261,30 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	void ols_Socket_RPC_SIGNAL_Object::send_data(QVariantList& data_buffer)
+	{
+		auto& descriptor = *data_map["send_data(QVariantList&)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("send_data(QVariantList&)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal send_data  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << data_buffer;
+		SRPCSignalClass::Instance().toLog(QString("send_data  call_number %2 data_buffer =  %1").arg(RPCSignalClass::QVariantToString(data_buffer)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal send_data sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		data_buffer = data_map["send_data(QVariantList&)"]->signal_data.at(0).toList();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal send_data finished").arg(objectName()));
+	}
 	void ols_Socket_RPC_SIGNAL_Object::new_ols_data(QVariantList data_buffer, QVariantList mask_buffer)
 	{
 		auto& descriptor = *data_map["new_ols_data(QVariantList, QVariantList)"].get();
@@ -277,6 +309,29 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ols_data finished").arg(objectName()));
+	}
+	void ols_Socket_RPC_SIGNAL_Object::packet_ready(QVariantList data_buffer)
+	{
+		auto& descriptor = *data_map["packet_ready(QVariantList)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("packet_ready(QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal packet_ready  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << data_buffer;
+		SRPCSignalClass::Instance().toLog(QString("packet_ready  call_number %2 data_buffer =  %1").arg(RPCSignalClass::QVariantToString(data_buffer)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal packet_ready sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal packet_ready finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +403,47 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 	{
 		try
 		{
-			int res = app->unols_trigger_imm();
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int devise = _values.at(0).value<int>();
+			int res = app->unols_trigger_imm(devise);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant ols_Socket_RPC_SLOT_Object::unols_read_data_kr(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList data_buffer = _values.at(0).value<QVariantList>();
+			app->unols_read_data_kr(data_buffer);
+			_values[0] = data_buffer;
+			SRPCSignalClass::Instance().toLog(QString("%1 data_buffer = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant ols_Socket_RPC_SLOT_Object::unols_mStart(QVariantList& _values)
+	{
+		try
+		{
+			int res = app->unols_mStart();
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}

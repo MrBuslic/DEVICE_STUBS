@@ -50,7 +50,7 @@ private:
 	QList<MV_MODULE> mpvn_modules;
 	QList<MV_MODULE> mvku_modules;
 	QList<UPI_MODULE> upi_modules;
-	VCHM_MODULE vchm_module;
+	R733_VCHM_MODULE vchm_module;
 
 	RPC_omnibus_SLOT_Thread omni_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omni_signal_thr;

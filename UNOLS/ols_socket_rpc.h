@@ -27,7 +27,9 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
+	void send_data(QVariantList& data_buffer);
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
+	void packet_ready(QVariantList data_buffer);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -98,6 +100,8 @@ public:
 	QVariant log_timer_ontimer(QVariantList& _values);
 	QVariant unols_write_data_kf(QVariantList& _values);
 	QVariant unols_trigger_imm(QVariantList& _values);
+	QVariant unols_read_data_kr(QVariantList& _values);
+	QVariant unols_mStart(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

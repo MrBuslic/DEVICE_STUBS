@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 
 #enable_language(C)
 
-
 set(CMAKE_AUTOMOC ON)
 include_directories($ENV{LOKI_HOME}/include)	
 
@@ -45,10 +44,11 @@ else()
 	set(ADDITIONAL_LIBS pthread mongoclient)
 endif()
 
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{OMNIBUS_HOME}/lib $ENV{MONGO_HOME}/lib)
-set(CARD_SOURCES BTICARD.cpp omnibus_rpc.h omnibus_rpc.cpp BufferClass.h BufferClass.cpp)
 
-set(1553_SOURCES BTI1553.cpp omnibus_rpc.h omnibus_rpc.cpp BufferClass1553.h BufferClass1553.cpp)
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{OMNIBUS_HOME}/lib $ENV{MONGO_HOME}/lib)
+set(CARD_SOURCES BTICARD/BTICARD.cpp omnibus_rpc.h omnibus_rpc.cpp BTICARD/BufferClass.h BTICARD/BufferClass.cpp BTICARD/DllMain.cpp)
+
+set(1553_SOURCES BTI1553/BTI1553.cpp omnibus_rpc.h omnibus_rpc.cpp BTI1553/BufferClass1553.h BTI1553/BufferClass1553.cpp BTI1553/DllMain.cpp)
 
 include_directories($ENV{OMNIBUS_HOME}/include)
 

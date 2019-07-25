@@ -35,6 +35,7 @@ RpcOmnibusWidget::RpcOmnibusWidget() : QWidget(), auto_scroll(true)
 	edit->setReadOnly(true);
 	_doc->setMaximumBlockCount(1000);
 	setMinimumSize(490, 300);
+	setMaximumSize(500, 500);
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);

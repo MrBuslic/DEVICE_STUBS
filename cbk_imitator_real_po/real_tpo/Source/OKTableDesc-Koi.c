@@ -7,38 +7,38 @@
  */
 
 // Сигналы ОК МБК02
-unsigned Control_NumList00[] =
+unsigned Koi_Control_NumList00[] =
 { 
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
 17,33,43,44,45,49 
 };
 
 // Сигналы ОК ЛКА-06 устройства 14Р732
-unsigned Control_NumList01[] =
+unsigned Koi_Control_NumList01[] =
 { 
 65,81,97,113,129,145,161,177,193 
 };
 
 // Сигналы ОК устройства АСН-Е
-unsigned Control_NumList02[] =
+unsigned Koi_Control_NumList02[] =
 { 
 209,210,211,212,213,214,215,216,217,220,222,223,224 
 };
 
 // Сигналы ОК устройства МБК04
-unsigned Control_NumList03[] =
+unsigned Koi_Control_NumList03[] =
 { 
 225,226,227,228,229,230 
 };
 
 // Сигналы ОК блока ЛКА-05
-unsigned Control_NumList04[] =
+unsigned Koi_Control_NumList04[] =
 { 
 241,257,273,289,305,321,337 
 };
 
 // Сигналы ОК устройства БЭЧ-Е
-unsigned Control_NumList05[] =
+unsigned Koi_Control_NumList05[] =
 { 
 353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,
 369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,
@@ -46,7 +46,7 @@ unsigned Control_NumList05[] =
 };
 
 // Сигналы ОК устройства 14Р733
-unsigned Control_NumList06[] =
+unsigned Koi_Control_NumList06[] =
 { 
 513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,
 529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,
@@ -60,7 +60,7 @@ unsigned Control_NumList06[] =
 };
 
 // Сигналы ОК устройства МБК07М
-unsigned Control_NumList07[] =
+unsigned Koi_Control_NumList07[] =
 { 
 737,738,739,740,741,742,743,744,745,746,747,748,749,750,751,752,
 753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,
@@ -68,7 +68,7 @@ unsigned Control_NumList07[] =
 };
 
 // Сигналы ОК БУП-Е АФС БКУПИ
-unsigned Control_NumList08[] =
+unsigned Koi_Control_NumList08[] =
 { 
 801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816 
 };

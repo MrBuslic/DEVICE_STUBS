@@ -7,8 +7,7 @@
 
 int ads128_count = 0;
 
-
-rpc_buffer_class::rpc_buffer_class()
+ads128_rpc_buffer_class::ads128_rpc_buffer_class()
 {
 	for (int i = 0; i < 2; i++)
 	{
@@ -27,53 +26,6 @@ rpc_buffer_class::rpc_buffer_class()
 		ads128_signal_thr.push_back(signal_thr);
 	}
 }
-
-// Объявляем функцию DllMain  
-
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-	DWORD fdwReason, LPVOID lpvReserved)
-{
-	Srpc_buffer_class::Instance();
-	switch (fdwReason)    
-		// Дерево разбора уведомлений
-	{
-	case DLL_PROCESS_ATTACH: // Подключение DLL
-		//MessageBox(NULL,"Подключение Заглушки UNADS128 для Мезонина АДС128","Использование заглушек!", MB_ICONINFORMATION);
-		//if (lpvReserved)  // Определение способа загрузки
-		// MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-		//else
-		//MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-		//return 1; // успешная инициализация
-				break;
-
-	case DLL_PROCESS_DETACH: 
-		// Отключение DLL
-		// Здесь – освобождаем память, закрываем
-		// файлы и т.д.
-		break;
-
-	case DLL_THREAD_ATTACH: 
-		// Уведомление о новом потоке
-		// Здесь – если надо переходим на
-		// многопоточный режим работы с
-		// использованием средств синхронизации
-		// таких как критическая секция, мутанты,
-		// семафоры и т.д.
-		break;
-
-	case DLL_THREAD_DETACH:
-		//Уведомление о завершении потока
-		// Здесь – если надо освобождаем все ресурсы, 
-		// вязанные с завершившимся потоком. Какой именно
-		// поток завершился можно узнать просмотром списка
-		// потоков средствами TOOLHELP32
-		//MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
-		break;
-
-	}
-	return TRUE;    // Код возврата игнорируется
-}
-
 
 	ViStatus _VI_FUNC unads128_sft_interface(ViSession vi, UN_SFT_INTERFACE sftInterface) { return 0; }
 
@@ -95,7 +47,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 	ViStatus _VI_FUNC unads128_start (ViSession vi)
 	{
-	Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_start();
+		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_start();
 		return 0; 
 	}
 
@@ -106,7 +58,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 	ViStatus _VI_FUNC unads128_stop (ViSession vi) 
 	{
-		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_stop();
+		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_stop();
 		return 0;
 	}
 
@@ -121,7 +73,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		ViReal64 level_0,
 		ViReal64 level_1)
 	{
-		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_conf_analog(group,level_0,level_1);
+		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_conf_analog(group,level_0,level_1);
 		return 0;
 	}
 
@@ -133,7 +85,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 		uint group_;
 		double lev0;
 		double lev1;
-		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_analog_q(group_, lev0, lev1);
+		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_analog_q(group_, lev0, lev1);
 		*level_0 = lev0;
 		*level_1 = lev1;
 		group = group_;
@@ -155,7 +107,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 		QVariantList thisbuf;
 
-		Srpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_read_data(thisbuf, QVariantList());
+		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_read_data(thisbuf, QVariantList());
 
 		for (int i = 0; i < 16; i++)
 				thisBuiff[i] = thisbuf[i].toUInt();

@@ -2,6 +2,8 @@
 #include "rpc_ports.h"
 #include <QMessageBox>
 
+typedef unsigned char byte;
+
 union MKOWord
 {
 	quint16 com_word;				 // командное слово целиком
@@ -21,10 +23,10 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	FSMU_gb = new QGroupBox("ФСМУ", this);
 	FSVU_gb = new QGroupBox("ФСВУ", this);
 
-	mode_names.insert(full_mode::PI15, "ПИ15");
-	mode_names.insert(full_mode::PI8, "ПИ8");
-	mode_names.insert(full_mode::WTF8, "ВТФ");
-	mode_names.insert(full_mode::ERR, "");
+	mode_names.insert(int(full_mode::PI15), "ПИ15");
+	mode_names.insert(int(full_mode::PI8), "ПИ8");
+	mode_names.insert(int(full_mode::WTF8), "ВТФ");
+	mode_names.insert(int(full_mode::ERR), "");
 
 	stab_names.insert(STAB::LOW_STAB, "НС");
 	stab_names.insert(STAB::HIGH_STAB, "ВС");
@@ -32,10 +34,10 @@ MBK07_widg::MBK07_widg(QWidget *parent) : flag_on(false)
 	stab_names.insert(STAB::KG2_STAB, "КГ 2");
 	stab_names.insert(STAB::OFF_STAB, "");
 
-	ant_names.insert(ANTENNA::OHA, "ОНА");
-	ant_names.insert(ANTENNA::MHAPY, "МНА+Y");
-	ant_names.insert(ANTENNA::MHAMY, "МНА-Y");
-	ant_names.insert(ANTENNA::ANT_OFF, "");
+	ant_names.insert(MBK07_ANTENNA::OHA, "ОНА");
+	ant_names.insert(MBK07_ANTENNA::MHAPY, "МНА+Y");
+	ant_names.insert(MBK07_ANTENNA::MHAMY, "МНА-Y");
+	ant_names.insert(MBK07_ANTENNA::ANT_OFF, "");
 
 	for (int i = 0; i < 9; i++)
 	{
@@ -202,7 +204,7 @@ void MBK07_widg::closeEvent(QCloseEvent *event)
 
 void MBK07_widg::get_frame(QString mode, QVariant frame_data)
 {
-	if ((mode_names.value(full_mode(current_mode)) == mode) && (current_FSMU != FSMU_OFF))
+	if ((mode_names.value(int(current_mode)) == mode) && (current_FSMU != FSMU_OFF))
 	{
 		frame_slot_thr.get_frame_bus_obj()->make_new_frame_07(mode, PSP(current_PSP), current_lit, pi8_fast ? 2 : 1, ant_names[current_antenna], frame_data);
 	}
@@ -255,7 +257,7 @@ void MBK07_widg::imit_off()
 	current_FSMU = FSMU_OFF;
 	current_FSVU = FSVU_OFF;
 	current_lit = 0;
-	current_mode = ERR;
+	current_mode = full_mode::ERR;
 	current_PSP = PSP_OFF;
 	current_stab = OFF_STAB;
 
@@ -299,7 +301,7 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 				current_FSVU = FSVU_numbB(tmp_pshm);
 				break;
 			case 3:
-				current_antenna = ANTENNA(tmp_pshm);
+				current_antenna = MBK07_ANTENNA(tmp_pshm);
 				break;
 			}
 			update_graphics();
@@ -368,12 +370,12 @@ void MBK07_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			mode_itr = mode_names.find(rezh);
 			if (mode_itr == mode_names.end())
 			{
-				current_mode = ERR;
+				current_mode = full_mode::ERR;
 				break;
 			}
 			current_mode = full_mode(mode_itr.key());
 
-			if (current_mode == PI8)
+			if (current_mode == full_mode::PI8)
 			{
 				current_PSP = PSP(PSP_OFF);
 			}
@@ -419,12 +421,12 @@ void MBK07_widg::update_graphics()
 	}
 
 	QString res_mode;
-	if (mode_names.contains(current_mode))
+	if (mode_names.contains(int(current_mode)))
 	{
-		res_mode = mode_names[current_mode];
-		if (current_mode != ERR)
+		res_mode = mode_names[int(current_mode)];
+		if (current_mode != full_mode::ERR)
 		{
-			if (current_mode == PI8)
+			if (current_mode == full_mode::PI8)
 			{
 				res_mode += QString("F%1 ПСП%2").arg((pi8_fast) ? "15" : "1.5").arg(current_PSP);
 				//?все что перед - если, : -все что перед иначе.
@@ -500,8 +502,8 @@ void MBK07_widg::set_new_tm()
 		f_word += 0x40;
 	if (IM)
 		f_word += 0x10;
-	if (current_mode != ERR)
-		f_word += 1 << full_mode(current_mode) - 1;
+	if (current_mode != full_mode::ERR)
+		f_word += 1 << int(current_mode) - 1;
 	tm_words.push_back(f_word);
 
 	if (current_lit != 0)

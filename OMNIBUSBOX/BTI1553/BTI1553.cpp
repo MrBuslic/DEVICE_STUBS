@@ -17,65 +17,6 @@
 #include "rpc_ports.h"
 
 
-// Объявляем функцию DllMain
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-	DWORD fdwReason, LPVOID lpvReserved)
-{
-	RPC_omnibus_SLOT_Thread& slot_thr(Srpc_buffer_class::Instance().omnibus_slot_thr);
-	RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
-	//получение айпи
-	/*QString tmp_srvr_ip;
-	QString ipSettingsFile = QString(QCoreApplication::applicationDirPath() + "/" + "ipSettings.ini");
-	QSettings *ipSettings = new QSettings(ipSettingsFile, QSettings::IniFormat, NULL);
-	ipSettings->beginGroup("IP");*/
-	QString ip_str = instr::GetIpFromSettings("rpc_omnibus");//ipSettings->value(QString("rpc_omnibus"), "").toString();
-	//ipSettings->endGroup();
-
-	switch (fdwReason)      // Дерево разбора уведомлений
-	{
-	case DLL_PROCESS_ATTACH: // Подключение DLL
-		if (!slot_thr.isRunning())
-		{
-			slot_thr.set_connection_params(ip_str, OMNIBUS_SLOT);
-			slot_thr.start();
-		}
-		//if (!slot_thr.wait_connected(3))
-		//	return false;
-		if (!signal_thr.isRunning())
-		{
-			signal_thr.set_connection_params(ip_str, OMNIBUS_SIGNAL);
-			signal_thr.start();
-		}
-		signal_thr.wait_connected(3);
-
-		break; // успешная инициализация
-
-	case DLL_PROCESS_DETACH: // Отключение DLL
-		// Здесь – освобождаем память, закрываем
-		// файлы и т.д.
-		break;
-
-	case DLL_THREAD_ATTACH: // Уведомление о новом потоке
-		// Здесь – если надо переходим на
-		// многопоточный режим работы с
-		// использованием средств синхронизации
-		// таких как критическая секция, мутанты,
-		// семафоры и т.д.
-		break;
-
-	case DLL_THREAD_DETACH:
-		//Уведомление о завершении потока
-		// Здесь – если надо освобождаем все ресурсы,
-		// вязанные с завершившимся потоком. Какой именно
-		// поток завершился можно узнать просмотром списка
-		// потоков средствами TOOLHELP32
-
-		break;
-
-	}
-	return TRUE;    // Код возврата игнорируется
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -121,13 +62,13 @@ BTI1553API ERRVAL __stdcall BTI1553_BCSetTimeout(USHORT timeoutval,INT channum,H
 BTI1553API ERRVAL __stdcall BTI1553_BCSyncDefine(BOOL enableflag,USHORT syncmask,USHORT pinpolarity,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,INT channum,HCORE handleval)
 {
-	MkoWord tmp_cwd;
+	MkoWord1553 tmp_cwd;
 	tmp_cwd.cw = xmitfields->cwd1;
 	QVariantList tmp_msgs;
 	for (int i = 0; i < tmp_cwd.count; i++)
 		tmp_msgs << xmitfields->data[i];
 	int os;
-	Srpc_buffer_class::Instance().omnibus_slot_thr.get_omnibus_obj()->send_msg(channum, ((xmitfields->ctrlflags & MSGCRT1553_BUSB) == MSGCRT1553_BUSB) ? 1 : 0, xmitfields->cwd1, tmp_msgs, os);
+	Srpc_buffer_class_1553::Instance().omnibus_slot_thr.get_omnibus_obj()->send_msg(channum, ((xmitfields->ctrlflags & MSGCRT1553_BUSB) == MSGCRT1553_BUSB) ? 1 : 0, xmitfields->cwd1, tmp_msgs, os);
 	if (os == -1)
 	{
 		xmitfields->errflags = MSGERR1553_NORESP;
@@ -176,7 +117,7 @@ BTI1553API INT __stdcall BTI1553_ListDataRd(LPUSHORT buf,INT count,LISTADDR list
 BTI1553API INT __stdcall BTI1553_ListDataWr(LPUSHORT buf,INT count,LISTADDR listaddr,HCORE handleval){ return 0; }
 BTI1553API BOOL __stdcall BTI1553_ListMultiBlockRd(LPUSHORT buf,LPINT blkcountptr,LISTADDR listaddr,HCORE handleval)
 { 
-	rpc_buffer_class& tmp_buf(Srpc_buffer_class::Instance());
+	rpc_buffer_class_1553& tmp_buf(Srpc_buffer_class_1553::Instance());
 	QMutexLocker lock(&(tmp_buf.msg_mutex));
 	QMap<int, LstAddr>::iterator itr = tmp_buf.lst_addrs.find(listaddr);
 	if (itr == tmp_buf.lst_addrs.end())
@@ -217,7 +158,7 @@ BTI1553API VOID __stdcall BTI1553_MsgDataWr(LPUSHORT buf,INT count,MSGADDR msgad
 	for (int i = 0; i < count; i++)
 		tmp_msgs << buf[i];
 
-	rpc_buffer_class& tmp_buf(Srpc_buffer_class::Instance());
+	rpc_buffer_class_1553& tmp_buf(Srpc_buffer_class_1553::Instance());
 	MsgAddr& tmp_addr(tmp_buf.msg_addrs[msgaddr]);
 	tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs);
 }
@@ -238,30 +179,30 @@ BTI1553API INT __stdcall BTI1553_PlayStatus(INT channum,HCORE handleval){ return
 BTI1553API USHORT __stdcall BTI1553_PlayWr(LPUSHORT buf,USHORT bufcount,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTConfig(ULONG configval,INT taval,INT channum,HCORE handleval)
 {
-	if (!Srpc_buffer_class::Instance().signal_connected)
+	if (!Srpc_buffer_class_1553::Instance().signal_connected)
 	{
-		Srpc_buffer_class::Instance().signal_connected = true;
-		RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class::Instance().omnibus_signal_thr);
-		QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+		Srpc_buffer_class_1553::Instance().signal_connected = true;
+		RPC_omnibus_SIGNAL_Thread& signal_thr(Srpc_buffer_class_1553::Instance().omnibus_signal_thr);
+		QObject::connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), &Srpc_buffer_class_1553::Instance(), SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	}
-	Srpc_buffer_class::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab(channum, taval, configval != RTCFG1553_DISABLE);
+	Srpc_buffer_class_1553::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab(channum, taval, configval != RTCFG1553_DISABLE);
 	return 0;
 }
 BTI1553API LISTADDR __stdcall BTI1553_RTCreateList(ULONG listconfigval,INT count,ULONG msgconfigval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval)
 { 
-	return Srpc_buffer_class::Instance().create_list_addr(taval, saval, channum, count, trflag ? 1 : 0);
+	return Srpc_buffer_class_1553::Instance().create_list_addr(taval, saval, channum, count, trflag ? 1 : 0);
 }
 BTI1553API MSGADDR __stdcall BTI1553_RTCreateMsg(ULONG configval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval)
 {
 
-	return Srpc_buffer_class::Instance().create_msg_addr(taval, saval, channum);
+	return Srpc_buffer_class_1553::Instance().create_msg_addr(taval, saval, channum);
 }
 BTI1553API MSGADDR __stdcall BTI1553_RTGetMsg(BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTReset(INT taval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTResponseTimeSet(INT resptime,INT taval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTSetMode(ULONG configval,INT taval,INT channum,HCORE handleval)
 {
-	Srpc_buffer_class::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab(channum, taval, configval != RTCFG1553_DISABLE);
+	Srpc_buffer_class_1553::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab(channum, taval, configval != RTCFG1553_DISABLE);
 	return 0;
 }
 BTI1553API USHORT __stdcall BTI1553_RTSWDRd(INT taval,INT channum,HCORE handleval){ return 0; }
@@ -269,7 +210,7 @@ BTI1553API ERRVAL __stdcall BTI1553_RTSWDWr(USHORT swdval,INT taval,INT channum,
 BTI1553API ERRVAL __stdcall BTI1553_RTSyncDefine(BOOL enableflag,USHORT syncmask,USHORT pinpolarity,INT taval,ULONG rcvsamask,ULONG xmtsamask,ULONG rcvmcmask,ULONG xmtmcmask,INT channum,HCORE handleval){ return 0; }
 BTI1553API USHORT __stdcall BTI1553_ValPackCWD(INT TAval,INT TRflag,INT SAval,INT WCval)
 {
-	MkoWord tmp_word;
+	MkoWord1553 tmp_word;
 	tmp_word.adr = TAval;
 	tmp_word.subadr = SAval;
 	tmp_word.count = WCval;
@@ -278,7 +219,7 @@ BTI1553API USHORT __stdcall BTI1553_ValPackCWD(INT TAval,INT TRflag,INT SAval,IN
 }
 BTI1553API VOID __stdcall BTI1553_ValUnpackCWD(USHORT CWDval,LPINT TAval,LPINT TRflag,LPINT SAval,LPINT WCval)
 {
-	MkoWord tmp_word;
+	MkoWord1553 tmp_word;
 	tmp_word.cw = CWDval;
 
 	*TAval = tmp_word.adr;

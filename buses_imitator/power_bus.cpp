@@ -11,7 +11,7 @@ PowerWidget::PowerWidget(QWidget *parent)
 {
 	LogWidget* log_w = new LogWidget();
 	log_w->show();
-	setFixedSize(250, 80);
+	//setFixedSize(250, 80);
 	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
 	QString ip_str = "127.0.0.1";
@@ -29,6 +29,7 @@ PowerWidget::PowerWidget(QWidget *parent)
 	on_btn = new QPushButton("Вкл", this);
 	off_btn = new QPushButton("Откл", this);
 	QVBoxLayout* lay = new QVBoxLayout(this);
+	lay->addStretch(10);
 	lay->addWidget(on_btn);
 	lay->addWidget(off_btn);
 	connect(on_btn, &QPushButton::clicked, this, &PowerWidget::set_on);

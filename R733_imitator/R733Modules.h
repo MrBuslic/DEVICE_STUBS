@@ -16,14 +16,14 @@ public:
 	virtual unsigned short get_tm() = 0;
 };
 
-enum CURRENT_DEV
+enum class R733_CURRENT_DEV
 {
 	MAIN = 1,
 	RESERVE = 2,
 	OFF = 3
 };
 
-enum REGIME
+enum class REGIME
 {
 	PI15 = 0,
 	PI8 = 1,
@@ -67,14 +67,14 @@ enum MAJORITAR
 //public:
 //	UPI_MODULE();
 //	virtual unsigned short get_tm();
-//	void set_working(CURRENT_DEV _dev, bool _flag)
+//	void set_working(R733_CURRENT_DEV _dev, bool _flag)
 //	{
 //		if (_dev == OFF)
 //			return;
 //
 //		working[_dev] = _flag;
 //	}
-//	void set_ab_working(CURRENT_DEV _dev, bool _flag)
+//	void set_ab_working(R733_CURRENT_DEV _dev, bool _flag)
 //	{
 //		if (_dev == OFF)
 //			return;
@@ -89,19 +89,19 @@ enum MAJORITAR
 //	{
 //		return ab_working[current_dev];
 //	}
-//	void switch_cur_dev(CURRENT_DEV _dev)
+//	void switch_cur_dev(R733_CURRENT_DEV _dev)
 //	{
 //		if (_dev == OFF)
 //			return;
 //		current_dev = _dev;
 //	}
-//	CURRENT_DEV get_current_dev()
+//	R733_CURRENT_DEV get_current_dev()
 //	{
 //		return current_dev;
 //	}
 //private:
-//	QMap<CURRENT_DEV, bool> working;
-//	QMap<CURRENT_DEV, bool> ab_working;
+//	QMap<R733_CURRENT_DEV, bool> working;
+//	QMap<R733_CURRENT_DEV, bool> ab_working;
 //	REGIME regime_UPI;
 //};
 
@@ -111,16 +111,16 @@ class MU_MODULE : public R733_MODULE
 public:
 	MU_MODULE();
 	virtual unsigned short get_tm();
-	void set_working(CURRENT_DEV _dev, bool _flag)
+	void set_working(R733_CURRENT_DEV _dev, bool _flag)
 	{
-		if (_dev == OFF)
+		if (_dev == R733_CURRENT_DEV::OFF)
 			return;
 
 		working[_dev] = _flag;
 	}
-	void set_ab_working(CURRENT_DEV _dev, bool _flag)
+	void set_ab_working(R733_CURRENT_DEV _dev, bool _flag)
 	{
-		if (_dev == OFF)
+		if (_dev == R733_CURRENT_DEV::OFF)
 			return;
 
 		ab_working[_dev] = _flag;
@@ -133,24 +133,24 @@ public:
 	{
 		return ab_working[current_dev];
 	}
-	void switch_cur_dev(CURRENT_DEV _dev)
+	void switch_cur_dev(R733_CURRENT_DEV _dev)
 	{
 	//	if (_dev == OFF)
 	//		return;
 		current_dev = _dev;
 	}
-	CURRENT_DEV get_current_dev()
+	R733_CURRENT_DEV get_current_dev()
 	{
 		return current_dev;
 	}
 private:
-	QMap<CURRENT_DEV, bool> working;
-	QMap<CURRENT_DEV, bool> ab_working;
-	CURRENT_DEV current_dev;
+	QMap<R733_CURRENT_DEV, bool> working;
+	QMap<R733_CURRENT_DEV, bool> ab_working;
+	R733_CURRENT_DEV current_dev;
 };
 
 
-struct MV_DEV
+struct R733_MV_DEV
 {
 	double u_kom = 27.0;
 	int dt_kom = 1;
@@ -168,22 +168,22 @@ public:
 	{
 		return devices[current_dev].working;
 	}
-	void set_working(CURRENT_DEV _dev, bool _flag)
+	void set_working(R733_CURRENT_DEV _dev, bool _flag)
 	{
-		if (_dev == OFF)
+		if (_dev == R733_CURRENT_DEV::OFF)
 			return;
 
 		devices[_dev].working = _flag;
 	}
-	void switch_cur_dev(CURRENT_DEV _dev)
+	void switch_cur_dev(R733_CURRENT_DEV _dev)
 	{
 		current_dev = _dev;
 	}
-	CURRENT_DEV get_current_dev()
+	R733_CURRENT_DEV get_current_dev()
 	{
 		return current_dev;
 	}
-	MV_DEV& get_settings()
+	R733_MV_DEV& get_settings()
 	{
 		return devices[current_dev];
 	}
@@ -200,8 +200,8 @@ public:
 	}
 
 private:
-	QMap<CURRENT_DEV, MV_DEV> devices;
-	CURRENT_DEV current_dev;
+	QMap<R733_CURRENT_DEV, R733_MV_DEV> devices;
+	R733_CURRENT_DEV current_dev;
 	int com;
 	int nim;
 
@@ -209,10 +209,10 @@ private:
 	int ku_p = -1;
 };
 
-class VCHM_MODULE
+class R733_VCHM_MODULE
 {
 public:
-	VCHM_MODULE();
+	R733_VCHM_MODULE();
 	enum VCHM_CHANEL
 	{
 		VCHM0 = 0,

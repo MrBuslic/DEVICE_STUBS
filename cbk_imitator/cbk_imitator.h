@@ -6,8 +6,8 @@
 #include "VIP_imit.h"
 #include <QtWidgets>
 
-enum {ON, OFF, CRASH};
-enum {SPOBU, TPO, VACANT, UNDEFINED};
+enum PowerState {ON, OFF, CRASH};
+enum POState {SPOBU, TPO, VACANT, UNDEFINED};
 
 struct VM_State
 {

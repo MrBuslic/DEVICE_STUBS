@@ -69,10 +69,10 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	Ant_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 
-	ant_names.insert(ANTENNA::MHA1MY, "MHA1-Y");
-	ant_names.insert(ANTENNA::MHA1PY, "MHA1+Y");
-	ant_names.insert(ANTENNA::MHA2MY, "MHA2-Y");
-	ant_names.insert(ANTENNA::MHA2PY, "MHA2+Y");
+	ant_names.insert(MBK02_ANTENNA::MHA1MY, "MHA1-Y");
+	ant_names.insert(MBK02_ANTENNA::MHA1PY, "MHA1+Y");
+	ant_names.insert(MBK02_ANTENNA::MHA2MY, "MHA2-Y");
+	ant_names.insert(MBK02_ANTENNA::MHA2PY, "MHA2+Y");
 
 	chanel_start_warm.insert(CHANEL_1, 0);
 	chanel_start_warm.insert(CHANEL_2, 0);
@@ -704,7 +704,7 @@ void MBK02_widg::update_graphics()
 	if (current_ant != MHAOFF)
 	{
 		Ant_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
-		Ant_pbut->setText(ant_names[ANTENNA(current_ant)]);
+		Ant_pbut->setText(ant_names[MBK02_ANTENNA(current_ant)]);
 	}
 	else
 	{
