@@ -19,8 +19,9 @@ R733_widg::R733_widg()
 {
 	mpvn_modules << MV_MODULE(5, 0);
 	mvku_modules << MV_MODULE(2, 0);
+//	upi_modules << UPI_MODULE();
 	vchm_chanels_init << 0 << 0 << 0 << 0;
-
+	upi_state_channels << 0 << 0 << 0 << 0;
 	mode_names.insert(REGIME::PI15, "ПИ15");
 	mode_names.insert(REGIME::PI8, "ПИ8");
 	mode_names.insert(REGIME::VTF, "ВТФ");
@@ -192,8 +193,26 @@ R733_widg::R733_widg()
 	adr = 6;
 //	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag_on = false;
-
-	
+	QVariantList words;
+	words << 0x011;
+	for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+	{
+		int state_upi = itr->toInt() /*& 0x1) >> 1*/;
+		upi_state_channels.clear();
+		upi_state_channels << (state_upi & 0x1);
+		upi_state_channels << ((state_upi & 0x4) >> 2);
+		upi_state_channels << ((state_upi & 0x10) >> 4);
+		upi_state_channels << ((state_upi & 0x40) >> 6);
+		upi_module.set_working_channels(vchm_chanels_init, false);
+		//for (int j = 0; j <= 7; j++)
+		//{
+		//	int state_upi = (itr->toInt() & 0x1) >> j;
+		//	//for (int i = 0; i <= 7; i++)
+		//	//{
+		//		upi_modules[j].switch_num_chan(STATE_UPI(state_upi));
+		//	//}
+		//}
+	}
 
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
@@ -257,7 +276,9 @@ void R733_widg::imit_on()
 		return;
 	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
-	AbOn_tmr->start(1000); //need time here?
+	AbOn_tmr->start(1000); 
+	upi_state_channels.clear();
+	upi_state_channels << 1 << 1 << 1 << 1 ;
 	change_power();
 	paint_buttons();
 	flag_on = true;
@@ -274,6 +295,8 @@ void R733_widg::imit_off()
 	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
 	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+	upi_state_channels.clear();
+	upi_state_channels << 0 << 0 << 0 << 0;
 	set_power_back();
 //	set_new_tm();
 	paint_buttons();
@@ -495,10 +518,20 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 						MV_DEV& param_ku = mvku_modules[nim].get_settings();
 						mvku_modules[nim].set_ku_p(num_ku);
 						int full_num_ku = num_ku + nim * 8;
-						mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
+						//mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
 					}
-
 				}
+				int state_upi = itr->toInt() /*& 0x1) >> 1*/;
+				upi_state_channels.clear();
+				upi_state_channels << (state_upi & 0x1);
+				upi_state_channels << ((state_upi & 0x4) >> 2);
+				upi_state_channels << ((state_upi & 0x10) >> 4);
+				upi_state_channels << ((state_upi & 0x40) >> 6);
+				upi_module.set_working_channels(vchm_chanels_init, false);
+				/*for (int i = 0; i <= 7; i++) 
+				{
+					upi_modules[i].switch_num_chan(STATE_UPI());
+				}*/
 			}
 			new_data_mv();
 		}
@@ -561,11 +594,21 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				rkm_channels << ((rkm & 0x2) >> 1);
 				rkm_channels << ((rkm & 0x4) >> 2);
 				rkm_channels << ((rkm & 0x8) >> 3);
-				rkm_channels << ((rkm & 0x10) >> 4);
-				rkm_channels << ((rkm & 0x20) >> 5);
-				rkm_channels << ((rkm & 0x40) >> 6);
-				rkm_channels << ((rkm & 0x80) >> 7);
-				//upi_module.set_working_channels(rkm_channels);
+				if (rrr == 8224) // блокировка разрешана, если включенно РБК в РРР
+				{
+					rkm_channels << ((rkm & 0x10) >> 4);
+					rkm_channels << ((rkm & 0x20) >> 5);
+					rkm_channels << ((rkm & 0x40) >> 6);
+					rkm_channels << ((rkm & 0x80) >> 7);
+					//upi_module.set_working_channels(rkm_channels);
+				}
+				else  
+				{
+					rkm_channels << 0;
+					rkm_channels << 0;
+					rkm_channels << 0;
+					rkm_channels << 0;
+				}
 			}
 			int j_major = 1;
 			int j_gsch = 1;
@@ -643,10 +686,20 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				int rbk_1 = itr->toInt() & 0xFF;
 				int rbk_2 = ((itr->toInt() & 0xFF00) >> 8);
 				rbk = rbk_1 & rbk_2;
-				rbk_channels << (rbk & 0x1);
-				rbk_channels << ((rbk & 0x2) >> 1);
-				rbk_channels << ((rbk & 0x4) >> 2);
-				rbk_channels << ((rbk & 0x8) >> 3);
+				if (rrr == 8224)
+				{
+					rbk_channels << (rbk & 0x1);
+					rbk_channels << ((rbk & 0x2) >> 1);
+					rbk_channels << ((rbk & 0x4) >> 2);
+					rbk_channels << ((rbk & 0x8) >> 3);
+				}
+				else
+				{
+					rbk_channels << 0;
+					rbk_channels << 0;
+					rbk_channels << 0;
+					rbk_channels << 0;
+				}
 				rbk_channels << ((rbk & 0x10) >> 4);
 				rbk_channels << ((rbk & 0x20) >> 5);
 				rbk_channels << ((rbk & 0x40) >> 6);
@@ -840,8 +893,8 @@ void R733_widg::auto_scroll_clicked(int _state)
 
 UPI_MODULE::UPI_MODULE()
 {
-	working.insert(MAIN, false);
-	working.insert(OFF, false);
+	working.insert(VKL, false);
+	working.insert(VIKL, false);
 }
 
 
@@ -867,7 +920,6 @@ void VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
 	}
 }
 
-
 void R733_widg::new_frame_04(QString mode, QVariant frame_data)
 {
 	if (regime == mode)
@@ -881,3 +933,4 @@ void R733_widg::closeEvent(QCloseEvent *event)
 	settings.setValue("733_geometry", saveGeometry());
 	QWidget::closeEvent(event);
 }
+

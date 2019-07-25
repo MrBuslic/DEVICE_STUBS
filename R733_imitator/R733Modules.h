@@ -55,12 +55,12 @@ enum MAJORITAR
 	B_3_GSCH = 1,
 	B_4_GSCH = 1
 };
+enum STATE_UPI
+{
+	VKL = 1,
+	VIKL = 2
+};
 
-//enum STATE_UPI
-//{
-//	MAIN = 1,
-//	OFF = 2
-//};
 
 //class UPI_MODULE : public R733_MODULE
 //{
@@ -237,11 +237,11 @@ class UPI_MODULE
 public:
 	UPI_MODULE();
 	
-	enum STATE_UPI
+	/*enum STATE_UPI
 	{
 		MAIN = 1,
 		OFF = 2
-	};
+	};*/
 	void set_working_channels(QList<int> chanels_state, bool can_on = false);
 	bool get_working(int channel)
 	{
