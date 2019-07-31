@@ -50,7 +50,7 @@ public:
 	RPC_mn8i_SIGNAL_Object(QString _addr, int _port) : RPC_SIGNAL_Object(_addr, _port)
 	{
 		this->QObject::setObjectName("mn8i_signal_obj");
-		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection);
+		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection); 
 	}
 	virtual void connect_to_server();
 public slots:
