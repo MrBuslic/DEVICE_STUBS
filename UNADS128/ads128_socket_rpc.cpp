@@ -1,23 +1,22 @@
 	#include "ads128_socket_rpc.h"
 
-int ads128_Socket_RPC_SLOT_Object::obj_num = 0;
-int ads128_Socket_RPC_SIGNAL_Object::obj_num = 0;
-int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
+int Socket_RPC_SLOT_Object::obj_num = 0;
+int Socket_RPC_SIGNAL_Object::obj_num = 0;
 
-	ads128_Socket_RPC_SIGNAL_Thread::ads128_Socket_RPC_SIGNAL_Thread() : QThread()
+	Socket_RPC_SIGNAL_Thread::Socket_RPC_SIGNAL_Thread() : QThread()
 	{
-		setObjectName("ads128_Socket_RPC_SIGNAL_Thread");
+		setObjectName("Socket_RPC_SIGNAL_Thread");
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Thread::run()
+	void Socket_RPC_SIGNAL_Thread::run()
 	{
-		rpc_srv = new ads128_Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
+		rpc_srv = new Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
 		rpc_srv->set_app(app);
 		SRPCSignalClass::Instance().toLog("ads128 signal thread started");
 		exec();
 	}
 
-	ads128_Socket_RPC_SIGNAL_Server::ads128_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
+	Socket_RPC_SIGNAL_Server::Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
 	{
 		rpc_server = new QTcpServer;
 		connect(rpc_server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
@@ -26,66 +25,69 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Server::tcp_slot()
+	void Socket_RPC_SIGNAL_Server::tcp_slot()
 	{
 		SRPCSignalClass::Instance().toLog("ads128 signal client connected");
-		std::shared_ptr<ads128_Socket_RPC_SIGNAL_Object> tmp_obj(new ads128_Socket_RPC_SIGNAL_Object);
+		std::shared_ptr<Socket_RPC_SIGNAL_Object> tmp_obj(new Socket_RPC_SIGNAL_Object);
 		tmp_obj->set_app(app);
 		tmp_obj->set_socket(rpc_server->nextPendingConnection());
 		rpc_objects << tmp_obj;
 	}
 
-	ads128_Socket_RPC_SLOT_Server_Thread::ads128_Socket_RPC_SLOT_Server_Thread() : QThread()
+	Socket_RPC_SLOT_Server_Thread::Socket_RPC_SLOT_Server_Thread() : QThread()
 	{
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	ads128_Socket_RPC_SLOT_Server::ads128_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcADS128Widget* _app) : QTcpServer(), app(_app)
+	Socket_RPC_SLOT_Server::Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcADS128Widget* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
 	}
 
 
-	void ads128_Socket_RPC_SLOT_Server_Thread::run()
+	void Socket_RPC_SLOT_Server_Thread::run()
 	{
-		rpc_srv = new ads128_Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
+		rpc_srv = new Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
 		SRPCSignalClass::Instance().toLog("ads128 slot thread started");
 		exec();
 	}
 
-	void ads128_Socket_RPC_SLOT_Thread::run()
+	void Socket_RPC_SLOT_Thread::run()
 	{
-		rpc_obj = std::shared_ptr<ads128_Socket_RPC_SLOT_Object>(new ads128_Socket_RPC_SLOT_Object(app, socketDescriptor));
+		rpc_obj = std::shared_ptr<Socket_RPC_SLOT_Object>(new Socket_RPC_SLOT_Object(app, socketDescriptor));
 		exec();
 	}
 
-	ads128_Socket_RPC_SLOT_Thread::ads128_Socket_RPC_SLOT_Thread(RpcADS128Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	Socket_RPC_SLOT_Thread::Socket_RPC_SLOT_Thread(RpcADS128Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
-	void ads128_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
+	void Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
 		SRPCSignalClass::Instance().toLog("ads128 slot client connected");
-		std::shared_ptr<ads128_Socket_RPC_SLOT_Thread> tmp_obj(new ads128_Socket_RPC_SLOT_Thread(app, socketDescriptor));
+		std::shared_ptr<Socket_RPC_SLOT_Thread> tmp_obj(new Socket_RPC_SLOT_Thread(app, socketDescriptor));
 		tmp_obj->start();
 		rpc_objects << tmp_obj;
 	}
 
-	ads128_Socket_RPC_SLOT_Object::ads128_Socket_RPC_SLOT_Object(RpcADS128Widget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	Socket_RPC_SLOT_Object::Socket_RPC_SLOT_Object(RpcADS128Widget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
 	setObjectName(QString("ads128_SLOT_Object_%1").arg(obj_num++));
-		operators_map["QuerySlots()"] = &ads128_Socket_RPC_SLOT_Object::QuerySlots;
+		operators_map["QuerySlots()"] = &Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &ads128_Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &ads128_Socket_RPC_SLOT_Object::log_timer_ontimer;
-		operators_map["ads_timer_ontimer()"] = &ads128_Socket_RPC_SLOT_Object::ads_timer_ontimer;
-		operators_map["new_ku(int, int, double, int)"] = &ads128_Socket_RPC_SLOT_Object::new_ku;
-		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &ads128_Socket_RPC_SLOT_Object::new_mk;
-		operators_map["ads128_conf_analog(uint, double, double)"] = &ads128_Socket_RPC_SLOT_Object::ads128_conf_analog;
-		operators_map["ads128_start()"] = &ads128_Socket_RPC_SLOT_Object::ads128_start;
-		operators_map["ads128_read_data(QVariantList&, QVariantList&)"] = &ads128_Socket_RPC_SLOT_Object::ads128_read_data;
-		operators_map["ads128_stop()"] = &ads128_Socket_RPC_SLOT_Object::ads128_stop;
-		operators_map["ads128_analog_q(uint, double&, double&)"] = &ads128_Socket_RPC_SLOT_Object::ads128_analog_q;
+		operators_map["auto_scroll_clicked(int)"] = &Socket_RPC_SLOT_Object::auto_scroll_clicked;
+		operators_map["log_timer_ontimer()"] = &Socket_RPC_SLOT_Object::log_timer_ontimer;
+		operators_map["measurement_timer_ontimer()"] = &Socket_RPC_SLOT_Object::measurement_timer_ontimer;
+		operators_map["infin_timer_ontimer()"] = &Socket_RPC_SLOT_Object::infin_timer_ontimer;
+		operators_map["unads128_start()"] = &Socket_RPC_SLOT_Object::unads128_start;
+		operators_map["unads128_input_trigger(bool)"] = &Socket_RPC_SLOT_Object::unads128_input_trigger;
+		operators_map["unads128_sample_width_q(uint&, uint&)"] = &Socket_RPC_SLOT_Object::unads128_sample_width_q;
+		operators_map["unads128_read_sample(uint&, uint&, uint&)"] = &Socket_RPC_SLOT_Object::unads128_read_sample;
+		operators_map["unads128_read_packet(bool, uint, QVariantList&, uint&)"] = &Socket_RPC_SLOT_Object::unads128_read_packet;
+		operators_map["unads128_sample_period(double)"] = &Socket_RPC_SLOT_Object::unads128_sample_period;
+		operators_map["unads128_mode_cycle(uint)"] = &Socket_RPC_SLOT_Object::unads128_mode_cycle;
+		operators_map["unads128_num_ready_data(uint&)"] = &Socket_RPC_SLOT_Object::unads128_num_ready_data;
+		operators_map["button_clicked()"] = &Socket_RPC_SLOT_Object::button_clicked;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -94,43 +96,46 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	ads128_Socket_RPC_SIGNAL_Object::ads128_Socket_RPC_SIGNAL_Object() : QObject()
+	Socket_RPC_SIGNAL_Object::Socket_RPC_SIGNAL_Object() : QObject()
 	{
 		setObjectName(QString("ads128_SIGNAL_Object_%1").arg(obj_num++));
 		connect(this, SIGNAL(send_signal(QByteArray*)), this, SLOT(send_signal_slot(QByteArray*)), Qt::BlockingQueuedConnection);
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
+	void Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
 	{
 		QMutexLocker locker(&signal_mutex);
 		emit send_signal(_arr);
 	}
 
-	void ads128_Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
+	void Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SLOT SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
+	void Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
 	{
 		rpc_socket = _rpc_socket;
 		connect(rpc_socket, SIGNAL(readyRead()), this, SLOT(read_data()));
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
+	void Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
+		disconnect(app, SIGNAL(packet_ready()), this, SLOT(packet_ready()));
 	}
-	void ads128_Socket_RPC_SIGNAL_Object::set_app(RpcADS128Widget* _app)
+	void Socket_RPC_SIGNAL_Object::set_app(RpcADS128Widget* _app)
 	{
 		app = _app;
+		connect(app, SIGNAL(packet_ready()), this, SLOT(packet_ready()), Qt::DirectConnection);
+		data_map.insert("packet_ready()", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
-	void ads128_Socket_RPC_SLOT_Object::read_data()
+	void Socket_RPC_SLOT_Object::read_data()
 	{
 		//LARGE_INTEGER _freq;
 		//LARGE_INTEGER tmp1;
@@ -194,13 +199,13 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString(" %1 %2 call_n %3 response sent %4 %5 %6").arg(objectName()).arg(op_name).arg(call_n).arg(tmp_arr2.size()).arg(tmp_arr3.size()).arg(tmp_arr3.data())); 
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
+	void Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
 	{
 		rpc_socket->write(*_arr);
 		rpc_socket->waitForBytesWritten(3000);
 	}
 
-	void ads128_Socket_RPC_SIGNAL_Object::read_data()
+	void Socket_RPC_SIGNAL_Object::read_data()
 	{
 		int tmp_size;
 		while (rpc_socket->bytesAvailable())
@@ -256,9 +261,29 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	void Socket_RPC_SIGNAL_Object::packet_ready()
+	{
+		auto& descriptor = *data_map["packet_ready()"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("packet_ready()");
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal packet_ready").arg(objectName()).arg(QThread::currentThread()->objectName()));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal packet_ready sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal packet_ready finished").arg(objectName()));
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QVariant ads128_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
 	{
 		QString tmp_string;
 		int _count = operators_map.keys().count();
@@ -268,7 +293,7 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant ads128_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
 	{
 		try
 		{
@@ -286,7 +311,7 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
 	{
 		try
 		{
@@ -302,11 +327,11 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::ads_timer_ontimer(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::measurement_timer_ontimer(QVariantList& _values)
 	{
 		try
 		{
-			app->ads_timer_ontimer();
+			app->measurement_timer_ontimer();
 			return 0;
 		}
 		catch(const std::exception &)
@@ -318,16 +343,11 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::new_ku(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::infin_timer_ontimer(QVariantList& _values)
 	{
 		try
 		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int ku_n = _values.at(0).value<int>();
-			int length = _values.at(1).value<int>();
-			double u = _values.at(2).value<double>();
-			int line = _values.at(3).value<int>();
-			app->new_ku(ku_n, length, u, line);
+			app->infin_timer_ontimer();
 			return 0;
 		}
 		catch(const std::exception &)
@@ -339,41 +359,11 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::new_mk(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::unads128_start(QVariantList& _values)
 	{
 		try
 		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int mshm = _values.at(0).value<int>();
-			int pshm = _values.at(1).value<int>();
-			int length_m = _values.at(2).value<int>();
-			int length_p = _values.at(3).value<int>();
-			double u_m = _values.at(4).value<double>();
-			double u_p = _values.at(5).value<double>();
-			int dt = _values.at(6).value<int>();
-			int line_m = _values.at(7).value<int>();
-			int line_p = _values.at(8).value<int>();
-			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant ads128_Socket_RPC_SLOT_Object::ads128_conf_analog(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			uint group = _values.at(0).value<uint>();
-			double level_0 = _values.at(1).value<double>();
-			double level_1 = _values.at(2).value<double>();
-			int res = app->ads128_conf_analog(group, level_0, level_1);
+			int res = app->unads128_start();
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -386,11 +376,13 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::ads128_start(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::unads128_input_trigger(QVariantList& _values)
 	{
 		try
 		{
-			int res = app->ads128_start();
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			bool state = _values.at(0).value<bool>();
+			int res = app->unads128_input_trigger(state);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -403,18 +395,18 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::ads128_read_data(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::unads128_sample_width_q(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QVariantList thisbuf = _values.at(0).value<QVariantList>();
-			QVariantList firstbuf = _values.at(1).value<QVariantList>();
-			int res = app->ads128_read_data(thisbuf, firstbuf);
-			_values[0] = thisbuf;
-			SRPCSignalClass::Instance().toLog(QString("%1 thisbuf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
-			_values[1] = firstbuf;
-			SRPCSignalClass::Instance().toLog(QString("%1 firstbuf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			uint frame_width = _values.at(0).value<uint>();
+			uint width_in_bytes = _values.at(1).value<uint>();
+			int res = app->unads128_sample_width_q(frame_width, width_in_bytes);
+			_values[0] = frame_width;
+			SRPCSignalClass::Instance().toLog(QString("%1 frame_width = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			_values[1] = width_in_bytes;
+			SRPCSignalClass::Instance().toLog(QString("%1 width_in_bytes = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
 			with_return = true;
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -428,11 +420,22 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::ads128_stop(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::unads128_read_sample(QVariantList& _values)
 	{
 		try
 		{
-			int res = app->ads128_stop();
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint _buf = _values.at(0).value<uint>();
+			uint _firstTime = _values.at(1).value<uint>();
+			uint _thisTime = _values.at(2).value<uint>();
+			int res = app->unads128_read_sample(_buf, _firstTime, _thisTime);
+			_values[0] = _buf;
+			SRPCSignalClass::Instance().toLog(QString("%1 _buf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			_values[1] = _firstTime;
+			SRPCSignalClass::Instance().toLog(QString("%1 _firstTime = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			_values[2] = _thisTime;
+			SRPCSignalClass::Instance().toLog(QString("%1 _thisTime = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[2])));
+			with_return = true;
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -445,19 +448,20 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant ads128_Socket_RPC_SLOT_Object::ads128_analog_q(QVariantList& _values)
+	QVariant Socket_RPC_SLOT_Object::unads128_read_packet(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			uint group_ = _values.at(0).value<uint>();
-			double lev0 = _values.at(1).value<double>();
-			double lev1 = _values.at(2).value<double>();
-			int res = app->ads128_analog_q(group_, lev0, lev1);
-			_values[1] = lev0;
-			SRPCSignalClass::Instance().toLog(QString("%1 lev0 = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
-			_values[2] = lev1;
-			SRPCSignalClass::Instance().toLog(QString("%1 lev1 = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[2])));
+			bool isHot = _values.at(0).value<bool>();
+			uint numSamples = _values.at(1).value<uint>();
+			QVariantList buf = _values.at(2).value<QVariantList>();
+			uint realNumSamples = _values.at(3).value<uint>();
+			int res = app->unads128_read_packet(isHot, numSamples, buf, realNumSamples);
+			_values[2] = buf;
+			SRPCSignalClass::Instance().toLog(QString("%1 buf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[2])));
+			_values[3] = realNumSamples;
+			SRPCSignalClass::Instance().toLog(QString("%1 realNumSamples = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[3])));
 			with_return = true;
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -469,6 +473,82 @@ int ads128_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unads128_sample_period(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			double _periodS = _values.at(0).value<double>();
+			int res = app->unads128_sample_period(_periodS);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unads128_mode_cycle(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint _size = _values.at(0).value<uint>();
+			int res = app->unads128_mode_cycle(_size);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::unads128_num_ready_data(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint _num = _values.at(0).value<uint>();
+			int res = app->unads128_num_ready_data(_num);
+			_values[0] = _num;
+			SRPCSignalClass::Instance().toLog(QString("%1 _num = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			with_return = true;
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant Socket_RPC_SLOT_Object::button_clicked(QVariantList& _values)
+	{
+		try
+		{
+			app->button_clicked();
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////
