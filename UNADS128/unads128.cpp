@@ -82,13 +82,12 @@ ads128_rpc_buffer_class::ads128_rpc_buffer_class()
 		ViPReal64 level_0,
 		ViPReal64 level_1)
 	{
-		uint group_;
+
 		double lev0;
 		double lev1;
-		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_analog_q(group_, lev0, lev1);
+		Sads128_rpc_buffer_class::Instance().ads128_slot_thr[vi - 1]->get_ads128_obj()->ads128_analog_q(group, lev0, lev1);
 		*level_0 = lev0;
 		*level_1 = lev1;
-		group = group_;
 		return 0;
 	}
 

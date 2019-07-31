@@ -9,51 +9,7 @@
 #include "MainUnit.h"
 //================================================================================
 
-/*! \fn void ReplyToKpaWithDataX_New (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize);
-* \brief Функция передачи сообщения и данных на КПА (данные об ошибках), используется в функциях, вызываемых из задачи обработки ошибок.
-* \param [in] ABaseMkoLine - линия МКО для обмена (0 = 1 линия, 1 = 2 линия)
-* \param [in] ABaseMkoChan - канал МКО для обмена (0 = основной канал, 1 = резервный канал)
-* \param [in] AReply - передаваемый код сообщения
-* \param [in] ASubAddr - подадрес КПА, на который передается сообщение
-* \param [in] ABuffer - указатель на буфер с данными для передачи, данные передаются как
-* один или несколько пакетов на подадрес [ASubAddr+1] КПА перед передачей сообщения.
-* \param [in] ADataSize - размер передаваемых данных в байтах
-*/
-
-void ReplyToKpaWithDataX_New(int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize)
-{
-	int Result, RemainSize, BlockSize, WordCount;
-	BYTE *DataSrc;
-
-	RemainSize = ADataSize;
-	DataSrc = (BYTE*)ABuffer;
-
-	while (RemainSize)
-	{
-		BlockSize = (RemainSize >= 64) ? (64) : (RemainSize);
-		memmove(&MkoBufX[0][0], DataSrc, BlockSize);
-
-		RemainSize -= BlockSize;
-		DataSrc += BlockSize;
-
-		WordCount = (BlockSize + 1) / 2;
-		Result = MkoXchgXn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr + 1, MKO_TX, WordCount), 0);
-		if (Result)
-		{
-			MkoBufX[0][0] = DECODE_XCHG_ERROR_New(Result);
-			MkoXchgXn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1), 0);
-			return;
-		}
-	}
-
-	MkoBufX[0][0] = AReply;
-	MkoBufX[0][1] = ADataSize;
-	MkoBufX[0][2] = CalcCrc16(ABuffer, ADataSize);
-	MkoXchgXn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 3), 0);
-}
-//================================================================================
-
-/*! \fn int MkoXchgAn_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
+/*! \fn int MkoXchgAn (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
  * \brief Функция передает одно сообщение по МКО, используется пакет A. Используется в функциях основного потока СПО
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -67,7 +23,7 @@ void ReplyToKpaWithDataX_New(int ABaseMkoLine, int ABaseMkoChan, int AReply, int
  * при этом возможна передача расширенных данных об ошибках обмена
  */
 
-int MkoXchgAn_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
+int MkoXchgAn (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
 {
 int BaseMkoLine, BaseMkoChan;
 int TotalResult, Pass, MkoMode, ErrorCode, ErrorBuffer;
@@ -200,12 +156,12 @@ if ((TotalResult) && (SpoConfig.EnableMkoErrorExtendedInfo))
   BaseMkoLine = SpoConfig.KpaMkoLine & 1;
   BaseMkoChan = SpoConfig.KpaMkoChan & 1;
 
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9001, KPA_SUBADDR_DEBUG, &TotalResult, sizeof(TotalResult));
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9002, KPA_SUBADDR_DEBUG, &MkoPackResA, sizeof(MkoPackResA));
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9003, KPA_SUBADDR_DEBUG, &MkoMsgResA[0], sizeof(MkoMsgResA[0]));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9001, KPA_SUBADDR_DEBUG, &TotalResult, sizeof(TotalResult));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9002, KPA_SUBADDR_DEBUG, &MkoPackResA, sizeof(MkoPackResA));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9003, KPA_SUBADDR_DEBUG, &MkoMsgResA[0], sizeof(MkoMsgResA[0]));
 
-  if (ErrorCode) ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9004, KPA_SUBADDR_DEBUG, &ErrorCode, sizeof(ErrorCode));
-  if (ErrorBuffer) ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9005, KPA_SUBADDR_DEBUG, &DebugMki, 64);
+  if (ErrorCode) ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9004, KPA_SUBADDR_DEBUG, &ErrorCode, sizeof(ErrorCode));
+  if (ErrorBuffer) ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9005, KPA_SUBADDR_DEBUG, &DebugMki, 64);
   }
 
 // обмен завершен
@@ -213,7 +169,7 @@ return TotalResult;
 }
 //================================================================================
 
-/*! \fn int MkoXchgBn_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
+/*! \fn int MkoXchgBn (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
  * \brief Функция передает одно сообщение по МКО, используется пакет B. Используется в функциях, вызываемых из прерываний СПО
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -227,7 +183,7 @@ return TotalResult;
  * при этом обмен с некоторыми устройствами производится по особому алгоритму, и возможна передача расширенных данных об ошибках обмена
  */
 
-int MkoXchgBn_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
+int MkoXchgBn (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
 {
 int Result, Addr, SubAddr, Dir, DataSize;
 
@@ -243,19 +199,19 @@ if ((SpoConfig.EnableMkoExtXchg) &&
     (((Addr == 2) || (Addr == 4)) && ((SubAddr == 28) || (SubAddr == 29))))
   {
   // обмен с адресами 2/4 - расширенный алгоритм обмена
-  Result = MkoXchgBnExt_New(MkoLine, MkoChan, MkoCmd, F4Mode);
+  Result = MkoXchgBnExt(MkoLine, MkoChan, MkoCmd, F4Mode);
   }
 else
   {
   // обмен с прочими адресами - стандартный алгоритм обмена
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MkoCmd, F4Mode);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MkoCmd, F4Mode);
   }
 
 return Result;
 }
 //================================================================================
 
-/*! \fn int MkoXchgBnStd_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
+/*! \fn int MkoXchgBnStd (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
  * \brief Служебная функция, производит обмен с устройствами на МКО в обычном режиме, для обмена используется пакет B.
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -268,7 +224,7 @@ return Result;
  * \details Возможна передача расширенных данных об ошибках обмена (если разрешено в конфигурации СПО).
  */
 
-int MkoXchgBnStd_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
+int MkoXchgBnStd (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
 {
 int BaseMkoLine, BaseMkoChan;
 int TotalResult, Pass, MkoMode, ErrorCode, ErrorBuffer;
@@ -401,12 +357,12 @@ if ((TotalResult) && (SpoConfig.EnableMkoErrorExtendedInfo))
   BaseMkoLine = SpoConfig.KpaMkoLine & 1;
   BaseMkoChan = SpoConfig.KpaMkoChan & 1;
 
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9001, KPA_SUBADDR_DEBUG, &TotalResult, sizeof(TotalResult));
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9002, KPA_SUBADDR_DEBUG, &MkoPackResB, sizeof(MkoPackResB));
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9003, KPA_SUBADDR_DEBUG, &MkoMsgResB[0], sizeof(MkoMsgResB[0]));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9001, KPA_SUBADDR_DEBUG, &TotalResult, sizeof(TotalResult));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9002, KPA_SUBADDR_DEBUG, &MkoPackResB, sizeof(MkoPackResB));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9003, KPA_SUBADDR_DEBUG, &MkoMsgResB[0], sizeof(MkoMsgResB[0]));
 
-  if (ErrorCode) ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9004, KPA_SUBADDR_DEBUG, &ErrorCode, sizeof(ErrorCode));
-  if (ErrorBuffer) ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9005, KPA_SUBADDR_DEBUG, &DebugMki, 64);
+  if (ErrorCode) ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9004, KPA_SUBADDR_DEBUG, &ErrorCode, sizeof(ErrorCode));
+  if (ErrorBuffer) ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9005, KPA_SUBADDR_DEBUG, &DebugMki, 64);
   }
 
 // обмен завершен
@@ -414,7 +370,7 @@ return TotalResult;
 }
 //================================================================================
 
-/*! \fn int MkoXchgBnExt_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
+/*! \fn int MkoXchgBnExt (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
  * \brief Служебная функция, производит обмен с устройствами на МКО в расширенном режиме (по адресам 2/4), для обмена используется пакет B.
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -427,7 +383,7 @@ return TotalResult;
  * \details Возможна передача расширенных данных об ошибках обмена (если разрешено в конфигурации СПО).
  */
 
-int MkoXchgBnExt_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
+int MkoXchgBnExt (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
 {
 int Result, Count, State1, State2, Index;
 WORD Addr, SubAddr, Command;
@@ -448,7 +404,7 @@ if ((Addr == 4) && (SubAddr == 28))
   MkoBufB[0][3] = 0x300E;
   MkoBufB[0][4] = 0x310E;
   MkoBufB[0][5] = 0x320E;
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(4, 17, MKO_TX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(4, 17, MKO_TX, 6), 0);
   if (Result) return Result;
   SleepMSec(100);
   }
@@ -460,7 +416,7 @@ if ((Addr == 2) && (SubAddr == 29))
   MkoBufB[0][3] = 0x200E;
   MkoBufB[0][4] = 0x210E;
   MkoBufB[0][5] = 0x220E;
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(2, 17, MKO_TX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(2, 17, MKO_TX, 6), 0);
   if (Result) return Result;
   SleepMSec(100);
   }
@@ -472,7 +428,7 @@ if ((Addr == 4) && (SubAddr == 29))
   MkoBufB[0][3] = 0x200E;
   MkoBufB[0][4] = 0x210E;
   MkoBufB[0][5] = 0x220E;
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(4, 17, MKO_TX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(4, 17, MKO_TX, 6), 0);
   if (Result) return Result;
   SleepMSec(100);
   }
@@ -481,7 +437,7 @@ if ((Addr == 4) && (SubAddr == 29))
 if ((Addr != 2) || (SubAddr != 28))
   {
   Count = (Addr == 2) ? (9) : (7);
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, 17, MKO_RX, Count), 0);    
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, 17, MKO_RX, Count), 0);    
   if (Result) return Result;
   SleepMSec(10);
   }
@@ -511,7 +467,7 @@ if ((Addr == 4) && (SubAddr == 29))
 // проверка состояния МВКУ/МПВН
 if ((Addr == 4) && (SubAddr == 28))
   {
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
   if (Result) return Result;
   if ((MkoBufB[0][0] != MkoBufB[0][1]) || (MkoBufB[0][0] != 0x0000)) { return 0x81; }
   if ((MkoBufB[0][2] != MkoBufB[0][3]) || (MkoBufB[0][2] != 0x0100)) { return 0x81; }
@@ -519,7 +475,7 @@ if ((Addr == 4) && (SubAddr == 28))
   }
 if ((Addr == 2) && (SubAddr == 29))
   {
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
   if (Result) return Result;
   if ((MkoBufB[0][0] != MkoBufB[0][1]) || (MkoBufB[0][0] != 0x0000)) { return 0x81; }
   if ((MkoBufB[0][2] != MkoBufB[0][3]) || (MkoBufB[0][2] != 0x0100)) { return 0x81; }
@@ -527,7 +483,7 @@ if ((Addr == 2) && (SubAddr == 29))
   }
 if ((Addr == 4) && (SubAddr == 29))
   {
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
   if (Result) return Result;
   if ((MkoBufB[0][0] != MkoBufB[0][1]) || (MkoBufB[0][0] != 0x0000)) { return 0x81; }
   if ((MkoBufB[0][2] != MkoBufB[0][3]) || (MkoBufB[0][2] != 0x0100)) { return 0x81; }
@@ -537,14 +493,14 @@ SleepMSec(10);
 
 // передача оригинальной команды на устройство
 memmove(&MkoBufB[0], &Buf, sizeof(Buf));
-Result = MkoXchgBnStd_New(MkoLine, MkoChan, MkoCmd, F4Mode);
+Result = MkoXchgBnStd(MkoLine, MkoChan, MkoCmd, F4Mode);
 if (Result) return Result;
 
 // проверка состояния после подачи команды
 if ((Addr == 4) && (SubAddr == 28))
   {
   SleepMSec(300);
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
   if (Result) return Result;
   memmove(&Buf, &MkoBufB[0], sizeof(MkoBufB[0]));
 
@@ -582,7 +538,7 @@ if ((Addr == 4) && (SubAddr == 28))
 if ((Addr == 2) && (SubAddr == 29))
   {
   SleepMSec(300);
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
   if (Result) return Result;
   memmove(&Buf, &MkoBufB[0], sizeof(MkoBufB[0]));
 
@@ -598,7 +554,7 @@ if ((Addr == 2) && (SubAddr == 29))
 if ((Addr == 4) && (SubAddr == 29))
   {
   SleepMSec(300);
-  Result = MkoXchgBnStd_New(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
+  Result = MkoXchgBnStd(MkoLine, MkoChan, MKO_CMD(Addr, SubAddr, MKO_RX, 6), 0);
   if (Result) return Result;
   memmove(&Buf, &MkoBufB[0], sizeof(MkoBufB[0]));
 
@@ -615,7 +571,7 @@ return 0;
 }
 //================================================================================
 
-/*! \fn int MkoXchgBnBlock_New (int MkoLine, int MkoChan, WORD MkoCmd1, WORD MkoCmd2, int MsgCount, int SendCmdMsg);
+/*! \fn int MkoXchgBnBlock (int MkoLine, int MkoChan, WORD MkoCmd1, WORD MkoCmd2, int MsgCount, int SendCmdMsg);
  * \brief Функция передает набор сообщений по МКО, используется пакет B. Используется в функциях, вызываемых из прерываний СПО (при обменах с МБК04)
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -631,7 +587,7 @@ return 0;
  * при этом обмен возможна передача расширенных данных об ошибках обмена
  */
 
-int MkoXchgBnBlock_New (int MkoLine, int MkoChan, WORD MkoCmd1, WORD MkoCmd2, int MsgCount, int SendCmdMsg)
+int MkoXchgBnBlock (int MkoLine, int MkoChan, WORD MkoCmd1, WORD MkoCmd2, int MsgCount, int SendCmdMsg)
 {
 int BaseMkoLine, BaseMkoChan;
 int TotalResult, MkoMode, ErrorCode, ErrorBuffer, Index;
@@ -743,12 +699,12 @@ if ((TotalResult) && (SpoConfig.EnableMkoErrorExtendedInfo))
   BaseMkoLine = SpoConfig.KpaMkoLine & 1;
   BaseMkoChan = SpoConfig.KpaMkoChan & 1;
 
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9001, KPA_SUBADDR_DEBUG, &TotalResult, sizeof(TotalResult));
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9002, KPA_SUBADDR_DEBUG, &MkoPackResB, sizeof(MkoPackResB));
-  ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9003, KPA_SUBADDR_DEBUG, &MkoMsgResB[0], sizeof(MkoMsgResB[0]));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9001, KPA_SUBADDR_DEBUG, &TotalResult, sizeof(TotalResult));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9002, KPA_SUBADDR_DEBUG, &MkoPackResB, sizeof(MkoPackResB));
+  ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9003, KPA_SUBADDR_DEBUG, &MkoMsgResB[0], sizeof(MkoMsgResB[0]));
 
-  if (ErrorCode) ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9004, KPA_SUBADDR_DEBUG, &ErrorCode, sizeof(ErrorCode));
-  if (ErrorBuffer) ReplyToKpaWithDataX_New(BaseMkoLine, BaseMkoChan, 0x9005, KPA_SUBADDR_DEBUG, &DebugMki, 64);
+  if (ErrorCode) ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9004, KPA_SUBADDR_DEBUG, &ErrorCode, sizeof(ErrorCode));
+  if (ErrorBuffer) ReplyToKpaWithDataX(BaseMkoLine, BaseMkoChan, 0x9005, KPA_SUBADDR_DEBUG, &DebugMki, 64);
   }
 
 // обмен успешно завершен
@@ -756,7 +712,7 @@ return TotalResult;
 }
 //================================================================================
 
-/*! \fn int MkoXchgXn_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
+/*! \fn int MkoXchgXn (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
  * \brief Функция передает одно сообщение по МКО, используется пакет X. Используется в функциях, вызываемых из задачи обработки ошибок СПО.
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -768,7 +724,7 @@ return TotalResult;
  * <0 = нет связи/сбой передачи (для детальной информации см. таблицы констант) <br>
  */
 
-int MkoXchgXn_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
+int MkoXchgXn (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
 {
 int TotalResult, Pass, MkoMode;
 STATUS Result;
@@ -839,7 +795,7 @@ return TotalResult;
 }
 //================================================================================
 
-/*! \fn int MkoXchgStub_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
+/*! \fn int MkoXchgStub (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode);
  * \brief Функция-заглушка, используется в случаях, не предусматривающих выдачу сообщений по МКО
  * \param [in] MkoLine - номер линии МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] MkoChan - номер канала МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -848,19 +804,19 @@ return TotalResult;
  * \return Функция всегда возвращает 0 (успешно завершено)
  */
 
-int MkoXchgStub_New (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
+int MkoXchgStub (int MkoLine, int MkoChan, WORD MkoCmd, int F4Mode)
 {
 return 0;
 }
 //================================================================================
 
-/*! \fn int DECODE_XCHG_ERROR_New (int Result);
+/*! \fn int DECODE_XCHG_ERROR (int Result);
  * \brief Функция распаковывает код результата обмена по МКО в коды ошибок СПО
  * \param [in] Result - код результата обмена по МКО
  * \return Возвращает код ошибки, соответствующий данному коду (для детальной информации см. таблицы констант)
  */
 
-int DECODE_XCHG_ERROR_New (int Result)
+int DECODE_XCHG_ERROR (int Result)
 {
 if (Result == 0x80) return REPLY_DEVICE_STATE1_ERROR;
 if (Result == 0x81) return REPLY_DEVICE_STATE2_ERROR;
@@ -877,7 +833,7 @@ return REPLY_UNK_ERROR;
 }
 //================================================================================
 
-/*! \fn void ReplyToKpaNoData_New (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr);
+/*! \fn void ReplyToKpaNoData (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr);
  * \brief Функция передачи сообщения без данных на КПА, используется в функциях, вызываемых из прерываний СПО.
  * \param [in] ABaseMkoLine - линия МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] ABaseMkoChan - канал МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -885,14 +841,14 @@ return REPLY_UNK_ERROR;
  * \param [in] ASubAddr - подадрес КПА, на который передается сообщение
  */
 
-void ReplyToKpaNoData_New (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr)
+void ReplyToKpaNoData (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr)
 {
 MkoBufB[0][0] = AReply;
-MkoXchgBn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1), 0);
+MkoXchgBn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1), 0);
 }
 //================================================================================
 
-/*! \fn void ReplyToKpaWithData_New (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize);
+/*! \fn void ReplyToKpaWithData (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize);
  * \brief Функция передачи сообщения и данных на КПА, используется в функциях, вызываемых из прерываний СПО.
  * \param [in] ABaseMkoLine - линия МКО для обмена (0 = 1 линия, 1 = 2 линия)
  * \param [in] ABaseMkoChan - канал МКО для обмена (0 = основной канал, 1 = резервный канал)
@@ -903,7 +859,7 @@ MkoXchgBn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1)
  * \param [in] ADataSize - размер передаваемых данных в байтах
  */
 
-void ReplyToKpaWithData_New (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize)
+void ReplyToKpaWithData (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize)
 {
 int Result, RemainSize, BlockSize, WordCount;
 BYTE *DataSrc;
@@ -920,11 +876,11 @@ while (RemainSize)
   DataSrc += BlockSize;
 
   WordCount = (BlockSize + 1) / 2;
-  Result = MkoXchgBn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr + 1, MKO_TX, WordCount), 0);
+  Result = MkoXchgBn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr + 1, MKO_TX, WordCount), 0);
   if (Result)
     {
-    MkoBufB[0][0] = DECODE_XCHG_ERROR_New(Result);
-    MkoXchgBn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1), 0);
+    MkoBufB[0][0] = DECODE_XCHG_ERROR(Result);
+    MkoXchgBn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1), 0);
     return;
     }
   }
@@ -932,6 +888,51 @@ while (RemainSize)
 MkoBufB[0][0] = AReply;
 MkoBufB[0][1] = ADataSize;
 MkoBufB[0][2] = CalcCrc16(ABuffer, ADataSize);
-MkoXchgBn_New(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 3), 0);
+MkoXchgBn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 3), 0);
 }
 //================================================================================
+
+/*! \fn void ReplyToKpaWithDataX (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize);
+ * \brief Функция передачи сообщения и данных на КПА (данные об ошибках), используется в функциях, вызываемых из задачи обработки ошибок.
+ * \param [in] ABaseMkoLine - линия МКО для обмена (0 = 1 линия, 1 = 2 линия)
+ * \param [in] ABaseMkoChan - канал МКО для обмена (0 = основной канал, 1 = резервный канал)
+ * \param [in] AReply - передаваемый код сообщения
+ * \param [in] ASubAddr - подадрес КПА, на который передается сообщение
+ * \param [in] ABuffer - указатель на буфер с данными для передачи, данные передаются как
+ * один или несколько пакетов на подадрес [ASubAddr+1] КПА перед передачей сообщения.
+ * \param [in] ADataSize - размер передаваемых данных в байтах
+ */
+
+void ReplyToKpaWithDataX (int ABaseMkoLine, int ABaseMkoChan, int AReply, int ASubAddr, void *ABuffer, int ADataSize)
+{
+int Result, RemainSize, BlockSize, WordCount;
+BYTE *DataSrc;
+
+RemainSize = ADataSize;
+DataSrc = (BYTE*) ABuffer;
+
+while (RemainSize)
+  {
+  BlockSize = (RemainSize >= 64) ? (64) : (RemainSize);
+  memmove(&MkoBufX[0][0], DataSrc, BlockSize);
+
+  RemainSize -= BlockSize;
+  DataSrc += BlockSize;
+
+  WordCount = (BlockSize + 1) / 2;
+  Result = MkoXchgXn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr + 1, MKO_TX, WordCount), 0);
+  if (Result)
+    {
+    MkoBufX[0][0] = DECODE_XCHG_ERROR(Result);
+    MkoXchgXn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 1), 0);
+    return;
+    }
+  }
+
+MkoBufX[0][0] = AReply;
+MkoBufX[0][1] = ADataSize;
+MkoBufX[0][2] = CalcCrc16(ABuffer, ADataSize);
+MkoXchgXn(ABaseMkoLine, ABaseMkoChan, MKO_CMD(KPA_ADDR, ASubAddr, MKO_TX, 3), 0);
+}
+//================================================================================
+
