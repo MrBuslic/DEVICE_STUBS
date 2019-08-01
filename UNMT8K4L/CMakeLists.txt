@@ -36,7 +36,7 @@ add_library(unmt8k4l_32 SHARED ${UNMT8_HEADERS} ${UNMT8_SOURCES} export.def)
 target_link_libraries(unmt8k4l_32 socket_rpc)                                                        
 
 set(RPC_MT8K4L_SOURCES rpc_mt8k4l.h rpc_mt8k4l.cpp mt8k4l_main.cpp mt8k4l_socket_rpc.h mt8k4l_socket_rpc.cpp)
-add_executable(rpc_mt8k4l WIN32 ${RPC_MT8K4L_SOURCES})
+add_executable(rpc_mt8k4l WIN32 ${RPC_MT8K4L_SOURCES} icon.rc)
 set_target_properties(rpc_mt8k4l PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_mt8k4l ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_mt8k4l Core Widgets Gui Network)

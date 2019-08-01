@@ -117,7 +117,7 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MO
 
 set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(cbk_imitator_real_po ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${TPO_SOURCES} ${TPO_HEADERS} ${BOS_SOURCES} ${BOS_HEADERS} ${OMNIBUSBOX_RESOURCES} ${INTERRUPT_RESOURCES} ${VIP_RESOURCES})
+add_executable(cbk_imitator_real_po ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${TPO_SOURCES} ${TPO_HEADERS} ${BOS_SOURCES} ${BOS_HEADERS} ${OMNIBUSBOX_RESOURCES} ${INTERRUPT_RESOURCES} ${VIP_RESOURCES} icon.rc)
 target_link_libraries (cbk_imitator_real_po ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc ) 
 

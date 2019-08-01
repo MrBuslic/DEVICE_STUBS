@@ -34,7 +34,7 @@ add_library(unvvk4 SHARED ${UNVVK4_HEADERS} ${UNVVK4_SOURCES} export.def)
 target_link_libraries(unvvk4 socket_rpc)
 
 set(RPC_VVK4_SOURCES rpc_vvk4.h rpc_vvk4.cpp vvk4_main.cpp vvk4_socket_rpc.h vvk4_socket_rpc.cpp)
-add_executable(rpc_vvk4 WIN32 ${RPC_VVK4_SOURCES})
+add_executable(rpc_vvk4 WIN32 ${RPC_VVK4_SOURCES} icon.rc)
 set_target_properties(rpc_vvk4 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_vvk4 ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_vvk4 Core Widgets Gui Network)

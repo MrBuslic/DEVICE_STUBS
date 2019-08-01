@@ -41,7 +41,7 @@ FILE(GLOB HEADERS *.h *.hpp)
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
 
-add_executable(IBEP_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} )
+add_executable(IBEP_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} icon.rc)
 target_link_libraries (IBEP_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 

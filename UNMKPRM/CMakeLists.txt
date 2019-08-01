@@ -34,7 +34,7 @@ add_library(unmkprm_32 SHARED ${UNMKPRM_HEADERS} ${UNMKPRM_SOURCES} export.def)
 target_link_libraries(unmkprm_32 socket_rpc)
 
 set(RPC_MKPRM_SOURCES rpc_mkprm.h rpc_mkprm.cpp mkprm_main.cpp mkprm_socket_rpc.h mkprm_socket_rpc.cpp ${UNFOI_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${UNFOI_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.cpp)
-add_executable(rpc_mkprm WIN32 ${RPC_MKPRM_SOURCES})
+add_executable(rpc_mkprm WIN32 ${RPC_MKPRM_SOURCES} icon.rc)
 set_target_properties(rpc_mkprm PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_mkprm ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_mkprm Core Widgets Gui Network)

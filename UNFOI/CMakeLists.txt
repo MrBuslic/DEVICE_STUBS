@@ -34,7 +34,7 @@ add_library(unfoi_32 SHARED ${UNFOI_HEADERS} ${UNFOI_SOURCES} export.def)
 target_link_libraries(unfoi_32 socket_rpc)
 
 set(RPC_FOI_SOURCES rpc_foi.h rpc_foi.cpp foi_main.cpp foi_socket_rpc.h foi_socket_rpc.cpp ${UNFOI_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h ${UNFOI_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
-add_executable(rpc_foi WIN32 ${RPC_FOI_SOURCES})
+add_executable(rpc_foi WIN32 ${RPC_FOI_SOURCES} icon.rc)
 set_target_properties(rpc_foi PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_foi ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_foi Core Widgets Gui Network)

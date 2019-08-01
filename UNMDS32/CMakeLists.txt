@@ -36,7 +36,7 @@ add_library(unmds32_32 SHARED ${UNMDS32_HEADERS} ${UNMDS32_SOURCES} export.def)
 target_link_libraries(unmds32_32 socket_rpc)                                                        
 
 set(RPC_MDS32_SOURCES rpc_mds32.h rpc_mds32.cpp mds32_main.cpp mds32_socket_rpc.h mds32_socket_rpc.cpp)
-add_executable(rpc_mds32 WIN32 ${RPC_MDS32_SOURCES})
+add_executable(rpc_mds32 WIN32 ${RPC_MDS32_SOURCES} icon.rc)
 set_target_properties(rpc_mds32 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_mds32 ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_mds32 Core Widgets Gui Network)
