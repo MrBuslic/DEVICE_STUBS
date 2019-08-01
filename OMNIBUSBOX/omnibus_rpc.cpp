@@ -1,40 +1,5 @@
 #include "omnibus_rpc.h"
 
-void RPC_omnibus_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("omnibus slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("omnibus slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("omnibus slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_omnibus_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("omnibus signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("omnibus signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("omnibus signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_omnibus_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_omnibus_SLOT_Object>(new RPC_omnibus_SLOT_Object(addr, port));
@@ -191,6 +156,16 @@ void RPC_omnibus_SLOT_Object::log_timer_ontimer()
 	dynamic_call("log_timer_ontimer()", tmp_list);
 	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished log_timer_ontimer");
 }
+void RPC_omnibus_SLOT_Object::switch_ab_os(int mko, int addr, int _os)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mko);
+	tmp_list << QVariant(addr);
+	tmp_list << QVariant(_os);
+	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call switch_ab_os %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("switch_ab_os(int, int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished switch_ab_os");
+}
 void RPC_omnibus_SLOT_Object::switch_ab(int mko, int addr, bool _on)
 {
 	QVariantList tmp_list;
@@ -228,6 +203,19 @@ void RPC_omnibus_SLOT_Object::send_msg(int mko, int line, int cwd, QVariantList&
 	os = tmp_list.at(4).toInt();
 	tmp_ret_params += " os="+RPCSignalClass::QVariantToString(tmp_list.at(4));
 	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call finished send_msg %1").arg(tmp_ret_params));
+}
+int RPC_omnibus_SLOT_Object::unomnibus_map_channels_setup(int _n, short _chan)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(_n);
+	tmp_list << QVariant(_chan);
+	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call unomnibus_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unomnibus_map_channels_setup(int, short)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call finished unomnibus_map_channels_setup %1").arg(tmp_ret_params));
+	return res.toInt();
 }
 QVariant RPC_omnibus_SLOT_Object::get_dt()
 {

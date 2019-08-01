@@ -1,40 +1,5 @@
 #include "lka05_rpc.h"
 
-void RPC_lka05_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("lka05 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("lka05 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("lka05 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_lka05_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("lka05 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("lka05 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("lka05 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_lka05_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_lka05_SLOT_Object>(new RPC_lka05_SLOT_Object(addr, port));
@@ -66,12 +31,12 @@ void RPC_lka05_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_ku)) {
 		SRPCSignalClass::Instance().toLog("new_ku connected");
-		emit connect_signal("new_ku(int, int, double)", true);
+		emit connect_signal("new_ku(int, int, double, int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_mk)) {
 		SRPCSignalClass::Instance().toLog("new_mk connected");
-		emit connect_signal("new_mk(int, int, int, int, double, double, int)", true);
+		emit connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", true);
 	}
 }
 
@@ -79,12 +44,12 @@ void RPC_lka05_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_ku)) {
 		SRPCSignalClass::Instance().toLog("new_ku disconnected");
-		//emit connect_signal("new_ku(int, int, double)", false);
+		//emit connect_signal("new_ku(int, int, double, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_mk)) {
 		SRPCSignalClass::Instance().toLog("new_mk disconnected");
-		//emit connect_signal("new_mk(int, int, int, int, double, double, int)", false);
+		//emit connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", false);
 	}
 }
 
@@ -116,21 +81,26 @@ void RPC_lka05_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("lka05 new signal " + op_name);
 
-			if (op_name == "new_ku(int, int, double)")
+			if (op_name == "new_ku(int, int, double, int)")
 			{
 				int ku_n;
 				tmp_stream >> ku_n;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" ku_n = "+RPCSignalClass::QVariantToString(ku_n));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " ku_n = "+RPCSignalClass::QVariantToString(ku_n));
 				int length;
 				tmp_stream >> length;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" length = "+RPCSignalClass::QVariantToString(length));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " length = "+RPCSignalClass::QVariantToString(length));
 				double u;
 				tmp_stream >> u;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" u = "+RPCSignalClass::QVariantToString(u));
-				emit new_ku(ku_n, length, u);
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " u = "+RPCSignalClass::QVariantToString(u));
+				int line;
+				tmp_stream >> line;
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " line = "+RPCSignalClass::QVariantToString(line));
+				emit new_ku(ku_n, length, u, line);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -139,32 +109,38 @@ void RPC_lka05_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("lka05 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("lka05 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
-			if (op_name == "new_mk(int, int, int, int, double, double, int)")
+			if (op_name == "new_mk(int, int, int, int, double, double, int, int, int)")
 			{
 				int mshm;
 				tmp_stream >> mshm;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" mshm = "+RPCSignalClass::QVariantToString(mshm));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " mshm = "+RPCSignalClass::QVariantToString(mshm));
 				int pshm;
 				tmp_stream >> pshm;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" pshm = "+RPCSignalClass::QVariantToString(pshm));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " pshm = "+RPCSignalClass::QVariantToString(pshm));
 				int length_m;
 				tmp_stream >> length_m;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" length_m = "+RPCSignalClass::QVariantToString(length_m));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " length_m = "+RPCSignalClass::QVariantToString(length_m));
 				int length_p;
 				tmp_stream >> length_p;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" length_p = "+RPCSignalClass::QVariantToString(length_p));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " length_p = "+RPCSignalClass::QVariantToString(length_p));
 				double u_m;
 				tmp_stream >> u_m;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" u_m = "+RPCSignalClass::QVariantToString(u_m));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " u_m = "+RPCSignalClass::QVariantToString(u_m));
 				double u_p;
 				tmp_stream >> u_p;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" u_p = "+RPCSignalClass::QVariantToString(u_p));
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " u_p = "+RPCSignalClass::QVariantToString(u_p));
 				int dt;
 				tmp_stream >> dt;
-				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" dt = "+RPCSignalClass::QVariantToString(dt));
-				emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt);
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " dt = "+RPCSignalClass::QVariantToString(dt));
+				int line_m;
+				tmp_stream >> line_m;
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " line_m = "+RPCSignalClass::QVariantToString(line_m));
+				int line_p;
+				tmp_stream >> line_p;
+				SRPCSignalClass::Instance().toLog("lka05 " + op_name +" call_number "+ QString::number(call_number) + " line_p = "+RPCSignalClass::QVariantToString(line_p));
+				emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -173,7 +149,7 @@ void RPC_lka05_SIGNAL_Object::read_data()
 				tmp_stream3 << tmp_arr2.size();
 				_sock->write(tmp_arr3 + tmp_arr2);
 				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("lka05 signal finished " + op_name);
+				SRPCSignalClass::Instance().toLog("lka05 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
 		}
 	}
@@ -196,13 +172,6 @@ void RPC_lka05_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd,
 	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_message");
 }
-void RPC_lka05_SLOT_Object::save_choose_set()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call save_choose_set %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("save_choose_set()", tmp_list);
-	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished save_choose_set");
-}
 void RPC_lka05_SLOT_Object::new_tm(int tm)
 {
 	QVariantList tmp_list;
@@ -210,6 +179,25 @@ void RPC_lka05_SLOT_Object::new_tm(int tm)
 	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call new_tm %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("new_tm(int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_tm");
+}
+void RPC_lka05_SLOT_Object::new_ku_732(int ku_n, int length, double u, int line)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(ku_n);
+	tmp_list << QVariant(length);
+	tmp_list << QVariant(u);
+	tmp_list << QVariant(line);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call new_ku_732 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_ku_732(int, int, double, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished new_ku_732");
+}
+void RPC_lka05_SLOT_Object::get_power(double _volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(_volt);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_power(double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished get_power");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
