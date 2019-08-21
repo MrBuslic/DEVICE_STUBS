@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <module name="Операторы настройки имитаторов шин">
+        <command name="ANTENNA_USTANOVKA_KOMMUTACII" short_description="Установка ошибочного соединения выводов антенны." description="" header="ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)">
+            <param name="IMYA_ANTENNI" description="Введите имя антенны для соединения." type="строка">
+                <default/>
+            </param>
+            <param name="IMYA_PRISOED_ANTENI" description="Введите название другой антенны, которую хотите соединить с первой." type="строка">
+                <default/>
+            </param>
+        </command>
+        <command name="KU_NASTROYKA_CELOSTNOSTI_KANALOV" short_description="Осуществляет имитацию нарушения целостности выбранного канала. &#10;При помощи параметра линия настраивается целостность основной/резервной линии канала (см. описание параметра линия)." description="" header="KU_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)">
+            <param name="NOMER_KANALA" description="Выбор номера настраиваемого канала." type="целое">
+                <default/>
+            </param>
+            <param name="LINIYA" description="Установка нарушения целостности линий выбранного канала:&#10;0 - основная и резервная линии не исправны;&#10;1 - исправна только основная линия;&#10;2 - исправна только резерная линия;&#10;3 - исправны обе линии." type="целое">
+                <default/>
+            </param>
+        </command>
+        <command name="FOI_NASTROYKA_CELOSTNOSTI_KANALOV" short_description="Осуществляет имитацию нарушения целостности выбранного канала. &#10;При помощи параметра линия настраивается целостность основной/резервной линии канала (см. описание параметра линия)." description="" header="FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)">
+            <param name="NOMER_KANALA" description="Выбор номера настраиваемого канала." type="целое">
+                <default/>
+            </param>
+            <param name="LINIYA" description="Установка нарушения целостности линий выбранного канала:&#10;0 - основная и резервная линии не исправны;&#10;1 - исправна только основная линия;&#10;2 - исправна только резерная линия;&#10;3 - исправны обе линии." type="целое">
+                <default/>
+            </param>
+        </command>
+        <command name="MSHM_NASTROYKA_CELOSTNOSTI_KANALOV" short_description="Осуществляет имитацию нарушения целостности выбранного канала. &#10;При помощи параметра линия настраивается целостность основной/резервной линии канала (см. описание параметра линия)." description="" header="MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)">
+            <param name="NOMER_KANALA" description="Выбор номера настраиваемого канала." type="целое">
+                <default/>
+            </param>
+            <param name="LINIYA" description="Установка нарушения целостности линий выбранного канала:&#10;0 - основная и резервная линии не исправны;&#10;1 - исправна только основная линия;&#10;2 - исправна только резерная линия;&#10;3 - исправны обе линии." type="целое">
+                <default/>
+            </param>
+        </command>
+        <command name="PSHM_NASTROYKA_CELOSTNOSTI_KANALOV" short_description="Осуществляет имитацию нарушения целостности выбранного канала. &#10;При помощи параметра линия настраивается целостность основной/резервной линии канала (см. описание параметра линия)." description="" header="PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)">
+            <param name="NOMER_KANALA" description="Выбор номера настраиваемого канала." type="целое">
+                <default/>
+            </param>
+            <param name="LINIYA" description="Установка нарушения целостности линий выбранного канала:&#10;0 - основная и резервная линии не исправны;&#10;1 - исправна только основная линия;&#10;2 - исправна только резерная линия;&#10;3 - исправны обе линии." type="целое">
+                <default/>
+            </param>
+        </command>
+        <command name="OLS_CHTENIE_DANNICH_REGISTRACII" short_description="Осуществляет чтение данных устройства регистрации." description="" header="OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList&amp;)">
+            <param name="DANNIE" description="Запись_массив для сохранения данных из устройства регистрации." type="запись_массив">
+                <default/>
+            </param>
+        </command>
+        <command name="OLS_ZAPIS_DANNIH_FORMIROVANIYA" short_description="Осуществляет запись данных устройства формирования." description="" header="OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList, QVariantList)">
+            <param name="DANNIE" description="Массив записи в устройство формирования." type="массив">
+                <default/>
+            </param>
+            <param name="MASKA" description="Массив маски устройства формирования." type="массив">
+                <default/>
+            </param>
+        </command>
+        <command name="OLS_BISTRIY_START" short_description="Активация устройства регистрации/формирования модуля ОЛС." description="" header="OLS_BISTRIY_START(int)">
+            <param name="USTROYSTVO" description="Выбор устройства:&#10;1 - приём (регистрация);&#10;2 - выдача (формирование)." type="целое">
+                <default/>
+            </param>
+        </command>
+        <command name="USTANOVIT_SOSTOYANIE_SHINI_PITANIYA" short_description="Осуществляет имитацию нарушения целостности выбранной шины питания. " description="" header="USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)">
+            <param name="SHINA" description="Выбор номера настраиваемой шины." type="целое">
+                <default/>
+            </param>
+            <param name="SOSTOYANIE" description="Установка нарушения целостности выбранной шины:&#10;0 - целостность нарушена;&#10;1 - шина исправна." type="целое">
+                <default/>
+            </param>
+        </command>
+        <command name="OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV" short_description="Осуществляет имитацию нарушения целостности выбранного канала. &#10;При помощи параметра линия настраивается целостность основной/резервной линии канала (см. описание параметра линия)." description="" header="OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)">
+            <param name="NOMER_KANALA" description="Выбор номера настраиваемого канала." type="целое">
+                <default/>
+            </param>
+            <param name="LINIYA" description="Установка нарушения целостности линий выбранного канала:&#10;0 - основная и резервная линии не исправны;&#10;1 - исправна только основная линия;&#10;2 - исправна только резерная линия;&#10;3 - исправны обе линии." type="целое">
+                <default/>
+            </param>
+        </command>
+    </module>
+</document>

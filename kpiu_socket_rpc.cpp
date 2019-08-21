@@ -76,16 +76,17 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("kpiu_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &kpiu_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["ku_map_channels_setup(int, short)"] = &kpiu_Socket_RPC_SLOT_Object::ku_map_channels_setup;
-		operators_map["mshm_map_channels_setup(int, short)"] = &kpiu_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
-		operators_map["pshm_map_channels_setup(int, short)"] = &kpiu_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
-		operators_map["unfoi_map_channels_setup(int, short)"] = &kpiu_Socket_RPC_SLOT_Object::unfoi_map_channels_setup;
-		operators_map["unols_write_data_kf(QVariantList, QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::unols_write_data_kf;
-		operators_map["unols_trigger_imm(int)"] = &kpiu_Socket_RPC_SLOT_Object::unols_trigger_imm;
-		operators_map["unols_read_data_kr(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::unols_read_data_kr;
-		operators_map["set_antenna_connection(QString, QString)"] = &kpiu_Socket_RPC_SLOT_Object::set_antenna_connection;
-		operators_map["unomnibus_map_channels_setup(int, short)"] = &kpiu_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup;
-		operators_map["set_bus_state(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::set_bus_state;
+		operators_map["KU_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::KU_NASTROYKA_CELOSTNOSTI_KANALOV;
+		operators_map["MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::MSHM_NASTROYKA_CELOSTNOSTI_KANALOV;
+		operators_map["PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::PSHM_NASTROYKA_CELOSTNOSTI_KANALOV;
+		operators_map["FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::FOI_NASTROYKA_CELOSTNOSTI_KANALOV;
+		operators_map["OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList, QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA;
+		operators_map["OLS_BISTRIY_START(int)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_BISTRIY_START;
+		operators_map["OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII;
+		operators_map["ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)"] = &kpiu_Socket_RPC_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII;
+		operators_map["OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV;
+		operators_map["USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA;
+		operators_map["getXML()"] = &kpiu_Socket_RPC_SLOT_Object::getXML;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -399,14 +400,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant kpiu_Socket_RPC_SLOT_Object::ku_map_channels_setup(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::KU_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int ku_n = _values.at(0).value<int>();
-			short line = _values.at(1).value<short>();
-			int res = app->ku_map_channels_setup(ku_n, line);
+			int line = _values.at(1).value<int>();
+			int res = app->KU_NASTROYKA_CELOSTNOSTI_KANALOV(ku_n, line);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -419,14 +420,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::mshm_map_channels_setup(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mshm = _values.at(0).value<int>();
-			short line_m = _values.at(1).value<short>();
-			int res = app->mshm_map_channels_setup(mshm, line_m);
+			int line_m = _values.at(1).value<int>();
+			int res = app->MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(mshm, line_m);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -439,14 +440,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::pshm_map_channels_setup(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int pshm = _values.at(0).value<int>();
-			short line_p = _values.at(1).value<short>();
-			int res = app->pshm_map_channels_setup(pshm, line_p);
+			int line_p = _values.at(1).value<int>();
+			int res = app->PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(pshm, line_p);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -459,14 +460,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::unfoi_map_channels_setup(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::FOI_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _n = _values.at(0).value<int>();
-			short _chan = _values.at(1).value<short>();
-			int res = app->unfoi_map_channels_setup(_n, _chan);
+			int _chan = _values.at(1).value<int>();
+			int res = app->FOI_NASTROYKA_CELOSTNOSTI_KANALOV(_n, _chan);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -479,14 +480,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::unols_write_data_kf(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariantList data_buffer = _values.at(0).value<QVariantList>();
 			QVariantList mask_buffer = _values.at(1).value<QVariantList>();
-			int res = app->unols_write_data_kf(data_buffer, mask_buffer);
+			int res = app->OLS_ZAPIS_DANNIH_FORMIROVANIYA(data_buffer, mask_buffer);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -499,13 +500,13 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::unols_trigger_imm(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_BISTRIY_START(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int devise = _values.at(0).value<int>();
-			int res = app->unols_trigger_imm(devise);
+			int res = app->OLS_BISTRIY_START(devise);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -518,13 +519,13 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::unols_read_data_kr(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariantList data_buffer = _values.at(0).value<QVariantList>();
-			app->unols_read_data_kr(data_buffer);
+			app->OLS_CHTENIE_DANNICH_REGISTRACII(data_buffer);
 			_values[0] = data_buffer;
 			SRPCSignalClass::Instance().toLog(QString("%1 data_buffer = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
 			with_return = true;
@@ -539,14 +540,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::set_antenna_connection(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QString antenna_name = _values.at(0).value<QString>();
 			QString connected_antenna_name = _values.at(1).value<QString>();
-			app->set_antenna_connection(antenna_name, connected_antenna_name);
+			app->ANTENNA_USTANOVKA_KOMMUTACII(antenna_name, connected_antenna_name);
 			return 0;
 		}
 		catch(const std::exception &)
@@ -558,14 +559,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _n = _values.at(0).value<int>();
-			short _chan = _values.at(1).value<short>();
-			int res = app->unomnibus_map_channels_setup(_n, _chan);
+			int _chan = _values.at(1).value<int>();
+			int res = app->OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(_n, _chan);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
@@ -578,14 +579,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::set_bus_state(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int bus = _values.at(0).value<int>();
 			int state = _values.at(1).value<int>();
-			app->set_bus_state(bus, state);
+			app->USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(bus, state);
 			return 0;
 		}
 		catch(const std::exception &)
@@ -595,6 +596,23 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::getXML(QVariantList& _values)
+	{
+		try
+		{
+			QString res = app->getXML();
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return QString();
+		}
+		catch(...)
+		{
+			return QString();
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

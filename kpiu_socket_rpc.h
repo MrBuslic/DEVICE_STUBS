@@ -5,7 +5,7 @@
 #include <QString>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include "KPIU_server.h"
+#include "kpiu_server.h"
 
 #include <QWidget>
 #include <QTextEdit>
@@ -98,16 +98,17 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant ku_map_channels_setup(QVariantList& _values);
-	QVariant mshm_map_channels_setup(QVariantList& _values);
-	QVariant pshm_map_channels_setup(QVariantList& _values);
-	QVariant unfoi_map_channels_setup(QVariantList& _values);
-	QVariant unols_write_data_kf(QVariantList& _values);
-	QVariant unols_trigger_imm(QVariantList& _values);
-	QVariant unols_read_data_kr(QVariantList& _values);
-	QVariant set_antenna_connection(QVariantList& _values);
-	QVariant unomnibus_map_channels_setup(QVariantList& _values);
-	QVariant set_bus_state(QVariantList& _values);
+	QVariant KU_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
+	QVariant MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
+	QVariant PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
+	QVariant FOI_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
+	QVariant OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList& _values);
+	QVariant OLS_BISTRIY_START(QVariantList& _values);
+	QVariant OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& _values);
+	QVariant ANTENNA_USTANOVKA_KOMMUTACII(QVariantList& _values);
+	QVariant OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
+	QVariant USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(QVariantList& _values);
+	QVariant getXML(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

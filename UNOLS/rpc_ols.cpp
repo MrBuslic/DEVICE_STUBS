@@ -20,6 +20,7 @@ RpcOlsWidget::RpcOlsWidget(int ols_num) : QWidget(), auto_scroll(true)
 	edit->setReadOnly(true);
 	_doc->setMaximumBlockCount(1000);
 	setMinimumSize(490, 300);
+
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
@@ -55,6 +56,7 @@ int RpcOlsWidget::unols_write_data_kf(QVariantList data_buffer, QVariantList mas
 {
 	rpc_ols_kf_buffer = data_buffer;
 	rpc_mask_buffer = mask_buffer;
+	SRPCSignalClass::Instance().toLog(QString("Записываю данные %1 с маской %2").arg(data_buffer).arg(mask_buffer));
 	return 0;
 }
 /*

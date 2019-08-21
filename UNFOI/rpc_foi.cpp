@@ -44,6 +44,7 @@ RpcFoiWidget::RpcFoiWidget() : QWidget()
 int RpcFoiWidget::unfoi_map_channels_setup(int _n, short _chan)
 {
 	map_channels[_n] = _chan;
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(_n).arg(_chan));
 	return 0;
 }
 

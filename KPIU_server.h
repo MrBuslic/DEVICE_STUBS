@@ -23,27 +23,27 @@ public:
 	KPIUServer(QWidget* parent = 0);
 public slots:
 	//mku_bus_setup
-	int ku_map_channels_setup(int ku_n, short line);
-	int mshm_map_channels_setup(int mshm, short line_m);
-	int pshm_map_channels_setup(int pshm, short line_p);
+	int KU_NASTROYKA_CELOSTNOSTI_KANALOV(int ku_n, int line);
+	int MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int mshm, int line_m);
+	int PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int pshm, int line_p);
 
 	//unfoi_setup
-	int unfoi_map_channels_setup(int _n, short _chan);
+	int FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
 
 	//unols_setup
-	int unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer);
-	int unols_trigger_imm(int devise);
-	void unols_read_data_kr(QVariantList& data_buffer);
+	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
+	int OLS_BISTRIY_START(int devise);
+	void OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
 
 	//KPRD_setup
-	void set_antenna_connection(QString antenna_name, QString connected_antenna_name);
+	void ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
 
 	//OMNIBUS_setup
-	int unomnibus_map_channels_setup(int _n, short _chan);
+	int OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
 
 	//power_bus_setup
-	void set_bus_state(int bus, int state);
-
+	void USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
+	QString getXML();
 private:
 	RpcOmnibusWidget* omnibus_widget;
 	InterruptWidget* interrupt_widget;

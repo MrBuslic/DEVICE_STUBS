@@ -10,7 +10,7 @@
 PowerWidget::PowerWidget(QWidget *parent)
 {
 	LogWidget* log_w = new LogWidget();
-	log_w->show();
+	//log_w->show();
 	//setFixedSize(250, 80);
 	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
@@ -121,6 +121,7 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 void PowerWidget::set_bus_state(int bus, int state)
 {
 	power_bus_state_map[bus] = state;
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу шины %1 значение %2").arg(bus).arg(state));
 }
 
 void PowerWidget::set_on()

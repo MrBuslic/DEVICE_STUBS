@@ -21,7 +21,7 @@ include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
 include_directories(${Qt5Script_INCLUDES})
 include_directories(${PROJECT_SOURCE_DIR}/../../lib/db_ctrl)
-include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl)
+#include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl)
 include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl_v3)
 
 add_definitions(-DNOMINMAX)
@@ -57,8 +57,8 @@ include_directories(${OMNIBUSBOX_SOURCE_DIR}/../../lib/socket_rpc/include ../../
 add_library(BTICARD SHARED ${CARD_HEADERS} ${CARD_SOURCES})
 add_library(BTI1553 SHARED ${1553_HEADERS} ${1553_SOURCES})
 
-target_link_libraries(BTICARD socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller mongo_controller_v3 ${Boost_LIBRARIES})
-target_link_libraries(BTI1553 socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller mongo_controller_v3 ${Boost_LIBRARIES})
+target_link_libraries(BTICARD socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller_v3 ${Boost_LIBRARIES})
+target_link_libraries(BTI1553 socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller_v3 ${Boost_LIBRARIES})
 
 set(OMNIBUS_SOURCES OMNIBUSBOX.h OMNIBUSBOX.cpp omnibus_socket_rpc.h omnibus_socket_rpc.cpp main.cpp)
 

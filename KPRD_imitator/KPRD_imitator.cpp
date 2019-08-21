@@ -355,5 +355,8 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 
 void KPRD_imitator::set_antenna_connection(QString antenna_name, QString connected_antenna_name)
 {
-	kprd_state_map[antenna_name] = connected_antenna_name;
+	if (kprd_state_map.contains(antenna_name))
+	{
+		kprd_state_map[antenna_name] = connected_antenna_name;
+	}
 }
