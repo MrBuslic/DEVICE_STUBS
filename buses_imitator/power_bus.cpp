@@ -9,7 +9,7 @@
 
 PowerWidget::PowerWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget();
+	//LogWidget* log_w = new LogWidget();
 	//log_w->show();
 	//setFixedSize(250, 80);
 	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
@@ -27,7 +27,9 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->start();
 
 	on_btn = new QPushButton("Вкл", this);
+	on_btn->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	off_btn = new QPushButton("Откл", this);
+	off_btn->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	QVBoxLayout* lay = new QVBoxLayout(this);
 	lay->addStretch(10);
 	lay->addWidget(on_btn);

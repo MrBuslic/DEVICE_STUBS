@@ -204,7 +204,7 @@ void RPC_omnibus_SLOT_Object::send_msg(int mko, int line, int cwd, QVariantList&
 	tmp_ret_params += " os="+RPCSignalClass::QVariantToString(tmp_list.at(4));
 	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call finished send_msg %1").arg(tmp_ret_params));
 }
-int RPC_omnibus_SLOT_Object::unomnibus_map_channels_setup(int _n, short _chan)
+int RPC_omnibus_SLOT_Object::unomnibus_map_channels_setup(int _n, int _chan)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -212,7 +212,7 @@ int RPC_omnibus_SLOT_Object::unomnibus_map_channels_setup(int _n, short _chan)
 	tmp_list << QVariant(_n);
 	tmp_list << QVariant(_chan);
 	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call unomnibus_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unomnibus_map_channels_setup(int, short)", tmp_list);
+	dynamic_call("unomnibus_map_channels_setup(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call finished unomnibus_map_channels_setup %1").arg(tmp_ret_params));
 	return res.toInt();

@@ -35,7 +35,7 @@ RpcOmnibusWidget::RpcOmnibusWidget() : QWidget(), auto_scroll(true)
 	edit->setReadOnly(true);
 	_doc->setMaximumBlockCount(1000);
 	setMinimumSize(490, 300);
-	setMaximumSize(500, 500);
+	setMaximumSize(500, 300);
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
@@ -194,7 +194,7 @@ void RpcOmnibusWidget::log_timer_ontimer()
 	log_file.close();
 }
 
-int RpcOmnibusWidget::unomnibus_map_channels_setup(int _n, short _chan)
+int RpcOmnibusWidget::unomnibus_map_channels_setup(int _n, int _chan)
 {
 	map_channels[_n] = _chan;
 	return 0;

@@ -81,6 +81,7 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::PSHM_NASTROYKA_CELOSTNOSTI_KANALOV;
 		operators_map["FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::FOI_NASTROYKA_CELOSTNOSTI_KANALOV;
 		operators_map["OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList, QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA;
+		operators_map["OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_REGISTRACII;
 		operators_map["OLS_BISTRIY_START(int)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_BISTRIY_START;
 		operators_map["OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII;
 		operators_map["ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)"] = &kpiu_Socket_RPC_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII;
@@ -488,6 +489,25 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			QVariantList data_buffer = _values.at(0).value<QVariantList>();
 			QVariantList mask_buffer = _values.at(1).value<QVariantList>();
 			int res = app->OLS_ZAPIS_DANNIH_FORMIROVANIYA(data_buffer, mask_buffer);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList data_buffer = _values.at(0).value<QVariantList>();
+			int res = app->OLS_ZAPIS_DANNIH_REGISTRACII(data_buffer);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}

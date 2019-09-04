@@ -103,6 +103,7 @@ public:
 	QVariant PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
 	QVariant FOI_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
 	QVariant OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList& _values);
+	QVariant OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList& _values);
 	QVariant OLS_BISTRIY_START(QVariantList& _values);
 	QVariant OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& _values);
 	QVariant ANTENNA_USTANOVKA_KOMMUTACII(QVariantList& _values);

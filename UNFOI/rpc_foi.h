@@ -27,7 +27,7 @@ class RpcFoiWidget : public QWidget
 public:
 	RpcFoiWidget();
 public slots:
-	int unfoi_map_channels_setup(int _n, short _chan);
+	int unfoi_map_channels_setup(int _n, int _chan);
 	int unfoi_chan_setup(int _n, short _chan, double _u, double _t);
 	int unfoi_run();
 private:

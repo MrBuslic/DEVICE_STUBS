@@ -272,6 +272,18 @@ int RPC_kpiu_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffe
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_ZAPIS_DANNIH_FORMIROVANIYA %1").arg(tmp_ret_params));
 	return res.toInt();
 }
+int RPC_kpiu_SLOT_Object::OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(data_buffer);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call OLS_ZAPIS_DANNIH_REGISTRACII %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_ZAPIS_DANNIH_REGISTRACII %1").arg(tmp_ret_params));
+	return res.toInt();
+}
 int RPC_kpiu_SLOT_Object::OLS_BISTRIY_START(int devise)
 {
 	if(!connected) return 1;

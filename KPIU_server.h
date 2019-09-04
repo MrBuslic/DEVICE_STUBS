@@ -32,6 +32,7 @@ public slots:
 
 	//unols_setup
 	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
+	int OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer);
 	int OLS_BISTRIY_START(int devise);
 	void OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
 

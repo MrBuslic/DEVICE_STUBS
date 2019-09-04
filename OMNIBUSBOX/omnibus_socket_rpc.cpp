@@ -82,7 +82,7 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["switch_ab(int, int, bool)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab;
 		operators_map["set_new_data(int, int, int, QVariantList)"] = &omnibus_Socket_RPC_SLOT_Object::set_new_data;
 		operators_map["send_msg(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg;
-		operators_map["unomnibus_map_channels_setup(int, short)"] = &omnibus_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup;
+		operators_map["unomnibus_map_channels_setup(int, int)"] = &omnibus_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup;
 		operators_map["get_dt()"] = &omnibus_Socket_RPC_SLOT_Object::get_dt;
 		operators_map["message_to_log_slot(QString)"] = &omnibus_Socket_RPC_SLOT_Object::message_to_log_slot;
 		///////////////////////////////////////////////////////////////////////
@@ -457,7 +457,7 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _n = _values.at(0).value<int>();
-			short _chan = _values.at(1).value<short>();
+			int _chan = _values.at(1).value<int>();
 			int res = app->unomnibus_map_channels_setup(_n, _chan);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;

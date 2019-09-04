@@ -15,6 +15,7 @@ public slots:
 	int PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int pshm, int line_p);
 	int FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
 	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
+	int OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer);
 	int OLS_BISTRIY_START(int devise);
 	void OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
 	void ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
