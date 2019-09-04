@@ -24,10 +24,6 @@ MKI_imitator::MKI_imitator()
 	gridLayout->addWidget(RPIK_label, 3, 0);
 	gridLayout->addWidget(log_edit, 5, 0, 1, 2);
 
-	btn = new QPushButton("server to MKI", widg);
-	gridLayout->addWidget(btn, 4, 0);
-	connect(btn, &QPushButton::clicked, this, &MKI_imitator::writeByBtn);
-	
 	QSettings tmp_settings("Cometa", "СПО МКПА МЦА");
 	QString ip = tmp_settings.value("IP_rm", "192.168.0.100").toString();
 	if (ip == "localhost")	// QUdpSocket::bind не жрёт "localhost". Ему "127.0.0.1" подавай.
@@ -36,10 +32,6 @@ MKI_imitator::MKI_imitator()
 	tcpServer = new QTcpServer(widg);
 	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConn()));
 	tcpServer->listen(QHostAddress::Any, 33333);
-
-	sock.connectToHost("10.44.4.13", 33333);
-	connect(&sock, &QTcpSocket::readyRead, this, &MKI_imitator::readByBtn);
-
 	
 	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
 	frame_slot_thr.start();
@@ -54,10 +46,6 @@ MKI_imitator::MKI_imitator()
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("rmmbk07_geometry").toByteArray());
-	//connect(_sock, SIGNAL(readyRead()), SLOT(read()));
-	RUValue = MU;
-	RRValue = RR;
-	RPIKValue = OFF;
 }
 
 void MKI_imitator::log_msg(QString msg)
@@ -108,10 +96,45 @@ QByteArray MKI_imitator::createCommandHeader(const int & command, const int & da
 	numberIntoBA(header, RPIKValue, header_RPIK);
 
 	//CRC32
-	//unsigned int crc32_new = sp_getCRC32((unsigned char*)(header.data()), header.size() - 4);
-	//numberIntoBA(header, crc32_new, header_crc_header_ind);
+	unsigned int crc32_new = sp_getCRC32((unsigned char*)(header.data()), header.size() - 4);
+	numberIntoBA(header, crc32_new, header_crc_header_ind);
 
 	return header;
+}
+
+void MKI_imitator::sendKRO(int MsgTypeC)
+{
+	sock.disconnectFromHost();
+	sock.waitForDisconnected(3000);
+	sock.connectToHost("10.44.4.13", 50164);
+	if (!sock.waitForConnected(3000))
+		log_msg("Ошибка сокета: " + sock.errorString());
+
+	QByteArray query_data = createCommandHeader(MsgTypeC + 2e9, 0);
+	sock.write(query_data);
+}
+
+unsigned long MKI_imitator::sp_getCRC32(unsigned char * buf, unsigned long len)
+{
+	static int	crc_tab_sw = 0;
+	static unsigned long crc_table[256];
+	unsigned long crc;
+	int	i, j;
+
+	if (crc_tab_sw == 0)
+	{
+		for (i = 0; i < 256; i++)
+		{
+			crc = i;
+			for (j = 0; j < 8; j++)	crc = crc & 1 ? (crc >> 1) ^ 0xEDB88320UL : crc >> 1;
+			crc_table[i] = crc;
+		}
+		crc_tab_sw = 1;
+	}
+	crc = 0xFFFFFFFFUL;
+	while (len--) crc = crc_table[(crc ^ *buf++) & 0xFF] ^ (crc >> 8);
+
+	return (crc ^ 0xFFFFFFFFUL);
 }
 
 void MKI_imitator::closeEvent(QCloseEvent *event)
@@ -157,6 +180,7 @@ void MKI_imitator::newConn()
 	clientSocket = tcpServer->nextPendingConnection();
 	QHostAddress adrv4(clientSocket->peerAddress().toIPv4Address());
 	log_msg(QString("Новое подключение с %1:%2").arg(adrv4.toString()).arg(QString::number(clientSocket->peerPort())));
+	ip_label->setText(QString("IP клиента: %1:%2").arg(adrv4.toString()).arg(QString::number(clientSocket->peerPort())));
 	//connect(clientSocket, SIGNAL(readyRead()), this, SLOT(slotReadClient()));
 	connect(clientSocket, &QTcpSocket::readyRead, this, &MKI_imitator::slotReadClient);
 }
@@ -168,49 +192,32 @@ void MKI_imitator::slotReadClient()
 
 	while (clientSocket->bytesAvailable())
 		read_data += clientSocket->read(clientSocket->bytesAvailable());
-	
-	qDebug() << read_data.toHex();
-	qDebug() << read_data.size();
-	log_msg("0x" + QString(read_data.toHex()));
 
-	
-	unsigned int MsgTypeC = numberFromBA<unsigned int>(read_data, 12);	// Код типа сообщения
-	MsgTypeC += 1e9;
-	
-	QByteArray response_data = createCommandHeader(MsgTypeC, 0);
+	unsigned int MsgTypeC = numberFromBA<unsigned int>(read_data, header_MsgTypeC_ind);	// Код типа сообщения
+	log_msg(QString("Пришла команда %1: 0x%2").arg(QString::number(MsgTypeC)).arg(QString(read_data.toHex())));
+	log_msg("");
 
-	//response_data.append(read_data.mid(0, 4));	// Код начала заголовка и версии протокола.
-	//response_data.append(read_data.mid(8, 4));	// FromAddr
-	//response_data.append(read_data.mid(4, 4));	// ToAddr
+	switch (MsgTypeC)
+	{
+		case(10102):
+			RUValue = numberFromBA<unsigned int>(read_data, msgHeaderLen);
+			control_label->setText("Управление: " + control_names[RUValue]);	// Первый байт данных с РУ
+			break;
+		case(10101):
+			RRValue = numberFromBA<unsigned int>(read_data, msgHeaderLen);
+			rezhim_label->setText("Режим работы: " + rezhim_names[RRValue]);	// Первый байт данных с РР
+			break;
+		case(10103):
+			RPIKValue = numberFromBA<unsigned int>(read_data, msgHeaderLen);
+			RPIK_label->setText("РПИК: " + RPIK_names[RPIKValue]);	// Первый байт данных с РПИК
+			break;
+		default:
+			break;
+	}
 
-	//numberIntoBA(response_data, MsgTypeC, 12);
-
-	//response_data.append(read_data.mid(16, 14));
-
-	//unsigned int ErrStat = 0;
-	//numberIntoBA(response_data, ErrStat, 40);
-
-	//response_data.append(read_data.mid(44));
-	//response_data.resize(96);
-
-
-	qDebug() << response_data.toHex();
-	qDebug() << response_data.size();
+	QByteArray response_data = createCommandHeader(MsgTypeC + 1e9, 0);
 	clientSocket->write(response_data);
-	//clientSocket->write("ewq");
+
+	sendKRO(MsgTypeC);
 }
 
-void MKI_imitator::writeByBtn()
-{
-	sock.write("qwe");
-}
-
-void MKI_imitator::readByBtn()
-{
-	QByteArray read_data;
-	while (sock.bytesAvailable())
-		read_data += sock.read(sock.bytesAvailable());
-
-	qDebug() << read_data;
-	log_msg(read_data);
-}

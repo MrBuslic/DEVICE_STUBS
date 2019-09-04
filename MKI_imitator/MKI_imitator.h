@@ -19,14 +19,14 @@
 #include "rpc_ports.h"
 
 /**
-*	\class таймер
+*	\class С‚Р°Р№РјРµСЂ
 *
 */
 class MyTimer
 {
 public:
 	/**
-	*	\brief конструктор
+	*	\brief РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ
 	*
 	*/
 	MyTimer() : CounterStart(0)
@@ -38,7 +38,7 @@ public:
 		Freq_In_mSec = li.QuadPart - CounterStart;
 	}
 	/**
-	*	\brief запуск счетчика
+	*	\brief Р·Р°РїСѓСЃРє СЃС‡РµС‚С‡РёРєР°
 	*
 	*/
 	bool StartCounter()
@@ -52,7 +52,7 @@ public:
 		return true;
 	}
 	/**
-	*	\brief остановка счетчика
+	*	\brief РѕСЃС‚Р°РЅРѕРІРєР° СЃС‡РµС‚С‡РёРєР°
 	*
 	*/
 	void StopCounter()
@@ -62,7 +62,7 @@ public:
 		CounterStop = li.QuadPart;
 	}
 	/**
-	*	\brief получить секунды
+	*	\brief РїРѕР»СѓС‡РёС‚СЊ СЃРµРєСѓРЅРґС‹
 	*
 	*/
 	long GetSec()
@@ -72,7 +72,7 @@ public:
 			);
 	}
 	/**
-	*	\brief получить секунды
+	*	\brief РїРѕР»СѓС‡РёС‚СЊ СЃРµРєСѓРЅРґС‹
 	*
 	*/
 	long GetUSec()
@@ -102,7 +102,7 @@ private:
 	QLabel *control_label;
 	QLabel *rezhim_label;
 	QLabel *ip_label;
-	QLabel *RPIK_label;	// Режим Приёма Кадра
+	QLabel *RPIK_label;	// Р РµР¶РёРј РџСЂРёС‘РјР° РљР°РґСЂР°
 
 	QTextEdit *log_edit;
 	QScrollBar* _scroll_bar;
@@ -113,32 +113,16 @@ private:
 	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
 
 	void log_msg(QString msg);
-	QPushButton *btn;
 	QTcpSocket sock;
 
-	enum control : unsigned int
-	{
-		MU = 1,
-		CU = 2
-	};
+	//const char *control_names[] = { "РњРЈ", "Р¦РЈ"};
+	const QVector<QString> control_names = {"", "РњРЈ", "Р¦РЈ" };
+	const QVector<QString> rezhim_names = { "", "Р Р ", "РџР‘Р ", "Р‘Р " };
+	const QVector<QString> RPIK_names = { "РІС‹РєР»", "Р’РўР¤", "РРљ8", "РРљ15" };
 
-	enum rezhim : int
-	{
-		RR = 1,
-		PBR = 2,
-		BR = 3,
-	};
-
-	enum RPIK : unsigned int
-	{
-		OFF = 0,
-		VTF = 1,
-		IK8 = 2,
-		IK15 = 3
-	};
-	int RUValue;
-	int RRValue;
-	int RPIKValue;
+	unsigned int RUValue = 0;
+	unsigned int RRValue = 0;
+	unsigned int RPIKValue = 0;
 	QString ipValue;
 	
 	const int msgHeaderLen = 96;
@@ -167,13 +151,15 @@ private:
 	MyTimer my_timer;
 
 	QByteArray createCommandHeader(const int& command, const int& dataSize, int id = 0);
+	void sendKRO(int MsgTypeC);
+	unsigned long sp_getCRC32(unsigned char *buf, unsigned long len);
 
 	template <typename T>
 	/**
-	*	\brief целое в БА
-	* \param ba - массив БА
-	* \param data - данные
-	* \param start_ind - начальный индекс
+	*	\brief С†РµР»РѕРµ РІ Р‘Рђ
+	* \param ba - РјР°СЃСЃРёРІ Р‘Рђ
+	* \param data - РґР°РЅРЅС‹Рµ
+	* \param start_ind - РЅР°С‡Р°Р»СЊРЅС‹Р№ РёРЅРґРµРєСЃ
 	*/
 	static void numberIntoBA(QByteArray& ba, T data, const int& start_ind)
 	{
@@ -191,10 +177,10 @@ private:
 
 	template <typename T>
 	/**
-	*	\brief номер из БА
-	* \param ba - массив БА
-	* \param start_ind - начальный индекс
-	* \param bytes_count - количество байт
+	*	\brief РЅРѕРјРµСЂ РёР· Р‘Рђ
+	* \param ba - РјР°СЃСЃРёРІ Р‘Рђ
+	* \param start_ind - РЅР°С‡Р°Р»СЊРЅС‹Р№ РёРЅРґРµРєСЃ
+	* \param bytes_count - РєРѕР»РёС‡РµСЃС‚РІРѕ Р±Р°Р№С‚
 	*/
 	static T numberFromBA(const QByteArray& ba, const int& start_ind, const int bytes_count = 0)
 	{
@@ -218,8 +204,6 @@ public slots :
 	void new_frame_07(QString mode_in, int psp_in, int lit_in, int _fm, QString _ant, QVariant frame_data);
 	void newConn();
 	void slotReadClient();
-	void writeByBtn();
-	void readByBtn();
 };
 
 #endif
