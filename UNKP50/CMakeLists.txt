@@ -27,7 +27,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNKP50_SOURCES unkp50.cpp kp50_rpc.h kp50_rpc.cpp)
+set(UNKP50_SOURCES unkp50.cpp kp50_rpc.h kp50_rpc.cpp DllMain.cpp)
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unkp50_32 SHARED ${UNKP50_HEADERS} ${UNKP50_SOURCES} export.def)

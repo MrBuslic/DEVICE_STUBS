@@ -29,7 +29,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNMT8_SOURCES unmt8k4l.cpp mt8k4l_rpc.h mt8k4l_rpc.cpp)                                            
+set(UNMT8_SOURCES unmt8k4l.cpp mt8k4l_rpc.h mt8k4l_rpc.cpp DllMain.cpp)                                            
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unmt8k4l_32 SHARED ${UNMT8_HEADERS} ${UNMT8_SOURCES} export.def)

@@ -27,7 +27,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNMKPRM_SOURCES unmkprm.cpp mkprm_rpc.h mkprm_rpc.cpp)
+set(UNMKPRM_SOURCES unmkprm.cpp mkprm_rpc.h mkprm_rpc.cpp DllMain.cpp)
 include_directories($ENV{VISA_HOME}/include)
 
 add_library(unmkprm_32 SHARED ${UNMKPRM_HEADERS} ${UNMKPRM_SOURCES} export.def)

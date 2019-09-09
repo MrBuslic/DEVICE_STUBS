@@ -30,7 +30,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNMN8I_SOURCES unmn8i.cpp unmn8i_h.h mn8i_rpc.h mn8i_rpc.cpp)
+set(UNMN8I_SOURCES unmn8i.cpp unmn8i_h.h mn8i_rpc.h mn8i_rpc.cpp DllMain.cpp)
 
 include_directories($ENV{VISA_HOME}include)
 

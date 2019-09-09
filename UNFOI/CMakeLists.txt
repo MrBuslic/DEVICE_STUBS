@@ -27,7 +27,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNFOI_SOURCES unfoi.cpp foi_rpc.h foi_rpc.cpp)
+set(UNFOI_SOURCES unfoi.cpp foi_rpc.h foi_rpc.cpp DllMain.cpp)
 include_directories($ENV{VISA_HOME}/include)
 
 add_library(unfoi_32 SHARED ${UNFOI_HEADERS} ${UNFOI_SOURCES} export.def)

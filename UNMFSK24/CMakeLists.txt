@@ -29,7 +29,7 @@ endif()
 
 QT5_ADD_RESOURCES(RESOURCES mfsk24.qrc)
 
-set(UNMFSK24_SOURCES unmfsk24.cpp mfsk24_rpc.h mfsk24_rpc.cpp)                                            
+set(UNMFSK24_SOURCES unmfsk24.cpp mfsk24_rpc.h mfsk24_rpc.cpp DllMain.cpp)                                            
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unmfsk24_32 SHARED ${UNMFSK24_HEADERS} ${UNMFSK24_SOURCES} export.def)

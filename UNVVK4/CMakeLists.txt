@@ -26,7 +26,7 @@ if(WIN32)
 endif()
 
 
-set(UNVVK4_SOURCES unvvk4.cpp vvk4_rpc.h vvk4_rpc.cpp)
+set(UNVVK4_SOURCES unvvk4.cpp vvk4_rpc.h vvk4_rpc.cpp DllMain.cpp)
 include_directories($ENV{LOKI_HOME}/include)	
 include_directories($ENV{VISA_HOME}/include)
 

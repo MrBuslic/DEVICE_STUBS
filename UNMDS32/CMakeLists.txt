@@ -29,7 +29,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNMDS32_SOURCES unmds32.cpp mds32_rpc.h mds32_rpc.cpp)                                            
+set(UNMDS32_SOURCES unmds32.cpp mds32_rpc.h mds32_rpc.cpp DllMain.cpp)                                            
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unmds32_32 SHARED ${UNMDS32_HEADERS} ${UNMDS32_SOURCES} export.def)
