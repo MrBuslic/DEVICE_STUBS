@@ -23,6 +23,12 @@ ols_rpc_buffer_class::ols_rpc_buffer_class()
 
 		ols_slot_thr.push_back(slot_thr);
 		ols_signal_thr.push_back(signal_thr);
+
+		periods << 0;
+		series << 0;
+
+		ols_KF_buffer << QVariantList();
+		mask_buffer << QVariantList();
 	}
 }
 
