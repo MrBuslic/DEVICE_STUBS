@@ -62,7 +62,7 @@ target_link_libraries(BTI1553 socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIE
 
 set(OMNIBUS_SOURCES OMNIBUSBOX.h OMNIBUSBOX.cpp omnibus_socket_rpc.h omnibus_socket_rpc.cpp main.cpp)
 
-add_executable(rpc_omnibus WIN32 ${OMNIBUS_SOURCES})
+add_executable(rpc_omnibus WIN32 ${OMNIBUS_SOURCES} icon.rc)
 set_target_properties(rpc_omnibus PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_omnibus ${QT_LIBRARIES} socket_rpc common_functions ${ADDITIONAL_LIBS})
 qt5_use_modules(rpc_omnibus Core Widgets Gui Network)

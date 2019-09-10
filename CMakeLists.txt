@@ -159,6 +159,7 @@ add_subdirectory(BOOP_imitator)
 add_subdirectory(R732_imitator)
 add_subdirectory(R733_imitator)
 add_subdirectory(RM_MBK07_imitator)
+add_subdirectory(MKI_imitator)
 
 #set(SOURCES "cbk_imitator/main.cpp")
 file(GLOB_RECURSE SOURCES *.cpp *.c)

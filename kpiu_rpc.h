@@ -8,7 +8,6 @@ class RPC_kpiu_SLOT_Object : public RPC_SLOT_Object
 	Q_OBJECT
 public:
 	RPC_kpiu_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("kpiu_slot_obj");}
-	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
 	int ku_map_channels_setup(int ku_n, short line);
@@ -46,7 +45,6 @@ public:
 		this->QObject::setObjectName("kpiu_signal_obj");
 		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection); 
 	}
-	virtual void connect_to_server();
 public slots:
 	void read_data();
 	void send_connect(QString signal_name, bool _connect);
