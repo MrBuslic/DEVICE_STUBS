@@ -49,7 +49,6 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
-	void send_data(QVariantList& data_buffer);
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
 	void packet_ready(QVariantList data_buffer);
 };
