@@ -19,6 +19,7 @@ find_package(Qt5Network)
 find_package(Qt5Script)
 find_package(Qt5ScriptTools)
 find_package(Qt5PrintSupport)
+find_package(libmongocxx-static REQUIRED)
 
 add_definitions(-DLOKI_CLASS_LEVEL_THREADING -DWINDOWS -D_WINDOWS)
 add_definitions(-DWIN32_LEAN_AND_MEAN)
@@ -26,7 +27,7 @@ add_definitions(-DWIN32_LEAN_AND_MEAN)
 include_directories($ENV{VISA_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include)
-include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
+#include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
 include_directories($ENV{LOKI_HOME}/include)
 include_directories($ENV{OMNIBUS_HOME}/include)
 include_directories($ENV{SM_HOME}/SM/target/BOS/BOS_h)
@@ -50,6 +51,8 @@ include_directories(core/Qt4)
 include_directories(core/qsci)	
 include_directories(core/lexers)
 include_directories(core/include)
+include_directories(${LIBMONGOCXX_STATIC_INCLUDE_DIRS})
+
 add_definitions(${Qt5PrintSupport_DEFINITIONS})
 add_definitions(-DQSCINTILLA_MAKE_DLL)
 add_definitions(-DQT)
@@ -63,7 +66,7 @@ include_directories("../lib/frame_converter")
 include_directories("../lib/my_git")
 include_directories("../lib/common_functions")
 include_directories("../lib/db_ctrl")
-include_directories("../lib/mongo_ctrl")
+#include_directories("../lib/mongo_ctrl")
 include_directories("../vendor/QScintilla/core/Qt4")
 
 include_directories(${QT_QTSCRIPTTOOLS_INCLUDE_DIR})
@@ -111,7 +114,6 @@ SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2}/stubs)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 
 add_subdirectory(buses_imitator)
-
 add_subdirectory(AG7972)
 add_subdirectory(ASN_imitator)
 add_subdirectory(SORENSEN)
@@ -162,12 +164,14 @@ add_subdirectory(R733_imitator)
 add_subdirectory(RM_MBK07_imitator)
 add_subdirectory(MKI_imitator)
 
+
+
 #set(SOURCES "cbk_imitator/main.cpp")
 file(GLOB_RECURSE SOURCES *.cpp *.c)
 file(GLOB_RECURSE HEADERS *.h)
 #file(GLOB_RECURSE REMOVE_SOURCES "*main.cpp")
-file(GLOB_RECURSE REMOVE_SOURCES "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp" "cbk_imitator/*.cpp" "spobu_imitator/*.cpp" "tpo_imitator/*.cpp" "*BUSES.cpp" "cbk_imitator_real_po/real_tpo/DebugUnit.c" "cbk_imitator_real_po/real_tpo/ProtoUnit1.c" "cbk_imitator_real_po/real_tpo/ProtoUnit2.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Erti.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Koi.c" "DllMain.cpp" "cbk_imitator_real_po/*.cpp" "cbk_imitator_real_po/*.c"  )
-file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h" "cbk_imitator/*.h" "spobu_imitator/*.h" "tpo_imitator/*.h" "*BUSES.h" "cbk_imitator_real_po/*.h")#Выделить заголовочные файлы МКО в отдельную папку
+file(GLOB_RECURSE REMOVE_SOURCES "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp" "cbk_imitator/*.cpp" "spobu_imitator/*.cpp" "tpo_imitator/*.cpp" "*BUSES.cpp" "cbk_imitator_real_po/real_tpo/DebugUnit.c" "cbk_imitator_real_po/real_tpo/ProtoUnit1.c" "cbk_imitator_real_po/real_tpo/ProtoUnit2.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Erti.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Koi.c" "DllMain.cpp" "cbk_imitator_real_po/*.cpp" "cbk_imitator_real_po/*.c" "kpiu_server_plugin.cpp")
+file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h" "cbk_imitator/*.h" "spobu_imitator/*.h" "tpo_imitator/*.h" "*BUSES.h" "cbk_imitator_real_po/*.h" "kpiu_server_plugin.h")#Выделить заголовочные файлы МКО в отдельную папку
 #list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
 list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
 list(REMOVE_ITEM HEADERS ${REMOVE_HEADERS})
@@ -176,26 +180,35 @@ list(APPEND SOURCES ${PROJECT_SOURCE_DIR}/main.cpp)
 #list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
 #list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/cbk_imitator/main.cpp)
 
-add_executable(Stubs ${SOURCES} ${HEADERS})
+add_executable(Stubs WIN32 ${SOURCES} ${HEADERS})
 
-target_link_libraries (Stubs ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} BTICARD BTI1553 socket_rpc mongo_controller mongo_controller_v3 qscintilla db_ctrl git2 my_git common_functions unfoi_32 frame_converter) 
+ADD_CUSTOM_COMMAND(TARGET Stubs
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/kpiu_server.h ${PROJECT_SOURCE_DIR} kpiu
+)
+
+#QT5_ADD_RESOURCES(KPIU_SERVER_RESOURCES kpiu_plugin.qrc)
+set(KPIU_SERVER_plugin_SOURCES kpiu_server_plugin.h  kpiu_server_plugin.cpp ${PROJECT_SOURCE_DIR}/kpiu_rpc.h ${PROJECT_SOURCE_DIR}/kpiu_rpc.cpp)
+
+add_library(kpiu_server_plugin SHARED ${KPIU_SERVER_plugin_SOURCES} ${KPIU_SERVER_RESOURCES} )
+target_link_libraries(kpiu_server_plugin ${Qt5Core_LIBRARIES}  ${Qt5Widgets_LIBRARIES} common_functions db_ctrl mongo_controller_v3 socket_rpc)
+
+target_link_libraries(Stubs ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+                                      ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} BTICARD BTI1553 socket_rpc 
+									   mongo_controller_v3 ${LIBMONGOCXX_STATIC_LIBRARIES} qscintilla db_ctrl git2 my_git common_functions unfoi_32 frame_converter
+									   $ENV{VISA_LIBS} ) 
 
 if(WIN32)
 	qt5_use_modules(Stubs Core Widgets Network Gui)
 	# SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
 
-
-ADD_CUSTOM_COMMAND(TARGET Stubs
-	PRE_BUILD
-	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/KPIU_server.h ${PROJECT_SOURCE_DIR} kpiu
-)
-
-
+target_compile_definitions(Stubs PRIVATE ${LIBMONGOCXX_STATIC_DEFINITIONS})
+qt5_use_modules(kpiu_server_plugin Core Widgets)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3})
 
-QT5_ADD_RESOURCES(RESOURCES common_functions.qrc) #что делает?
+QT5_ADD_RESOURCES(kpiu_server_plugin common_functions.qrc) #что делает?
+

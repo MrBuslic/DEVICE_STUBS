@@ -76,7 +76,7 @@ void RPC_foi_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-int RPC_foi_SLOT_Object::unfoi_map_channels_setup(int _n, short _chan)
+int RPC_foi_SLOT_Object::unfoi_map_channels_setup(int _n, int _chan)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -84,7 +84,7 @@ int RPC_foi_SLOT_Object::unfoi_map_channels_setup(int _n, short _chan)
 	tmp_list << QVariant(_n);
 	tmp_list << QVariant(_chan);
 	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call unfoi_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unfoi_map_channels_setup(int, short)", tmp_list);
+	dynamic_call("unfoi_map_channels_setup(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call finished unfoi_map_channels_setup %1").arg(tmp_ret_params));
 	return res.toInt();

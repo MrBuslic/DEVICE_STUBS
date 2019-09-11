@@ -207,124 +207,146 @@ void RPC_kpiu_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-int RPC_kpiu_SLOT_Object::ku_map_channels_setup(int ku_n, short line)
+int RPC_kpiu_SLOT_Object::KU_NASTROYKA_CELOSTNOSTI_KANALOV(int ku_n, int line)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(ku_n);
 	tmp_list << QVariant(line);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call ku_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("ku_map_channels_setup(int, short)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call KU_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("KU_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished ku_map_channels_setup %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished KU_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::mshm_map_channels_setup(int mshm, short line_m)
+int RPC_kpiu_SLOT_Object::MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int mshm, int line_m)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(mshm);
 	tmp_list << QVariant(line_m);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mshm_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("mshm_map_channels_setup(int, short)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call MSHM_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished mshm_map_channels_setup %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished MSHM_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::pshm_map_channels_setup(int pshm, short line_p)
+int RPC_kpiu_SLOT_Object::PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int pshm, int line_p)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(pshm);
 	tmp_list << QVariant(line_p);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call pshm_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("pshm_map_channels_setup(int, short)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call PSHM_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished pshm_map_channels_setup %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished PSHM_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::unfoi_map_channels_setup(int _n, short _chan)
+int RPC_kpiu_SLOT_Object::FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(_n);
 	tmp_list << QVariant(_chan);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call unfoi_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unfoi_map_channels_setup(int, short)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call FOI_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished unfoi_map_channels_setup %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished FOI_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer)
+int RPC_kpiu_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(data_buffer);
 	tmp_list << QVariant(mask_buffer);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call unols_write_data_kf %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unols_write_data_kf(QVariantList, QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call OLS_ZAPIS_DANNIH_FORMIROVANIYA %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList, QVariantList)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished unols_write_data_kf %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_ZAPIS_DANNIH_FORMIROVANIYA %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::unols_trigger_imm(int devise)
+int RPC_kpiu_SLOT_Object::OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(data_buffer);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call OLS_ZAPIS_DANNIH_REGISTRACII %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_ZAPIS_DANNIH_REGISTRACII %1").arg(tmp_ret_params));
+	return res.toInt();
+}
+int RPC_kpiu_SLOT_Object::OLS_BISTRIY_START(int devise)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(devise);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call unols_trigger_imm %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unols_trigger_imm(int)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call OLS_BISTRIY_START %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("OLS_BISTRIY_START(int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished unols_trigger_imm %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_BISTRIY_START %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-void RPC_kpiu_SLOT_Object::unols_read_data_kr(QVariantList& data_buffer)
+void RPC_kpiu_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
 {
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(data_buffer);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call unols_read_data_kr %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unols_read_data_kr(QVariantList&)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call OLS_CHTENIE_DANNICH_REGISTRACII %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList&)", tmp_list);
 	data_buffer = tmp_list.at(0).toList();
 	tmp_ret_params += " data_buffer="+RPCSignalClass::QVariantToString(tmp_list.at(0));
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished unols_read_data_kr %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_CHTENIE_DANNICH_REGISTRACII %1").arg(tmp_ret_params));
 }
-void RPC_kpiu_SLOT_Object::set_antenna_connection(QString antenna_name, QString connected_antenna_name)
+void RPC_kpiu_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(antenna_name);
 	tmp_list << QVariant(connected_antenna_name);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call set_antenna_connection %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("set_antenna_connection(QString, QString)", tmp_list);
-	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished set_antenna_connection");
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call ANTENNA_USTANOVKA_KOMMUTACII %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished ANTENNA_USTANOVKA_KOMMUTACII");
 }
-int RPC_kpiu_SLOT_Object::unomnibus_map_channels_setup(int _n, short _chan)
+int RPC_kpiu_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(_n);
 	tmp_list << QVariant(_chan);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call unomnibus_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("unomnibus_map_channels_setup(int, short)", tmp_list);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished unomnibus_map_channels_setup %1").arg(tmp_ret_params));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-void RPC_kpiu_SLOT_Object::set_bus_state(int bus, int state)
+void RPC_kpiu_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(bus);
 	tmp_list << QVariant(state);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call set_bus_state %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("set_bus_state(int, int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished set_bus_state");
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call USTANOVIT_SOSTOYANIE_SHINI_PITANIYA %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished USTANOVIT_SOSTOYANIE_SHINI_PITANIYA");
+}
+QString RPC_kpiu_SLOT_Object::getXML()
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call getXML %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("getXML()", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished getXML %1").arg(tmp_ret_params));
+	return res.toString();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

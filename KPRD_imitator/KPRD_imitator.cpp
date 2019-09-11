@@ -12,6 +12,7 @@ KPRD_imitator::KPRD_imitator()
 		kprd_state_map.insert(*list_it, *list_it);
 
 	setCentralWidget(widg);
+	setMaximumSize(500, 300);
 	setWindowTitle("Имитатор КПРД");
 
 	pause_btn = new QPushButton("П", widg);
@@ -91,7 +92,7 @@ KPRD_imitator::KPRD_imitator()
 		return;
 	}
 	
-	connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr.get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPRD_imitator::dataIn);
+	//connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr.get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPRD_imitator::dataIn);
 
 	kpi_slot_thr.set_connection_params("127.0.0.1", KPI_SLOT);
 	kpi_slot_thr.start();
@@ -355,5 +356,8 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 
 void KPRD_imitator::set_antenna_connection(QString antenna_name, QString connected_antenna_name)
 {
-	kprd_state_map[antenna_name] = connected_antenna_name;
+	if (kprd_state_map.contains(antenna_name))
+	{
+		kprd_state_map[antenna_name] = connected_antenna_name;
+	}
 }

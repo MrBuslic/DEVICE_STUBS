@@ -9,8 +9,8 @@
 
 PowerWidget::PowerWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget();
-	log_w->show();
+	//LogWidget* log_w = new LogWidget();
+	//log_w->show();
 	//setFixedSize(250, 80);
 	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
@@ -27,7 +27,9 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->start();
 
 	on_btn = new QPushButton("Вкл", this);
+	on_btn->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	off_btn = new QPushButton("Откл", this);
+	off_btn->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	QVBoxLayout* lay = new QVBoxLayout(this);
 	lay->addStretch(10);
 	lay->addWidget(on_btn);
@@ -121,6 +123,7 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 void PowerWidget::set_bus_state(int bus, int state)
 {
 	power_bus_state_map[bus] = state;
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу шины %1 значение %2").arg(bus).arg(state));
 }
 
 void PowerWidget::set_on()

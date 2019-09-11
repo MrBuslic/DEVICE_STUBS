@@ -20,10 +20,12 @@ RpcOlsWidget::RpcOlsWidget(int ols_num) : QWidget(), auto_scroll(true)
 	edit->setReadOnly(true);
 	_doc->setMaximumBlockCount(1000);
 	setMinimumSize(490, 300);
+	setMaximumSize(500, 300);
 	auto_scroll_box = new QCheckBox(this);
 	auto_scroll_box->setText("Автопрокрутка");
 	auto_scroll_box->setChecked(true);
 	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcOlsWidget::auto_scroll_clicked);
+	
 	v_lay->addWidget(edit);
 	v_lay->addWidget(auto_scroll_box);
 
@@ -55,6 +57,7 @@ int RpcOlsWidget::unols_write_data_kf(QVariantList data_buffer, QVariantList mas
 {
 	rpc_ols_kf_buffer = data_buffer;
 	rpc_mask_buffer = mask_buffer;
+//	SRPCSignalClass::Instance().toLog(QString("Записываю данные %1 с маской %2").arg(data_buffer).arg(mask_buffer));
 	return 0;
 }
 /*
@@ -65,11 +68,11 @@ int RpcOlsWidget::unols_read_data_kr(QVariantList data_buffer)
 */
 int RpcOlsWidget::unols_trigger_imm(int devise)//добавить параметр (выдача, приём)
 {
-	if (devise)//возможно обойтись без ветвления?
+	if (devise == 1)//возможно обойтись без ветвления?
 	{
-		emit send_data(rpc_ols_kr_buffer);//добавить связь сигнала rpc_ols с КПИУ 
+		emit send_data(rpc_ols_kr_buffer);//добавить связь сигнала rpc_ols с КПИУ
 	}
-	else {
+	else if (devise == 2){
 		emit new_ols_data(rpc_ols_kf_buffer, rpc_mask_buffer);
 	}
 	return 0;
@@ -77,6 +80,7 @@ int RpcOlsWidget::unols_trigger_imm(int devise)//добавить парамет
 
 void RpcOlsWidget::unols_read_data_kr(QVariantList& data_buffer)
 {
+	//rpc_ols_kr_buffer << 10;
 	data_buffer = rpc_ols_kr_buffer;
 }
 

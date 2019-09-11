@@ -27,7 +27,6 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void send_data(QVariantList& data_buffer);
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
 	void packet_ready(QVariantList data_buffer);
 

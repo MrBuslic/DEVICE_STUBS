@@ -40,20 +40,23 @@ void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u
 	emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 }
 
-int MKUWidget::ku_map_channels_setup(int ku_n, short line)
+int MKUWidget::ku_map_channels_setup(int ku_n, int line)
 {
 	ku_map_channels[ku_n] = line;
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(ku_n).arg(line));
 	return 0;
 }
 
-int MKUWidget::mshm_map_channels_setup(int mshm, short line_m)
+int MKUWidget::mshm_map_channels_setup(int mshm, int line_m)
 {
 	mshm_map_channels[mshm] = line_m;
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(mshm).arg(line_m));
 	return 0;
 }
 
-int MKUWidget::pshm_map_channels_setup(int pshm, short line_p)
+int MKUWidget::pshm_map_channels_setup(int pshm, int line_p)
 {
 	pshm_map_channels[pshm] = line_p;
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(pshm).arg(line_p));
 	return 0;
 }

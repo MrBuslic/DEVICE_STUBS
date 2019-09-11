@@ -33,7 +33,7 @@ void mezanin_list_add(QString desc, int type, int model, int slot, int commapp)
 {
 	mezanin_struct mez;
 	strcpy(mez.desc, desc.toLocal8Bit().data());
-	mez.type = VI_INTF_VXI;
+	mez.type = type;
 	mez.model = model; 
 	mez.slot = slot;
 	mez.commapp = commapp;
@@ -161,7 +161,7 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		case VI_ATTR_INTF_TYPE:
 		{
 			int* tmp_res = (int*)attrValue;
-			*tmp_res = VI_INTF_VXI;
+			*tmp_res = mezanin_list.at(mezanin_list_poiner).type;
 			break;
 		}
 		case VI_ATTR_MODEL_CODE:

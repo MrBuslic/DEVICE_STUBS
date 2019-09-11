@@ -53,7 +53,7 @@ private:
 	double u;
 	double t;
 signals:
-	void send_data(QVariantList& data_buffer);
+	void send_data(QVariantList& data_buffer);//todo поменять название на receive_data
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
 	void packet_ready(QVariantList data_buffer);
 };
