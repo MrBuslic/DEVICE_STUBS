@@ -162,11 +162,11 @@ BOOP::BOOP()
 
   mainSetButton = new QPushButton("Основной полукомплект", this);
   mainSetButton->setFixedWidth(180);
-	mainSetButton->setFlat(true);
+	mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 
   reserveSetButton = new QPushButton("Резервный полукомплект", this);
   reserveSetButton->setFixedWidth(180);
-	reserveSetButton->setFlat(true);
+	reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 
   QHBoxLayout *halfSetBlock = new QHBoxLayout();
   halfSetBlock->addWidget(mainSetButton);
@@ -347,16 +347,16 @@ BOOP::BOOP()
 
 	// Styles
 
-  this->setStyleSheet("QPushButton {"
-                      "min-height: 20px;"
-                      "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #bbdfc4, stop: 1 #8ec69c);"
-                      "color: #000000;"
-                      "border: 1px solid #008000; }"
+  //this->setStyleSheet("QPushButton {"
+  //                    "min-height: 20px;"
+  //                    "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #bbdfc4, stop: 1 #8ec69c);"
+  //                    "color: #000000;"
+  //                    "border: 1px solid #008000; }"
 
-                      "QPushButton:flat {"
-                      "background-color: #fcfcfc;"
-                      "color: #4e4e4e;"
-                      "border: 1px solid #808080;");
+  //                    "QPushButton:flat {"
+  //                    "background-color: #fcfcfc;"
+  //                    "color: #4e4e4e;"
+  //                    "border: 1px solid #808080;");
 
 	this->setWindowTitle("Блок управления приводами");
 	this->setLayout(mainLayout);
@@ -487,18 +487,18 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 
 	if (mshm == 5) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
-		mainSetButton->setFlat(false);
+		mainSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
 
 	if (mshm == 6) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
-		reserveSetButton->setFlat(false);
+		reserveSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
 
 	if (mshm == 7) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, false);
-		mainSetButton->setFlat(true);
-		reserveSetButton->setFlat(false);
+		mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
+		reserveSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
 
 	logArea->append(_message);
