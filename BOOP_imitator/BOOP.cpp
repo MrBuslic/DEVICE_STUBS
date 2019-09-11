@@ -391,6 +391,8 @@ BOOP::BOOP()
 	  return;
   }
 
+  connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_matrix_command(int, int, int, int, double, double, int, int, int)));
+
   QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
   restoreGeometry(settings.value("boop_geometry").toByteArray());
 }
@@ -488,17 +490,19 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 	if (mshm == 5) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 		mainSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
+		reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
 
 	if (mshm == 6) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 		reserveSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
+		mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
 
 	if (mshm == 7) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, false);
 		mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
-		reserveSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
+		reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
 
 	logArea->append(_message);

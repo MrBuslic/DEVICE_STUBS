@@ -72,7 +72,7 @@ private:
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
-	RPC_mku_bus_SLOT_Thread mku_signal_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
 	const int MKO = 1;
 	const int address = 9;
