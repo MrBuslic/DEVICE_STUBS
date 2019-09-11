@@ -113,6 +113,7 @@ SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 add_subdirectory(buses_imitator)
 
 add_subdirectory(AG7972)
+add_subdirectory(ASN_imitator)
 add_subdirectory(SORENSEN)
 add_subdirectory(IBEP_imitator)
 add_subdirectory(HPE1472)
