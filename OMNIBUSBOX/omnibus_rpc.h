@@ -11,15 +11,12 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	void switch_ab_os(int mko, int addr, int _os);
 	void switch_ab(int mko, int addr, bool _on);
 	void set_new_data(int mko, int addr, int saddr, QVariantList words);
 	void send_msg(int mko, int line, int cwd, QVariantList& words, int& os);
 	int unomnibus_map_channels_setup(int _n, int _chan);
 	QVariant get_dt();
-	void message_to_log_slot(QString _msg);
 	////////////////////////////////////
 };
 

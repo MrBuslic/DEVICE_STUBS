@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QVariant>
+#include "rpc_loger.h"
 
 class FrameBusWidget : public QWidget
 {
@@ -19,7 +20,8 @@ public slots:
 
 protected:
 	void closeEvent(QCloseEvent *event);
-
+private:
+	LogWidget* log_widget;
 signals:
 	void new_frame_04(QString mode, QVariant frame_data);
 	void new_frame_733(QString mode, QVariant frame_data);

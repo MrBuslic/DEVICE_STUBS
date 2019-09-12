@@ -1,7 +1,7 @@
-#include "power_bus.h"
+#include "ASN.h"
 #include <QApplication>
 #include <QTextCodec>
-
+#include "rpc_loger.h"
 
 #ifdef WIN32
 #include "windows.h"
@@ -14,13 +14,14 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, int)
 int main(int argc, char **argv)
 {
 #endif
-    QApplication app(argc, argv);
+	QApplication app(argc, argv);
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-	LogWidget log_w;
-	log_w.show();
+	//	LogWidget log_w;
+	//	log_w.show();
 
-	PowerWidget power_widget;
-	power_widget.show();
 
-    return app.exec();
+	ASN_widg asn_widget;
+	asn_widget.show();
+
+	return app.exec();
 }

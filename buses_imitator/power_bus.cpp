@@ -9,9 +9,7 @@
 
 PowerWidget::PowerWidget(QWidget *parent)
 {
-	//LogWidget* log_w = new LogWidget();
-	//log_w->show();
-	//setFixedSize(250, 80);
+	log_widget = new LogWidget(this, "power_bus");
 	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
 	QString ip_str = "127.0.0.1";
@@ -34,6 +32,7 @@ PowerWidget::PowerWidget(QWidget *parent)
 	lay->addStretch(10);
 	lay->addWidget(on_btn);
 	lay->addWidget(off_btn);
+	lay->addWidget(log_widget);
 	connect(on_btn, &QPushButton::clicked, this, &PowerWidget::set_on);
 	connect(off_btn, &QPushButton::clicked, this, &PowerWidget::set_off);
 
@@ -123,7 +122,7 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 void PowerWidget::set_bus_state(int bus, int state)
 {
 	power_bus_state_map[bus] = state;
-	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу шины %1 значение %2").arg(bus).arg(state));
+	log_widget->log_append(QString("Присваиваю каналу шины %1 значение %2").arg(bus).arg(state));
 }
 
 void PowerWidget::set_on()

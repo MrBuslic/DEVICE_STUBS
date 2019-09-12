@@ -2,42 +2,40 @@
 #include "kprd_socket_rpc.h"
 #include "rpc_ports.h"
 
-KPRD_imitator::KPRD_imitator()  
+KPRD_imitator::KPRD_imitator(QWidget* parent) : QWidget(parent)
 {
-	widg = new QWidget(this);
 	antenna_name_list << "МНА1+Y" << "МНА1-Y" << "МНА2+Y" << "МНА2-Y";
 	
 	QList<QString>::iterator list_it;
 	for (list_it = antenna_name_list.begin(); list_it != antenna_name_list.end(); list_it++)
 		kprd_state_map.insert(*list_it, *list_it);
 
-	setCentralWidget(widg);
-	setMaximumSize(500, 300);
+	setMaximumSize(300, 300);
 	setWindowTitle("Имитатор КПРД");
 
-	pause_btn = new QPushButton("П", widg);
-	pause_btn->setFixedWidth(150);
+	pause_btn = new QPushButton("П", this);
+	pause_btn->setFixedWidth(50);
 	pause_btn->setFixedHeight(50);
-	zero_btn = new QPushButton("0", widg);
-	zero_btn->setFixedWidth(150);
+	zero_btn = new QPushButton("0", this);
+	zero_btn->setFixedWidth(50);
 	zero_btn->setFixedHeight(50);
-	one_btn = new QPushButton("1", widg);
-	one_btn->setFixedWidth(150);
+	one_btn = new QPushButton("1", this);
+	one_btn->setFixedWidth(50);
 	one_btn->setFixedHeight(50);
 
-	generetors_label = new QLabel("Генераторы", widg);
-	pause_kod_label = new QLabel("Код: ", widg);
-	zero_kod_label = new QLabel("Код: ", widg);
-	one_kod_label = new QLabel("Код: ", widg);
-	antenna_label = new QLabel("Антенна: ", widg);
-	attenuation_label = new QLabel("Ослабление: ", widg);
+	generetors_label = new QLabel("Генераторы", this);
+	pause_kod_label = new QLabel("Код: ", this);
+	zero_kod_label = new QLabel("Код: ", this);
+	one_kod_label = new QLabel("Код: ", this);
+	antenna_label = new QLabel("Антенна: ", this);
+	attenuation_label = new QLabel("Ослабление: ", this);
 
-	log_edit = new QTextEdit(widg);
+	log_edit = new QTextEdit(this);
 	log_edit->setReadOnly(true);
 	_scroll_bar = new QScrollBar();
 	_scroll_bar = log_edit->verticalScrollBar();
 
-	gridLayout = new QGridLayout(widg);
+	gridLayout = new QGridLayout(this);
 
 	gridLayout->addWidget(generetors_label, 0, 0, 1, 3, Qt::AlignHCenter);
 	gridLayout->addWidget(pause_btn, 1, 0);
@@ -132,8 +130,10 @@ KPRD_imitator::~KPRD_imitator()
 	delete attenuation_label;
 	delete _scroll_bar;
 	delete gridLayout;
-	delete widg;
-
+	ols_slot_thr.quit();
+	ols_signal_thr.quit();
+	kpi_slot_thr.quit();
+	kpi_signal_thr.quit();
 }
 
 QString KPRD_imitator::set_antenna_label(qulonglong val)

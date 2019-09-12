@@ -7,7 +7,9 @@
 
 InterruptWidget::InterruptWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget(this);
+	log_widget = new LogWidget(this, "interrupt_bus");
+	QVBoxLayout* v_lay = new QVBoxLayout(this);
+	v_lay->addWidget(log_widget);
 
 
 	QString ip_str = "127.0.0.1";
@@ -25,5 +27,6 @@ InterruptWidget::InterruptWidget(QWidget *parent)
 
 void InterruptWidget::make_interrupt(int _n, short _chan, double _u, double _t)
 {
+	log_widget->log_append(QString("Прерывание %1").arg(_n));
 	emit new_interrupt(_n, _chan, _u, _t);
 }

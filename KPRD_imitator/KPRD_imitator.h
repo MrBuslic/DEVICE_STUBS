@@ -17,15 +17,14 @@
 #include "../buses_imitator/kpi_bus_rpc.h"
 
 class KPRD_imitator :
-	public QMainWindow
+	public QWidget
 {
 	Q_OBJECT
 public:
-	KPRD_imitator();
+	KPRD_imitator(QWidget* parent = 0);
 	~KPRD_imitator();
 	
 private:
-	QWidget* widg;
 	
 	QPushButton *pause_btn;
 	QPushButton *zero_btn;

@@ -11,8 +11,6 @@ public:
 	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	int unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer);
 	int unols_trigger_imm(int devise);
 	void unols_read_data_kr(QVariantList& data_buffer);

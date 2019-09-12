@@ -2,6 +2,7 @@
 #define INTERRUPT_BUS_H
 
 #include <QWidget>
+#include "rpc_loger.h"
 
 class InterruptWidget : public QWidget
 {
@@ -12,7 +13,8 @@ public:
 
 public slots:
 	void make_interrupt(int _n, short _chan, double _u, double _t);
-
+private:
+	LogWidget* log_widget;
 signals:
 	void new_interrupt(int _n, short _chan, double _u, double _t);
 };

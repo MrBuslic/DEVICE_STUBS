@@ -15,6 +15,7 @@
 #include <memory>
 #include <qlayout.h>
 #include <loki/Singleton.h>
+#include "rpc_loger.h"
 
 #ifndef SINGLETON_DEF
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
@@ -23,26 +24,15 @@ class RpcOlsWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcOlsWidget(int ols_num);
+	RpcOlsWidget(QWidget* parent = 0, int ols_num = 0);
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
+
 	//todo корректно ли называть функцию передачи данных через rpc как функцию записи формирования
 	int unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer);
 	int unols_trigger_imm(int devise);
 	void unols_read_data_kr(QVariantList& data_buffer);
 	int unols_mStart();	
 private:
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
-	QStringList log_buffer;
-	QMutex log_mutex;
 
 	QVariantList rpc_ols_kr_buffer;
 	QVariantList rpc_ols_kf_buffer;
@@ -52,6 +42,8 @@ private:
 	short chan;
 	double u;
 	double t;
+
+	LogWidget* log_widget;
 signals:
 	void send_data(QVariantList& data_buffer);//todo поменять название на receive_data
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);

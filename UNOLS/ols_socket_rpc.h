@@ -95,8 +95,6 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant auto_scroll_clicked(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
 	QVariant unols_write_data_kf(QVariantList& _values);
 	QVariant unols_trigger_imm(QVariantList& _values);
 	QVariant unols_read_data_kr(QVariantList& _values);

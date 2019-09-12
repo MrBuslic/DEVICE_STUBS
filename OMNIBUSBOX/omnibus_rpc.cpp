@@ -176,21 +176,6 @@ void RPC_omnibus_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_omnibus_SLOT_Object::auto_scroll_clicked(int _state)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("auto_scroll_clicked(int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished auto_scroll_clicked");
-}
-void RPC_omnibus_SLOT_Object::log_timer_ontimer()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("log_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished log_timer_ontimer");
-}
 void RPC_omnibus_SLOT_Object::switch_ab_os(int mko, int addr, int _os)
 {
 	QVariantList tmp_list;
@@ -261,14 +246,6 @@ QVariant RPC_omnibus_SLOT_Object::get_dt()
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call finished get_dt %1").arg(tmp_ret_params));
 	return res;
-}
-void RPC_omnibus_SLOT_Object::message_to_log_slot(QString _msg)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(_msg);
-	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call message_to_log_slot %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("message_to_log_slot(QString)", tmp_list);
-	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished message_to_log_slot");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

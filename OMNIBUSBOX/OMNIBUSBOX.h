@@ -16,6 +16,7 @@
 #include <qlayout.h>
 #include <loki/Singleton.h>
 #include "rpc_ports.h"
+#include "rpc_loger.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -32,11 +33,8 @@ class RpcOmnibusWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcOmnibusWidget();
+	RpcOmnibusWidget(QWidget* parent = 0);
 public slots:
-
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 
 	void switch_ab_os(int mko, int addr, int _os);
 	void switch_ab(int mko, int addr, bool _on);
@@ -45,18 +43,8 @@ public slots:
 	int unomnibus_map_channels_setup(int _n, int _chan);
 	QVariant get_dt();
 
-	void message_to_log_slot(QString _msg);
 private:
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
-	QStringList log_buffer;
-	QMutex log_mutex;
+
 	QMap<short, QMap<short, RpcAbonent>> abonents;
 	QMap<int, int> map_channels;//словарь исправности каналов
 
@@ -64,7 +52,7 @@ private:
 	short chan;
 	double u;
 	double t;
-
+	LogWidget* log_widget;
 signals:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void message_to_log(QString _msg);

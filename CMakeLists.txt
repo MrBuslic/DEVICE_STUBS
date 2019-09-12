@@ -19,7 +19,7 @@ find_package(Qt5Network)
 find_package(Qt5Script)
 find_package(Qt5ScriptTools)
 find_package(Qt5PrintSupport)
-find_package(libmongocxx-static REQUIRED)
+find_package(libmongocxx REQUIRED)
 
 add_definitions(-DLOKI_CLASS_LEVEL_THREADING -DWINDOWS -D_WINDOWS)
 add_definitions(-DWIN32_LEAN_AND_MEAN)
@@ -51,13 +51,12 @@ include_directories(core/Qt4)
 include_directories(core/qsci)	
 include_directories(core/lexers)
 include_directories(core/include)
-include_directories(${LIBMONGOCXX_STATIC_INCLUDE_DIRS})
+include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
 
 add_definitions(${Qt5PrintSupport_DEFINITIONS})
 add_definitions(-DQSCINTILLA_MAKE_DLL)
 add_definitions(-DQT)
 add_definitions(-DSCI_LEXER)
-add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(-DNOMINMAX)
 
 include_directories("../lib/socket_rpc/include")
@@ -115,6 +114,7 @@ SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 
 add_subdirectory(buses_imitator)
 add_subdirectory(AG7972)
+add_subdirectory(ASN_imitator)
 add_subdirectory(SORENSEN)
 add_subdirectory(IBEP_imitator)
 add_subdirectory(HPE1472)
@@ -179,7 +179,7 @@ list(APPEND SOURCES ${PROJECT_SOURCE_DIR}/main.cpp)
 #list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
 #list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/cbk_imitator/main.cpp)
 
-add_executable(Stubs WIN32 ${SOURCES} ${HEADERS})
+add_executable(KPIU WIN32 ${SOURCES} ${HEADERS})
 
 ADD_CUSTOM_COMMAND(TARGET Stubs
 	PRE_BUILD
@@ -192,17 +192,16 @@ set(KPIU_SERVER_plugin_SOURCES kpiu_server_plugin.h  kpiu_server_plugin.cpp ${PR
 add_library(kpiu_server_plugin SHARED ${KPIU_SERVER_plugin_SOURCES} ${KPIU_SERVER_RESOURCES} )
 target_link_libraries(kpiu_server_plugin ${Qt5Core_LIBRARIES}  ${Qt5Widgets_LIBRARIES} common_functions db_ctrl mongo_controller_v3 socket_rpc)
 
-target_link_libraries(Stubs ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+target_link_libraries(KPIU ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} BTICARD BTI1553 socket_rpc 
-									   mongo_controller_v3 ${LIBMONGOCXX_STATIC_LIBRARIES} qscintilla db_ctrl git2 my_git common_functions unfoi_32 frame_converter
+									   mongo_controller_v3 ${LIBMONGOCXX_LIBRARIES} qscintilla db_ctrl git2 my_git common_functions unfoi_32 frame_converter
 									   $ENV{VISA_LIBS} ) 
 
 if(WIN32)
-	qt5_use_modules(Stubs Core Widgets Network Gui)
+	qt5_use_modules(KPIU Core Widgets Network Gui)
 	# SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
 
-target_compile_definitions(Stubs PRIVATE ${LIBMONGOCXX_STATIC_DEFINITIONS})
 qt5_use_modules(kpiu_server_plugin Core Widgets)
 
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
