@@ -232,7 +232,7 @@ void RPC_mku_bus_SLOT_Object::make_mk(int mshm, int pshm, int length_m, int leng
 	dynamic_call("make_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mku_bus dynamic_call finished make_mk");
 }
-int RPC_mku_bus_SLOT_Object::ku_map_channels_setup(int ku_n, short line)
+int RPC_mku_bus_SLOT_Object::ku_map_channels_setup(int ku_n, int line)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -240,12 +240,12 @@ int RPC_mku_bus_SLOT_Object::ku_map_channels_setup(int ku_n, short line)
 	tmp_list << QVariant(ku_n);
 	tmp_list << QVariant(line);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call ku_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("ku_map_channels_setup(int, short)", tmp_list);
+	dynamic_call("ku_map_channels_setup(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call finished ku_map_channels_setup %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_mku_bus_SLOT_Object::mshm_map_channels_setup(int mshm, short line_m)
+int RPC_mku_bus_SLOT_Object::mshm_map_channels_setup(int mshm, int line_m)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -253,12 +253,12 @@ int RPC_mku_bus_SLOT_Object::mshm_map_channels_setup(int mshm, short line_m)
 	tmp_list << QVariant(mshm);
 	tmp_list << QVariant(line_m);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call mshm_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("mshm_map_channels_setup(int, short)", tmp_list);
+	dynamic_call("mshm_map_channels_setup(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call finished mshm_map_channels_setup %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_mku_bus_SLOT_Object::pshm_map_channels_setup(int pshm, short line_p)
+int RPC_mku_bus_SLOT_Object::pshm_map_channels_setup(int pshm, int line_p)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
@@ -266,7 +266,7 @@ int RPC_mku_bus_SLOT_Object::pshm_map_channels_setup(int pshm, short line_p)
 	tmp_list << QVariant(pshm);
 	tmp_list << QVariant(line_p);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call pshm_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("pshm_map_channels_setup(int, short)", tmp_list);
+	dynamic_call("pshm_map_channels_setup(int, int)", tmp_list);
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call finished pshm_map_channels_setup %1").arg(tmp_ret_params));
 	return res.toInt();

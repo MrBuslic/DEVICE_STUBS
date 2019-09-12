@@ -79,9 +79,9 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["make_ku(int, int, double, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_ku;
 		operators_map["make_ku_732(int, int, double, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_ku_732;
 		operators_map["make_mk(int, int, int, int, double, double, int, int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_mk;
-		operators_map["ku_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::ku_map_channels_setup;
-		operators_map["mshm_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
-		operators_map["pshm_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
+		operators_map["ku_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::ku_map_channels_setup;
+		operators_map["mshm_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
+		operators_map["pshm_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -444,7 +444,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int ku_n = _values.at(0).value<int>();
-			short line = _values.at(1).value<short>();
+			int line = _values.at(1).value<int>();
 			int res = app->ku_map_channels_setup(ku_n, line);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -464,7 +464,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mshm = _values.at(0).value<int>();
-			short line_m = _values.at(1).value<short>();
+			int line_m = _values.at(1).value<int>();
 			int res = app->mshm_map_channels_setup(mshm, line_m);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -484,7 +484,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int pshm = _values.at(0).value<int>();
-			short line_p = _values.at(1).value<short>();
+			int line_p = _values.at(1).value<int>();
 			int res = app->pshm_map_channels_setup(pshm, line_p);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;

@@ -9,9 +9,12 @@
 
 #include <qmessagebox.h>
 
-RpcFoiWidget::RpcFoiWidget() : QWidget()
+RpcFoiWidget::RpcFoiWidget(QWidget* parent) : QWidget(parent)
 {
-	LogWidget* log_widg = new LogWidget(this);
+	log_widget = new LogWidget(this, "mku_bus");
+	QVBoxLayout* v_lay = new QVBoxLayout(this);
+	v_lay->addWidget(log_widget);
+
 	for (int i = 1; i <= 12; i++) map_channels[i] = 3;//инициализация словаря исправных каналов
 
 	QString ip_str = "127.0.0.1";
@@ -44,7 +47,7 @@ RpcFoiWidget::RpcFoiWidget() : QWidget()
 int RpcFoiWidget::unfoi_map_channels_setup(int _n, int _chan)
 {
 	map_channels[_n] = _chan;
-	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(_n).arg(_chan));
+	log_widget->log_append(QString("Присваиваю каналу %1 значение %2").arg(_n).arg(_chan));
 	return 0;
 }
 
@@ -64,10 +67,10 @@ int RpcFoiWidget::unfoi_run()
 	//QMapIterator<int, int> it (mapChannels);
 	//QMap<int, int>::iterator it = mapChannels.begin();
 	if (map_channels[n] & chan) {//todo обращение к индикатору исправности канала
-		SRPCSignalClass::Instance().toLog(QString("Выдаю сигнал на канале %1 линии %2").arg(n).arg(chan));
+		log_widget->log_append(QString("Выдаю сигнал на канале %1 линии %2").arg(n).arg(chan));
 	}
 	else {
-		SRPCSignalClass::Instance().toLog(QString("Канал %1 не работает").arg(n));
+		log_widget->log_append(QString("Канал %1 не работает").arg(n));
 		return 0;
 	}
 	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(n, chan & map_channels[n], u, t);//todo изменить функцию или выбрать значения по умолчанию

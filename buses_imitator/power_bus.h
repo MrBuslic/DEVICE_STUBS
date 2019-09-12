@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <qmap.h>
 #include <QPushButton>
+#include "rpc_loger.h"
 
 enum POWER_BUSES
 {
@@ -52,6 +53,8 @@ private:
 
 	QPushButton* on_btn;
 	QPushButton* off_btn;
+
+	LogWidget* log_widget;
 };
 
 #endif // POWER_BUS_H

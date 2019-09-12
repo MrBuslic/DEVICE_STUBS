@@ -76,15 +76,12 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("omnibus_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &omnibus_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &omnibus_Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &omnibus_Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["switch_ab_os(int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab_os;
 		operators_map["switch_ab(int, int, bool)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab;
 		operators_map["set_new_data(int, int, int, QVariantList)"] = &omnibus_Socket_RPC_SLOT_Object::set_new_data;
 		operators_map["send_msg(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg;
 		operators_map["unomnibus_map_channels_setup(int, int)"] = &omnibus_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup;
 		operators_map["get_dt()"] = &omnibus_Socket_RPC_SLOT_Object::get_dt;
-		operators_map["message_to_log_slot(QString)"] = &omnibus_Socket_RPC_SLOT_Object::message_to_log_slot;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -329,40 +326,6 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant omnibus_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int _state = _values.at(0).value<int>();
-			app->auto_scroll_clicked(_state);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant omnibus_Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
-	{
-		try
-		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
 	QVariant omnibus_Socket_RPC_SLOT_Object::switch_ab_os(QVariantList& _values)
 	{
 		try
@@ -486,24 +449,6 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return QVariant();
-		}
-	}
-	QVariant omnibus_Socket_RPC_SLOT_Object::message_to_log_slot(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QString _msg = _values.at(0).value<QString>();
-			app->message_to_log_slot(_msg);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

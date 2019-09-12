@@ -13,9 +13,9 @@ public slots:
 	void make_ku(int ku_n, int length, double u, int line);
 	void make_ku_732(int ku_n, int length, double u, int line);
 	void make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
-	int ku_map_channels_setup(int ku_n, short line);
-	int mshm_map_channels_setup(int mshm, short line_m);
-	int pshm_map_channels_setup(int pshm, short line_p);
+	int ku_map_channels_setup(int ku_n, int line);
+	int mshm_map_channels_setup(int mshm, int line_m);
+	int pshm_map_channels_setup(int pshm, int line_p);
 	////////////////////////////////////
 };
 

@@ -10,8 +10,6 @@ public:
 	RPC_ols_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("ols_slot_obj");}
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	int unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer);
 	int unols_trigger_imm(int devise);
 	void unols_read_data_kr(QVariantList& data_buffer);

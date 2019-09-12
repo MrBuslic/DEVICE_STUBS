@@ -17,6 +17,8 @@ int main(int argc, char **argv)
 
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 	QApplication app(argc, argv);
+	LogWidget log_w;
+	log_w.show();
 	RpcFoiWidget foi_widget;
 	foi_widget.show();
 	return app.exec();

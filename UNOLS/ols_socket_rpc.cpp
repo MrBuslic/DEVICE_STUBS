@@ -76,8 +76,6 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("ols_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &ols_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &ols_Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &ols_Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["unols_write_data_kf(QVariantList, QVariantList)"] = &ols_Socket_RPC_SLOT_Object::unols_write_data_kf;
 		operators_map["unols_trigger_imm(int)"] = &ols_Socket_RPC_SLOT_Object::unols_trigger_imm;
 		operators_map["unols_read_data_kr(QVariantList&)"] = &ols_Socket_RPC_SLOT_Object::unols_read_data_kr;
@@ -318,40 +316,6 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant ols_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int _state = _values.at(0).value<int>();
-			app->auto_scroll_clicked(_state);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant ols_Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
-	{
-		try
-		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
 	QVariant ols_Socket_RPC_SLOT_Object::unols_write_data_kf(QVariantList& _values)
 	{
 		try

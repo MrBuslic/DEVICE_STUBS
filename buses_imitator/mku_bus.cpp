@@ -7,7 +7,10 @@
 
 MKUWidget::MKUWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget(this);
+	log_widget = new LogWidget(this, "mku_bus");
+	QVBoxLayout* v_lay = new QVBoxLayout(this);
+	v_lay->addWidget(log_widget);
+
 	for (int i = 1; i <= 8; i++) ku_map_channels[i] = 3;
 	for (int i = 1; i <= 20; i++) mshm_map_channels[i] = 3;
 	for (int i = 1; i <= 20; i++) pshm_map_channels[i] = 3;
@@ -25,38 +28,56 @@ MKUWidget::MKUWidget(QWidget *parent)
 	rpc_signal_srv->start();
 }
 
+QString MKUWidget::get_line(int line)
+{
+	switch (line)
+	{
+	case 0: return "–û–±—Ä—ã–≤";
+	case 1: return "–û";
+	case 2: return "–†";
+	case 3: return "–û–†";
+	};
+	return "";
+}
+
 void MKUWidget::make_ku(int ku_n, int length, double u, int line)
 {
+	line &= ku_map_channels[ku_n];
+	log_widget->log_append(QString("–ö–£ %1 %2").arg(ku_n).arg(get_line(line)));
 	emit new_ku(ku_n, length, u, line);
 }
 
 void MKUWidget::make_ku_732(int ku_n, int length, double u, int line)
 {
+	log_widget->log_append(QString("–ö–£ 732 %1").arg(ku_n));
 	emit new_ku_732(ku_n, length, u, line);
 }
 
 void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
+	line_m &= mshm_map_channels[mshm];
+	line_p &= mshm_map_channels[pshm];
+	log_widget->log_append(QString("–ú–ö –ú–®–ú%1 % –ü–®–ú%3 %4").arg(mshm).arg(get_line(line_m)).arg(pshm).arg(get_line(line_p)));
 	emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 }
 
 int MKUWidget::ku_map_channels_setup(int ku_n, int line)
 {
 	ku_map_channels[ku_n] = line;
-	SRPCSignalClass::Instance().toLog(QString("œËÒ‚‡Ë‚‡˛ Í‡Ì‡ÎÛ %1 ÁÌ‡˜ÂÌËÂ %2").arg(ku_n).arg(line));
+	log_widget->log_append(QString("–ü—Ä–∏—Å–≤–∞–∏–≤–∞—é –∫–∞–Ω–∞–ª—É %1 –∑–Ω–∞—á–µ–Ω–∏–µ %2").arg(ku_n).arg(line));
 	return 0;
 }
 
 int MKUWidget::mshm_map_channels_setup(int mshm, int line_m)
 {
 	mshm_map_channels[mshm] = line_m;
-	SRPCSignalClass::Instance().toLog(QString("œËÒ‚‡Ë‚‡˛ Í‡Ì‡ÎÛ %1 ÁÌ‡˜ÂÌËÂ %2").arg(mshm).arg(line_m));
+	log_widget->log_append(QString("–ü—Ä–∏—Å–≤–∞–∏–≤–∞—é –∫–∞–Ω–∞–ª—É %1 –∑–Ω–∞—á–µ–Ω–∏–µ %2").arg(mshm).arg(line_m));
 	return 0;
 }
 
 int MKUWidget::pshm_map_channels_setup(int pshm, int line_p)
 {
 	pshm_map_channels[pshm] = line_p;
-	SRPCSignalClass::Instance().toLog(QString("œËÒ‚‡Ë‚‡˛ Í‡Ì‡ÎÛ %1 ÁÌ‡˜ÂÌËÂ %2").arg(pshm).arg(line_p));
+	log_widget->log_append(QString("–ü—Ä–∏—Å–≤–∞–∏–≤–∞—é –∫–∞–Ω–∞–ª—É %1 –∑–Ω–∞—á–µ–Ω–∏–µ %2").arg(pshm).arg(line_p));
 	return 0;
 }
