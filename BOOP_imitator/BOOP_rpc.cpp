@@ -105,6 +105,13 @@ void RPC_BOOP_SLOT_Object::new_matrix_command(int mshm, int pshm, int length_m, 
 	dynamic_call("new_matrix_command(int, int, int, int, double, double, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("BOOP dynamic_call finished new_matrix_command");
 }
+void RPC_BOOP_SLOT_Object::move_boop()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call move_boop %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("move_boop()", tmp_list);
+	SRPCSignalClass::Instance().toLog("BOOP dynamic_call finished move_boop");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

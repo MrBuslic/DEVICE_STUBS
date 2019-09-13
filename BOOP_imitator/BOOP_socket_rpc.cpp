@@ -78,6 +78,7 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &BOOP_Socket_RPC_SLOT_Object::new_message;
 		operators_map["new_matrix_command(int, int, int, int, double, double, int, int, int)"] = &BOOP_Socket_RPC_SLOT_Object::new_matrix_command;
+		operators_map["move_boop()"] = &BOOP_Socket_RPC_SLOT_Object::move_boop;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -298,6 +299,22 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int line_m = _values.at(7).value<int>();
 			int line_p = _values.at(8).value<int>();
 			app->new_matrix_command(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant BOOP_Socket_RPC_SLOT_Object::move_boop(QVariantList& _values)
+	{
+		try
+		{
+			app->move_boop();
 			return 0;
 		}
 		catch(const std::exception &)

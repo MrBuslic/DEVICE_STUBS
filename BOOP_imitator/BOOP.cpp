@@ -196,11 +196,9 @@ BOOP::BOOP()
 
   decreaseUpsilonAngle = new QPushButton("−", this);
   decreaseUpsilonAngle->setFixedWidth(40);
-	decreaseUpsilonAngle->setFlat(true);
 
   increaseUpsilonAngle = new QPushButton("+", this);
   increaseUpsilonAngle->setFixedWidth(40);
-	increaseUpsilonAngle->setFlat(true);
 
   upsilonAngleServoPower = new QCheckBox("Питание ШД", this);
   upsilonAngleServoPower->setFixedWidth(84);
@@ -246,11 +244,9 @@ BOOP::BOOP()
 
   decreasePhiAngle = new QPushButton("−", this);
   decreasePhiAngle->setFixedWidth(40);
-	decreasePhiAngle->setFlat(true);
 
   increasePhiAngle = new QPushButton("+", this);
   increasePhiAngle->setFixedWidth(40);
-	increasePhiAngle->setFlat(true);
 
   phiAngleServoPower = new QCheckBox("Питание ШД", this);
   phiAngleServoPower->setFixedWidth(84);
@@ -334,6 +330,12 @@ BOOP::BOOP()
   connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_matrix_command(int, int, int, int, double, double, int, int, int)));
   timer_for_msg->setInterval(1000);
   connect(timer_for_msg, SIGNAL(timeout()), this, SLOT(move_boop()));
+
+  increaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+  decreaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+  increasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+  decreasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+
 
   QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
   restoreGeometry(settings.value("boop_geometry").toByteArray());
@@ -432,11 +434,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		word_for_cbk.phi_pulse_frequency = parsed_data_words.phi_pulse_frequency;
 
 		//время в сек
-		upsilon_sec = parsed_data_words.upsilon_pulse_amount / word_for_cbk.uplsilon_pulse_frequency;
-		phi_sec = parsed_data_words.phi_pulse_amount / word_for_cbk.phi_pulse_frequency;
 		
-
-
 		if (parsed_data_words.upsilon_rotation_command || parsed_data_words.phi_rotation_command)
 		{
 			upsilon_rotation_direction = parsed_data_words.upsilon_rotation_direction;
@@ -452,6 +450,10 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 			word_for_cbk.upsilon_rotation_direction = parsed_data_words.upsilon_rotation_direction;
 			word_for_cbk.upsilon_pulse_amount = parsed_data_words.upsilon_pulse_amount; // уточнить у Олега
 
+			if (word_for_cbk.uplsilon_pulse_frequency)
+				upsilon_sec = parsed_data_words.upsilon_pulse_amount / word_for_cbk.uplsilon_pulse_frequency;
+			else
+				upsilon_sec = 0;
 
 			
 
@@ -483,6 +485,10 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 			word_for_cbk.phi_rotation_direction = parsed_data_words.phi_rotation_direction;
 			word_for_cbk.phi_pulse_amount = parsed_data_words.phi_pulse_amount; // уточнить у Олега
 
+			if (word_for_cbk.phi_pulse_frequency)
+				phi_sec = parsed_data_words.phi_pulse_amount / word_for_cbk.phi_pulse_frequency;
+			else
+				phi_sec = 0;
 
 
 			//if (parsed_data_words.phi_rotation_direction)
@@ -648,14 +654,22 @@ void BOOP::move_boop()
 	(phi_angl_amount > 0) ? word_for_cbk.phi_summ_sign = 0 : word_for_cbk.phi_summ_sign = 1;
 	word_for_cbk.phi_pulse_summ = qAbs(phi_angl_amount);
 
+	if (upsilon_sec == 0)
+	{
+		increaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+		decreaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+	}
+
+	if (phi_sec == 0)
+	{
+		increasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+		decreasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+
+	}
 
 	if (( upsilon_sec == 0) && ( phi_sec == 0))
 	{
 		timer_for_msg->stop();
-		increaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
-		decreaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
-		increasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
-		decreasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
 	}
 
 	new_tm();
