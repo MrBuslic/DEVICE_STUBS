@@ -120,18 +120,22 @@ private:
 	QCheckBox *phiAngleServoPower;
 	QPushButton *increasePhiAngle;
 	QPushButton *decreasePhiAngle;
-
+	QTimer *timer_for_msg = new QTimer();
 	// Log area
 	QTextEdit *logArea;
 	BOOPDataWords word_for_cbk;
-	int halfset = 2;
+	int upsilon_sec = 0, phi_sec = 0;
 	int upsilon_angl_amount;
 	int phi_angl_amount;
+	bool need_to_move;
+	int timer_count;
+	quint16 upsilon_rotation_direction, phi_rotation_direction;
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word);
 	void new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void move_boop();
 
 signals:
 	
