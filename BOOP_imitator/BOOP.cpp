@@ -244,15 +244,15 @@ BOOP::BOOP()
   QLabel *phiRotationLabel = new QLabel("Вращение", this);
   phiRotationLabel->setFixedWidth(64);
 
-  QPushButton *decreasePhiAngle = new QPushButton("−", this);
+  decreasePhiAngle = new QPushButton("−", this);
   decreasePhiAngle->setFixedWidth(40);
 	decreasePhiAngle->setFlat(true);
 
-  QPushButton *increasePhiAngle = new QPushButton("+", this);
+  increasePhiAngle = new QPushButton("+", this);
   increasePhiAngle->setFixedWidth(40);
 	increasePhiAngle->setFlat(true);
 
-  QCheckBox *phiAngleServoPower = new QCheckBox("Питание ШД", this);
+  phiAngleServoPower = new QCheckBox("Питание ШД", this);
   phiAngleServoPower->setFixedWidth(84);
 
   QHBoxLayout *phiThirdControlsStrip = new QHBoxLayout();
@@ -353,7 +353,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 
 	MKOCommandWord parsed_command_word(command_word);
 
-	if ((MKO != this->MKO) || (parsed_command_word.address != this->address))
+	if ((MKO != this->MKO) || (parsed_command_word.address != this->address) || (parsed_command_word.subaddress != 3))
 		return;
 
 	if (parsed_command_word.words_count != 6 || words.count() != 6)
@@ -363,17 +363,21 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 	for (int i = 0; i < words.count() - 1; i++)
 		_checksum += words.at(i).toInt();
 
-	if (_checksum&0xFFFF != words.last().toInt())
+	QString _message;
+
+	if ((_checksum&0xFFFF) != words.last().toInt())
 	{
 		word_for_cbk.previous_message_error = 1;
-		return;
+		_message = QString("[%1] принял некорректный массив на подадресе %2 c КС %3")
+			.arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
+			.arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
 	}
 	else
 	{
 
 		MKODataWords parsed_data_words(words);
 
-		QString _message = QString("[%1] принял сигнал на подадресе %2 c КС %3")
+		_message = QString("[%1] принял корректный массив на подадресе %2 c КС %3")
 			.arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
 			.arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
 
@@ -397,7 +401,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		else
 		{
 			phiAngleServoPower->setChecked(false);
-			word_for_cbk.phi_servo_power_status = 1;
+			word_for_cbk.phi_servo_power_status = 0;
 		}
 		if (parsed_data_words.upsilon_angle_sensor_power)
 		{
@@ -433,12 +437,18 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 			if (parsed_data_words.upsilon_rotation_direction)
 			{
 				_upsilon_current_angle += parsed_data_words.upsilon_pulse_amount;
-				word_for_cbk.upsilon_pulse_summ += parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
+				upsilon_angl_amount += parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
+				if (_upsilon_current_angle > 0xFFFF)
+					_upsilon_current_angle = _upsilon_current_angle - 0xFFFF;
+
 			}
 			else
 			{
 				_upsilon_current_angle -= parsed_data_words.upsilon_pulse_amount;
-				word_for_cbk.upsilon_pulse_summ -= parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
+				upsilon_angl_amount -= parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
+				if (_upsilon_current_angle < 0)
+					_upsilon_current_angle = 0xFFFF + _upsilon_current_angle;
+
 			}
 			word_for_cbk.upsilon_angle = _upsilon_current_angle;// уточнить у Олега
 			upsilonAngleValue->setText(QString("%1").arg(_upsilon_current_angle, 0, 16).toUpper());
@@ -450,17 +460,21 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 
 			word_for_cbk.phi_channel_work_status = 1;
 			word_for_cbk.phi_rotation_direction = parsed_data_words.phi_rotation_direction;
-			word_for_cbk.phi_pulse_amount++; // уточнить у Олега
+			word_for_cbk.phi_pulse_amount = parsed_data_words.phi_pulse_amount; // уточнить у Олега
 
 			if (parsed_data_words.phi_rotation_direction)
 			{
 				_phi_current_angle += parsed_data_words.phi_pulse_amount;
-				word_for_cbk.phi_pulse_summ -= parsed_data_words.phi_pulse_amount;// уточнить у Олега
+				phi_angl_amount += parsed_data_words.phi_pulse_amount;// уточнить у Олега
+				if (_phi_current_angle > 0xFFFF)
+					_phi_current_angle = _phi_current_angle - 0xFFFF;
 			}
 			else
 			{
 				_phi_current_angle -= parsed_data_words.phi_pulse_amount;
-				word_for_cbk.phi_pulse_summ -= parsed_data_words.phi_pulse_amount;// уточнить у Олега
+				if (_phi_current_angle < 0)
+					_phi_current_angle = 0xFFFF + _phi_current_angle;
+				phi_angl_amount -= parsed_data_words.phi_pulse_amount;// уточнить у Олега
 			}
 
 			word_for_cbk.phi_angle = _phi_current_angle;
@@ -469,8 +483,10 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		word_for_cbk.uplsilon_pulse_frequency = parsed_data_words.uplsilon_pulse_frequency;
 		word_for_cbk.phi_pulse_frequency = parsed_data_words.phi_pulse_frequency;
 
-		(word_for_cbk.upsilon_pulse_summ > 0) ? word_for_cbk.usplison_summ_sign = 1 : word_for_cbk.usplison_summ_sign = 0;
-		(word_for_cbk.phi_pulse_summ > 0) ? word_for_cbk.phi_summ_sign = 1 : word_for_cbk.phi_summ_sign = 0;
+		(upsilon_angl_amount > 0) ? word_for_cbk.usplison_summ_sign = 0 : word_for_cbk.usplison_summ_sign = 1;
+		word_for_cbk.upsilon_pulse_summ = qAbs(upsilon_angl_amount);
+		(phi_angl_amount > 0) ? word_for_cbk.phi_summ_sign = 0 : word_for_cbk.phi_summ_sign = 1;
+		word_for_cbk.phi_pulse_summ = qAbs(phi_angl_amount);
 
 		//признаки самоконтроля БУП(Е)
 		bit19->isChecked() ? word_for_cbk.bit19 = 1 : word_for_cbk.bit19 = 0;
@@ -482,23 +498,25 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		bit12->isChecked() ? word_for_cbk.bit13 = 1 : word_for_cbk.bit12 = 0;
 		bit4->isChecked() ? word_for_cbk.bit4 = 1 : word_for_cbk.bit4 = 0;
 
-		//контрольная сумма
-		for (int i = 0; i++; i <= 13)
-			word_for_cbk.checksum += word_for_cbk.data_words[i];
-		word_for_cbk.checksum = word_for_cbk.checksum & 0xFFFF;
-
-		logArea->append(_message);
-		
-		new_tm();
 	}
+
+	//контрольная сумма
+	for (int i = 0; i < 10; i++)
+		word_for_cbk.checksum += word_for_cbk.data_words[i];
+	word_for_cbk.checksum = word_for_cbk.checksum & 0xFFFF;
+
+	logArea->append(_message);
+
+	new_tm();
 }
 
 void BOOP::new_tm()
 {
 
 	QVariantList tmp_list;
-	tmp_list.push_back(word_for_cbk.data_words[13]);
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, address, 3, tmp_list);
+	for (int i = 0; i < 11; i++)
+		tmp_list.push_back(word_for_cbk.data_words[i]);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, address, 2, tmp_list);
 }
 
 void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
@@ -514,6 +532,8 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 		mainSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 		reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
+		upsilon_angl_amount = 0;
+		phi_angl_amount = 0;
 		halfset = 0;
 	}
 
@@ -521,6 +541,8 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 		reserveSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 		mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
+		upsilon_angl_amount = 0;
+		phi_angl_amount = 0;
 		halfset = 1;
 	}
 

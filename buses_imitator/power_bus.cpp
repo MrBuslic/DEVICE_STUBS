@@ -53,14 +53,17 @@ void PowerWidget::set_u(int bus, double volt) //
 	case NK:
 		nk_volt = volt;
 		emit u_on_nk(volt);
+		log_widget->log_append(QString("UНК - %1В").arg(nk_volt));
 		break;
 	case K1:
 		k1_volt = volt;
 		emit u_on_k1(volt);
+		log_widget->log_append(QString("UК1 - %1В").arg(k1_volt));
 		break;
 	case K2:
 		k2_volt = volt;
 		emit u_on_k2(volt);
+		log_widget->log_append(QString("UК2 - %1В").arg(k2_volt));
 		break;
 	}
 }
@@ -83,6 +86,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		}
 		curr = tmp_curr;
 		nk_curr = tmp_curr;
+		log_widget->log_append(QString("IНК - %1А").arg(nk_curr));
 		break;
 	case K1:
 		for (QMap<QString, double>::iterator itr = k1_curr_map.begin(); itr != k1_curr_map.end(); itr++)
@@ -91,6 +95,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		}
 		curr = tmp_curr;
 		k1_curr = tmp_curr;
+		log_widget->log_append(QString("IК1 - %1А").arg(k1_curr));
 		break;
 	case K2:
 		for (QMap<QString, double>::iterator itr = k2_curr_map.begin(); itr != k2_curr_map.end(); itr++)
@@ -99,6 +104,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		}
 		curr = tmp_curr;
 		k2_curr = tmp_curr;
+		log_widget->log_append(QString("IК2 - %1А").arg(k2_curr));
 		break;
 	}
 }

@@ -23,7 +23,6 @@ KPIWidget::KPIWidget(QWidget *parent)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
-	log_widget->log_append(QString("тест КПИ"));
 }
 
 void KPIWidget::make_KPI(QVariantList KPI_list)

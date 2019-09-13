@@ -19,7 +19,7 @@ union BOOPDataWords
 		// Form data words
 	}
 
-	quint16 data_words[13];
+	quint16 data_words[11];
 
 	struct {
 		quint16 upsilon_servo_power_status : 1,
