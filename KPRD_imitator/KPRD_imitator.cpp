@@ -30,10 +30,7 @@ KPRD_imitator::KPRD_imitator(QWidget* parent) : QWidget(parent)
 	antenna_label = new QLabel("Антенна: ", this);
 	attenuation_label = new QLabel("Ослабление: ", this);
 
-	log_edit = new QTextEdit(this);
-	log_edit->setReadOnly(true);
-	_scroll_bar = new QScrollBar();
-	_scroll_bar = log_edit->verticalScrollBar();
+	log_edit = new LogWidget(this, "kprd");
 
 	gridLayout = new QGridLayout(this);
 
@@ -128,7 +125,6 @@ KPRD_imitator::~KPRD_imitator()
 	delete one_kod_label;
 	delete antenna_label;
 	delete attenuation_label;
-	delete _scroll_bar;
 	delete gridLayout;
 	ols_slot_thr.quit();
 	ols_signal_thr.quit();
@@ -350,7 +346,7 @@ void KPRD_imitator::dataIn(QVariantList dataList, QVariantList maskList)
 
 
 	}	// for
-	log_edit->setText("Выдано: " + KPIString + "\n");
+	log_edit->log_append("Выдано: " + KPIString + "\n");
 	kpi_slot_thr.get_kpi_bus_obj()->make_KPI(kpi_list);
 }
 
@@ -358,6 +354,7 @@ void KPRD_imitator::set_antenna_connection(QString antenna_name, QString connect
 {
 	if (kprd_state_map.contains(antenna_name))
 	{
+		log_edit->log_append("Соединяю: " + antenna_name + " с " + connected_antenna_name + "\n");
 		kprd_state_map[antenna_name] = connected_antenna_name;
 	}
 }

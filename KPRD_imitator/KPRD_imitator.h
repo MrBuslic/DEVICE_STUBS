@@ -10,6 +10,8 @@
 #include <QList>
 #include <QMessageBox>
 
+#include "rpc_loger.h"
+
 #include <boost/range/combine.hpp>
 #include <boost/tuple/tuple.hpp>
 
@@ -37,8 +39,8 @@ private:
 	QLabel *antenna_label;
 	QLabel *attenuation_label;
 
-	QTextEdit *log_edit;
-	QScrollBar* _scroll_bar;
+	LogWidget *log_edit;
+
 
 	QGridLayout *gridLayout;
 

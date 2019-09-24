@@ -1,4 +1,6 @@
+#ifdef WIN32
 #include <windows.h>
+#endif
 #include "omnibus_rpc.h"
 #include "rpc_ports.h"
 #include "BTI1553\BufferClass1553.h"
