@@ -187,7 +187,7 @@ ADD_CUSTOM_COMMAND(TARGET Stubs
 )
 
 #QT5_ADD_RESOURCES(KPIU_SERVER_RESOURCES kpiu_plugin.qrc)
-set(KPIU_SERVER_plugin_SOURCES kpiu_server_plugin.h  kpiu_server_plugin.cpp ${PROJECT_SOURCE_DIR}/kpiu_rpc.h ${PROJECT_SOURCE_DIR}/kpiu_rpc.cpp)
+set(KPIU_SERVER_plugin_SOURCES KPIU_server_plugin.h  KPIU_server_plugin.cpp ${PROJECT_SOURCE_DIR}/kpiu_rpc.h ${PROJECT_SOURCE_DIR}/kpiu_rpc.cpp)
 
 add_library(kpiu_server_plugin SHARED ${KPIU_SERVER_plugin_SOURCES} ${KPIU_SERVER_RESOURCES} )
 target_link_libraries(kpiu_server_plugin ${Qt5Core_LIBRARIES}  ${Qt5Widgets_LIBRARIES} common_functions db_ctrl mongo_controller_v3 socket_rpc)
