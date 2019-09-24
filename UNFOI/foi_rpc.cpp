@@ -1,5 +1,40 @@
 #include "foi_rpc.h"
 
+void RPC_foi_SLOT_Object::connect_to_server()
+{
+	SRPCSignalClass::Instance().toLog(QString("foi slot connecting %1 %2").arg(addr).arg(port));
+	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
+	_sock->connectToHost(addr,port);
+	if (_sock->waitForConnected(3000))
+	{
+		connected = true;
+		SRPCSignalClass::Instance().toLog("foi slot connected");
+	}
+	else
+	{
+		connected = false;
+		SRPCSignalClass::Instance().toLog(QString("foi slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
+	}
+}
+
+void RPC_foi_SIGNAL_Object::connect_to_server()
+{
+	SRPCSignalClass::Instance().toLog(QString("foi signal connecting %1 %2").arg(addr).arg(port));
+	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
+	_sock->connectToHost(addr,port);
+	if (_sock->waitForConnected(3000))
+	{
+		connected = true;
+		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
+		SRPCSignalClass::Instance().toLog("foi signal connected");
+	}
+	else
+	{
+		connected = false;
+		SRPCSignalClass::Instance().toLog(QString("foi signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
+	}
+}
+
 void RPC_foi_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_foi_SLOT_Object>(new RPC_foi_SLOT_Object(addr, port));

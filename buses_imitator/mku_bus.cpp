@@ -64,20 +64,20 @@ void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u
 int MKUWidget::ku_map_channels_setup(int ku_n, int line)
 {
 	ku_map_channels[ku_n] = line;
-	log_widget->log_append(QString("Присваиваю каналу %1 значение %2").arg(ku_n).arg(line));
+	log_widget->log_append(QString("На шине КУ присваиваю каналу %1 значение %2").arg(ku_n).arg(line));
 	return 0;
 }
 
 int MKUWidget::mshm_map_channels_setup(int mshm, int line_m)
 {
 	mshm_map_channels[mshm] = line_m;
-	log_widget->log_append(QString("Присваиваю каналу %1 значение %2").arg(mshm).arg(line_m));
+	log_widget->log_append(QString("На шине МШМ присваиваю каналу %1 значение %2").arg(mshm).arg(line_m));
 	return 0;
 }
 
 int MKUWidget::pshm_map_channels_setup(int pshm, int line_p)
 {
 	pshm_map_channels[pshm] = line_p;
-	log_widget->log_append(QString("Присваиваю каналу %1 значение %2").arg(pshm).arg(line_p));
+	log_widget->log_append(QString("На шине ПШМ присваиваю каналу %1 значение %2").arg(pshm).arg(line_p));
 	return 0;
 }
