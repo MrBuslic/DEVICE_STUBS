@@ -58,7 +58,9 @@ public:
 	~ASN_widg();
 
 private:
-	QPushButton *io; //In/Out (Включить/Выключить)
+	//QPushButton *io; //In/Out (Включить/Выключить)
+	QPushButton *first_half;
+	QPushButton *second_half;
 	QPushButton *nw; //Normal work (Штатная работа)
 	QPushButton *ts; //Test switch (Поверочное включение)
 	QPushButton *jm_glonass; //Job mode GLONASS (Задание режима работы по ГЛОНАСС)
@@ -70,9 +72,6 @@ private:
 	QTextEdit *text; // Информация
 
 	QString name = "ASN";//Имя устройства
-
-	QTextCodec *codec = QTextCodec::codecForName("CP 1251");
-	QString RussianText(char *msg);
 
 	void EnableButton();
 
@@ -151,4 +150,6 @@ private:
 
 	unsigned short sokr_time(QDateTime t, bool a);
 	unsigned short od_plav(float f, int a);
+protected:
+	void closeEvent(QCloseEvent *event);
 };

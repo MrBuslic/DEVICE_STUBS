@@ -1,4 +1,4 @@
-﻿#include "ASN.h"
+#include "ASN.h"
 #include "rpc_ports.h"
 union MKOWord
 {
@@ -13,17 +13,24 @@ union MKOWord
 	};
 };
 
-ASN_widg::ASN_widg(QWidget *parent) : sett(QCoreApplication::applicationDirPath() + "/ans.ini", QSettings::IniFormat)//:QWidget(parent)
+ASN_widg::ASN_widg(QWidget *parent) : QWidget(parent), sett(QCoreApplication::applicationDirPath() + "/ans.ini", QSettings::IniFormat), a(true)
 {
-	io = new QPushButton(RussianText("Включить"));
-	nw = new QPushButton(RussianText("Штатная работа"));
-	ts = new QPushButton(RussianText("Поверочное включение"));
-	jm_glonass = new QPushButton(RussianText("ГЛОНАСС"));
-	jm_gps = new QPushButton(RussianText("GPS"));
-	jm_gg = new QPushButton(RussianText("ГЛОНАСС + GPS"));
-	n_hrg = new QPushButton(RussianText("Отказ от прогрева ОГ"));
-	zacep = new QPushButton(RussianText("Зацепиться"));
+	//io = new QPushButton(QString("Включить"));
+	first_half = new QPushButton(QString("Первый комплект"));
+	first_half->setStyleSheet("background-color: rgb(204, 204, 204);");
+	second_half = new QPushButton(QString("Второй комплект"));
+	second_half->setStyleSheet("background-color: rgb(204, 204, 204);");
+	nw = new QPushButton(QString("Штатная работа"));
+	ts = new QPushButton(QString("Поверочное включение"));
+	jm_glonass = new QPushButton(QString("ГЛОНАСС"));
+	jm_gps = new QPushButton(QString("GPS"));
+	jm_gg = new QPushButton(QString("ГЛОНАСС + GPS"));
+	n_hrg = new QPushButton(QString("Отказ от прогрева ОГ"));
+	zacep = new QPushButton(QString("Зацепиться"));
 	EnableButton();
+	QHBoxLayout *halves_lay = new QHBoxLayout;
+	halves_lay->addWidget(first_half);
+	halves_lay->addWidget(second_half);
 
 	QHBoxLayout *hBoxLayout = new QHBoxLayout;
 	hBoxLayout->addWidget(jm_glonass);
@@ -36,7 +43,7 @@ ASN_widg::ASN_widg(QWidget *parent) : sett(QCoreApplication::applicationDirPath(
 	gridLayout->addWidget(n_hrg, 0, 1);
 	gridLayout->addWidget(zacep, 1, 1);
 	
-	connect(io, SIGNAL(clicked()), this, SLOT(io_Clicked()));
+	//connect(io, SIGNAL(clicked()), this, SLOT(io_Clicked()));
 	connect(nw, SIGNAL(clicked()), this, SLOT(nw_Clicked()));
 	connect(ts, SIGNAL(clicked()), this, SLOT(ts_Clicked()));
 	connect(jm_glonass, SIGNAL(clicked()), this, SLOT(jm_glonass_Clicked()));
@@ -120,7 +127,7 @@ ASN_widg::ASN_widg(QWidget *parent) : sett(QCoreApplication::applicationDirPath(
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QVBoxLayout *main = new QVBoxLayout;
-	main->addWidget(io);
+	main->addLayout(halves_lay);
 	main->addLayout(gridLayout);
 	main->addLayout(hBoxLayout);
 	main->addWidget(text);
@@ -129,25 +136,20 @@ ASN_widg::ASN_widg(QWidget *parent) : sett(QCoreApplication::applicationDirPath(
 	setLayout(main);
 	setWindowTitle(name);
 
-}
-
-QString ASN_widg::RussianText(char *msg)
-{
-	QString message = codec->toUnicode(msg, strlen(msg));
-	return message;
-	return 0;
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("asn_geometry").toByteArray());
 }
 
 void ASN_widg::nw_Clicked()
 {
-	text->append(RussianText("Штатная работа"));
+	text->append(QString("Штатная работа"));
 	jm_glonass->setStyleSheet("black");
 	jm_gps->setStyleSheet("black");
 	jm_gg->setStyleSheet("black");
 	jm_glonass->setEnabled(true);
 	jm_gps->setEnabled(true);
 	jm_gg->setEnabled(true);
-
+	zacep->setEnabled(true);
 	/*QList<QVariant> list;
 	list << 3;
 	MKOWord tmp_KS;
@@ -160,7 +162,7 @@ void ASN_widg::nw_Clicked()
 
 void ASN_widg::ts_Clicked()
 {
-	text->append(RussianText("Поверочное включение"));
+	text->append(QString("Поверочное включение"));
 	jm_glonass->setStyleSheet("black");
 	jm_gps->setStyleSheet("black");
 	jm_gg->setStyleSheet("black");
@@ -171,7 +173,7 @@ void ASN_widg::ts_Clicked()
 
 void ASN_widg::jm_glonass_Clicked()
 {
-	text->append(RussianText("Задание режима работы по ГЛОНАСС"));
+	text->append(QString("Задание режима работы по ГЛОНАСС"));
 	jm_glonass->setEnabled(false);
 	jm_gps->setStyleSheet("black");
 	jm_gg->setStyleSheet("black");
@@ -184,7 +186,7 @@ void ASN_widg::jm_glonass_Clicked()
 }
 void ASN_widg::jm_gps_Clicked()
 {
-	text->append(RussianText("Задание режима работы по GPS"));
+	text->append(QString("Задание режима работы по GPS"));
 	jm_gps->setEnabled(false);
 	jm_glonass->setStyleSheet("black");
 	jm_gg->setStyleSheet("black");
@@ -196,7 +198,7 @@ void ASN_widg::jm_gps_Clicked()
 }
 void ASN_widg::jm_gg_Clicked()
 {
-	text->append(RussianText("Задание режима работы по ГЛОНАСС и GPS"));
+	text->append(QString("Задание режима работы по ГЛОНАСС и GPS"));
 	jm_gg->setEnabled(false);
 	jm_glonass->setStyleSheet("black");
 	jm_gps->setStyleSheet("black");
@@ -212,12 +214,12 @@ void ASN_widg::n_hrg_Clicked()
 	{
 		a = false;
 		EnableButton();
-		n_hrg->setText(RussianText("Прогрев"));
+		n_hrg->setText(QString("Прогрев"));
 		n_hrg->setEnabled(true);
 		ts->setEnabled(true);
 		heat_og_tmr->stop();
 		text->setTextColor(QColor("red"));
-		text->append(RussianText("Отказ от прогрева ОГ"));
+		text->append(QString("Отказ от прогрева ОГ"));
 		text->setTextColor(QColor("black"));
 		set_new_tm(8);
 	}
@@ -225,10 +227,10 @@ void ASN_widg::n_hrg_Clicked()
 	{
 		a = true;
 		EnableButton();
-		n_hrg->setText(RussianText("Отказ от прогрева ОГ"));
+		n_hrg->setText(QString("Отказ от прогрева ОГ"));
 		n_hrg->setEnabled(true);
 		text->setTextColor(QColor("red"));
-		text->append(RussianText("Режим ожидания прогрева ОГ"));
+		text->append(QString("Режим ожидания прогрева ОГ"));
 		text->setTextColor(QColor("black"));
 		update_time();
 		n_hrg->setEnabled(true);
@@ -237,26 +239,28 @@ void ASN_widg::n_hrg_Clicked()
 }
 void ASN_widg::zacep_Clicked()
 {
-	text->append(RussianText("Зацепился"));
+	text->append(QString("Зацепился"));
+	prer->start(1000);
 }
 void ASN_widg::io_Clicked()
 {
-	if (!flag_on)
+	first_half->setStyleSheet("background-color: rgb(204, 204, 204);");
+	second_half->setStyleSheet("background-color: rgb(204, 204, 204);");
+
+	if (flag_on)
 	{
 		time = QDateTime::currentDateTime();
-		flag_on = true;
 		test = true;
-		text->append(RussianText("Питание включено"));
-		io->setText(RussianText("Выключить"));
+		text->append(QString("Питание включено"));
 		if (test)
 		{
 			text->setTextColor(QColor("green"));
-			text->append(RussianText("Автономный тест пройден"));
+			text->append(QString("Автономный тест пройден"));
 			text->setTextColor(QColor("black"));
 		}
-		prer->start(1000);
+
 		text->setTextColor(QColor("red"));
-		text->append(RussianText("Режим ожидания прогрева ОГ"));
+		text->append(QString("Режим ожидания прогрева ОГ"));
 		text->setTextColor(QColor("black"));
 		if (!sett.contains("SUBSET"))
 		{
@@ -270,14 +274,17 @@ void ASN_widg::io_Clicked()
 
 		}
 		text->append(QString("Текущий комплект %1").arg(current_SUBSET+1));
+		if (current_SUBSET == SUBSET_1)
+			first_half->setStyleSheet("background-color: rgb(142, 198, 156);");
+		else
+			second_half->setStyleSheet("background-color: rgb(142, 198, 156);");
+
 		update_time();
 		n_hrg->setEnabled(true);
 	}
 	else
 	{
-		flag_on = false;
-		text->append(RussianText("Питание отключено"));
-		io->setText(RussianText("Включить"));
+		text->append(QString("Питание отключено"));
 		EnableButton();
 		prer->stop();
 		heat_og_tmr->stop();
@@ -302,7 +309,7 @@ void ASN_widg::heating_OG()
 	{
 		OG = true;
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Прогрелся"));
+		text->append(QString("Прогрелся"));
 		text->setTextColor(QColor("black"));
 		n_hrg->setEnabled(false);
 		set_new_tm(8);
@@ -312,7 +319,7 @@ void ASN_widg::heating_OG()
 	else
 	{
 		text->setTextColor(QColor("red"));
-		text->append(RussianText("Ошибка прогрева"));
+		text->append(QString("Ошибка прогрева"));
 		text->setTextColor(QColor("black"));
 	}
 
@@ -323,12 +330,12 @@ void ASN_widg::get_power(double _volt)
 	volt = _volt;
 	if (volt >= 27.0)
 	{
-		flag_on = false;
+		flag_on = true;
 		io_Clicked();
 	}
 	else if (volt < 1)
 	{
-		flag_on = true;
+		flag_on = false;
 		io_Clicked();
 	}
 
@@ -430,7 +437,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//1 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Признак достоверности"));
+		text->append(QString("Признак достоверности"));
 		text->setTextColor(QColor("black"));
 
 		if (priznak_dost) _word += 0x8000;
@@ -440,7 +447,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//2-3 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Время привязки"));
+		text->append(QString("Время привязки"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -459,7 +466,7 @@ void ASN_widg::set_new_tm(int subadr)
 		
 		//5-8 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Коордианата X"));
+		text->append(QString("Коордианата X"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -468,7 +475,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//9-12 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Коордианата Y"));
+		text->append(QString("Коордианата Y"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -477,7 +484,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//13-16 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Коордианата Z"));
+		text->append(QString("Коордианата Z"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -486,7 +493,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//17-18 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Скорость X"));
+		text->append(QString("Скорость X"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -495,7 +502,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//19-20 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Скорость Y"));
+		text->append(QString("Скорость Y"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -504,7 +511,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//21-22 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Скорость Z"));
+		text->append(QString("Скорость Z"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -513,7 +520,7 @@ void ASN_widg::set_new_tm(int subadr)
 
 		//23-24 слово
 		text->setTextColor(QColor("green"));
-		text->append(RussianText("Текущее время"));
+		text->append(QString("Текущее время"));
 		text->setTextColor(QColor("black"));
 
 		_word = 0;
@@ -560,7 +567,7 @@ void ASN_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 	text->append(QString::number(tmp_cwd.adr));
 	if ((mko == MKO) && (tmp_cwd.adr == adr))
 	{
-		QString _msg = QString(RussianText("%1 принял сигнал на подадресе %2 c КС %3")).arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
+		QString _msg = QString(QString("%1 принял сигнал на подадресе %2 c КС %3")).arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
 		text->append(_msg);
 
 		int tmp_word = words[0].toInt();
@@ -583,17 +590,23 @@ void ASN_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 		case 0:
 			current_SUBSET = SUBSET_1;
 			sett.setValue("SUBSET", 1);
+			flag_on = true;
+
 			break;
 		case 1:
 			current_SUBSET = SUBSET_2;
 			sett.setValue("SUBSET_2", 2);
+			flag_on = true;
+
 			break;
 		case 2:
+			flag_on = false;
 
 			break;
 		}
 		text->append(QString("Текущий комплект %1").arg(current_SUBSET + 1));
 		sett.sync();
+		io_Clicked();
 	}
 }
 
@@ -634,7 +647,7 @@ void ASN_widg::load_fact()
 	}
 	if (cycle_i == 0)
 	{
-		text->append(RussianText("Файл 'fact.rcd' не найден"));
+		text->append(QString("Файл 'fact.rcd' не найден"));
 	}
 
 	in_file.close();
@@ -642,6 +655,7 @@ void ASN_widg::load_fact()
 
 void ASN_widg::set_new_tm_2()
 {
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(0, 3, 5, 4.5);
 	set_new_tm(2);
 }
 
@@ -705,4 +719,11 @@ unsigned short ASN_widg::od_plav(float f, int a)
 
 	return 0;
 
+}
+
+void ASN_widg::closeEvent(QCloseEvent *event)
+{
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	settings.setValue("asn_geometry", saveGeometry());
+	QWidget::closeEvent(event);
 }

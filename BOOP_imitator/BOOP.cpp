@@ -75,67 +75,7 @@ union BOOPRespondWord
 	};
 };
 
-union BOOPDataWords
-{
-	BOOPDataWords()
-	{
-		// Form data words
-	}
 
-	quint16 data_words[13];
-
-	struct {
-		quint16 upsilon_servo_power_status : 1,
-				phi_servo_power_status : 1,
-				upsilon_angle_sensor_power_status : 1,
-				phi_angle_sensor_power_status : 1,
-				upsilon_channel_work_status : 1,
-				phi_channel_work_status : 1,
-				previous_message_error : 1,
-				half_set_engage : 1,
-				temperature : 8;
-
-		quint16 upsilon_pulse_amount : 15,
-				upsilon_rotation_direction : 1;
-
-		quint16 phi_pulse_amount : 15,
-				phi_rotation_direction : 1;
-
-		quint16 uplsilon_pulse_frequency : 9,
-				: 7;
-
-		quint16 phi_pulse_frequency : 9,
-				: 7;
-
-		quint16 upsilon_angle;
-
-		quint16 phi_angle;
-
-		quint16 upsilon_pulse_summ : 15,
-				usplison_summ_sign : 1;
-
-		quint16 phi_pulse_summ : 15,
-				phi_summ_sign : 1;
-
-		// Self-control bits
-		quint16 bit19 : 1,
-				bit18 : 1,
-				bit17 : 1,
-				bit16 : 1,
-				bit15 : 1,
-				bit14 : 1,
-				bit13 : 1,
-				bit12 : 1,
-				: 7,
-				bit4 : 1;
-
-		quint16 upsilon_min_angle;
-
-		quint16 phi_min_angle;
-
-		quint16 checksum;
-	};
-};
 
 BOOP::BOOP()
 {
@@ -149,7 +89,7 @@ BOOP::BOOP()
   QLabel *temperatureLabel1 = new QLabel("Температура ", this);
   QLabel *temperatureLabel2 = new QLabel("°C", this);
 
-  temperatureEdit = new QLineEdit("-10", this);
+  temperatureEdit = new QLineEdit("20", this);
   temperatureEdit->setAlignment(Qt::AlignCenter);
   temperatureEdit->setFixedWidth(42);
 
@@ -256,11 +196,9 @@ BOOP::BOOP()
 
   decreaseUpsilonAngle = new QPushButton("−", this);
   decreaseUpsilonAngle->setFixedWidth(40);
-	decreaseUpsilonAngle->setFlat(true);
 
   increaseUpsilonAngle = new QPushButton("+", this);
   increaseUpsilonAngle->setFixedWidth(40);
-	increaseUpsilonAngle->setFlat(true);
 
   upsilonAngleServoPower = new QCheckBox("Питание ШД", this);
   upsilonAngleServoPower->setFixedWidth(84);
@@ -304,15 +242,13 @@ BOOP::BOOP()
   QLabel *phiRotationLabel = new QLabel("Вращение", this);
   phiRotationLabel->setFixedWidth(64);
 
-  QPushButton *decreasePhiAngle = new QPushButton("−", this);
+  decreasePhiAngle = new QPushButton("−", this);
   decreasePhiAngle->setFixedWidth(40);
-	decreasePhiAngle->setFlat(true);
 
-  QPushButton *increasePhiAngle = new QPushButton("+", this);
+  increasePhiAngle = new QPushButton("+", this);
   increasePhiAngle->setFixedWidth(40);
-	increasePhiAngle->setFlat(true);
 
-  QCheckBox *phiAngleServoPower = new QCheckBox("Питание ШД", this);
+  phiAngleServoPower = new QCheckBox("Питание ШД", this);
   phiAngleServoPower->setFixedWidth(84);
 
   QHBoxLayout *phiThirdControlsStrip = new QHBoxLayout();
@@ -392,6 +328,14 @@ BOOP::BOOP()
   }
 
   connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_matrix_command(int, int, int, int, double, double, int, int, int)));
+  timer_for_msg->setInterval(1000);
+  connect(timer_for_msg, SIGNAL(timeout()), this, SLOT(move_boop()));
+
+  increaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+  decreaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+  increasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+  decreasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+
 
   QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
   restoreGeometry(settings.value("boop_geometry").toByteArray());
@@ -413,7 +357,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 
 	MKOCommandWord parsed_command_word(command_word);
 
-	if ((MKO != this->MKO) || (parsed_command_word.address != this->address))
+	if ((MKO != this->MKO) || (parsed_command_word.address != this->address) || (parsed_command_word.subaddress != 3))
 		return;
 
 	if (parsed_command_word.words_count != 6 || words.count() != 6)
@@ -423,61 +367,188 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 	for (int i = 0; i < words.count() - 1; i++)
 		_checksum += words.at(i).toInt();
 
-	if (_checksum != words.last().toInt())
-		return;
+	QString _message;
 
-	MKODataWords parsed_data_words(words);
-
-	QString _message = QString("[%1] принял сигнал на подадресе %2 c КС %3")
-		                 .arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
-										 .arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
-
-	if (parsed_data_words.upsilon_servo_power)
-		upsilonAngleServoPower->setChecked(true);
-	else
-		upsilonAngleServoPower->setChecked(false);
-
-	if (parsed_data_words.phi_servo_power)
-		phiAngleServoPower->setChecked(true);
-	else
-		phiAngleServoPower->setChecked(false);
-
-	if (parsed_data_words.upsilon_angle_sensor_power)
-		upsilonAngleSensorPower->setChecked(true);
-	else
-		upsilonAngleSensorPower->setChecked(false);
-
-	if (parsed_data_words.phi_angle_sensor_power)
-		phiAngleSensorPower->setChecked(true);
-	else
-		phiAngleSensorPower->setChecked(false);
-
-	if (parsed_data_words.upsilon_rotation_command)
+	if ((_checksum&0xFFFF) != words.last().toInt())
 	{
-		int _upsilon_current_angle = upsilonAngleValue->text().toInt(nullptr, 16);
+		word_for_cbk.previous_message_error = 1;
+		_message = QString("[%1] принял некорректный массив на подадресе %2 c КС %3")
+			.arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
+			.arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
+	}
+	else
+	{
 
-		if (parsed_data_words.upsilon_rotation_direction)
-			_upsilon_current_angle += parsed_data_words.upsilon_pulse_amount;
+		MKODataWords parsed_data_words(words);
+
+		_message = QString("[%1] принял корректный массив на подадресе %2 c КС %3")
+			.arg(QTime::currentTime().toString("hh:mm:ss.zzz"))
+			.arg(parsed_command_word.subaddress).arg(parsed_command_word.command_word);
+
+		word_for_cbk.previous_message_error = 0;
+
+		if (parsed_data_words.upsilon_servo_power)
+		{
+			upsilonAngleServoPower->setChecked(true);
+			word_for_cbk.upsilon_servo_power_status = 1;
+		}
 		else
-			_upsilon_current_angle -= parsed_data_words.upsilon_pulse_amount;
+		{
+			upsilonAngleServoPower->setChecked(false);
+			word_for_cbk.upsilon_servo_power_status = 0;
+		}
+		if (parsed_data_words.phi_servo_power)
+		{
+			phiAngleServoPower->setChecked(true);
+			word_for_cbk.phi_servo_power_status = 1;
+		}
+		else
+		{
+			phiAngleServoPower->setChecked(false);
+			word_for_cbk.phi_servo_power_status = 0;
+		}
+		if (parsed_data_words.upsilon_angle_sensor_power)
+		{
+			upsilonAngleSensorPower->setChecked(true);
+			word_for_cbk.upsilon_angle_sensor_power_status = 1;
+		}
+		else
+		{
+			upsilonAngleSensorPower->setChecked(false);
+			word_for_cbk.upsilon_angle_sensor_power_status = 0;
+		}
+		if (parsed_data_words.phi_angle_sensor_power)
+		{
+			phiAngleSensorPower->setChecked(true);
+			word_for_cbk.phi_angle_sensor_power_status = 1;
+		}
+		else
+		{
+			phiAngleSensorPower->setChecked(false);
+			word_for_cbk.phi_angle_sensor_power_status = 0;
+		}
+		//тут еще должен быть признак ошибки по контрольной сумме
+		word_for_cbk.temperature = temperatureEdit->text().toInt(nullptr, 16);
+		//частота
+		word_for_cbk.uplsilon_pulse_frequency = parsed_data_words.uplsilon_pulse_frequency;
+		word_for_cbk.phi_pulse_frequency = parsed_data_words.phi_pulse_frequency;
 
-		upsilonAngleValue->setText(QString("%1").arg(_upsilon_current_angle, 0, 16).toUpper());
+		//время в сек
+		
+		if (parsed_data_words.upsilon_rotation_command || parsed_data_words.phi_rotation_command)
+		{
+			upsilon_rotation_direction = parsed_data_words.upsilon_rotation_direction;
+			phi_rotation_direction = parsed_data_words.phi_rotation_direction;
+			timer_for_msg->start();
+		}
+
+		if (parsed_data_words.upsilon_rotation_command)
+		{
+			//int _upsilon_current_angle = upsilonAngleValue->text().toInt(nullptr, 16);
+
+			word_for_cbk.upsilon_channel_work_status = 1;
+			word_for_cbk.upsilon_rotation_direction = parsed_data_words.upsilon_rotation_direction;
+			word_for_cbk.upsilon_pulse_amount = parsed_data_words.upsilon_pulse_amount; // уточнить у Олега
+
+			if (word_for_cbk.uplsilon_pulse_frequency)
+				upsilon_sec = parsed_data_words.upsilon_pulse_amount / word_for_cbk.uplsilon_pulse_frequency;
+			else
+				upsilon_sec = 0;
+
+			
+
+			//if (parsed_data_words.upsilon_rotation_direction)
+			//{
+			//	_upsilon_current_angle += parsed_data_words.upsilon_pulse_amount;
+			//	upsilon_angl_amount += parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
+			//	if (_upsilon_current_angle > 0xFFFF)
+			//		_upsilon_current_angle = _upsilon_current_angle - 0xFFFF;
+			//	increaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+			//}
+			//else
+			//{
+			//	_upsilon_current_angle -= parsed_data_words.upsilon_pulse_amount;
+			//	upsilon_angl_amount -= parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
+			//	if (_upsilon_current_angle < 0)
+			//		_upsilon_current_angle = 0xFFFF + _upsilon_current_angle;
+			//	decreaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+			//}
+			//word_for_cbk.upsilon_angle = _upsilon_current_angle;// уточнить у Олега
+			//upsilonAngleValue->setText(QString("%1").arg(_upsilon_current_angle, 0, 16).toUpper());
+		}
+
+		if (parsed_data_words.phi_rotation_command)
+		{
+			//int _phi_current_angle = phiAngleValue->text().toInt(nullptr, 16);
+
+			word_for_cbk.phi_channel_work_status = 1;
+			word_for_cbk.phi_rotation_direction = parsed_data_words.phi_rotation_direction;
+			word_for_cbk.phi_pulse_amount = parsed_data_words.phi_pulse_amount; // уточнить у Олега
+
+			if (word_for_cbk.phi_pulse_frequency)
+				phi_sec = parsed_data_words.phi_pulse_amount / word_for_cbk.phi_pulse_frequency;
+			else
+				phi_sec = 0;
+
+
+			//if (parsed_data_words.phi_rotation_direction)
+			//{
+			//	_phi_current_angle += parsed_data_words.phi_pulse_amount;
+			//	phi_angl_amount += parsed_data_words.phi_pulse_amount;// уточнить у Олега
+			//	if (_phi_current_angle > 0xFFFF)
+			//		_phi_current_angle = _phi_current_angle - 0xFFFF;
+			//	increasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+			//}
+			//else
+			//{
+			//	_phi_current_angle -= parsed_data_words.phi_pulse_amount;
+			//	if (_phi_current_angle < 0)
+			//		_phi_current_angle = 0xFFFF + _phi_current_angle;
+			//	phi_angl_amount -= parsed_data_words.phi_pulse_amount;// уточнить у Олега
+			//	decreasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+			//}
+
+			//word_for_cbk.phi_angle = _phi_current_angle;
+			//phiAngleValue->setText(QString("%1").arg(_phi_current_angle, 0, 16).toUpper());
+		}
+
+
+		//(upsilon_angl_amount > 0) ? word_for_cbk.usplison_summ_sign = 0 : word_for_cbk.usplison_summ_sign = 1;
+		//word_for_cbk.upsilon_pulse_summ = qAbs(upsilon_angl_amount);
+		//(phi_angl_amount > 0) ? word_for_cbk.phi_summ_sign = 0 : word_for_cbk.phi_summ_sign = 1;
+		//word_for_cbk.phi_pulse_summ = qAbs(phi_angl_amount);
+
+		//признаки самоконтроля БУП(Е)
+		bit19->isChecked() ? word_for_cbk.bit19 = 1 : word_for_cbk.bit19 = 0;
+		bit18->isChecked() ? word_for_cbk.bit18 = 1 : word_for_cbk.bit18 = 0;
+		bit17->isChecked() ? word_for_cbk.bit17 = 1 : word_for_cbk.bit17 = 0;
+		bit16->isChecked() ? word_for_cbk.bit16 = 1 : word_for_cbk.bit16 = 0;
+		bit15->isChecked() ? word_for_cbk.bit15 = 1 : word_for_cbk.bit15 = 0;
+		bit14->isChecked() ? word_for_cbk.bit14 = 1 : word_for_cbk.bit14 = 0;
+		bit12->isChecked() ? word_for_cbk.bit13 = 1 : word_for_cbk.bit12 = 0;
+		bit4->isChecked() ? word_for_cbk.bit4 = 1 : word_for_cbk.bit4 = 0;
+
 	}
 
-	if (parsed_data_words.phi_rotation_command)
-	{
-		int _phi_current_angle = phiAngleValue->text().toInt(nullptr, 16);
-
-		if (parsed_data_words.phi_rotation_direction)
-			_phi_current_angle += parsed_data_words.phi_pulse_amount;
-		else
-			_phi_current_angle -= parsed_data_words.phi_pulse_amount;
-
-		phiAngleValue->setText(QString("%1").arg(_phi_current_angle, 0, 16).toUpper());
-	}
+	//контрольная сумма
+	for (int i = 0; i < 10; i++)
+		word_for_cbk.checksum += word_for_cbk.data_words[i];
+	word_for_cbk.checksum = word_for_cbk.checksum & 0xFFFF;
 
 	logArea->append(_message);
+
+	new_tm();
 }
+
+void BOOP::new_tm()
+{
+
+	QVariantList tmp_list;
+	for (int i = 0; i < 11; i++)
+		tmp_list.push_back(word_for_cbk.data_words[i]);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, address, 2, tmp_list);
+}
+
 void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	if (pshm != 1 || mshm < 5 || mshm > 7)
@@ -491,32 +562,116 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 		mainSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 		reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
+		upsilon_angl_amount = 0;
+		phi_angl_amount = 0;
+		
+		word_for_cbk.half_set_engage = 0;
 	}
 
 	if (mshm == 6) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, true);
 		reserveSetButton->setStyleSheet("background-color: rgb(142, 198, 156);");
 		mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
+		upsilon_angl_amount = 0;
+		phi_angl_amount = 0;
+		
+		word_for_cbk.half_set_engage = 1;
 	}
 
 	if (mshm == 7) {
 		slot_thr.get_omnibus_obj()->switch_ab(1, 9, false);
 		mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
+		
 	}
 
 	logArea->append(_message);
 }
-void BOOP::new_data(int mko, int address, int subaddress, QVariantList words)
-{
 
-	// Do something
-
-}
 
 void BOOP::closeEvent(QCloseEvent *event)
 {
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	settings.setValue("boop_geometry", saveGeometry());
 	QWidget::closeEvent(event);
+}
+
+void BOOP::move_boop()
+{
+
+	int _upsilon_current_angle = upsilonAngleValue->text().toInt(nullptr, 16);
+	int _phi_current_angle = phiAngleValue->text().toInt(nullptr, 16);
+	if (upsilon_sec)
+	{
+		upsilon_sec--;
+
+		if (upsilon_rotation_direction)
+		{
+			_upsilon_current_angle += word_for_cbk.uplsilon_pulse_frequency;
+			upsilon_angl_amount += word_for_cbk.uplsilon_pulse_frequency;// уточнить у Олега
+			if (_upsilon_current_angle > 0xFFFF)
+				_upsilon_current_angle = _upsilon_current_angle - 0xFFFF;
+			increaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+		}
+		else
+		{
+			_upsilon_current_angle -= word_for_cbk.uplsilon_pulse_frequency;
+			if (_upsilon_current_angle < 0)
+				_upsilon_current_angle = 0xFFFF + _upsilon_current_angle;
+			upsilon_angl_amount -= word_for_cbk.uplsilon_pulse_frequency;// уточнить у Олега
+			decreaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+		}
+		word_for_cbk.upsilon_angle = _upsilon_current_angle;// уточнить у Олега
+		upsilonAngleValue->setText(QString("%1").arg(_upsilon_current_angle, 0, 16).toUpper());
+	}
+	if (phi_sec)
+	{
+		phi_sec--;
+
+		if (phi_rotation_direction)
+		{
+			_phi_current_angle += word_for_cbk.phi_pulse_frequency;
+			phi_angl_amount += word_for_cbk.phi_pulse_frequency;// уточнить у Олега
+			if (_phi_current_angle > 0xFFFF)
+				_phi_current_angle = _phi_current_angle - 0xFFFF;
+			increasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+		}
+		else
+		{
+			_phi_current_angle -= word_for_cbk.phi_pulse_frequency;
+			if (_phi_current_angle < 0)
+				_phi_current_angle = 0xFFFF + _phi_current_angle;
+			phi_angl_amount -= word_for_cbk.phi_pulse_frequency;// уточнить у Олега
+			decreasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
+		}
+
+		word_for_cbk.phi_angle = _phi_current_angle;
+		phiAngleValue->setText(QString("%1").arg(_phi_current_angle, 0, 16).toUpper());
+
+	}
+	(upsilon_angl_amount > 0) ? word_for_cbk.usplison_summ_sign = 0 : word_for_cbk.usplison_summ_sign = 1;
+	word_for_cbk.upsilon_pulse_summ = qAbs(upsilon_angl_amount);
+	(phi_angl_amount > 0) ? word_for_cbk.phi_summ_sign = 0 : word_for_cbk.phi_summ_sign = 1;
+	word_for_cbk.phi_pulse_summ = qAbs(phi_angl_amount);
+
+	if (upsilon_sec == 0)
+	{
+		increaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+		decreaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+	}
+
+	if (phi_sec == 0)
+	{
+		increasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+		decreasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+
+	}
+
+	if (( upsilon_sec == 0) && ( phi_sec == 0))
+	{
+		timer_for_msg->stop();
+	}
+
+	new_tm();
+
 }
