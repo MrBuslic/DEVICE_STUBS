@@ -25,7 +25,7 @@ union MkoWord
 
 RpcOmnibusWidget::RpcOmnibusWidget(QWidget* parent) : QWidget(parent)
 {
-	for (int i = 1; i <= 2; i++) map_channels[i] = 3;//инициализация мап исправных каналов
+	for (int i = 0; i <= 2; i++) map_channels[i] = 3;//инициализация мап исправных каналов
 
 	log_widget = new LogWidget(this, "omnibusbox");
 	QVBoxLayout* v_lay = new QVBoxLayout(this);

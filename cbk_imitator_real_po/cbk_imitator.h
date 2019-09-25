@@ -1,9 +1,13 @@
 #ifndef CBK_IMIT_H
 #define CBK_IMIT_H
 #include "omnibus_rpc.h"
-#include "VIP_imit.h"
+
 #include "real_tpo\MY_BOS\thread_module.h"
 #include <QtWidgets>
+#include <bitset>
+
+#include "../buses_imitator/power_bus_rpc.h"
+#include "../buses_imitator/mku_bus_rpc.h"
 
 enum PowerState{ON, OFF, CRASH};
 enum POState{SPOBU, TPO, VACANT, UNDEFINED};
@@ -30,25 +34,21 @@ protected:
 private:
 	VM_State VMS;
 	Work_State w_state;
-	QLabel *VM1_Label, *VM2_Label, *VM3_Label, *VM4_Label, *ipMFSK_Label, *ipMDS_Label, *portMFSK_Label, *portMDS_Label;
-	QComboBox *VM1_Combo, *VM2_Combo, *VM3_Combo, *VM4_Combo;
-	QPushButton *VM1_ON, *VM2_ON, *VM3_ON, *VM4_ON, *VM1_OFF, *VM2_OFF, *VM3_OFF, *VM4_OFF, *VM1_CRASH, *VM2_CRASH, *VM3_CRASH, *VM4_CRASH, *MFSK_ON, *MFSK_RE, *MDS_ON, *MDS_RE, *Get_Time;
-	QLineEdit *ipMFSK_Edit, *portMFSK_Edit, *ipMDS_Edit, *portMDS_Edit;
+	QList<QLabel*> VM_Labels;
+	QList<QComboBox*> VM_Combos;
+	QList<QPushButton*> ON_btns;
+	QList<QPushButton*> OFF_btns;
+	QList<QPushButton*> CRASH_btns;
+	QPushButton *Get_Time;
 	QTextEdit *edit;
 	QStringList str_combo;
-	QGroupBox *createVM1Group();
-	QGroupBox *createVM2Group();
-	QGroupBox *createVM3Group();
-	QGroupBox *createVM4Group();
-	QGroupBox *createMDS32Group();
-	QGroupBox *createMFSK24Group();
-	mds32_exchange* mds32_imit;
-	mfsk24_exchange* mfsk24_imit;
+	QGroupBox *createVMGroup(int n_vm);
+
 	TPOThread tpo_thread;
 	InterHandlerThread interrupt_thread;
 	//TimeThread b_time;
 
-	bool pitanie[5];
+	std::bitset<5> pitanie;
 
 	void VM_init();
 	void WorkState_init();
@@ -56,25 +56,13 @@ private:
 	void closeEvent(QCloseEvent *event);
 
 private slots:
-	void set_VM1_ON();
-	void set_VM2_ON();
-	void set_VM3_ON();
-	void set_VM4_ON();
-	
-	void set_VM1_OFF();
-	void set_VM2_OFF();
-	void set_VM3_OFF();
-	void set_VM4_OFF();
-	
-	void set_VM1_CRASH();
-	void set_VM2_CRASH();
-	void set_VM3_CRASH();
-	void set_VM4_CRASH();
-
-	void change_PO_VM1(int index);
-	void change_PO_VM2(int index);
-	void change_PO_VM3(int index);
-	void change_PO_VM4(int index);
+	void set_VM_ON(int n_vm);
+	void VM_ON_clicked();
+	void set_VM_OFF(int n_vm);
+	void VM_OFF_clicked();
+	void set_VM_CRASH(int n_vm);
+	void VM_CRASH_clicked();
+	void change_PO_VM(int index);
 	
 	void slot_vm_is_on(int n_vm);
 	void slot_vm_is_off(int n_vm);
@@ -84,18 +72,24 @@ private slots:
 	void read_settings();
 	void write_settings();
 
-	void connectMDS();
-	void connectMFSK();
-	void reconnectMDS();
-	void reconnectMFSK();
-	void mds32_send_sample(int channel, uint& buf, int& flag);
-	void slot_mfsk24_impulse_change(QVariantList);
-	
+
 	void show_time();
+
+	void get_power(double _volt);
+public slots:
+	void set_tm_state();
+	void new_ku(int ku_n, int length, double u, int line);
 
 signals:
 	void vm_is_on(int n_vm);
 	void vm_is_off(int n_vm);
 	void vm_change_po(int n_vm);
+
+private:
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
+
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 };
 #endif

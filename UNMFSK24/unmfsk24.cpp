@@ -20,6 +20,7 @@ ViStatus _VI_FUNC unmfsk24_init (ViSession arg0, ViUInt16 arg1, ViBoolean arg2,
 #else
 ViStatus _VI_FUNC unmfsk24_init (ViRsrc rsrcName, ViBoolean IDquery,
                                  ViBoolean doReset, ViSession *mezvi){ 
+	Srpc_buffer_class::Instance();
 	mfsk_count++;
 	*mezvi = mfsk_count; 
 	return 0;
@@ -29,7 +30,7 @@ ViStatus _VI_FUNC unmfsk24_connect (ViSession mezvi, ViSession vi, ViUInt16 m_nu
 #endif
 ViStatus _VI_FUNC unmfsk24_set_cmd_time (ViSession line, ViInt16 chan,
 										 ViReal64 time){
-	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_set_cmd_time(chan, time);
+	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_set_cmd_time(chan, time*1000);
 }
 ViStatus _VI_FUNC unmfsk24_config_trigger (ViSession arg0, ViUInt16 arg1){ return 0; }
 

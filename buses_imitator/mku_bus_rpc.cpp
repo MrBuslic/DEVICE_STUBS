@@ -39,6 +39,11 @@ void RPC_mku_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		emit connect_signal("new_ku_732(int, int, double, int)", true);
 	}
 	else
+	if (signal == QMetaMethod::fromSignal(&RPC_mku_bus_SIGNAL_Object::new_ku_cbk)) {
+		SRPCSignalClass::Instance().toLog("new_ku_cbk connected");
+		emit connect_signal("new_ku_cbk(int, int, double, int)", true);
+	}
+	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mku_bus_SIGNAL_Object::new_mk)) {
 		SRPCSignalClass::Instance().toLog("new_mk connected");
 		emit connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", true);
@@ -55,6 +60,11 @@ void RPC_mku_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_mku_bus_SIGNAL_Object::new_ku_732)) {
 		SRPCSignalClass::Instance().toLog("new_ku_732 disconnected");
 		//emit connect_signal("new_ku_732(int, int, double, int)", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_mku_bus_SIGNAL_Object::new_ku_cbk)) {
+		SRPCSignalClass::Instance().toLog("new_ku_cbk disconnected");
+		//emit connect_signal("new_ku_cbk(int, int, double, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mku_bus_SIGNAL_Object::new_mk)) {
@@ -146,6 +156,31 @@ void RPC_mku_bus_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("mku_bus signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
+			if (op_name == "new_ku_cbk(int, int, double, int)")
+			{
+				int ku_n;
+				tmp_stream >> ku_n;
+				SRPCSignalClass::Instance().toLog("mku_bus " + op_name +" call_number "+ QString::number(call_number) + " ku_n = "+RPCSignalClass::QVariantToString(ku_n));
+				int length;
+				tmp_stream >> length;
+				SRPCSignalClass::Instance().toLog("mku_bus " + op_name +" call_number "+ QString::number(call_number) + " length = "+RPCSignalClass::QVariantToString(length));
+				double u;
+				tmp_stream >> u;
+				SRPCSignalClass::Instance().toLog("mku_bus " + op_name +" call_number "+ QString::number(call_number) + " u = "+RPCSignalClass::QVariantToString(u));
+				int line;
+				tmp_stream >> line;
+				SRPCSignalClass::Instance().toLog("mku_bus " + op_name +" call_number "+ QString::number(call_number) + " line = "+RPCSignalClass::QVariantToString(line));
+				emit new_ku_cbk(ku_n, length, u, line);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("mku_bus signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 			if (op_name == "new_mk(int, int, int, int, double, double, int, int, int)")
 			{
 				int mshm;
@@ -216,6 +251,17 @@ void RPC_mku_bus_SLOT_Object::make_ku_732(int ku_n, int length, double u, int li
 	dynamic_call("make_ku_732(int, int, double, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("mku_bus dynamic_call finished make_ku_732");
 }
+void RPC_mku_bus_SLOT_Object::make_ku_cbk(int ku_n, int length, double u, int line)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(ku_n);
+	tmp_list << QVariant(length);
+	tmp_list << QVariant(u);
+	tmp_list << QVariant(line);
+	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call make_ku_cbk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("make_ku_cbk(int, int, double, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mku_bus dynamic_call finished make_ku_cbk");
+}
 void RPC_mku_bus_SLOT_Object::make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	QVariantList tmp_list;
@@ -270,6 +316,27 @@ int RPC_mku_bus_SLOT_Object::pshm_map_channels_setup(int pshm, int line_p)
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call finished pshm_map_channels_setup %1").arg(tmp_ret_params));
 	return res.toInt();
+}
+void RPC_mku_bus_SLOT_Object::get_tm(QString tm_name, QVariant& tm_val)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(tm_name);
+	tmp_list << QVariant(tm_val);
+	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call get_tm %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_tm(QString, QVariant&)", tmp_list);
+	tm_val = tmp_list.at(1);
+	tmp_ret_params += " tm_val="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call finished get_tm %1").arg(tmp_ret_params));
+}
+void RPC_mku_bus_SLOT_Object::set_tm(QString tm_name, QVariant tm_val)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(tm_name);
+	tmp_list << QVariant(tm_val);
+	SRPCSignalClass::Instance().toLog(QString("mku_bus dynamic_call set_tm %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_tm(QString, QVariant)", tmp_list);
+	SRPCSignalClass::Instance().toLog("mku_bus dynamic_call finished set_tm");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

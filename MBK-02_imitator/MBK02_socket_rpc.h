@@ -30,6 +30,7 @@ public slots:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
 	void set_new_power_tm(int sadr, QVariantList words);
+	void emit_update_graphics();
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -103,6 +104,7 @@ public:
 	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant update_tm(QVariantList& _values);
 	QVariant get_power(QVariantList& _values);
+	QVariant update_graphics(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

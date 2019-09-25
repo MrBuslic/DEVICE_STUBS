@@ -1,31 +1,9 @@
 #include "cbk_imitator.h"
+#include "rpc_ports.h"
 
-enum eControlChan
-{
-	controlOnCommon = 15,
-	controlOnVM0 = 17,
-	controlOnVM1 = 18,
-	controlOnVM2 = 19,
-	controlOnVM3 = 20,
+#include "cbk_socket_rpc.h"
 
-	controlOffCommon = 16,
-	controlOffVM0 = 21,
-	controlOffVM1 = 22,
-	controlOffVM2 = 23,
-	controlOffVM3 = 24,
 
-#ifdef OLD_CRATE
-	controlHoldVM0 = 1,
-	controlHoldVM1 = 2,
-	controlHoldVM2 = 3,
-	controlHoldVM3 = 4,
-#else
-	controlHoldVM0 = 21,
-	controlHoldVM1 = 22,
-	controlHoldVM2 = 23,
-	controlHoldVM3 = 24,
-#endif
-};
 
 CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 {
@@ -33,14 +11,10 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 	QGridLayout *grid = new QGridLayout;
 	set_str_combo();
 
-	grid->addWidget(createVM1Group(), 0, 0);
-	grid->addWidget(createVM2Group(), 0, 1);
-	grid->addWidget(createVM3Group(), 0, 2);
-	grid->addWidget(createVM4Group(), 0, 3);
-
-	QGridLayout *vip_grid = new QGridLayout;
-	vip_grid->addWidget(createMDS32Group(), 0, 0);
-	vip_grid->addWidget(createMFSK24Group(), 0, 1);
+	grid->addWidget(createVMGroup(0), 0, 0);
+	grid->addWidget(createVMGroup(1), 0, 1);
+	grid->addWidget(createVMGroup(2), 0, 2);
+	grid->addWidget(createVMGroup(3), 0, 3);
 
 	/////////
 	Get_Time = new QPushButton("Время");
@@ -48,7 +22,6 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 	edit = new QTextEdit(this);
 	setMinimumSize(490, 500);
 	v_lay->addLayout(grid);
-	v_lay->addLayout(vip_grid);
 	v_lay->addWidget(Get_Time);
 	v_lay->addWidget(edit);
 
@@ -56,8 +29,6 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 	window->setLayout(v_lay);
 	setCentralWidget(window);
 	
-	mds32_imit = new mds32_exchange();
-	mfsk24_imit = new mfsk24_exchange();
 	
 	m_settings = new QSettings(QSettings::IniFormat, QSettings::SystemScope, tr("Комета"), tr("ЦБК"), this);
 	QFile file("C:\\ProgramData\\Комета\\ЦБК.ini");
@@ -66,222 +37,104 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 		read_settings();
 	}
 
-	QObject::connect(VM1_ON, SIGNAL(clicked()), this, SLOT(set_VM1_ON()));
-	QObject::connect(VM2_ON, SIGNAL(clicked()), this, SLOT(set_VM2_ON()));
-	QObject::connect(VM3_ON, SIGNAL(clicked()), this, SLOT(set_VM3_ON()));
-	QObject::connect(VM4_ON, SIGNAL(clicked()), this, SLOT(set_VM4_ON()));
-	QObject::connect(VM1_OFF, SIGNAL(clicked()), this, SLOT(set_VM1_OFF()));
-	QObject::connect(VM2_OFF, SIGNAL(clicked()), this, SLOT(set_VM2_OFF()));
-	QObject::connect(VM3_OFF, SIGNAL(clicked()), this, SLOT(set_VM3_OFF()));
-	QObject::connect(VM4_OFF, SIGNAL(clicked()), this, SLOT(set_VM4_OFF()));
-	QObject::connect(VM1_CRASH, SIGNAL(clicked()), this, SLOT(set_VM1_CRASH()));
-	QObject::connect(VM2_CRASH, SIGNAL(clicked()), this, SLOT(set_VM2_CRASH()));
-	QObject::connect(VM3_CRASH, SIGNAL(clicked()), this, SLOT(set_VM3_CRASH()));
-	QObject::connect(VM4_CRASH, SIGNAL(clicked()), this, SLOT(set_VM4_CRASH()));
-	QObject::connect(VM1_Combo, SIGNAL(currentIndexChanged(int)), this, SLOT(change_PO_VM1(int)));
-	QObject::connect(VM2_Combo, SIGNAL(currentIndexChanged(int)), this, SLOT(change_PO_VM2(int)));
-	QObject::connect(VM3_Combo, SIGNAL(currentIndexChanged(int)), this, SLOT(change_PO_VM3(int)));
-	QObject::connect(VM4_Combo, SIGNAL(currentIndexChanged(int)), this, SLOT(change_PO_VM4(int)));
-	QObject::connect(MDS_ON, SIGNAL(clicked()), this, SLOT(connectMDS()));
-	QObject::connect(MFSK_ON, SIGNAL(clicked()), this, SLOT(connectMFSK()));
-	QObject::connect(MDS_RE, SIGNAL(clicked()), this, SLOT(reconnectMDS()));
-	QObject::connect(MFSK_RE, SIGNAL(clicked()), this, SLOT(reconnectMFSK()));
 	QObject::connect(this, SIGNAL(vm_is_on(int)), this, SLOT(slot_vm_is_on(int)));
 	QObject::connect(this, SIGNAL(vm_is_off(int)), this, SLOT(slot_vm_is_off(int)));
 	QObject::connect(Get_Time, SIGNAL(clicked()), this, SLOT(show_time()));
+
+
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start();
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start();
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start();
+
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start();
+
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
+		this->deleteLater();
+		return;
+	}
+
+	//QString ip_str = "127.0.0.1";
+	//int slot_port = CBK_SLOT;
+	//int signal_port = CBK_SIGNAL;
+	//cbk_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new cbk_Socket_RPC_SLOT_Server_Thread;
+	//rpc_slot_srv->set_app(this);
+	//rpc_slot_srv->set_params(ip_str, slot_port);
+	//rpc_slot_srv->start();
+	//cbk_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new cbk_Socket_RPC_SIGNAL_Thread;
+	//rpc_signal_srv->set_app(this);
+	//rpc_signal_srv->set_params(ip_str, signal_port);
+	//rpc_signal_srv->start();
+
+
 	VM_init();
 	WorkState_init();
+
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_cbk(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("cbk_geometry").toByteArray());
 }
 
-QGroupBox *CBK_MainWindow::createVM1Group()
+QGroupBox *CBK_MainWindow::createVMGroup(int n_vm)
 {
 	QGroupBox *groupBox = new QGroupBox(tr("Управление ВМ 1"));
-	VM1_Label = new QLabel("ВМ 1");
-	VM1_Label->setFixedSize(70, 35);
-	VM1_Label->setAlignment(Qt::AlignCenter);
+	QLabel* VM_label = new QLabel("ВМ 1");
+	VM_label->setFixedSize(70, 35);
+	VM_label->setAlignment(Qt::AlignCenter);
 
-	VM1_Combo = new QComboBox();
-	VM1_Combo->addItems(str_combo);
-	VM1_Combo->setCurrentIndex(-1);
-	VM1_Combo->setFixedWidth(70);
 
-	VM1_ON = new QPushButton("ВМ1 ВКЛ");
-	VM1_ON->setFixedWidth(70);
-	VM1_OFF = new QPushButton("ВМ1 ВЫКЛ");
-	VM1_OFF->setFixedWidth(70);
-	VM1_CRASH = new QPushButton("ВМ1 Авария");
-	VM1_CRASH->setFixedWidth(70);
+	QComboBox* VM_Combo = new QComboBox();
+	VM_Combo->addItems(str_combo);
+	VM_Combo->setCurrentIndex(-1);
+	VM_Combo->setFixedWidth(70);
+	connect(VM_Combo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &CBK_MainWindow::change_PO_VM);
+
+
+	QPushButton* VM_ON = new QPushButton("ВМ1 ВКЛ");
+	VM_ON->setFixedWidth(70);
+	connect(VM_ON, &QPushButton::clicked, this, &CBK_MainWindow::VM_ON_clicked);
+
+	QPushButton* VM_OFF = new QPushButton("ВМ1 ВЫКЛ");
+	VM_OFF->setFixedWidth(70);
+	connect(VM_OFF, &QPushButton::clicked, this, &CBK_MainWindow::VM_OFF_clicked);
+
+	QPushButton* VM_CRASH = new QPushButton("ВМ1 Авария");
+	VM_CRASH->setFixedWidth(70);
+	connect(VM_CRASH, &QPushButton::clicked, this, &CBK_MainWindow::VM_CRASH_clicked);
 
 	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(VM1_Label);
-	vbox->addWidget(VM1_Combo);
-	vbox->addWidget(VM1_ON);
-	vbox->addWidget(VM1_OFF);
-	vbox->addWidget(VM1_CRASH);
+	vbox->addWidget(VM_label);
+	VM_Labels << VM_label;
+	vbox->addWidget(VM_Combo);
+	VM_Combos << VM_Combo;
+	vbox->addWidget(VM_ON);
+	ON_btns << VM_ON;
+	vbox->addWidget(VM_OFF);
+	OFF_btns << VM_OFF;
+	vbox->addWidget(VM_CRASH);
+	CRASH_btns << VM_CRASH;
 	vbox->addSpacing(2);
 	vbox->setAlignment(Qt::AlignCenter);
 	groupBox->setLayout(vbox);
 	return groupBox;
 }
 
-QGroupBox *CBK_MainWindow::createVM2Group()
-{
-	QGroupBox *groupBox = new QGroupBox(tr("Управление ВМ 2"));
-	VM2_Label = new QLabel("ВМ 2");
-	VM2_Label->setFixedSize(70, 35);
-	VM2_Label->setAlignment(Qt::AlignCenter);
-
-	VM2_Combo = new QComboBox();
-	VM2_Combo->addItems(str_combo);
-	VM2_Combo->setCurrentIndex(-1);
-	VM2_Combo->setFixedWidth(70);
-
-	VM2_ON = new QPushButton("ВМ2 ВКЛ");
-	VM2_ON->setFixedWidth(70);
-	VM2_OFF = new QPushButton("ВМ2 ВЫКЛ");
-	VM2_OFF->setFixedWidth(70);
-	VM2_CRASH = new QPushButton("ВМ2 Авария");
-	VM2_CRASH->setFixedWidth(70);
-
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(VM2_Label);
-	vbox->addWidget(VM2_Combo);
-	vbox->addWidget(VM2_ON);
-	vbox->addWidget(VM2_OFF);
-	vbox->addWidget(VM2_CRASH);
-	vbox->addSpacing(2);
-	vbox->setAlignment(Qt::AlignCenter);
-	groupBox->setLayout(vbox);
-	return groupBox;
-}
-
-QGroupBox *CBK_MainWindow::createVM3Group()
-{
-	QGroupBox *groupBox = new QGroupBox(tr("Управление ВМ 3"));
-	VM3_Label = new QLabel("ВМ 3");
-	VM3_Label->setFixedSize(70, 35);
-	VM3_Label->setAlignment(Qt::AlignCenter);
-
-	VM3_Combo = new QComboBox();
-	VM3_Combo->addItems(str_combo);
-	VM3_Combo->setCurrentIndex(-1);
-	VM3_Combo->setFixedWidth(70);
-
-	VM3_ON = new QPushButton("ВМ3 ВКЛ");
-	VM3_ON->setFixedWidth(70);
-	VM3_OFF = new QPushButton("ВМ3 ВЫКЛ");
-	VM3_OFF->setFixedWidth(70);
-	VM3_CRASH = new QPushButton("ВМ3 Авария");
-	VM3_CRASH->setFixedWidth(70);
-
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(VM3_Label);
-	vbox->addWidget(VM3_Combo);
-	vbox->addWidget(VM3_ON);
-	vbox->addWidget(VM3_OFF);
-	vbox->addWidget(VM3_CRASH);
-	vbox->addSpacing(2);
-	vbox->setAlignment(Qt::AlignCenter);
-	groupBox->setLayout(vbox);
-	return groupBox;
-}
-
-QGroupBox *CBK_MainWindow::createVM4Group()
-{
-	QGroupBox *groupBox = new QGroupBox(tr("Управление ВМ 4"));
-	VM4_Label = new QLabel("ВМ 4");
-	VM4_Label->setFixedSize(70, 35);
-	VM4_Label->setAlignment(Qt::AlignCenter);
-
-	VM4_Combo = new QComboBox();
-	VM4_Combo->addItems(str_combo);
-	VM4_Combo->setCurrentIndex(-1);
-	VM4_Combo->setFixedWidth(70);
-
-	VM4_ON = new QPushButton("ВМ4 ВКЛ");
-	VM4_ON->setFixedWidth(70);
-	VM4_OFF = new QPushButton("ВМ4 ВЫКЛ");
-	VM4_OFF->setFixedWidth(70);
-	VM4_CRASH = new QPushButton("ВМ4 Авария");
-	VM4_CRASH->setFixedWidth(70);
-
-	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(VM4_Label);
-	vbox->addWidget(VM4_Combo);
-	vbox->addWidget(VM4_ON);
-	vbox->addWidget(VM4_OFF);
-	vbox->addWidget(VM4_CRASH);
-	vbox->addSpacing(2);
-	vbox->setAlignment(Qt::AlignCenter);
-	groupBox->setLayout(vbox);
-	return groupBox;
-}
-QGroupBox *CBK_MainWindow::createMDS32Group()
-{
-	QGroupBox *groupBox = new QGroupBox(tr("Управление МДС-32"));
-	ipMDS_Label = new QLabel("IP сервера МДС-32:");
-	ipMDS_Label->setFixedSize(130, 25);
-	ipMDS_Label->setAlignment(Qt::AlignLeft);
-	portMDS_Label = new QLabel("Порт сервера МДС-32:");
-	portMDS_Label->setFixedSize(130, 25);
-	portMDS_Label->setAlignment(Qt::AlignLeft);
-
-	ipMDS_Edit = new QLineEdit();
-	ipMDS_Edit->setFixedSize(70, 25);
-	portMDS_Edit = new QLineEdit();
-	portMDS_Edit->setFixedSize(70, 25);
-
-
-	MDS_ON = new QPushButton("Connect");
-	MDS_ON->setFixedWidth(100);
-	MDS_RE = new QPushButton("Reconnect");
-	MDS_RE->setFixedWidth(100);
-
-	QGridLayout *gLay = new QGridLayout;
-	gLay->addWidget(ipMDS_Label, 0, 0);
-	gLay->addWidget(ipMDS_Edit, 0, 1);
-	gLay->addWidget(portMDS_Label, 1, 0);
-	gLay->addWidget(portMDS_Edit, 1, 1);
-	gLay->addWidget(MDS_ON, 2, 0);
-	gLay->addWidget(MDS_RE, 2, 1);
-	groupBox->setLayout(gLay);
-	return groupBox;
-}
-
-QGroupBox *CBK_MainWindow::createMFSK24Group()
-{
-	QGroupBox *groupBox = new QGroupBox(tr("Управление МФСК-24"));
-	ipMFSK_Label = new QLabel("IP сервера МФСК-24:");
-	ipMFSK_Label->setFixedSize(130, 25);
-	ipMFSK_Label->setAlignment(Qt::AlignLeft);
-	portMFSK_Label = new QLabel("Порт сервера МФСК-24:");
-	portMFSK_Label->setFixedSize(130, 25);
-	portMFSK_Label->setAlignment(Qt::AlignLeft);
-
-	ipMFSK_Edit = new QLineEdit();
-	ipMFSK_Edit->setFixedSize(70, 25);
-	portMFSK_Edit = new QLineEdit();
-	portMFSK_Edit->setFixedSize(70, 25);
-
-
-	MFSK_ON = new QPushButton("Connect");
-	MFSK_ON->setFixedWidth(100);
-	MFSK_RE = new QPushButton("Reconnect");
-	MFSK_RE->setFixedWidth(100);
-
-	QGridLayout *gLay = new QGridLayout;
-	gLay->addWidget(ipMFSK_Label, 0, 0);
-	gLay->addWidget(ipMFSK_Edit, 0, 1);
-	gLay->addWidget(portMFSK_Label, 1, 0);
-	gLay->addWidget(portMFSK_Edit, 1, 1);
-	gLay->addWidget(MFSK_ON, 2, 0);
-	gLay->addWidget(MFSK_RE, 2, 1);
-	groupBox->setLayout(gLay);
-	return groupBox;
-}
 
 void CBK_MainWindow::VM_init()
 {
@@ -289,18 +142,21 @@ void CBK_MainWindow::VM_init()
 	{
 		VMS.VMPowerState[i] = OFF;
 	}
-	set_VM1_OFF();
-	set_VM2_OFF();
-	set_VM3_OFF();
-	set_VM4_OFF();
-	VMS.VMPOState[0] = VM1_Combo->currentIndex();
-	VMS.VMPOState[1] = VM2_Combo->currentIndex();
-	VMS.VMPOState[2] = VM3_Combo->currentIndex();
-	VMS.VMPOState[3] = VM4_Combo->currentIndex();
+	set_VM_OFF(0);
+	set_VM_OFF(1);
+	set_VM_OFF(2);
+	set_VM_OFF(3);
+
+	VMS.VMPOState[0] = VM_Combos[0]->currentIndex();
+	VMS.VMPOState[1] = VM_Combos[1]->currentIndex();
+	VMS.VMPOState[2] = VM_Combos[2]->currentIndex();
+	VMS.VMPOState[3] = VM_Combos[3]->currentIndex();
+
 	for (int i = 0; i < 5; i++)
 	{
 		pitanie[i] = false;
 	}
+	set_tm_state();
 }
 
 void CBK_MainWindow::WorkState_init()
@@ -316,170 +172,94 @@ void CBK_MainWindow::set_str_combo()
 	str_combo.append("Свободно");
 }
 
-void CBK_MainWindow::set_VM1_ON()
+void CBK_MainWindow::VM_ON_clicked()
 {
-	VMS.VMPowerState[0] = ON;
-	VM1_Label->setStyleSheet("QLabel { background-color : green; color : black; }");
-	emit(vm_is_on(1));
-}
-
-void CBK_MainWindow::set_VM2_ON()
-{
-	VMS.VMPowerState[1] = ON;
-	VM2_Label->setStyleSheet("QLabel { background-color : green; color : black; }");
-	emit(vm_is_on(2));
-}
-
-void CBK_MainWindow::set_VM3_ON()
-{
-	VMS.VMPowerState[2] = ON;
-	VM3_Label->setStyleSheet("QLabel { background-color : green; color : black; }");
-	emit(vm_is_on(3));
-}
-
-void CBK_MainWindow::set_VM4_ON()
-{
-	VMS.VMPowerState[3] = ON;
-	VM4_Label->setStyleSheet("QLabel { background-color : green; color : black; }");
-	emit(vm_is_on(4));
-}
-
-void CBK_MainWindow::set_VM1_OFF()
-{
-	VMS.VMPowerState[0] = OFF;
-	VM1_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-	emit(vm_is_off(1));
-}
-
-void CBK_MainWindow::set_VM2_OFF()
-{
-	VMS.VMPowerState[1] = OFF;
-	VM2_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-	emit(vm_is_off(2));
-}
-
-void CBK_MainWindow::set_VM3_OFF()
-{
-	VMS.VMPowerState[2] = OFF;
-	VM3_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-	emit(vm_is_off(3));
-}
-
-void CBK_MainWindow::set_VM4_OFF()
-{
-	VMS.VMPowerState[3] = OFF;
-	VM4_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-	emit(vm_is_off(4));
-}
-
-void CBK_MainWindow::set_VM1_CRASH()
-{
-	VMS.VMPowerState[0] = CRASH;
-	VM1_Label->setStyleSheet("QLabel { background-color : red; color : black; }");
-}
-
-void CBK_MainWindow::set_VM2_CRASH()
-{
-	VMS.VMPowerState[1] = CRASH;
-	VM2_Label->setStyleSheet("QLabel { background-color : red; color : black; }");
-}
-
-void CBK_MainWindow::set_VM3_CRASH()
-{
-	VMS.VMPowerState[2] = CRASH;
-	VM3_Label->setStyleSheet("QLabel { background-color : red; color : black; }");
-}
-
-void CBK_MainWindow::set_VM4_CRASH()
-{
-	VMS.VMPowerState[3] = CRASH;
-	VM4_Label->setStyleSheet("QLabel { background-color : red; color : black; }");
-}
-
-void CBK_MainWindow::change_PO_VM1(int index)
-{
-	QString str;
-	str = "ВМ1";
-	str += "\n";
-	str += VM1_Combo->currentText();
-	VM1_Label->setText(str);
-	VM1_Label->setAlignment(Qt::AlignCenter);
-	switch (index)
+	int n_vm = -1;
+	for (int i = 0; i < 4; i++)
 	{
-	case 0:
-		VMS.VMPOState[0] = SPOBU;
-		break;
-	case 1:
-		VMS.VMPOState[0] = TPO;
-		break;
-	case 2:
-		VMS.VMPOState[0] = VACANT;
-		break;
+		if (ON_btns[i] == sender())
+			n_vm = i;
 	}
+	if (n_vm == -1)
+		return;
+	set_VM_ON(n_vm);
 }
 
-void CBK_MainWindow::change_PO_VM2(int index)
+void CBK_MainWindow::set_VM_ON(int n_vm)
 {
-	QString str;
-	str = "ВМ2";
-	str += "\n";
-	str += VM2_Combo->currentText();
-	VM2_Label->setText(str);
-	VM2_Label->setAlignment(Qt::AlignCenter);
-	switch (index)
+	VMS.VMPowerState[n_vm] = ON;
+	pitanie[n_vm+1] = true;
+	VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : green; color : black; }");
+	emit(vm_is_on(n_vm));
+	set_tm_state();
+}
+
+void CBK_MainWindow::VM_OFF_clicked()
+{
+	int n_vm = -1;
+	for (int i = 0; i < 4; i++)
 	{
-	case 0:
-		VMS.VMPOState[1] = SPOBU;
-		break;
-	case 1:
-		VMS.VMPOState[1] = TPO;
-		break;
-	case 2:
-		VMS.VMPOState[1] = VACANT;
-		break;
+		if (OFF_btns[i] == sender())
+			n_vm = i;
 	}
+	if (n_vm == -1)
+		return;
+	set_VM_OFF(n_vm);
 }
 
-void CBK_MainWindow::change_PO_VM3(int index)
+void CBK_MainWindow::set_VM_OFF(int n_vm)
 {
-	QString str;
-	str = "ВМ3";
-	str += "\n";
-	str += VM3_Combo->currentText();
-	VM3_Label->setText(str);
-	VM3_Label->setAlignment(Qt::AlignCenter);
-	switch (index)
+	VMS.VMPowerState[n_vm] = OFF;
+	pitanie[n_vm+1] = false;
+	VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : grey; color : black; }");
+	emit(vm_is_off(n_vm));
+	set_tm_state();
+}
+
+void CBK_MainWindow::VM_CRASH_clicked()
+{
+	int n_vm = -1;
+	for (int i = 0; i < 4; i++)
 	{
-	case 0:
-		VMS.VMPOState[2] = SPOBU;
-		break;
-	case 1:
-		VMS.VMPOState[2] = TPO;
-		break;
-	case 2:
-		VMS.VMPOState[2] = VACANT;
-		break;
+		if (CRASH_btns[i] == sender())
+			n_vm = i;
 	}
+	if (n_vm == -1)
+		return;
+	set_VM_CRASH(n_vm);
 }
 
-void CBK_MainWindow::change_PO_VM4(int index)
+void CBK_MainWindow::set_VM_CRASH(int n_vm)
 {
+	VMS.VMPowerState[n_vm] = CRASH;
+	VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : red; color : black; }");
+}
+
+void CBK_MainWindow::change_PO_VM(int index)
+{
+	int n_vm = -1;
+	for (int i = 0; i < 4; i++)
+	{
+		if (VM_Combos[i] == sender())
+			n_vm = i;
+	}
+	if (n_vm == -1)
+		return;
+
 	QString str;
-	str = "ВМ4";
-	str += "\n";
-	str += VM4_Combo->currentText();
-	VM4_Label->setText(str);
-	VM4_Label->setAlignment(Qt::AlignCenter);
+	str = QString("ВМ%1\n%2").arg(n_vm+1).arg(VM_Combos[n_vm]->currentText());
+	VM_Labels[n_vm]->setText(str);
+	VM_Labels[n_vm]->setAlignment(Qt::AlignCenter);
 	switch (index)
 	{
 	case 0:
-		VMS.VMPOState[3] = SPOBU;
+		VMS.VMPOState[n_vm] = SPOBU;
 		break;
 	case 1:
-		VMS.VMPOState[3] = TPO;
+		VMS.VMPOState[n_vm] = TPO;
 		break;
 	case 2:
-		VMS.VMPOState[3] = VACANT;
+		VMS.VMPOState[n_vm] = VACANT;
 		break;
 	}
 }
@@ -490,20 +270,14 @@ void CBK_MainWindow::write_settings()
 	settings.setValue("cbk_geometry", saveGeometry());
 
 	m_settings->beginGroup("CBK_State");
-	m_settings->setValue("VM1_PO", VM1_Combo->currentIndex());
-	m_settings->setValue("VM1_Lab", VM1_Label->text());
-	m_settings->setValue("VM2_PO", VM2_Combo->currentIndex());
-	m_settings->setValue("VM2_Lab", VM2_Label->text());
-	m_settings->setValue("VM3_PO", VM3_Combo->currentIndex());
-	m_settings->setValue("VM3_Lab", VM3_Label->text());
-	m_settings->setValue("VM4_PO", VM4_Combo->currentIndex());
-	m_settings->setValue("VM4_Lab", VM4_Label->text());
-	m_settings->endGroup();
-	m_settings->beginGroup("Connection_Settings");
-	m_settings->setValue("MDS_Server_IP", ipMDS_Edit->text());
-	m_settings->setValue("MDS_Server_Port", portMDS_Edit->text());
-	m_settings->setValue("MFSK_Server_IP", ipMFSK_Edit->text());
-	m_settings->setValue("MFSK_Server_Port", portMFSK_Edit->text());
+	m_settings->setValue("VM1_PO", VM_Combos[0]->currentIndex());
+	m_settings->setValue("VM1_Lab", VM_Labels[0]->text());
+	m_settings->setValue("VM2_PO", VM_Combos[1]->currentIndex());
+	m_settings->setValue("VM2_Lab", VM_Labels[1]->text());
+	m_settings->setValue("VM3_PO", VM_Combos[2]->currentIndex());
+	m_settings->setValue("VM3_Lab", VM_Labels[2]->text());
+	m_settings->setValue("VM4_PO", VM_Combos[3]->currentIndex());
+	m_settings->setValue("VM4_Lab", VM_Labels[3]->text());
 	m_settings->endGroup();
 	m_settings->sync();
 }
@@ -515,40 +289,30 @@ void CBK_MainWindow::read_settings()
 	m_settings->beginGroup("CBK_State");
 	int index = m_settings->value("VM1_PO", c_ind).toInt();
 	QString str = m_settings->value("VM1_Lab", l_str).toString();
-	VM1_Combo->setCurrentIndex(index);
-	VM1_Label->setText(str);
-	VM1_Label->setAlignment(Qt::AlignCenter);
+	VM_Combos[0]->setCurrentIndex(index);
+	VM_Labels[0]->setText(str);
+	VM_Labels[1]->setAlignment(Qt::AlignCenter);
 	index = m_settings->value("VM2_PO", c_ind).toInt();
 	str = m_settings->value("VM2_Lab", l_str).toString();
-	VM2_Combo->setCurrentIndex(index);
-	VM2_Label->setText(str);
-	VM2_Label->setAlignment(Qt::AlignCenter);
+	VM_Combos[1]->setCurrentIndex(index);
+	VM_Labels[1]->setText(str);
+	VM_Labels[1]->setAlignment(Qt::AlignCenter);
 	index = m_settings->value("VM3_PO", c_ind).toInt();
 	str = m_settings->value("VM3_Lab", l_str).toString();
-	VM3_Combo->setCurrentIndex(index);
-	VM3_Label->setText(str);
-	VM3_Label->setAlignment(Qt::AlignCenter);
+	VM_Combos[2]->setCurrentIndex(index);
+	VM_Labels[2]->setText(str);
+	VM_Labels[2]->setAlignment(Qt::AlignCenter);
 	index = m_settings->value("VM4_PO", c_ind).toInt();
 	str = m_settings->value("VM4_Lab", l_str).toString();
-	VM4_Combo->setCurrentIndex(index);
-	VM4_Label->setText(str);
-	VM4_Label->setAlignment(Qt::AlignCenter);
-	m_settings->endGroup();
-	m_settings->beginGroup("Connection_Settings");
-	str = m_settings->value("MDS_Server_IP", l_str).toString();
-	ipMDS_Edit->setText(str);
-	str = m_settings->value("MDS_Server_Port", l_str).toString();
-	portMDS_Edit->setText(str);
-	str = m_settings->value("MFSK_Server_IP", l_str).toString();
-	ipMFSK_Edit->setText(str);
-	str = m_settings->value("MFSK_Server_Port", l_str).toString();
-	portMFSK_Edit->setText(str);
+	VM_Combos[3]->setCurrentIndex(index);
+	VM_Labels[3]->setText(str);
+	VM_Labels[3]->setAlignment(Qt::AlignCenter);
 	m_settings->endGroup();
 }
 
 void CBK_MainWindow::closeEvent(QCloseEvent* event)
 {
-	if (QMessageBox::question(this, tr("Подтввердите"), tr("Завершить работу?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+	if (QMessageBox::question(this, tr("Подтвердите"), tr("Завершить работу?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
 	{
 		write_settings();
 		event->accept();
@@ -559,153 +323,34 @@ void CBK_MainWindow::closeEvent(QCloseEvent* event)
 	}
 }
 
-void CBK_MainWindow::connectMDS()
+void CBK_MainWindow::set_tm_state()
 {
-	QString ip_str = ipMDS_Edit->text();
-	int port = portMDS_Edit->text().toInt();
-	mds32_imit->create_signal_thread(ip_str, port);
-	QObject::connect(mds32_imit->get_mds32_exchange_thread()->get_obj().get(), SIGNAL(mds32_get_sample(int, uint&, int&)), this, SLOT(mds32_send_sample(int, uint&, int&)), Qt::BlockingQueuedConnection);
+	mku_slot_thr.get_mku_bus_obj()->set_tm("CBK_TM", (uint)(pitanie.to_ulong()));
 }
 
-void CBK_MainWindow::reconnectMDS()
+void CBK_MainWindow::new_ku(int ku_n, int length, double u, int line)
 {
-	return;
-}
-
-void CBK_MainWindow::connectMFSK()
-{
-	QString ip_str = ipMFSK_Edit->text();
-	int port = portMFSK_Edit->text().toInt();
-	mfsk24_imit->create_signal_thread(ip_str, port);
-	QObject::connect(mfsk24_imit->get_mds32_exchange_thread()->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(slot_mfsk24_impulse_change(QVariantList)), Qt::BlockingQueuedConnection);
-}
-
-void CBK_MainWindow::reconnectMFSK()
-{
-	return;
-}
-
-void CBK_MainWindow::mds32_send_sample(int channel, uint& buf, int& flag)
-{
-	switch (channel)
-	{
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	{
-		flag = 1;
-		if (pitanie[channel - 1] == false)
-		{
-			buf = 1;
-		}
-		else
-		{
-			buf = 0;
-		}
-		break;
-	}
-	case 6:
-	case 7:
-	case 8:
-	case 9:
-	{
-		buf = 1;
-		break;
-	}
-	default:
-		edit->append("The specified channel is not for us!");
-	}
-}
-
-void CBK_MainWindow::slot_mfsk24_impulse_change(QVariantList channels)
-{
-	if ((channels.count() % 2) != 0)
-	{
-		edit->append("Error in size of channels array!");
+	if (pitanie[0] == 0)
 		return;
-	}
-	QMap<int, int> channels_map;
-	for (int i = 0; i < channels.count(); i += 2)
-	{
-		channels_map.insert(channels[i].toInt(), channels[i + 1].toInt());
-	}
-	if (channels_map.contains(controlOnCommon))
-	{
-		if ((channels_map[controlOnCommon] > 300) && (channels_map[controlOnCommon] < 100))
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (channels_map.contains(controlOnVM0 + i) && (channels_map[controlOnVM0 + i] > 300) && (channels_map[controlOnVM0 + i] < 100))
-				{
-					VMS.VMPowerState[i] = ON;
-					pitanie[i] = true;
-					edit->append(QString("Turning VM%1 ON").arg(i));
-					switch (i)
-					{
-					case 0:
-						set_VM1_ON();
-						break;
-					case 1:
-						set_VM2_ON();
-						break;
-					case 2:
-						set_VM3_ON();
-						break;
-					case 3:
-						set_VM4_ON();
-						break;
-					default:
-						break;
-					}
-				}
-			}
-		}
-	}
+	if (u < 20)
+		return;
 
-	if (channels_map.contains(controlOffCommon))
-	{
-		if ((channels_map[controlOffCommon] > 300) && (channels_map[controlOffCommon] < 100))
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				if (channels_map.contains(controlOffVM0 + i) && (channels_map[controlOffVM0 + i] > 300) && (channels_map[controlOffVM0 + i] < 100))
-				{
-					VMS.VMPowerState[i] = OFF;
-					pitanie[i] = false;
-					edit->append(QString("Turning VM%1 OFF").arg(i));
-					switch (i)
-					{
-					case 0:
-						set_VM1_OFF();
-						break;
-					case 1:
-						set_VM2_OFF();
-						break;
-					case 2:
-						set_VM3_OFF();
-						break;
-					case 3:
-						set_VM4_OFF();
-						break;
-					default:
-						break;
-					}
-				}
-			}
-		}
-	}
-
+	if (ku_n < 4)
+		set_VM_ON(ku_n);
+	else
+		set_VM_OFF(ku_n-4);
 }
+	
+
+
 
 void CBK_MainWindow::slot_vm_is_on(int n_vm)
 {
 	if (w_state.VM == -1)
 	{
 		w_state.VM = n_vm;
-		w_state.PO = VMS.VMPOState[n_vm - 1];
-		switch (VMS.VMPOState[n_vm - 1])
+		w_state.PO = VMS.VMPOState[n_vm];
+		switch (VMS.VMPOState[n_vm])
 		{
 		case(SPOBU):
 			run_PO(SPOBU);
@@ -719,79 +364,29 @@ void CBK_MainWindow::slot_vm_is_on(int n_vm)
 		
 		return;
 	}
-	if ((w_state.PO == VMS.VMPOState[n_vm - 1])&&(w_state.VM != n_vm))
+	if ((w_state.PO == VMS.VMPOState[n_vm])&&(w_state.VM != n_vm))
 	{
-		VMS.VMPOState[n_vm - 1] = VACANT;
-		switch (n_vm)
-		{
-		case 1:
-			VM1_Combo->setCurrentIndex(VACANT);
-			break;
-		case 2:
-			VM2_Combo->setCurrentIndex(VACANT);
-			break;
-		case 3:
-			VM3_Combo->setCurrentIndex(VACANT);
-			break;
-		case 4:
-			VM4_Combo->setCurrentIndex(VACANT);
-			break;
-		}
-		QMessageBox::information(0, QString("VM -%1 is ON").arg(n_vm), "PO is changed to VAVANT");
+		VMS.VMPOState[n_vm] = VACANT;
+		VM_Combos[n_vm]->setCurrentIndex(VACANT);
+		QMessageBox::information(0, QString("VM -%1 is ON").arg(n_vm), "PO is changed to VACANT");
 		return;
 	}
-	if (((w_state.PO == SPOBU) && (VMS.VMPOState[n_vm - 1] == TPO))&&(w_state.VM != n_vm))
+	if (((w_state.PO == SPOBU) && (VMS.VMPOState[n_vm] == TPO))&&(w_state.VM != n_vm))
 	{
-		switch (n_vm)
-		{
-		case 1:
-			VMS.VMPowerState[0] = OFF;
-			VM1_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			break;
-		case 2:
-			VMS.VMPowerState[1] = OFF;
-			VM2_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			break;
-		case 3:
-			VMS.VMPowerState[2] = OFF;
-			VM3_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			break;
-		case 4:
-			VMS.VMPowerState[3] = OFF;
-			VM4_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			break;
-		}
+		VMS.VMPowerState[n_vm] = OFF;
+		VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : grey; color : black; }");
 		return;
 	}
-	if (((w_state.PO == TPO) && (VMS.VMPOState[n_vm - 1] == SPOBU)) && (w_state.VM != n_vm))
+	if (((w_state.PO == TPO) && (VMS.VMPOState[n_vm] == SPOBU)) && (w_state.VM != n_vm))
 	{
-		switch (w_state.VM)
-		{
-		case 1:
-			VMS.VMPowerState[0] = OFF;
-			VM1_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			shutdown_PO(TPO);
-			break;
-		case 2:
-			VMS.VMPowerState[1] = OFF;
-			VM2_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			shutdown_PO(TPO);
-			break;
-		case 3:
-			VMS.VMPowerState[2] = OFF;
-			VM3_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			shutdown_PO(TPO);
-			break;
-		case 4:
-			VMS.VMPowerState[3] = OFF;
-			VM4_Label->setStyleSheet("QLabel { background-color : grey; color : black; }");
-			shutdown_PO(TPO);
-			break;
-		}
+		VMS.VMPowerState[w_state.VM] = OFF;
+		VM_Labels[w_state.VM]->setStyleSheet("QLabel { background-color : grey; color : black; }");
+		shutdown_PO(TPO);
 		w_state.VM = n_vm;
-		w_state.PO = VMS.VMPOState[n_vm - 1];
+		w_state.PO = VMS.VMPOState[n_vm];
 		run_PO(SPOBU);
 	}
+
 }
 
 void CBK_MainWindow::slot_vm_is_off(int n_vm)
@@ -801,25 +396,11 @@ void CBK_MainWindow::slot_vm_is_off(int n_vm)
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			if ((VMS.VMPowerState[i] == ON) && (i != (n_vm - 1)) && (VMS.VMPOState[i] == VACANT))
+			if ((VMS.VMPowerState[i] == ON) && (i != (n_vm)) && (VMS.VMPOState[i] == VACANT))
 			{
-				w_state.VM = i + 1;
+				w_state.VM = i;
 				w_state.PO = VMS.VMPOState[i];
-				switch (i)
-				{
-				case 0:
-					VM1_Combo->setCurrentIndex(w_state.PO);
-					break;
-				case 1:
-					VM2_Combo->setCurrentIndex(w_state.PO);
-					break;
-				case 2:
-					VM3_Combo->setCurrentIndex(w_state.PO);
-					break;
-				case 3:
-					VM4_Combo->setCurrentIndex(w_state.PO);
-					break;
-				}
+				VM_Combos[i]->setCurrentIndex(w_state.PO);
 				need_shutdown = FALSE;
 				break;
 			}
@@ -882,4 +463,28 @@ void CBK_MainWindow::show_time()
 	int tmp_time = 0;
 	tmp_time = STimeThread::Instance().getCurTime();
 	edit->append(QString("Current time: %1").arg(tmp_time));
+}
+
+
+void CBK_MainWindow::get_power(double _volt)
+{
+	if (_volt >= 23.0)
+	{
+		pitanie[0] = true;
+		set_tm_state();
+		for (int i = 0; i < 4; i++)
+		{
+			if (VMS.VMPOState[i] == TPO)
+				set_VM_ON(i);
+		}
+
+	}
+	else
+	{
+		pitanie[0] = false;
+		set_VM_OFF(0);
+		set_VM_OFF(1);
+		set_VM_OFF(2);
+		set_VM_OFF(3);
+	}
 }

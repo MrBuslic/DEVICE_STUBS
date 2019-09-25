@@ -18,8 +18,8 @@ public:
 private:
 	rpc_buffer_class()
 	{
-		QString commapp = QCoreApplication::applicationName();
-		if (commapp == "comapp1")
+		QString comapp = QCoreApplication::applicationName();
+		if (comapp == "comapp1")
 		{
 			num_add = 0;
 		}
@@ -27,7 +27,7 @@ private:
 		{
 			num_add = 5;
 		}
-
+		qDebug() << "comapp " << comapp << " num_add " << num_add;
 		for (int i = 0; i < 4; i++)
 		{
 			RPC_mfsk24_SLOT_Thread* slot_thr = new RPC_mfsk24_SLOT_Thread;

@@ -45,6 +45,10 @@ public slots:
 	//power_bus_setup
 	void USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
 	QString getXML();
+	
+	void mfsk_1_impulse(QVariantList channels);
+
+	void mds_1_get_sample(uint& buf, bool& flag);
 private:
 	RpcOmnibusWidget* omnibus_widget;
 	InterruptWidget* interrupt_widget;

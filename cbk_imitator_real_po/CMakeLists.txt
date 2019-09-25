@@ -50,8 +50,7 @@ include_directories("../../lib/mongo_ctrl")
 include_directories("../../lib/socket_rpc/include")
 include_directories("../OMNIBUSBOX")
 include_directories("../buses_imitator")
-include_directories("../UNMDS32")
-include_directories("../UNMFSK24")
+
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
@@ -106,18 +105,19 @@ SET(TPO_HEADERS ${PROJECT_SOURCE_DIR}/real_tpo/Source/MainUnit.h
 	${PROJECT_SOURCE_DIR}/real_tpo/Source/VecUnit.h
 )
   
-SET(CBK_HEADERS cbk_imitator.h VIP_imit.h)
-SET(CBK_SOURCES cbk_imitator.cpp main.cpp VIP_imit.cpp)
+SET(CBK_HEADERS cbk_imitator.h)
+SET(CBK_SOURCES cbk_imitator.cpp main.cpp)
 
-SET(OMNIBUSBOX_RESOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
-SET(INTERRUPT_RESOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
-SET(VIP_RESOURCES ${PROJECT_SOURCE_DIR}/../UNMDS32/mds32_rpc.h ${PROJECT_SOURCE_DIR}/../UNMFSK24/mfsk24_rpc.h ${PROJECT_SOURCE_DIR}/../UNMDS32/mds32_rpc.cpp ${PROJECT_SOURCE_DIR}/../UNMFSK24/mfsk24_rpc.cpp)
+SET(OMNIBUSBOX_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
+SET(INTERRUPT_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
+SET(VIP_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
+SET(MKU_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MONGO_HOME}/lib)
 
 set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(cbk_imitator_real_po ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${TPO_SOURCES} ${TPO_HEADERS} ${BOS_SOURCES} ${BOS_HEADERS} ${OMNIBUSBOX_RESOURCES} ${INTERRUPT_RESOURCES} ${VIP_RESOURCES} icon.rc)
+add_executable(cbk_imitator_real_po ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${TPO_SOURCES} ${TPO_HEADERS} ${BOS_SOURCES} ${BOS_HEADERS} ${OMNIBUSBOX_SOURCES} ${INTERRUPT_SOURCES} ${VIP_SOURCES} ${MKU_SOURCES} icon.rc)
 target_link_libraries (cbk_imitator_real_po ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc ) 
 
@@ -126,7 +126,10 @@ if(WIN32)
 endif()
 
 
-
+ADD_CUSTOM_COMMAND(TARGET cbk_imitator_real_po
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/cbk_imitator.h ${PROJECT_SOURCE_DIR} cbk
+)
 
 
 

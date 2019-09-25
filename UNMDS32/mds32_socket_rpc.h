@@ -27,7 +27,7 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void mds32_get_sample(int channel, uint& buf, int& flag);
+	void mds32_get_sample(uint& buf, bool& flag);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -94,8 +94,6 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant auto_scroll_clicked(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
 	QVariant unmds32_input_trigger(QVariantList& _values);
 	QVariant unmds32_read_sample(QVariantList& _values);
 	QVariant unmds32_start(QVariantList& _values);

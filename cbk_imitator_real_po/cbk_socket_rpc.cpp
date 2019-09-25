@@ -1,23 +1,23 @@
-	#include "mds32_socket_rpc.h"
+	#include "cbk_socket_rpc.h"
 
-int mds32_Socket_RPC_SLOT_Object::obj_num = 0;
-int mds32_Socket_RPC_SIGNAL_Object::obj_num = 0;
-int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
+int cbk_Socket_RPC_SLOT_Object::obj_num = 0;
+int cbk_Socket_RPC_SIGNAL_Object::obj_num = 0;
+int cbk_Socket_RPC_SIGNAL_Object::call_number = 0;
 
-	mds32_Socket_RPC_SIGNAL_Thread::mds32_Socket_RPC_SIGNAL_Thread() : QThread()
+	cbk_Socket_RPC_SIGNAL_Thread::cbk_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
-		setObjectName("mds32_Socket_RPC_SIGNAL_Thread");
+		setObjectName("cbk_Socket_RPC_SIGNAL_Thread");
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Thread::run()
+	void cbk_Socket_RPC_SIGNAL_Thread::run()
 	{
-		rpc_srv = new mds32_Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
+		rpc_srv = new cbk_Socket_RPC_SIGNAL_Server(conn_ip, conn_port);
 		rpc_srv->set_app(app);
-		SRPCSignalClass::Instance().toLog("mds32 signal thread started");
+		SRPCSignalClass::Instance().toLog("cbk signal thread started");
 		exec();
 	}
 
-	mds32_Socket_RPC_SIGNAL_Server::mds32_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
+	cbk_Socket_RPC_SIGNAL_Server::cbk_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port)
 	{
 		rpc_server = new QTcpServer;
 		connect(rpc_server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
@@ -26,61 +26,58 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Server::tcp_slot()
+	void cbk_Socket_RPC_SIGNAL_Server::tcp_slot()
 	{
-		SRPCSignalClass::Instance().toLog("mds32 signal client connected");
-		std::shared_ptr<mds32_Socket_RPC_SIGNAL_Object> tmp_obj(new mds32_Socket_RPC_SIGNAL_Object);
+		SRPCSignalClass::Instance().toLog("cbk signal client connected");
+		std::shared_ptr<cbk_Socket_RPC_SIGNAL_Object> tmp_obj(new cbk_Socket_RPC_SIGNAL_Object);
 		tmp_obj->set_app(app);
 		tmp_obj->set_socket(rpc_server->nextPendingConnection());
 		rpc_objects << tmp_obj;
 	}
 
-	mds32_Socket_RPC_SLOT_Server_Thread::mds32_Socket_RPC_SLOT_Server_Thread() : QThread()
+	cbk_Socket_RPC_SLOT_Server_Thread::cbk_Socket_RPC_SLOT_Server_Thread() : QThread()
 	{
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	mds32_Socket_RPC_SLOT_Server::mds32_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, RpcMDS32Widget* _app) : QTcpServer(), app(_app)
+	cbk_Socket_RPC_SLOT_Server::cbk_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, CBK_MainWindow* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
 	}
 
 
-	void mds32_Socket_RPC_SLOT_Server_Thread::run()
+	void cbk_Socket_RPC_SLOT_Server_Thread::run()
 	{
-		rpc_srv = new mds32_Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
-		SRPCSignalClass::Instance().toLog("mds32 slot thread started");
+		rpc_srv = new cbk_Socket_RPC_SLOT_Server(conn_ip, conn_port, app);
+		SRPCSignalClass::Instance().toLog("cbk slot thread started");
 		exec();
 	}
 
-	void mds32_Socket_RPC_SLOT_Thread::run()
+	void cbk_Socket_RPC_SLOT_Thread::run()
 	{
-		rpc_obj = std::shared_ptr<mds32_Socket_RPC_SLOT_Object>(new mds32_Socket_RPC_SLOT_Object(app, socketDescriptor));
+		rpc_obj = std::shared_ptr<cbk_Socket_RPC_SLOT_Object>(new cbk_Socket_RPC_SLOT_Object(app, socketDescriptor));
 		exec();
 	}
 
-	mds32_Socket_RPC_SLOT_Thread::mds32_Socket_RPC_SLOT_Thread(RpcMDS32Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	cbk_Socket_RPC_SLOT_Thread::cbk_Socket_RPC_SLOT_Thread(CBK_MainWindow* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
-	void mds32_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
+	void cbk_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
-		SRPCSignalClass::Instance().toLog("mds32 slot client connected");
-		std::shared_ptr<mds32_Socket_RPC_SLOT_Thread> tmp_obj(new mds32_Socket_RPC_SLOT_Thread(app, socketDescriptor));
+		SRPCSignalClass::Instance().toLog("cbk slot client connected");
+		std::shared_ptr<cbk_Socket_RPC_SLOT_Thread> tmp_obj(new cbk_Socket_RPC_SLOT_Thread(app, socketDescriptor));
 		tmp_obj->start();
 		rpc_objects << tmp_obj;
 	}
 
-	mds32_Socket_RPC_SLOT_Object::mds32_Socket_RPC_SLOT_Object(RpcMDS32Widget* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	cbk_Socket_RPC_SLOT_Object::cbk_Socket_RPC_SLOT_Object(CBK_MainWindow* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
-	setObjectName(QString("mds32_SLOT_Object_%1").arg(obj_num++));
-		operators_map["QuerySlots()"] = &mds32_Socket_RPC_SLOT_Object::QuerySlots;
+	setObjectName(QString("cbk_SLOT_Object_%1").arg(obj_num++));
+		operators_map["QuerySlots()"] = &cbk_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["unmds32_input_trigger(bool)"] = &mds32_Socket_RPC_SLOT_Object::unmds32_input_trigger;
-		operators_map["unmds32_read_sample(uint&, uint&, uint&)"] = &mds32_Socket_RPC_SLOT_Object::unmds32_read_sample;
-		operators_map["unmds32_start()"] = &mds32_Socket_RPC_SLOT_Object::unmds32_start;
-		operators_map["check_box_clicked()"] = &mds32_Socket_RPC_SLOT_Object::check_box_clicked;
-		operators_map["line_edit_changed(QString&)"] = &mds32_Socket_RPC_SLOT_Object::line_edit_changed;
+		operators_map["set_tm_state()"] = &cbk_Socket_RPC_SLOT_Object::set_tm_state;
+		operators_map["new_ku(int, int, double, int)"] = &cbk_Socket_RPC_SLOT_Object::new_ku;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -89,46 +86,52 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	mds32_Socket_RPC_SIGNAL_Object::mds32_Socket_RPC_SIGNAL_Object() : QObject()
+	cbk_Socket_RPC_SIGNAL_Object::cbk_Socket_RPC_SIGNAL_Object() : QObject()
 	{
-		setObjectName(QString("mds32_SIGNAL_Object_%1").arg(obj_num++));
+		setObjectName(QString("cbk_SIGNAL_Object_%1").arg(obj_num++));
 		connect(this, SIGNAL(send_signal(QByteArray*)), this, SLOT(send_signal_slot(QByteArray*)), Qt::BlockingQueuedConnection);
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
+	void cbk_Socket_RPC_SIGNAL_Object::send_signal_func(QByteArray* _arr)
 	{
 		QMutexLocker locker(&signal_mutex);
 		emit send_signal(_arr);
 	}
 
-	void mds32_Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
+	void cbk_Socket_RPC_SLOT_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SLOT SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
+	void cbk_Socket_RPC_SIGNAL_Object::set_socket(QTcpSocket* _rpc_socket)
 	{
 		rpc_socket = _rpc_socket;
 		connect(rpc_socket, SIGNAL(readyRead()), this, SLOT(read_data()));
 		connect(rpc_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(sock_error(QAbstractSocket::SocketError)));
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
+	void cbk_Socket_RPC_SIGNAL_Object::sock_error(QAbstractSocket::SocketError _err)
 	{
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds32_get_sample(uint&, bool&)));
+		disconnect(app, SIGNAL(vm_is_on(int)), this, SLOT(vm_is_on(int)));
+		disconnect(app, SIGNAL(vm_is_off(int)), this, SLOT(vm_is_off(int)));
+		disconnect(app, SIGNAL(vm_change_po(int)), this, SLOT(vm_change_po(int)));
 	}
-	void mds32_Socket_RPC_SIGNAL_Object::set_app(RpcMDS32Widget* _app)
+	void cbk_Socket_RPC_SIGNAL_Object::set_app(CBK_MainWindow* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds32_get_sample(uint&, bool&)), Qt::DirectConnection);
-		data_map.insert("mds32_get_sample(uint&, bool&)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(vm_is_on(int)), this, SLOT(vm_is_on(int)), Qt::DirectConnection);
+		data_map.insert("vm_is_on(int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(vm_is_off(int)), this, SLOT(vm_is_off(int)), Qt::DirectConnection);
+		data_map.insert("vm_is_off(int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(vm_change_po(int)), this, SLOT(vm_change_po(int)), Qt::DirectConnection);
+		data_map.insert("vm_change_po(int)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
-	void mds32_Socket_RPC_SLOT_Object::read_data()
+	void cbk_Socket_RPC_SLOT_Object::read_data()
 	{
 		//LARGE_INTEGER _freq;
 		//LARGE_INTEGER tmp1;
@@ -192,13 +195,13 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString(" %1 %2 call_n %3 response sent %4 %5 %6").arg(objectName()).arg(op_name).arg(call_n).arg(tmp_arr2.size()).arg(tmp_arr3.size()).arg(tmp_arr3.data())); 
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
+	void cbk_Socket_RPC_SIGNAL_Object::send_signal_slot(QByteArray* _arr)
 	{
 		rpc_socket->write(*_arr);
 		rpc_socket->waitForBytesWritten(3000);
 	}
 
-	void mds32_Socket_RPC_SIGNAL_Object::read_data()
+	void cbk_Socket_RPC_SIGNAL_Object::read_data()
 	{
 		int tmp_size;
 		while (rpc_socket->bytesAvailable())
@@ -254,36 +257,78 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void mds32_Socket_RPC_SIGNAL_Object::mds32_get_sample(uint& buf, bool& flag)
+	void cbk_Socket_RPC_SIGNAL_Object::vm_is_on(int n_vm)
 	{
-		auto& descriptor = *data_map["mds32_get_sample(uint&, bool&)"].get();
+		auto& descriptor = *data_map["vm_is_on(int)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("mds32_get_sample(uint&, bool&)");
+		tmp_stream << QString("vm_is_on(int)");
 		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mds32_get_sample  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << buf;
-		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 buf =  %1").arg(RPCSignalClass::QVariantToString(buf)).arg(call_number));
-		tmp_stream << flag;
-		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 flag =  %1").arg(RPCSignalClass::QVariantToString(flag)).arg(call_number));
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal vm_is_on  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << n_vm;
+		SRPCSignalClass::Instance().toLog(QString("vm_is_on  call_number %2 n_vm =  %1").arg(RPCSignalClass::QVariantToString(n_vm)).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
 		tmp_arr2 += tmp_arr;
 		descriptor.mutex.lock();
 		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mds32_get_sample sended").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal vm_is_on sended").arg(objectName()));
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
-		buf = data_map["mds32_get_sample(uint&, bool&)"]->signal_data.at(0).toUInt();
-		flag = data_map["mds32_get_sample(uint&, bool&)"]->signal_data.at(1).toBool();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mds32_get_sample finished").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal vm_is_on finished").arg(objectName()));
+	}
+	void cbk_Socket_RPC_SIGNAL_Object::vm_is_off(int n_vm)
+	{
+		auto& descriptor = *data_map["vm_is_off(int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("vm_is_off(int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal vm_is_off  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << n_vm;
+		SRPCSignalClass::Instance().toLog(QString("vm_is_off  call_number %2 n_vm =  %1").arg(RPCSignalClass::QVariantToString(n_vm)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal vm_is_off sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal vm_is_off finished").arg(objectName()));
+	}
+	void cbk_Socket_RPC_SIGNAL_Object::vm_change_po(int n_vm)
+	{
+		auto& descriptor = *data_map["vm_change_po(int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("vm_change_po(int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal vm_change_po  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << n_vm;
+		SRPCSignalClass::Instance().toLog(QString("vm_change_po  call_number %2 n_vm =  %1").arg(RPCSignalClass::QVariantToString(n_vm)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal vm_change_po sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal vm_change_po finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	QVariant mds32_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
+	QVariant cbk_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
 	{
 		QString tmp_string;
 		int _count = operators_map.keys().count();
@@ -293,75 +338,11 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant mds32_Socket_RPC_SLOT_Object::unmds32_input_trigger(QVariantList& _values)
+	QVariant cbk_Socket_RPC_SLOT_Object::set_tm_state(QVariantList& _values)
 	{
 		try
 		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			bool state = _values.at(0).value<bool>();
-			int res = app->unmds32_input_trigger(state);
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant mds32_Socket_RPC_SLOT_Object::unmds32_read_sample(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			uint _buf = _values.at(0).value<uint>();
-			uint _firstTime = _values.at(1).value<uint>();
-			uint _lasteTime = _values.at(2).value<uint>();
-			int res = app->unmds32_read_sample(_buf, _firstTime, _lasteTime);
-			_values[0] = _buf;
-			SRPCSignalClass::Instance().toLog(QString("%1 _buf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
-			_values[1] = _firstTime;
-			SRPCSignalClass::Instance().toLog(QString("%1 _firstTime = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
-			_values[2] = _lasteTime;
-			SRPCSignalClass::Instance().toLog(QString("%1 _lasteTime = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[2])));
-			with_return = true;
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant mds32_Socket_RPC_SLOT_Object::unmds32_start(QVariantList& _values)
-	{
-		try
-		{
-			int res = app->unmds32_start();
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant mds32_Socket_RPC_SLOT_Object::check_box_clicked(QVariantList& _values)
-	{
-		try
-		{
-			app->check_box_clicked();
+			app->set_tm_state();
 			return 0;
 		}
 		catch(const std::exception &)
@@ -373,16 +354,16 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
-	QVariant mds32_Socket_RPC_SLOT_Object::line_edit_changed(QVariantList& _values)
+	QVariant cbk_Socket_RPC_SLOT_Object::new_ku(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QString _text = _values.at(0).value<QString>();
-			app->line_edit_changed(_text);
-			_values[0] = _text;
-			SRPCSignalClass::Instance().toLog(QString("%1 _text = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
-			with_return = true;
+			int ku_n = _values.at(0).value<int>();
+			int length = _values.at(1).value<int>();
+			double u = _values.at(2).value<double>();
+			int line = _values.at(3).value<int>();
+			app->new_ku(ku_n, length, u, line);
 			return 0;
 		}
 		catch(const std::exception &)
