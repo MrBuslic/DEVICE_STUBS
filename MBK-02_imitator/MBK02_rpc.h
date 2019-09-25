@@ -17,6 +17,7 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void update_tm(int sadr);
 	void get_power(double volt);
+	void update_graphics();
 	////////////////////////////////////
 };
 
@@ -53,6 +54,7 @@ signals:
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
 	void set_new_power_tm(int sadr, QVariantList words);
+	void emit_update_graphics();
 };
 
 class RPC_MBK02_SIGNAL_Thread : public RPC_SIGNAL_Thread

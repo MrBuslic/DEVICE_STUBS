@@ -31,7 +31,7 @@ void RPC_mds32_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_mds32_SIGNAL_Object::mds32_get_sample)) {
 		SRPCSignalClass::Instance().toLog("mds32_get_sample connected");
-		emit connect_signal("mds32_get_sample(int, uint&, int&)", true);
+		emit connect_signal("mds32_get_sample(uint&, bool&)", true);
 	}
 }
 
@@ -39,7 +39,7 @@ void RPC_mds32_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_mds32_SIGNAL_Object::mds32_get_sample)) {
 		SRPCSignalClass::Instance().toLog("mds32_get_sample disconnected");
-		//emit connect_signal("mds32_get_sample(int, uint&, int&)", false);
+		//emit connect_signal("mds32_get_sample(uint&, bool&)", false);
 	}
 }
 
@@ -76,23 +76,19 @@ void RPC_mds32_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("mds32 new signal " + op_name);
 
-			if (op_name == "mds32_get_sample(int, uint&, int&)")
+			if (op_name == "mds32_get_sample(uint&, bool&)")
 			{
-				int channel;
-				tmp_stream >> channel;
-				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" call_number "+ QString::number(call_number) + " channel = "+RPCSignalClass::QVariantToString(channel));
 				uint buf;
 				tmp_stream >> buf;
 				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" call_number "+ QString::number(call_number) + " buf = "+RPCSignalClass::QVariantToString(buf));
-				int flag;
+				bool flag;
 				tmp_stream >> flag;
 				SRPCSignalClass::Instance().toLog("mds32 " + op_name +" call_number "+ QString::number(call_number) + " flag = "+RPCSignalClass::QVariantToString(flag));
-				emit mds32_get_sample(channel, buf, flag);
+				emit mds32_get_sample(buf, flag);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
 				QVariantList return_list;
-				return_list << QVariant(channel);
 				return_list << QVariant(buf);
 				return_list << QVariant(flag);
 				tmp_stream2 << return_list;
@@ -111,21 +107,6 @@ void RPC_mds32_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_mds32_SLOT_Object::auto_scroll_clicked(int _state)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("auto_scroll_clicked(int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished auto_scroll_clicked");
-}
-void RPC_mds32_SLOT_Object::log_timer_ontimer()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("mds32 dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("log_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("mds32 dynamic_call finished log_timer_ontimer");
-}
 int RPC_mds32_SLOT_Object::unmds32_input_trigger(bool state)
 {
 	if(!connected) return 1;

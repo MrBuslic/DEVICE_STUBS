@@ -83,6 +83,7 @@ int MBK02_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["auto_scroll_clicked(int)"] = &MBK02_Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["update_tm(int)"] = &MBK02_Socket_RPC_SLOT_Object::update_tm;
 		operators_map["get_power(double)"] = &MBK02_Socket_RPC_SLOT_Object::get_power;
+		operators_map["update_graphics()"] = &MBK02_Socket_RPC_SLOT_Object::update_graphics;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -123,6 +124,7 @@ int MBK02_Socket_RPC_SIGNAL_Object::call_number = 0;
 		disconnect(app, SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(msg_to_14R732(QVariantList)));
 		disconnect(app, SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_tm(int, int)));
 		disconnect(app, SIGNAL(set_new_power_tm(int, QVariantList)), this, SLOT(set_new_power_tm(int, QVariantList)));
+		disconnect(app, SIGNAL(emit_update_graphics()), this, SLOT(emit_update_graphics()));
 	}
 	void MBK02_Socket_RPC_SIGNAL_Object::set_app(MBK02_widg* _app)
 	{
@@ -133,6 +135,8 @@ int MBK02_Socket_RPC_SIGNAL_Object::call_number = 0;
 		data_map.insert("set_new_tm(int, int)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(set_new_power_tm(int, QVariantList)), this, SLOT(set_new_power_tm(int, QVariantList)), Qt::DirectConnection);
 		data_map.insert("set_new_power_tm(int, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(emit_update_graphics()), this, SLOT(emit_update_graphics()), Qt::DirectConnection);
+		data_map.insert("emit_update_graphics()", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -335,6 +339,27 @@ int MBK02_Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal set_new_power_tm finished").arg(objectName()));
 	}
+	void MBK02_Socket_RPC_SIGNAL_Object::emit_update_graphics()
+	{
+		auto& descriptor = *data_map["emit_update_graphics()"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("emit_update_graphics()");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal emit_update_graphics  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal emit_update_graphics sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal emit_update_graphics finished").arg(objectName()));
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant MBK02_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -468,6 +493,22 @@ int MBK02_Socket_RPC_SIGNAL_Object::call_number = 0;
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			double volt = _values.at(0).value<double>();
 			app->get_power(volt);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant MBK02_Socket_RPC_SLOT_Object::update_graphics(QVariantList& _values)
+	{
+		try
+		{
+			app->update_graphics();
 			return 0;
 		}
 		catch(const std::exception &)

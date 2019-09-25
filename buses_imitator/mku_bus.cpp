@@ -53,6 +53,12 @@ void MKUWidget::make_ku_732(int ku_n, int length, double u, int line)
 	emit new_ku_732(ku_n, length, u, line);
 }
 
+void MKUWidget::make_ku_cbk(int ku_n, int length, double u, int line)
+{
+	log_widget->log_append(QString("КУ ЦБК %1").arg(ku_n));
+	emit new_ku_cbk(ku_n, length, u, line);
+}
+
 void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	line_m &= mshm_map_channels[mshm];
@@ -80,4 +86,25 @@ int MKUWidget::pshm_map_channels_setup(int pshm, int line_p)
 	pshm_map_channels[pshm] = line_p;
 	log_widget->log_append(QString("На шине ПШМ присваиваю каналу %1 значение %2").arg(pshm).arg(line_p));
 	return 0;
+}
+
+void MKUWidget::get_tm(QString tm_name, QVariant& tm_val)
+{
+	QMap<QString, QVariant>::iterator tm_itr = tm_map.find(tm_name);
+	if (tm_itr == tm_map.end())
+	{
+		tm_val = QVariant();
+		log_widget->log_append(QString("Попытка считывания отсутствующего синала %1.").arg(tm_name));
+	}
+	else
+	{
+		tm_val = *tm_itr;
+		log_widget->log_append(QString("Считан сигнал %1. Значение: %2").arg(tm_name).arg(RPCSignalClass::QVariantToString(tm_val)));
+	}
+}
+
+void MKUWidget::set_tm(QString tm_name, QVariant tm_val)
+{
+	tm_map[tm_name] = tm_val;
+	log_widget->log_append(QString("Присваиваю сигналу %1 значение %2").arg(tm_name).arg(RPCSignalClass::QVariantToString(tm_val)));
 }

@@ -150,7 +150,7 @@ QVariantList RpcMFSK24Widget::map_convert()
 	QVariantList tmp_list;
 	for (QMap<int, int>::iterator itr = impulses.begin(); itr != impulses.end(); ++itr)
 	{
-		tmp_list << itr.key()+1;
+		tmp_list << itr.key();
 		tmp_list << itr.value();
 	}
 	return tmp_list;
@@ -164,11 +164,11 @@ int RpcMFSK24Widget::unmfsk24_start(QVariantList _state)
 	
 
 	
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i <= 24; i++)
 	{
 		if (impulses.contains(i))
 		{
-			_msg += QString("\tканал: %1 время: %2").arg(i + 1).arg(impulses[i]);
+			_msg += QString("\tканал: %1 время: %2").arg(i).arg(impulses[i]);
 			
 		}
 			
