@@ -18,6 +18,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	frame_widget = new FrameBusWidget(this);
 	power_widget = new PowerWidget(this);
 	ols_widget = new RpcOlsWidget(this, 0);
+	QThread::currentThread()->sleep(2);
 	kprd_widget = new KPRD_imitator(this);
 	foi_widget = new RpcFoiWidget(this);
 	QLabel* omnibus_label = new QLabel("OMNIBUS");
@@ -69,12 +70,11 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 1");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mn8i");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/RM_MBK07_imitator");
-	QThread::currentThread()->sleep(2);
+	QThread::currentThread()->sleep(3);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");
-	QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen.exe");
-	QProcess::startDetached(QApplication::applicationDirPath() + "/KPRD_imitator");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
-	QThread::currentThread()->sleep(1);
+	QThread::currentThread()->sleep(2);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/MBK-02_imitator");
 	QThread::currentThread()->sleep(2);

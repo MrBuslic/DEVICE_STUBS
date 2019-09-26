@@ -10,8 +10,6 @@ public:
 	RPC_kp50_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("kp50_slot_obj");}
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	void set_u_in(double _u);
 	int unkp50_switch_channel(int n, bool on);
 	bool unkp50_channel_state_Q(int n);

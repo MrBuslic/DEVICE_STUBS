@@ -18,6 +18,8 @@
 
 #include "../buses_imitator/power_bus_rpc.h"
 
+#include "rpc_loger.h"
+
 enum KP50_CHANNELS
 {
 	KPALL_CHANNELS,
@@ -35,10 +37,6 @@ class RpcKP50Widget : public QWidget
 public:
 	RpcKP50Widget();
 public slots:
-
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
-
 	void set_u_in(double _u);
 
 	int unkp50_switch_channel(int n, bool on);
@@ -48,19 +46,9 @@ public slots:
 	double unkp50_meas_Uin(int n);
 	double unkp50_meas_Uout(int n);
 private:
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
-	QStringList log_buffer;
-	QMutex log_mutex;
+	LogWidget* log_widget;
 
 	void switch_channel(int n, bool on);
-	void log_msg(const QString& msg);
 	double u_in;
 	QMap<int, bool> chans_states;
 	QMap<int, QString> chan_names;
