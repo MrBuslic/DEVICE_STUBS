@@ -12,21 +12,11 @@
 #include "is4_socket_rpc.h"
 #include "rpc_ports.h"
 
-RpcIS4Widget::RpcIS4Widget(int is4_num) : QWidget(), auto_scroll(true), is4_line(false)
+RpcIS4Widget::RpcIS4Widget(int is4_num) : QWidget(), is4_line(false)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	edit = new QTextEdit(this);
-	_scroll_bar = edit->verticalScrollBar();
-	_doc = new QTextDocument();
-	_cursor = new QTextCursor(_doc);
-	edit->setDocument(_doc);
-	edit->setReadOnly(true);
-	_doc->setMaximumBlockCount(1000);
-	setMinimumSize(490, 300);
-	auto_scroll_box = new QCheckBox(this);
-	auto_scroll_box->setText("Автопрокрутка");
-	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcIS4Widget::auto_scroll_clicked);
+	log_widget = new LogWidget(this, "is4");
+
 	
 	QHBoxLayout* hb_layout = new QHBoxLayout();
 	edit_number = new QLineEdit();
@@ -38,16 +28,8 @@ RpcIS4Widget::RpcIS4Widget(int is4_num) : QWidget(), auto_scroll(true), is4_line
 	connect(n_box, &QCheckBox::stateChanged, this, &RpcIS4Widget::is4_clicked);
 
 	v_lay->addLayout(hb_layout);
-	v_lay->addWidget(edit);
-	v_lay->addWidget(auto_scroll_box);
+	v_lay->addWidget(log_widget);
 
-	 log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
-	QDir dir("d:/logs");
-	if (!dir.exists())
-		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcIS4Widget::log_timer_ontimer);
-	log_timer.start(200);
- 
 /*	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
 	mku_slot_thr.start(); // вот тут падает
 
@@ -94,17 +76,10 @@ int  RpcIS4Widget::unis4_RangeMeas(uint range)
 int RpcIS4Widget::unis4_ResultMeas(double& ResMeas, uint& NumRes)
 {
 	QString _msg = QString("%1 Запрос данных").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
 	ResMeas = res_meas;
 	NumRes = 1;
 
-	_cursor->insertText(_msg + "\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
-
+	log_widget->log_append(_msg);
 	return 0;
 }
 
@@ -143,12 +118,8 @@ int RpcIS4Widget::unis4_StartACP()
 		if (_process == 1)//IS4_MeasVoltDC
 			_msg = QString("%1 Запускаю процесс измерения напряжения постоянного тока").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
 		//два диапазона 1=10В и 2=100В 
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
 
-		_cursor->insertText(_msg + "\n");
-		if (auto_scroll)
-			_scroll_bar->setValue(_scroll_bar->maximum());
+		log_widget->log_append(_msg);
 		return 0;
 	}
 
@@ -157,30 +128,6 @@ int RpcIS4Widget::unis4_StartACP()
 void RpcIS4Widget::is4_clicked(int state_is4)
 {
 	is4_line = (state_is4 != 0);
-}
-
-void RpcIS4Widget::auto_scroll_clicked(int _state)
-{
-	auto_scroll = (_state != 0);
-}
-
-
-void RpcIS4Widget::log_timer_ontimer()
-{
-	QStringList tmp_buffer;
-	{
-		QMutexLocker lock(&log_mutex);
-		tmp_buffer = log_buffer;
-		log_buffer.clear();
-	}
-	if (tmp_buffer.isEmpty())
-		return;
-	QFile log_file(log_filename);
-	QTextStream log_stream(&log_file);
-	log_file.open(QIODevice::Append);
-	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
-		log_stream << *itr << "\n";
-	log_file.close();
 }
 
 

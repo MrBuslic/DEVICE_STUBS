@@ -27,6 +27,7 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
+	void is4_measure(uint NProcess, QVariant& value);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -93,10 +94,7 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
-	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant is4_clicked(QVariantList& _values);
-	QVariant measure(QVariantList& _values);
 	QVariant unis4_SetTypeProcess(QVariantList& _values);
 	QVariant unis4_StartACP(QVariantList& _values);
 	QVariant unis4_ResultMeas(QVariantList& _values);
