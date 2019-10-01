@@ -252,12 +252,11 @@ ViStatus _VI_FUNC unis4_StopProcess (ViSession vi){ return 0; }
 //	Функция запроса данных измерения
 ViStatus _VI_FUNC unis4_ResultMeas (ViSession vi, ViReal64 ResultMeas[], ViPInt32 NumbResult)
 { 
-	QVariantList resmeas;
+	double resmeas;
 	uint numres;
  	Srpc_buffer_class::Instance().is4_slot_thr[vi - 1]->get_is4_obj()->unis4_ResultMeas(resmeas, numres);
 	*NumbResult = numres;
-	for (int i= 0; i < numres; i++)
-		ResultMeas[i] = resmeas[i].toDouble();
+	*ResultMeas = resmeas;
 	return 0; 
 }
 //	Функция запроса частоты напряжения переменного тока

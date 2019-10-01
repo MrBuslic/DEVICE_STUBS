@@ -39,7 +39,9 @@ add_library(unis4 SHARED ${UNIS4_HEADERS} ${UNIS4_SOURCES} export.def)
 
 target_link_libraries(unis4 socket_rpc)
 
-set(RPC_IS4_SOURCES rpc_is4.h rpc_is4.cpp is4_main.cpp is4_socket_rpc.h is4_socket_rpc.cpp)
+set(RPC_IS4_SOURCES rpc_is4.h rpc_is4.cpp 
+../buses_imitator/mku_bus_rpc.h ../buses_imitator/mku_bus_rpc.cpp
+is4_main.cpp is4_socket_rpc.h is4_socket_rpc.cpp)
 
 add_executable(rpc_is4 WIN32 ${RPC_IS4_SOURCES})
 set_target_properties(rpc_is4 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
