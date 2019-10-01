@@ -1,0 +1,67 @@
+#ifndef RPC_IS4_H
+#define RPC_IS4_H
+#ifdef WIN32
+#include "winsock2.h"
+#endif
+#include <QObject>
+#include <QString>
+#include <QWidget>
+#include <QThread>
+#include <QTextEdit>
+#include <QPushButton>
+#include <QScrollBar>
+#include <QCheckBox>
+#include <QTimer>
+#include <QMutex>
+#include <QLineEdit>
+#include <QTime>
+#include <memory>
+#include <qlayout.h>
+#include <loki/Singleton.h>
+#include "../buses_imitator/mku_bus_rpc.h"
+
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+
+class RpcIS4Widget : public QWidget
+{
+	Q_OBJECT
+public:
+	RpcIS4Widget(int is4_num);
+public slots:
+	void log_timer_ontimer();
+	void auto_scroll_clicked(int _state);
+	void is4_clicked(int state_is4);
+
+	int unis4_SetTypeProcess(uint EProcess);
+	int unis4_StartACP();
+	int unis4_ResultMeas(double& ResMeas, uint& NumRes);
+	int unis4_RangeMeas(uint range);
+	int unis4_StartCalibr();
+
+private:
+	QTextEdit* edit;
+	QLineEdit* edit_number;
+	QScrollBar* _scroll_bar;
+	QTextDocument* _doc;
+	QTextCursor* _cursor;
+	QCheckBox* auto_scroll_box;
+	QCheckBox* n_box;
+	bool auto_scroll;
+	QString log_filename;
+	QTimer log_timer;
+	int _process;
+	double res_meas;
+	int _range;
+	bool is4_line;
+
+	QStringList log_buffer;
+	QMutex log_mutex;
+
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
+signals:
+	void is4_measure(uint NProcess, QVariant& value);
+
+};
+
+#endif
