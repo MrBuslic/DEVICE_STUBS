@@ -29,10 +29,18 @@ void RPC_is4_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
 
 void RPC_is4_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_is4_SIGNAL_Object::is4_measure)) {
+		SRPCSignalClass::Instance().toLog("is4_measure connected");
+		emit connect_signal("is4_measure(uint, QVariant&)", true);
+	}
 }
 
 void RPC_is4_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_is4_SIGNAL_Object::is4_measure)) {
+		SRPCSignalClass::Instance().toLog("is4_measure disconnected");
+		//emit connect_signal("is4_measure(uint, QVariant&)", false);
+	}
 }
 
 void RPC_is4_SIGNAL_Object::read_data()
@@ -68,6 +76,29 @@ void RPC_is4_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("is4 new signal " + op_name);
 
+			if (op_name == "is4_measure(uint, QVariant&)")
+			{
+				uint NProcess;
+				tmp_stream >> NProcess;
+				SRPCSignalClass::Instance().toLog("is4 " + op_name +" call_number "+ QString::number(call_number) + " NProcess = "+RPCSignalClass::QVariantToString(NProcess));
+				QVariant value;
+				tmp_stream >> value;
+				SRPCSignalClass::Instance().toLog("is4 " + op_name +" call_number "+ QString::number(call_number) + " value = "+RPCSignalClass::QVariantToString(value));
+				emit is4_measure(NProcess, value);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QVariantList return_list;
+				return_list << QVariant(NProcess);
+				return_list << QVariant(value);
+				tmp_stream2 << return_list;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("is4 signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 		}
 	}
 }
@@ -76,21 +107,6 @@ void RPC_is4_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_is4_SLOT_Object::log_timer_ontimer()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("is4 dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("log_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("is4 dynamic_call finished log_timer_ontimer");
-}
-void RPC_is4_SLOT_Object::auto_scroll_clicked(int _state)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog(QString("is4 dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("auto_scroll_clicked(int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("is4 dynamic_call finished auto_scroll_clicked");
-}
 void RPC_is4_SLOT_Object::is4_clicked(int state_is4)
 {
 	QVariantList tmp_list;
@@ -98,18 +114,6 @@ void RPC_is4_SLOT_Object::is4_clicked(int state_is4)
 	SRPCSignalClass::Instance().toLog(QString("is4 dynamic_call is4_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("is4_clicked(int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("is4 dynamic_call finished is4_clicked");
-}
-void RPC_is4_SLOT_Object::measure(uint NProcess, QVariant& value)
-{
-	QVariantList tmp_list;
-	QString tmp_ret_params;
-	tmp_list << QVariant(NProcess);
-	tmp_list << QVariant(value);
-	SRPCSignalClass::Instance().toLog(QString("is4 dynamic_call measure %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("measure(uint, QVariant&)", tmp_list);
-	value = tmp_list.at(1);
-	tmp_ret_params += " value="+RPCSignalClass::QVariantToString(tmp_list.at(1));
-	SRPCSignalClass::Instance().toLog(QString("is4 dynamic_call finished measure %1").arg(tmp_ret_params));
 }
 int RPC_is4_SLOT_Object::unis4_SetTypeProcess(uint EProcess)
 {

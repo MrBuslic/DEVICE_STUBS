@@ -10,10 +10,7 @@ public:
 	RPC_is4_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("is4_slot_obj");}
 	////////////////////////////////////
 public slots:
-	void log_timer_ontimer();
-	void auto_scroll_clicked(int _state);
 	void is4_clicked(int state_is4);
-	void measure(uint NProcess, QVariant& value);
 	int unis4_SetTypeProcess(uint EProcess);
 	int unis4_StartACP();
 	int unis4_ResultMeas(double& ResMeas, uint& NumRes);
@@ -52,6 +49,7 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void connect_signal(QString signal_name, bool _connect);
+	void is4_measure(uint NProcess, QVariant& value);
 };
 
 class RPC_is4_SIGNAL_Thread : public RPC_SIGNAL_Thread
