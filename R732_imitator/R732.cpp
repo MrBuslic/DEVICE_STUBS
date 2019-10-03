@@ -2,6 +2,7 @@
 #include "r732_socket_rpc.h"
 #include <QMessageBox>
 #include "rpc_ports.h"
+#include "tor_bk_t_new.cpp"
 
 union MKOWord
 {
@@ -15,7 +16,7 @@ union MKOWord
 	};
 };
 
-R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bus(3), power(0), volt(0), power_on(false), name("14Р732"), ready_to_work_hard(false)
+R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bus(3), power(0), volt(0), power_on(false), name("14Р732"), ready_to_work_hard(false), kpi_counter(0)
 {
 	vchm_chanels_init << 0 << 0 << 0 << 0;
 	mpvn_modules << R732_MV_MODULE(5, 0);
@@ -133,6 +134,17 @@ R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bu
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
 	}
 
+	interrupt_slot_thr.set_connection_params("127.0.0.1", INTERRUPTS_SLOT);
+	interrupt_slot_thr.start();
+
+	interrupt_signal_thr.set_connection_params("127.0.0.1", INTERRUPTS_SIGNAL);
+	interrupt_signal_thr.start();
+
+	if (!interrupt_slot_thr.wait_connected(3) || !interrupt_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с interrupt_bus");
+	}
+
 	QString ip_str = "127.0.0.1";
 	int slot_port = R732_SLOT;
 	int signal_port = R732_SIGNAL;
@@ -243,7 +255,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 							vchm_chanels_init << ((chanels & 0x4) >> 2);
 							vchm_chanels_init << ((chanels & 0x8) >> 3);
 							vchm_module.set_working_chanels(vchm_chanels_init, false);
-							if (vchm_chanels_init.contains(1))
+							if (vchm_chanels_init.contains(1) && !vchm_on_timer.isActive())
 							{
 								vchm_on_timer.start(90000);
 								vchm_is_init = true;
@@ -299,45 +311,19 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				new_data_mv();
 
 		}
-		//		if (tmp_cwd.subadr == 28) //MK
-		//		{
-		//			int max_p;
-		//			max_p = 0;
-		//			int num_vertic;
-		//			//QVariantList pshm_list;
-		//
-		//			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-		//			{
-		//				int pshm = (itr->toInt()) >> 12;
-		//				if (pshm >= 12)
-		//				{
-		//					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
-		//					break;
-		//				}
-		//				R732_MV_MODULE& param_pshm = mvmk_modules[pshm / 4].get_settings();
-		//				for (int mshm = 0; mshm <= 11; mshm++)
-		//				{
-		//					num_vertic = (itr->toInt()&(1 << mshm));
-		//					if (num_vertic != 0)
-		//					{
-		//						if (max_p <= 4)
-		//						{
-		//							R732_MV_MODULE& param_mshm = mvmk_modules[mshm / 4].get_settings();
-		//							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
-		//							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
-		//							emit new_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom - param_mshm.dt_kom), 3, 3);
-		//							max_p++;
-		//						}
-		//						else
-		//						{
-		//							QMessageBox::critical(0, "Больше 4", "Ошибка СД");
-		//							break;
-		//						}
-		//					}
-		//				}
-		//			}
-		//			new_data_mv(tmp_cwd.subadr);
-		//		}
+
+		if (tmp_cwd.subadr == 21)
+		{
+			if (words.size() >= 2)
+			{
+				for (int i = 0; i < 2; ++i)
+				{
+					SCHBK[i] = words.at(i).toInt();
+				}
+				makeFuckingMagic();
+			}
+		}
+
 		if (tmp_cwd.subadr == 29) //KU
 		{
 			int ku;
@@ -359,14 +345,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			}
 			new_data_mv();
 		}
-		//		if (tmp_cwd.subadr == 30)
-		//		{
-		//			slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-		//		}
-		//		if (tmp_cwd.subadr == 26)
-		//		{
-		//
-		//		}
+
 		if ((tmp_cwd.subadr == 2) || (tmp_cwd.subadr == 3))
 		{
 			mbk02_slot_thr.get_MBK02_obj()->new_message(dt, mko, line, cwd, words, os);
@@ -399,7 +378,22 @@ void R732_widg::set_new_tm()
 	tm_words << mvku_modules[0].get_tm();
 	tm_words << mpvn_modules[0].get_tm();
 	tm_words << get_mko_counter_word();
+	tm_words << get_pups_words_list();
+	tm_words << get_vchm_word();
+	unsigned short word_11 = 0xC0A0;
+	word_11 += (PUPS & 0x1F);
+	tm_words << word_11;
 	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
+}
+
+void R732_widg::set_new_kpi()
+{
+	QVariantList kpi_words;
+	for (int i = 0; i < msg_count; ++i)
+	{
+		kpi_words << mko_Buffer[i];
+	}
+	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 21, kpi_words);
 }
 
 QVariantList R732_widg::get_mko_counter_word()
@@ -411,6 +405,54 @@ QVariantList R732_widg::get_mko_counter_word()
 	tm_words << first_word;
 	second_word += (mko_counter & 0xFFF); //младшие 12 бит счетчика сообщений МКО
 	tm_words << second_word;
+	return tm_words;
+}
+
+QVariantList R732_widg::get_pups_words_list()
+{
+	QVariantList tm_words;
+	//for (int vchm_index = 0; vchm_index < 4; ++vchm_index)
+	//{
+	//	unsigned short tmp_word = 0x8000;
+	//	tmp_word += ((vchm_index & 0x3) << 12); //номер ВЧМа (биты 12-13)
+	//	tmp_word += 0xC0; //разрешение чтения и записи (биты 6-7)
+	//	if (vchm_module.get_working(vchm_index))
+	//	{
+	//		tmp_word += 0x100; //признак включения ВЧМ (бит 8)
+	//		tmp_word += (PUPS & 0x1F); //пупс
+	//	}
+	//	tm_words << tmp_word;
+	//}
+	for (int vchm_index = 0; vchm_index < 4; ++vchm_index)
+	{
+		unsigned short tmp_word = 0x8000;
+		tmp_word += ((vchm_index & 0x3) << 9); //номер ВЧМа (биты 9-10)
+		tmp_word += 0xC0; //разрешение чтения и записи (биты 6-7)
+		if (vchm_module.get_working(vchm_index))
+		{
+			tmp_word += 0x100; //признак включения ВЧМ (бит 8)
+			tmp_word += (PUPS & 0x1F); //пупс
+		}
+		tm_words << tmp_word;
+	}
+	return tm_words;
+
+}
+
+QVariantList R732_widg::get_vchm_word()
+{
+	QVariantList tm_words;
+	unsigned short tmp_word = 0xC000;
+	for (int vchm_index = 0; vchm_index < 4; ++vchm_index)
+	{
+		if (vchm_module.get_working(vchm_index))
+		{
+			tmp_word += 1 << vchm_index; //признак включения ВЧМ (биты 0-3)
+			tmp_word += 1 << (8 + vchm_index); //признак включения ВЧМ в рабочую конфигурацию (биты 8-11)
+			tmp_word += (PUPS & 0x1F); //пупс
+		}
+	}
+	tm_words << tmp_word;
 	return tm_words;
 }
 
@@ -579,19 +621,17 @@ void R732_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_
 
 void R732_widg::new_kpi(QVariantList kpi)
 {
-	if (kpi.size() < 128)
-		return;
 	UINT8 msg[16];
 	int tmp_msg_ind = 0;
 	int tmp_word_ind = 0;
 	UINT8 tmp_msg = 0;
+	kpi_counter++;
 	for (QVariantList::ConstIterator itr = kpi.constBegin(); itr != kpi.constEnd(); itr++)
 	{
 		bool can_convert = false;
-		tmp_msg = tmp_msg << 1;
 		int tmp_int = itr->toInt(&can_convert);
 		if (can_convert && ((tmp_int == 0) || (tmp_int == 1))) //Проверяем, что двойка прислалала только нули и единицы 
-			tmp_msg += tmp_int;
+			tmp_msg += tmp_int << tmp_word_ind;
 		tmp_word_ind++;
 		if (tmp_word_ind == 8)
 		{
@@ -603,6 +643,11 @@ void R732_widg::new_kpi(QVariantList kpi)
 				break;
 		}
 	}
+	TestMSG_KPI(msg, kpi.length());
+	set_new_tm();
+	if (msg_count > 0)
+		set_new_kpi();
+	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(2, 3, 5, 4.5);
 }
 
 void R732_widg::restart_vchm_proc(int chanel)
