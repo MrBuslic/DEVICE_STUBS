@@ -14,6 +14,7 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
+#include "../buses_imitator//interrupt_bus_rpc.h"
 #include "../MBK-02_imitator/MBK02_rpc.h"
 
 class R732_widg : public QWidget
@@ -57,6 +58,9 @@ private:
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
+	RPC_interrupt_bus_SLOT_Thread interrupt_slot_thr;
+	RPC_interrupt_bus_SIGNAL_Thread interrupt_signal_thr;
+
 	int MKO;
 	int adr;
 	int num_ku;
@@ -67,13 +71,17 @@ private:
 	bool power_on;
 	bool ready_to_work_hard;
 	QString name;
+	int kpi_counter;
 
 	unsigned short mko_counter;
 
 	void paint_buttons();
 	void new_data_mv();
 	void set_new_tm();
+	void set_new_kpi();
 	QVariantList get_mko_counter_word();
+	QVariantList get_pups_words_list();
+	QVariantList get_vchm_word();
 	QTimer vchm_on_timer;
 	QTimer mu_on_timer;
 	QList<int> vchm_chanels_init;

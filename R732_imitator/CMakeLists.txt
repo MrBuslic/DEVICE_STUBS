@@ -16,7 +16,7 @@ add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
 add_definitions(${Qt5Network_DEFINITIONS})
 
-add_definitions(-DSTATIC_LIBMONGOCLIENT)
+#add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(-DNOMINMAX)
 
 include_directories(${Qt5Core_INCLUDES})
@@ -27,9 +27,12 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories("../../lib/socket_rpc/include")
 include_directories("../../lib/common_functions")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
-include_directories($ENV{MONGO_HOME}/include ${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl ${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl_v3 ${PROJECT_SOURCE_DIR}/../../lib/db_ctrl)
-include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
+include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl ${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl_v3 ${PROJECT_SOURCE_DIR}/../../lib/db_ctrl)
+#include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
 	
+find_package(libmongocxx REQUIRED)
+include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
+
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
@@ -42,14 +45,15 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(R732_HEADERS R732.h R732Modules.h)
+SET(R732_HEADERS R732.h R732Modules.h defines.h)
 SET(R732_SOURCES main.cpp R732.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS}  $ENV{MONGO_HOME}/lib)
 
 SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../MBK-02_imitator/MBK02_rpc.h 
 	${PROJECT_SOURCE_DIR}/../MBK-02_imitator/MBK02_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp  
-	${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp r732_socket_rpc.h r732_socket_rpc.cpp)
+	${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h 
+	${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp r732_socket_rpc.h r732_socket_rpc.cpp)
 
 add_executable(R732_imitator ${MY_WIN_FLAG} ${R732_HEADERS} ${R732_SOURCES} ${RPC_SOURCES} icon.rc)
 target_link_libraries (R732_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
