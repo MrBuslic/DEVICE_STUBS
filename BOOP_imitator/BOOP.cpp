@@ -1,6 +1,7 @@
 #include "BOOP.h"
 #include <QMessageBox>
 #include "rpc_ports.h"
+#include <qsettings.h>
 
 union MKOCommandWord
 {
@@ -121,52 +122,52 @@ BOOP::BOOP()
 
 	//  // First self-diagnostic column
 
-	bit19 = new QCheckBox("Исправность управляющего микроконвертора", this);
-	bit19->setChecked(true);
+	//bit19 = new QCheckBox("Исправность управляющего микроконвертора", this);
+	//bit19->setChecked(true);
 
-	bit18 = new QCheckBox("Исправность микроконвертора-драйвера ШД", this);
-	bit18->setChecked(true);
+	//bit18 = new QCheckBox("Исправность микроконвертора-драйвера ШД", this);
+	//bit18->setChecked(true);
 
-	bit17 = new QCheckBox("Исправность интерфейса SPI с ОУ МКО", this);
-	bit17->setChecked(true);
+	//bit17 = new QCheckBox("Исправность интерфейса SPI с ОУ МКО", this);
+	//bit17->setChecked(true);
 
-	bit16 = new QCheckBox("Исправность интерфейса с ДУ (канал υ)", this);
-	bit16->setChecked(true);
+	//bit16 = new QCheckBox("Исправность интерфейса с ДУ (канал υ)", this);
+	//bit16->setChecked(true);
 
-	bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
-	bit15->setChecked(true);
+	//bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
+	//bit15->setChecked(true);
 
-  QVBoxLayout *firstDiagnosticColumn = new QVBoxLayout();
-  firstDiagnosticColumn->addWidget(bit19);
-  firstDiagnosticColumn->addWidget(bit18);
-  firstDiagnosticColumn->addWidget(bit17);
-  firstDiagnosticColumn->addWidget(bit16);
-  firstDiagnosticColumn->addWidget(bit15);
+ // QVBoxLayout *firstDiagnosticColumn = new QVBoxLayout();
+ // firstDiagnosticColumn->addWidget(bit19);
+ // firstDiagnosticColumn->addWidget(bit18);
+ // firstDiagnosticColumn->addWidget(bit17);
+ // firstDiagnosticColumn->addWidget(bit16);
+ // firstDiagnosticColumn->addWidget(bit15);
 
-	//  // Second self-diagnostic column
+	////  // Second self-diagnostic column
 
-	bit14 = new QCheckBox("Исправность ОУ МКО (основной канал)", this);
-	bit14->setChecked(true);
+	//bit14 = new QCheckBox("Исправность ОУ МКО (основной канал)", this);
+	//bit14->setChecked(true);
 
-	bit13 = new QCheckBox("Исправность ОУ МКО (резервный канал)", this);
-	bit13->setChecked(true);
+	//bit13 = new QCheckBox("Исправность ОУ МКО (резервный канал)", this);
+	//bit13->setChecked(true);
 
-	bit12 = new QCheckBox("Исправность термодатчика", this);
-	bit12->setChecked(true);
+	//bit12 = new QCheckBox("Исправность термодатчика", this);
+	//bit12->setChecked(true);
 
-	bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
-	bit4->setChecked(true);
+	//bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
+	//bit4->setChecked(true);
 
-  QVBoxLayout *secondDiagnosticColumn = new QVBoxLayout();
-  secondDiagnosticColumn->addWidget(bit14);
-  secondDiagnosticColumn->addWidget(bit13);
-  secondDiagnosticColumn->addWidget(bit12);
-  secondDiagnosticColumn->addWidget(bit4);
+ // QVBoxLayout *secondDiagnosticColumn = new QVBoxLayout();
+ // secondDiagnosticColumn->addWidget(bit14);
+ // secondDiagnosticColumn->addWidget(bit13);
+ // secondDiagnosticColumn->addWidget(bit12);
+ // secondDiagnosticColumn->addWidget(bit4);
 
-  QHBoxLayout* secondStripe = new QHBoxLayout();
-  secondStripe->addLayout(firstDiagnosticColumn);
-  secondStripe->addStretch(1);
-  secondStripe->addLayout(secondDiagnosticColumn);
+ // QHBoxLayout* secondStripe = new QHBoxLayout();
+ // secondStripe->addLayout(firstDiagnosticColumn);
+ // secondStripe->addStretch(1);
+ // secondStripe->addLayout(secondDiagnosticColumn);
 
   // Servo controls block
 
@@ -177,39 +178,60 @@ BOOP::BOOP()
   QLabel *upsilonAngleLabel = new QLabel("Угол: ", this);
   upsilonAngleValue = new QLabel("0000", this);
 
+  QLabel *upsilonAngleLabelPi = new QLabel("°", this);
+  upsilonAnglePiValue = new QLabel("000", this);
+
   QHBoxLayout *upsilonAngleIndicatorBloc = new QHBoxLayout();
   upsilonAngleIndicatorBloc->addWidget(upsilonAngleLabel);
   upsilonAngleIndicatorBloc->addWidget(upsilonAngleValue);
+  
 
-  upsilonAngleSensorPower = new QCheckBox("Питание ДУ", this);
-  upsilonAngleSensorPower->setFixedWidth(84);
+
+  QHBoxLayout *upsilonAnglePiIndicatorBloc = new QHBoxLayout();
+  upsilonAnglePiIndicatorBloc->addWidget(upsilonAnglePiValue);
+  upsilonAnglePiIndicatorBloc->addWidget(upsilonAngleLabelPi);
+  
+
+  upsilonAngleSensorPower = new QCheckBox("ДУ", this);
+ // upsilonAngleSensorPower->setFixedWidth(84);
+
+  upsilonAngleServoPower = new QCheckBox("ШД", this);
+ // upsilonAngleServoPower->setFixedWidth(84);
+
+  QHBoxLayout *upsilonDuShwPanel = new QHBoxLayout();
+  upsilonDuShwPanel->addWidget(upsilonAngleSensorPower);
+  upsilonDuShwPanel->addWidget(upsilonAngleServoPower);
+
 
   QHBoxLayout *upsilonFirstControlsStrip = new QHBoxLayout();
   upsilonFirstControlsStrip->addLayout(upsilonAngleIndicatorBloc);
-  upsilonFirstControlsStrip->addStretch(1);
-  upsilonFirstControlsStrip->addWidget(upsilonAngleSensorPower);
-
+  upsilonFirstControlsStrip->addLayout(upsilonAnglePiIndicatorBloc);
+ // upsilonFirstControlsStrip->addWidget(upsilonAngleSensorPower);
+  upsilonFirstControlsStrip->addLayout(upsilonDuShwPanel);
+ // upsilonFirstControlsStrip->addStretch(1);
   // // // Second upsilon channel controls strip
 
   QLabel *upsilonRotationLabel = new QLabel("Вращение", this);
-  upsilonRotationLabel->setFixedWidth(64);
+ // upsilonRotationLabel->setFixedWidth(64);
 
   decreaseUpsilonAngle = new QPushButton("−", this);
-  decreaseUpsilonAngle->setFixedWidth(40);
+//  decreaseUpsilonAngle->setFixedWidth(40);
 
   increaseUpsilonAngle = new QPushButton("+", this);
-  increaseUpsilonAngle->setFixedWidth(40);
+ // increaseUpsilonAngle->setFixedWidth(40);
 
-  upsilonAngleServoPower = new QCheckBox("Питание ШД", this);
-  upsilonAngleServoPower->setFixedWidth(84);
+
+  QLabel *upsilonSawLabel = new QLabel("Пила ", this);
+  upsilonSawNumber = new QLabel("0", this);
 
   QHBoxLayout *upsilonThirdControlsStrip = new QHBoxLayout();
   upsilonThirdControlsStrip->addWidget(upsilonRotationLabel);
-  upsilonThirdControlsStrip->addStretch(1);
+ // upsilonThirdControlsStrip->addStretch(1);
   upsilonThirdControlsStrip->addWidget(decreaseUpsilonAngle);
   upsilonThirdControlsStrip->addWidget(increaseUpsilonAngle);
-  upsilonThirdControlsStrip->addStretch(1);
-  upsilonThirdControlsStrip->addWidget(upsilonAngleServoPower);
+  //upsilonThirdControlsStrip->addStretch(1);
+  upsilonThirdControlsStrip->addWidget(upsilonSawLabel);
+  upsilonThirdControlsStrip->addWidget(upsilonSawNumber);
 
   QVBoxLayout *upsilonChannelControls = new QVBoxLayout();
   upsilonChannelControls->addLayout(upsilonFirstControlsStrip);
@@ -224,40 +246,60 @@ BOOP::BOOP()
 
   QLabel *phiAngleLabel = new QLabel("Угол: ", this);
   phiAngleValue = new QLabel("0000", this);
+  QLabel *phiAnglePiLabel = new QLabel("°", this);
+  phiAnglePiValue = new QLabel("000", this);
 
   QHBoxLayout *phiAngleIndicatorBloc = new QHBoxLayout();
   phiAngleIndicatorBloc->addWidget(phiAngleLabel);
   phiAngleIndicatorBloc->addWidget(phiAngleValue);
 
-  phiAngleSensorPower = new QCheckBox("Питание ДУ", this);
-  phiAngleSensorPower->setFixedWidth(84);
+  QHBoxLayout *phiAnglePiIndicatorBloc = new QHBoxLayout();
+  phiAnglePiIndicatorBloc->addWidget(phiAnglePiValue);
+  phiAnglePiIndicatorBloc->addWidget(phiAnglePiLabel);
+ 
+
+  phiAngleSensorPower = new QCheckBox("ДУ", this);
+//  phiAngleSensorPower->setFixedWidth(84);
+
+  phiAngleServoPower = new QCheckBox("ШД", this);
+//  phiAngleServoPower->setFixedWidth(84);
+
+  QHBoxLayout *phiDuShwPanel = new QHBoxLayout();
+  phiDuShwPanel->addWidget(phiAngleSensorPower);
+  phiDuShwPanel->addWidget(phiAngleServoPower);
 
   QHBoxLayout *phiFirstControlsStrip = new QHBoxLayout();
   phiFirstControlsStrip->addLayout(phiAngleIndicatorBloc);
-  phiFirstControlsStrip->addStretch(1);
-  phiFirstControlsStrip->addWidget(phiAngleSensorPower);
+  phiFirstControlsStrip->addLayout(phiAnglePiIndicatorBloc);
+ // phiFirstControlsStrip->addStretch(1);
+  phiFirstControlsStrip->addLayout(phiDuShwPanel);
+ // phiFirstControlsStrip->addWidget(phiAngleSensorPower);
+ // phiFirstControlsStrip->addWidget(phiAngleServoPower);
+ // phiFirstControlsStrip->addWidget(phiSawLabel);
 
   // // // Second phi channel controls strip
 
   QLabel *phiRotationLabel = new QLabel("Вращение", this);
-  phiRotationLabel->setFixedWidth(64);
+//  phiRotationLabel->setFixedWidth(64);
 
   decreasePhiAngle = new QPushButton("−", this);
-  decreasePhiAngle->setFixedWidth(40);
+//  decreasePhiAngle->setFixedWidth(40);
 
   increasePhiAngle = new QPushButton("+", this);
-  increasePhiAngle->setFixedWidth(40);
+//  increasePhiAngle->setFixedWidth(40);
 
-  phiAngleServoPower = new QCheckBox("Питание ШД", this);
-  phiAngleServoPower->setFixedWidth(84);
+  QLabel *phiSawLabel = new QLabel("Пила ", this);
+
+  phiSawNumber = new QLabel("0", this);
 
   QHBoxLayout *phiThirdControlsStrip = new QHBoxLayout();
   phiThirdControlsStrip->addWidget(phiRotationLabel);
-  phiThirdControlsStrip->addStretch(1);
+ // phiThirdControlsStrip->addStretch(1);
   phiThirdControlsStrip->addWidget(decreasePhiAngle);
   phiThirdControlsStrip->addWidget(increasePhiAngle);
-  phiThirdControlsStrip->addStretch(1);
-  phiThirdControlsStrip->addWidget(phiAngleServoPower);
+ // phiThirdControlsStrip->addStretch(1);
+  phiThirdControlsStrip->addWidget(phiSawLabel);
+  phiThirdControlsStrip->addWidget(phiSawNumber);
 
   QVBoxLayout *phiChannelControls = new QVBoxLayout();
   phiChannelControls->addLayout(phiFirstControlsStrip);
@@ -268,7 +310,7 @@ BOOP::BOOP()
 
   QHBoxLayout* thirdStripe = new QHBoxLayout();
   thirdStripe->addWidget(upsilonGoupBox);
-  thirdStripe->addStretch(1);
+ // thirdStripe->addStretch(1);
   thirdStripe->addWidget(phiGroupBox);
 
   // Log message area
@@ -277,27 +319,53 @@ BOOP::BOOP()
 
   QVBoxLayout* mainLayout = new QVBoxLayout(this);
   mainLayout->addLayout(firstStripe);
-  mainLayout->addLayout(secondStripe);
+//  mainLayout->addLayout(secondStripe);
   mainLayout->addLayout(thirdStripe);
   mainLayout->addWidget(logArea);
 
-	// Styles
 
-  //this->setStyleSheet("QPushButton {"
-  //                    "min-height: 20px;"
-  //                    "background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #bbdfc4, stop: 1 #8ec69c);"
-  //                    "color: #000000;"
-  //                    "border: 1px solid #008000; }"
-
-  //                    "QPushButton:flat {"
-  //                    "background-color: #fcfcfc;"
-  //                    "color: #4e4e4e;"
-  //                    "border: 1px solid #808080;");
 
 	this->setWindowTitle("Блок управления приводами");
 	this->setLayout(mainLayout);
 	this->setFocus();
 	this->show();
+
+
+	QFile ang_ini(QApplication::applicationDirPath() + "/angles.ini");
+	if (ang_ini.exists())
+	{
+		QSettings angles(QApplication::applicationDirPath() + "/angles.ini", QSettings::IniFormat);
+		pos_ups = angles.value("cur_pos_ups").toString();
+		pos_phi = angles.value("cur_pos_phi").toString();
+		bool ok;
+		cur_pos_phi = pos_phi.toUInt(&ok, 16);
+		cur_pos_ups = pos_ups.toUInt(&ok, 16);
+
+		ShD_bit = angles.value("ShD_bit").toFloat();
+		DU_bit = angles.value("DU_bit").toFloat();
+		saw_numb_phi = angles.value("saw_numb_phi").toInt();
+		saw_numb_ups = angles.value("saw_numb_ups").toInt();
+	}
+	else
+	{
+		cur_pos_ups = 0xc29d;
+		cur_pos_phi = 0xeb45;
+		ShD_bit = 9.7031268;
+		DU_bit = 0.61799;
+		saw_numb_phi = 0;
+		saw_numb_ups = 0;
+	}
+ 
+  upsilonAngleValue->setText(QString("%1").arg(cur_pos_ups, 0, 16).toUpper());
+  phiAngleValue->setText(QString("%1").arg(cur_pos_phi, 0, 16).toUpper());
+  
+  upsilonSawNumber->setText(QString("%1").arg(saw_numb_ups));
+  phiSawNumber->setText(QString("%1").arg(saw_numb_phi));
+
+  angl_val_phi = cur_pos_phi*DU_bit;
+  angl_val_ups = cur_pos_ups*DU_bit;
+  phiAnglePiValue->setText(QString("%1").arg(angl_val_phi));
+  upsilonAnglePiValue->setText(QString("%1").arg(angl_val_ups));
 
   slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
   slot_thr.start();
@@ -308,8 +376,8 @@ BOOP::BOOP()
   if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
   {
 	  QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
-	  this->deleteLater();
-	  return;
+	 
+	  
   }
 
   connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)), Qt::QueuedConnection);
@@ -323,8 +391,7 @@ BOOP::BOOP()
   if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
   {
 	  QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
-	  this->deleteLater();
-	  return;
+
   }
 
   connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_matrix_command(int, int, int, int, double, double, int, int, int)));
@@ -335,6 +402,7 @@ BOOP::BOOP()
   decreaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
   increasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
   decreasePhiAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
+
 
 
   QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
@@ -454,32 +522,11 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 				upsilon_sec = parsed_data_words.upsilon_pulse_amount / word_for_cbk.uplsilon_pulse_frequency;
 			else
 				upsilon_sec = 0;
-
-			
-
-			//if (parsed_data_words.upsilon_rotation_direction)
-			//{
-			//	_upsilon_current_angle += parsed_data_words.upsilon_pulse_amount;
-			//	upsilon_angl_amount += parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
-			//	if (_upsilon_current_angle > 0xFFFF)
-			//		_upsilon_current_angle = _upsilon_current_angle - 0xFFFF;
-			//	increaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
-			//}
-			//else
-			//{
-			//	_upsilon_current_angle -= parsed_data_words.upsilon_pulse_amount;
-			//	upsilon_angl_amount -= parsed_data_words.upsilon_pulse_amount;// уточнить у Олега
-			//	if (_upsilon_current_angle < 0)
-			//		_upsilon_current_angle = 0xFFFF + _upsilon_current_angle;
-			//	decreaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
-			//}
-			//word_for_cbk.upsilon_angle = _upsilon_current_angle;// уточнить у Олега
-			//upsilonAngleValue->setText(QString("%1").arg(_upsilon_current_angle, 0, 16).toUpper());
 		}
 
 		if (parsed_data_words.phi_rotation_command)
 		{
-			//int _phi_current_angle = phiAngleValue->text().toInt(nullptr, 16);
+			
 
 			word_for_cbk.phi_channel_work_status = 1;
 			word_for_cbk.phi_rotation_direction = parsed_data_words.phi_rotation_direction;
@@ -489,34 +536,7 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 				phi_sec = parsed_data_words.phi_pulse_amount / word_for_cbk.phi_pulse_frequency;
 			else
 				phi_sec = 0;
-
-
-			//if (parsed_data_words.phi_rotation_direction)
-			//{
-			//	_phi_current_angle += parsed_data_words.phi_pulse_amount;
-			//	phi_angl_amount += parsed_data_words.phi_pulse_amount;// уточнить у Олега
-			//	if (_phi_current_angle > 0xFFFF)
-			//		_phi_current_angle = _phi_current_angle - 0xFFFF;
-			//	increasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
-			//}
-			//else
-			//{
-			//	_phi_current_angle -= parsed_data_words.phi_pulse_amount;
-			//	if (_phi_current_angle < 0)
-			//		_phi_current_angle = 0xFFFF + _phi_current_angle;
-			//	phi_angl_amount -= parsed_data_words.phi_pulse_amount;// уточнить у Олега
-			//	decreasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
-			//}
-
-			//word_for_cbk.phi_angle = _phi_current_angle;
-			//phiAngleValue->setText(QString("%1").arg(_phi_current_angle, 0, 16).toUpper());
 		}
-
-
-		//(upsilon_angl_amount > 0) ? word_for_cbk.usplison_summ_sign = 0 : word_for_cbk.usplison_summ_sign = 1;
-		//word_for_cbk.upsilon_pulse_summ = qAbs(upsilon_angl_amount);
-		//(phi_angl_amount > 0) ? word_for_cbk.phi_summ_sign = 0 : word_for_cbk.phi_summ_sign = 1;
-		//word_for_cbk.phi_pulse_summ = qAbs(phi_angl_amount);
 
 		//признаки самоконтроля БУП(Е)
 		bit19->isChecked() ? word_for_cbk.bit19 = 1 : word_for_cbk.bit19 = 0;
@@ -591,6 +611,14 @@ void BOOP::new_matrix_command(int mshm, int pshm, int length_m, int length_p, do
 
 void BOOP::closeEvent(QCloseEvent *event)
 {
+	QSettings angles(QApplication::applicationDirPath() + "/angles.ini", QSettings::IniFormat);
+	angles.setValue("cur_pos_ups",cur_pos_ups);
+	angles.setValue("cur_pos_phi",cur_pos_ups);
+	angles.setValue("ShD_bit",ShD_bit);
+	angles.setValue("DU_bit",DU_bit);
+	angles.setValue("saw_numb_phi",saw_numb_phi);
+	angles.setValue("saw_numb_ups",saw_numb_ups);
+
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	settings.setValue("boop_geometry", saveGeometry());
 	QWidget::closeEvent(event);
@@ -610,14 +638,26 @@ void BOOP::move_boop()
 			_upsilon_current_angle += word_for_cbk.uplsilon_pulse_frequency;
 			upsilon_angl_amount += word_for_cbk.uplsilon_pulse_frequency;// уточнить у Олега
 			if (_upsilon_current_angle > 0xFFFF)
-				_upsilon_current_angle = _upsilon_current_angle - 0xFFFF;
+			{ 
+				if (saw_numb_ups < 1)
+				{
+					_upsilon_current_angle = _upsilon_current_angle - 0xFFFF;
+					saw_numb_ups++;
+				}
+			}
 			increaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
 		}
 		else
 		{
 			_upsilon_current_angle -= word_for_cbk.uplsilon_pulse_frequency;
 			if (_upsilon_current_angle < 0)
-				_upsilon_current_angle = 0xFFFF + _upsilon_current_angle;
+			{
+				if (saw_numb_ups > -1)
+				{
+					_upsilon_current_angle = 0xFFFF + _upsilon_current_angle;
+					saw_numb_ups--;
+				}
+			}
 			upsilon_angl_amount -= word_for_cbk.uplsilon_pulse_frequency;// уточнить у Олега
 			decreaseUpsilonAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
 		}
@@ -633,14 +673,26 @@ void BOOP::move_boop()
 			_phi_current_angle += word_for_cbk.phi_pulse_frequency;
 			phi_angl_amount += word_for_cbk.phi_pulse_frequency;// уточнить у Олега
 			if (_phi_current_angle > 0xFFFF)
-				_phi_current_angle = _phi_current_angle - 0xFFFF;
+			{
+				if (saw_numb_phi < 1)
+				{
+					_phi_current_angle = _phi_current_angle - 0xFFFF;
+					saw_numb_phi++;
+				}
+			}
 			increasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
 		}
 		else
 		{
 			_phi_current_angle -= word_for_cbk.phi_pulse_frequency;
 			if (_phi_current_angle < 0)
-				_phi_current_angle = 0xFFFF + _phi_current_angle;
+			{
+				if (saw_numb_phi > -1)
+				{
+					_phi_current_angle = 0xFFFF + _phi_current_angle;
+					saw_numb_phi--;
+				}
+			}
 			phi_angl_amount -= word_for_cbk.phi_pulse_frequency;// уточнить у Олега
 			decreasePhiAngle->setStyleSheet("background-color: rgb(142, 198, 156);");
 		}
@@ -653,7 +705,10 @@ void BOOP::move_boop()
 	word_for_cbk.upsilon_pulse_summ = qAbs(upsilon_angl_amount);
 	(phi_angl_amount > 0) ? word_for_cbk.phi_summ_sign = 0 : word_for_cbk.phi_summ_sign = 1;
 	word_for_cbk.phi_pulse_summ = qAbs(phi_angl_amount);
-
+	cur_pos_phi = _phi_current_angle;
+	cur_pos_ups = _upsilon_current_angle;
+	upsilonSawNumber->setText(QString("%1").arg(saw_numb_ups));
+	phiSawNumber->setText(QString("%1").arg(saw_numb_phi));
 	if (upsilon_sec == 0)
 	{
 		increaseUpsilonAngle->setStyleSheet("background-color: rgb(204, 204, 204);");
