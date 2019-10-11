@@ -53,6 +53,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	kpiu_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new kpiu_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 
+	QProcess::execute(QApplication::applicationDirPath() + "/mongodb_export db");
 	QProcess::execute(QApplication::applicationDirPath() + "/bd_starter");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_kp50");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 1");
