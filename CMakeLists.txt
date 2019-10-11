@@ -68,6 +68,7 @@ include_directories("../lib/db_ctrl")
 #include_directories("../lib/mongo_ctrl")
 include_directories("../vendor/QScintilla/core/Qt4")
 
+
 include_directories(${QT_QTSCRIPTTOOLS_INCLUDE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/../lib/mongo_ctrl_v3)
 include_directories(${PROJECT_SOURCE_DIR}/../ServerSide/MBK07)
@@ -179,7 +180,7 @@ list(APPEND SOURCES ${PROJECT_SOURCE_DIR}/main.cpp)
 #list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
 #list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/cbk_imitator/main.cpp)
 
-add_executable(KPIU WIN32 ${SOURCES} ${HEADERS})
+add_executable(KPIU WIN32 ${SOURCES} ${HEADERS} icon.rc)
 
 ADD_CUSTOM_COMMAND(TARGET Stubs
 	PRE_BUILD

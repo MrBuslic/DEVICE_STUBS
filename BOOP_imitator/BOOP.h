@@ -109,6 +109,8 @@ private:
 
 	// Uplilon channel servo controls
 	QLabel *upsilonAngleValue;
+	QLabel *upsilonAnglePiValue;
+	QLabel *upsilonSawNumber;
 	QCheckBox *upsilonAngleSensorPower;
 	QCheckBox *upsilonAngleServoPower;
 	QPushButton *increaseUpsilonAngle;
@@ -116,6 +118,8 @@ private:
 
 	// Phi channel servo controls
 	QLabel *phiAngleValue;
+	QLabel *phiAnglePiValue;
+	QLabel *phiSawNumber;
 	QCheckBox *phiAngleSensorPower;
 	QCheckBox *phiAngleServoPower;
 	QPushButton *increasePhiAngle;
@@ -127,9 +131,15 @@ private:
 	int upsilon_sec = 0, phi_sec = 0;
 	int upsilon_angl_amount;
 	int phi_angl_amount;
+	double angl_val_phi, angl_val_ups;
 	bool need_to_move;
 	int timer_count;
 	quint16 upsilon_rotation_direction, phi_rotation_direction;
+	int cur_pos_ups, cur_pos_phi; 
+	double ShD_bit, DU_bit;
+	int saw_numb_phi, saw_numb_ups;
+	QString pos_ups, pos_phi;
+	
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
