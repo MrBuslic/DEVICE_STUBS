@@ -14,7 +14,7 @@
 #include <QTcpServer>
 #include <QSettings>
 #include <QVector>
-#include "../../ServerSide/MBK07/KPAdefines.h"
+#include "KPAdefines.h"
 #include "../buses_imitator/frame_bus_rpc.h"
 #include "rpc_ports.h"
 
