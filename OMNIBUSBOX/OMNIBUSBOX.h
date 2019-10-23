@@ -25,7 +25,7 @@ struct RpcAbonent
 	RpcAbonent(){}
 	RpcAbonent(int addr);
 	QMap<int, QList<unsigned short>> words;
-	unsigned short os;
+	QMap<int, unsigned short> os;
 	bool on;
 };
 
@@ -36,7 +36,7 @@ public:
 	RpcOmnibusWidget(QWidget* parent = 0);
 public slots:
 
-	void switch_ab_os(int mko, int addr, int _os);
+	void switch_ab_os(int mko, int addr, int _os, int _s_addr = -1);
 	void switch_ab(int mko, int addr, bool _on);
 	void set_new_data(int mko, int addr, int saddr, QVariantList words);
 	void send_msg(int mko, int line, int cwd, QVariantList& words, int& os);

@@ -98,6 +98,8 @@ public:
 	QVariant auto_scroll_clicked(QVariantList& _values);
 	QVariant get_power(QVariantList& _values);
 	QVariant new_frame_04(QVariantList& _values);
+	QVariant new_mk(QVariantList& _values);
+	QVariant set_vchm_on(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

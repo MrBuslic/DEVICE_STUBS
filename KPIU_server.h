@@ -15,6 +15,32 @@
 #include "rpc_foi.h"
 #include "rpc_ols.h"
 #include "KPRD_imitator.h"
+//!!!!!!!!!!!!!!!!!!!!!!!!!!mds1 и 2 наоборот должны быть!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+union MDS2_CHANNELS
+{
+	quint32 chans;
+	struct
+	{
+		quint32 ONA_chans : 3,
+			res1 : 13,
+			chans_732 : 5,
+			res2 : 11;
+	};
+};
+
+union MDS1_CHANNELS
+{
+	quint32 chans;
+	struct
+	{
+		quint32 CBK_chans : 9,
+			res1 : 7,
+			chans_733 : 5,
+			res2 : 11;
+	};
+};
+
 
 class KPIUServer : public QWidget
 {
@@ -49,7 +75,12 @@ public slots:
 	void mfsk_1_impulse(QVariantList channels);
 
 	void mds_1_get_sample(uint& buf, bool& flag);
+	void mds_2_get_sample(uint& buf, bool& flag);
 private:
+
+	MDS1_CHANNELS mds1_chans;
+	MDS2_CHANNELS mds2_chans;
+
 	RpcOmnibusWidget* omnibus_widget;
 	InterruptWidget* interrupt_widget;
 	KPIWidget* kpi_widget;

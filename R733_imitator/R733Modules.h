@@ -222,6 +222,7 @@ public:
 	};
 
 	void set_working_chanels(QList<int> chanels_state, bool can_on = false);
+	void set_working_proc(int chanel, int state);
 	bool get_working(int chanel)
 	{
 		return working[VCHM_CHANEL(chanel)];
@@ -243,6 +244,7 @@ public:
 		OFF = 2
 	};
 	void set_working_channels(QList<int> chanels_state, bool can_on = false);
+
 	bool get_working(int channel)
 	{
 		return working[num_channel];
@@ -261,10 +263,10 @@ public:
 	{
 		return num_channel;
 	}
-
 private:
 	STATE_UPI num_channel;
 	QMap<STATE_UPI, bool> working;
+
 };
 
 #endif // R733_MODULES_H

@@ -247,6 +247,7 @@ void LKA05_widg::omni_connect()
 	mu_module.switch_cur_dev(LKA05_CURRENT_DEV::MAIN);
 	mpvn_modules[0].switch_cur_dev(LKA05_CURRENT_DEV::MAIN);
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	slot_thr.get_omnibus_obj()->switch_ab_os(MKO, adr, -1, 1);
 	paint_buttons();
 	set_new_tm();
 	flag_on = true;
@@ -650,7 +651,12 @@ unsigned short LKA05_MV_MODULE::get_tm()
 	if (current_dev == LKA05_CURRENT_DEV::OFF)
 		_word += 0xC0;
 	else
-		_word += 0x20 << int(current_dev);
+	{
+		if (com == 5)//МПВН всегда занят в первый раз
+			_word += 0x28 << int(current_dev);
+		else
+			_word += 0x20 << int(current_dev);
+	}
 	return _word;
 }
 

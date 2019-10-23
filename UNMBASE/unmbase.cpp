@@ -183,6 +183,18 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		unmbase_mezanin_list_add(0, 0);
 	}
 
+	if (commapp == "mbk02")
+	{
+		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+		unmbase_mezanin_list_add(1, 0x17);	// MN8I
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+		unmbase_mezanin_list_add(0, 0);
+	}
+
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/

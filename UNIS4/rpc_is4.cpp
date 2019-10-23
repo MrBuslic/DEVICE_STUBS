@@ -122,7 +122,7 @@ int RpcIS4Widget::unis4_StartACP()
 		log_widget->log_append(_msg);
 		return 0;
 	}
-
+	return -1;
 }
 
 void RpcIS4Widget::is4_clicked(int state_is4)

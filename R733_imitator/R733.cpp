@@ -20,6 +20,7 @@ R733_widg::R733_widg()
 	mpvn_modules << MV_MODULE(5, 0);
 	mvku_modules << MV_MODULE(2, 0);
 	vchm_chanels_init << 0 << 0 << 0 << 0;
+	tm_data.tm_data = 0;
 
 	mode_names.insert(int(REGIME::PI15), "ПИ15");
 	mode_names.insert(int(REGIME::PI8), "ПИ8");
@@ -200,6 +201,11 @@ R733_widg::R733_widg()
 	connect(AbOn_tmr, &QTimer::timeout, this, &R733_widg::omni_connect);
 
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k2(double)), this, SLOT(get_power(double)));
+
+	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
+
 	//	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
 	//		regime_upi = REGIME::PI8;
 	//			QString _msg = QString("Режим работы модуля УПИ: %1").arg(mode_names[regime_upi]);
@@ -207,6 +213,8 @@ R733_widg::R733_widg()
 	mu_module.switch_cur_dev(R733_CURRENT_DEV::OFF);
 	mvku_modules[0].switch_cur_dev(R733_CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(R733_CURRENT_DEV::OFF);
+
+	connect(&vchm_on_timer, &QTimer::timeout, this, &R733_widg::set_vchm_on);
 	//upi_modules[0].switch_num_chan(NUM_CHANNEL::CHANNEL_1);
 	paint_buttons();
 		QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
@@ -255,11 +263,16 @@ void R733_widg::imit_on()
 {
 	if (flag_on)
 		return;
-	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
-	AbOn_tmr->start(1000); //need time here?
+	AbOn_tmr->start(12000); //need time here?
+	vchm_chanels_init.clear();
+	vchm_chanels_init << 1 << 1 << 1 << 1;
+	vchm_on_timer.start(VCHM_START_TIME);
 	change_power();
 	paint_buttons();
+
+	tm_data.PP = 1;
+	tm_data.VP_O = 1;
+	set_tm_state();
 	flag_on = true;
 }
 
@@ -267,18 +280,47 @@ void R733_widg::imit_off()
 {
 	if (!flag_on)
 		return;
-	disconnect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	power = 0;
 	flag_on = false;
 	mu_module.switch_cur_dev(R733_CURRENT_DEV::OFF);
 	mvku_modules[0].switch_cur_dev(R733_CURRENT_DEV::OFF);
 	mpvn_modules[0].switch_cur_dev(R733_CURRENT_DEV::OFF);
+	vchm_chanels_init.clear();
+	vchm_chanels_init << 0 << 0 << 0 << 0;
+	vchm_module.set_working_chanels(vchm_chanels_init);
 	set_power_back();
-//	set_new_tm();
+	tm_data.PP = 0;
+	tm_data.VP_O = 0;
+	tm_data.VP_R = 0;
+	set_tm_state();
+	set_new_tm();
 	paint_buttons();
 }
 
+
+void R733_widg::set_vchm_on()
+{
+	vchm_on_timer.stop();
+	if (vchm_chanels_init.size() < 4)
+		return;
+	vchm_module.set_working_chanels(vchm_chanels_init, true);
+	vchm_is_init = false;
+	paint_buttons();
+	set_new_tm();
+}
+
+QVariantList R733_widg::get_mko_counter_word()
+{
+	QVariantList tm_words;
+	unsigned short first_word = 0x6000;
+	unsigned short second_word = 0x6000;
+	first_word += ((mko_counter & 0xFFF000) >> 12); //старшие 12 бит счетчика сообщений МКО
+	tm_words << first_word;
+	second_word += (mko_counter & 0xFFF); //младшие 12 бит счетчика сообщений МКО
+	tm_words << second_word;
+	return tm_words;
+}
 
 void UPI_MODULE::set_working_channels(QList<int> chanels_state, bool can_on)
 {
@@ -353,9 +395,9 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 							vchm_chanels_init << ((chanels & 0x4) >> 2);
 							vchm_chanels_init << ((chanels & 0x8) >> 3);
 							vchm_module.set_working_chanels(vchm_chanels_init, false);
-							if (vchm_chanels_init.contains(1))
+							if (vchm_chanels_init.contains(1) && !vchm_on_timer.isActive())
 							{
-								vchm_on_timer.start(48000);
+								vchm_on_timer.start(VCHM_START_TIME);
 								vchm_is_init = true;
 							}
 						}
@@ -369,7 +411,17 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 						switch (comand)
 						{
 						case 0xC:
-							//команда подключения процессора 
+							if (pshk)
+							{
+								for (int i = 0; i < 4; i++)
+								{
+									vchm_module.set_working_proc(i, 1);
+								}
+							}
+							else
+							{
+								vchm_module.set_working_proc(nk, 1);
+							}
 							break;
 						case 0x7:
 						{
@@ -395,6 +447,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				};
 			}
 			paint_buttons();
+			mko_counter++;
 			set_new_tm();
 			if (need_mvku_renew)
 				new_data_mv();
@@ -500,6 +553,8 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 
 				}
 			}
+			mko_counter++;
+			set_new_tm();
 			new_data_mv();
 		}
 		//		if (tmp_cwd.subadr == 30)
@@ -693,8 +748,79 @@ void R733_widg::set_new_tm()
 	tm_words << mu_module.get_tm();
 	tm_words << mvku_modules[0].get_tm();
 	tm_words << mpvn_modules[0].get_tm();
-	//tm_words << get_mko_counter_word();
+	tm_words << get_mko_counter_word();
+	tm_words << get_pups_words_list();
+	tm_words << get_vchm_word();
+	unsigned short word_11 = 0xC0A0;
+	word_11 += (PUPS & 0x1F);
+	tm_words << word_11;
+	tm_words << 0xC000;
+	tm_words << 0xC200;
+	tm_words << 0xC400;
+	tm_words << 0xC600;
+
 	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
+}
+
+QVariantList R733_widg::get_pups_words_list()
+{
+	QVariantList tm_words;
+	//for (int vchm_index = 0; vchm_index < 4; ++vchm_index)
+	//{
+	//	unsigned short tmp_word = 0x8000;
+	//	tmp_word += ((vchm_index & 0x3) << 12); //номер ВЧМа (биты 12-13)
+	//	tmp_word += 0xC0; //разрешение чтения и записи (биты 6-7)
+	//	if (vchm_module.get_working(vchm_index))
+	//	{
+	//		tmp_word += 0x100; //признак включения ВЧМ (бит 8)
+	//		tmp_word += (PUPS & 0x1F); //пупс
+	//	}
+	//	tm_words << tmp_word;
+	//}
+	for (int vchm_index = 0; vchm_index < 4; ++vchm_index)
+	{
+		unsigned short tmp_word = 0x8000;
+		tmp_word += ((vchm_index & 0x3) << 9); //номер ВЧМа (биты 9-10)
+		tmp_word += 0xC0; //разрешение чтения и записи (биты 6-7)
+		if (vchm_module.get_working(vchm_index))
+		{
+			tmp_word += 0x100; //признак включения ВЧМ (бит 8)
+			tmp_word += (PUPS & 0x1F); //пупс
+		}
+		tm_words << tmp_word;
+	}
+	return tm_words;
+
+}
+
+QVariantList R733_widg::get_vchm_word()
+{
+	QVariantList tm_words;
+	unsigned short tmp_word = 0xC000;
+	for (int vchm_index = 0; vchm_index < 4; ++vchm_index)
+	{
+		if (vchm_module.get_working(vchm_index))
+		{
+			tmp_word += 1 << vchm_index; //признак включения ВЧМ (биты 0-3)
+			tmp_word += 1 << (8 + vchm_index); //признак включения ВЧМ в рабочую конфигурацию (биты 8-11)
+		}
+	}
+	tm_words << tmp_word;
+	return tm_words;
+}
+
+
+void R733_VCHM_MODULE::set_working_proc(int chanel, int state)
+{
+	if (chanel > 3)
+		return;
+	if (state)
+	{
+		if (working[VCHM_CHANEL(chanel)])
+			working[VCHM_CHANEL(chanel)] = true;
+	}
+	else
+		working[VCHM_CHANEL(chanel)] = false;
 }
 
 void R733_widg::paint_buttons()
@@ -807,7 +933,12 @@ unsigned short MV_MODULE::get_tm()
 	if (current_dev == R733_CURRENT_DEV::OFF)
 		_word += 0xC0;
 	else
-		_word += 0x20 << int(current_dev);
+	{
+		if (com == 5)//МПВН всегда занят в первый раз
+			_word += 0x28 << int(current_dev);
+		else
+			_word += 0x20 << int(current_dev);
+	}
 	return _word;
 }
 
@@ -880,4 +1011,33 @@ void R733_widg::closeEvent(QCloseEvent *event)
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	settings.setValue("733_geometry", saveGeometry());
 	QWidget::closeEvent(event);
+}
+
+void R733_widg::set_tm_state()
+{
+	mku_slot_thr.get_mku_bus_obj()->set_tm("733_TM", (uint)(tm_data.tm_data));
+}
+
+
+void R733_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	if ((pshm != 0) || ((mshm < 5) && (mshm > 6)))
+		return;
+	if (mshm == 5)
+	{
+		tm_data.VP_O = 1;
+		tm_data.VP_R = 0;
+		mu_module.switch_cur_dev(R733_CURRENT_DEV::MAIN);
+	}
+	else if (mshm == 6)
+	{
+		tm_data.VP_O = 0;
+		tm_data.VP_R = 1;
+		mu_module.switch_cur_dev(R733_CURRENT_DEV::RESERVE);
+	}
+	else
+		return;
+	paint_buttons();
+	set_new_tm();
+	set_tm_state();
 }

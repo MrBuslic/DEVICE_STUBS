@@ -4,6 +4,21 @@
 #include <windows.h>
 #include "rpc_ports.h"
 
+
+kp50_rpc_buffer_class::kp50_rpc_buffer_class()
+{
+	kp50_slot_thr = new RPC_kp50_SLOT_Thread;
+	kp50_slot_thr->set_connection_params("127.0.0.1", KP50_SLOT);
+	kp50_slot_thr->start();
+
+	kp50_signal_thr = new RPC_kp50_SIGNAL_Thread;
+	kp50_signal_thr->set_connection_params("127.0.0.1", KP50_SIGNAL);
+	kp50_signal_thr->start();
+
+	kp50_slot_thr->wait_connected(3);
+	kp50_signal_thr->wait_connected(3);
+}
+
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
 #endif
@@ -15,6 +30,7 @@ ViStatus _VI_FUNC unkp50_init (	ViRsrc 		rsrcName,
 								ViBoolean 	reset, 
 								ViPSession 	vi)
 {
+	Skp50_rpc_buffer_class::Instance();
 	return 0;
 }
 
@@ -90,7 +106,7 @@ ViStatus _VI_FUNC unkp50_reset_channel (ViSession vi, ViInt16 chan)
 // Функция "Запрос состояния канала. ОШИБКИ канала"
 ViStatus _VI_FUNC unkp50_channel_state_Q (ViSession vi, ViInt16 chan, ViUInt16 *code1, ViUInt16 *code2)
 {
-	bool on = Srpc_buffer_class::Instance().kp50_slot_thr.get_kp50_obj()->unkp50_channel_state_Q(chan);
+	bool on = Skp50_rpc_buffer_class::Instance().kp50_slot_thr->get_kp50_obj()->unkp50_channel_state_Q(chan);
 	if (on)
 		*code1 = 0x400;
 	else
@@ -100,19 +116,19 @@ ViStatus _VI_FUNC unkp50_channel_state_Q (ViSession vi, ViInt16 chan, ViUInt16 *
 // Функция "Измерение тока канала"
 ViStatus _VI_FUNC unkp50_meas_I (ViSession vi, ViInt16 chan, ViReal64 *I)
 {
-	*I = Srpc_buffer_class::Instance().kp50_slot_thr.get_kp50_obj()->unkp50_meas_I(chan);
+	*I = Skp50_rpc_buffer_class::Instance().kp50_slot_thr->get_kp50_obj()->unkp50_meas_I(chan);
 	return 0;
 }
 // Функция "Измерение входного напряжения канала"
 ViStatus _VI_FUNC unkp50_meas_Uin (ViSession vi, ViInt16 chan, ViReal64 *Uin)
 {
-	*Uin = Srpc_buffer_class::Instance().kp50_slot_thr.get_kp50_obj()->unkp50_meas_Uin(chan);
+	*Uin = Skp50_rpc_buffer_class::Instance().kp50_slot_thr->get_kp50_obj()->unkp50_meas_Uin(chan);
 	return 0;
 }
 // Функция "Измерение выходного напряжения канала"
 ViStatus _VI_FUNC unkp50_meas_Uout (ViSession vi, ViInt16 chan, ViReal64 *Uout)
 {
-	*Uout = Srpc_buffer_class::Instance().kp50_slot_thr.get_kp50_obj()->unkp50_meas_Uout(chan);
+	*Uout = Skp50_rpc_buffer_class::Instance().kp50_slot_thr->get_kp50_obj()->unkp50_meas_Uout(chan);
 	return 0;
 }
 // Функция "Проверка готовности микроконтроллеров канала к работе"
@@ -131,7 +147,7 @@ ViStatus _VI_FUNC unkp50_switch_relay (ViSession vi, ViInt16 relay, ViInt16 stat
 // Функция "Включить канал"
 ViStatus _VI_FUNC unkp50_switch_channel (ViSession vi, ViInt16 chan, ViInt16 on)
 {
-	return Srpc_buffer_class::Instance().kp50_slot_thr.get_kp50_obj()->unkp50_switch_channel(chan, on);
+	return Skp50_rpc_buffer_class::Instance().kp50_slot_thr->get_kp50_obj()->unkp50_switch_channel(chan, on);
 }
 
 // Функция "Включить контроль КЗ входов канала на корпус"

@@ -40,7 +40,7 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 		setObjectName("Socket_RPC_SLOT_Server_Thread");
 	}
 
-	BOOP_Socket_RPC_SLOT_Server::BOOP_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, BOOP* _app) : QTcpServer(), app(_app)
+	BOOP_Socket_RPC_SLOT_Server::BOOP_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, Angle* _app) : QTcpServer(), app(_app)
 	{
 		listen(((_conn_ip == "") ? QHostAddress::Any : QHostAddress(_conn_ip)), _conn_port);
 		SRPCSignalClass::Instance().toLog(QString("slot server started listen ip %1 port %2").arg(_conn_ip).arg(_conn_port));
@@ -60,7 +60,7 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 		exec();
 	}
 
-	BOOP_Socket_RPC_SLOT_Thread::BOOP_Socket_RPC_SLOT_Thread(BOOP* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
+	BOOP_Socket_RPC_SLOT_Thread::BOOP_Socket_RPC_SLOT_Thread(Angle* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
 	{}
 
 	void BOOP_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
@@ -71,14 +71,11 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 		rpc_objects << tmp_obj;
 	}
 
-	BOOP_Socket_RPC_SLOT_Object::BOOP_Socket_RPC_SLOT_Object(BOOP* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
+	BOOP_Socket_RPC_SLOT_Object::BOOP_Socket_RPC_SLOT_Object(Angle* _app, int socketDescriptor) : QObject(), with_return(false), app(_app)
 	{
 	setObjectName(QString("BOOP_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &BOOP_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &BOOP_Socket_RPC_SLOT_Object::new_message;
-		operators_map["new_matrix_command(int, int, int, int, double, double, int, int, int)"] = &BOOP_Socket_RPC_SLOT_Object::new_matrix_command;
-		operators_map["move_boop()"] = &BOOP_Socket_RPC_SLOT_Object::move_boop;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -117,7 +114,7 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 	}
-	void BOOP_Socket_RPC_SIGNAL_Object::set_app(BOOP* _app)
+	void BOOP_Socket_RPC_SIGNAL_Object::set_app(Angle* _app)
 	{
 		app = _app;
 
@@ -261,71 +258,6 @@ int BOOP_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant BOOP_Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QVariant dt = _values.at(0).value<QVariant>();
-			int MKO = _values.at(1).value<int>();
-			int line = _values.at(2).value<int>();
-			int command_word = _values.at(3).value<int>();
-			QVariantList words = _values.at(4).value<QVariantList>();
-			int respond_word = _values.at(5).value<int>();
-			app->new_message(dt, MKO, line, command_word, words, respond_word);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant BOOP_Socket_RPC_SLOT_Object::new_matrix_command(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int mshm = _values.at(0).value<int>();
-			int pshm = _values.at(1).value<int>();
-			int length_m = _values.at(2).value<int>();
-			int length_p = _values.at(3).value<int>();
-			double u_m = _values.at(4).value<double>();
-			double u_p = _values.at(5).value<double>();
-			int dt = _values.at(6).value<int>();
-			int line_m = _values.at(7).value<int>();
-			int line_p = _values.at(8).value<int>();
-			app->new_matrix_command(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant BOOP_Socket_RPC_SLOT_Object::move_boop(QVariantList& _values)
-	{
-		try
-		{
-			app->move_boop();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 

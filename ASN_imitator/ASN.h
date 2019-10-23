@@ -30,12 +30,25 @@ enum SUBSET
 	SUBSET_OFF = 3
 };
 
+enum ASN_MODE
+{
+	MAIN_WORK = 1,
+	VECTOR_MODE = 2,
+	WAIT_MODE = 5,
+	TEST_MODE = 6
+};
+
+enum SYS_MODE
+{
+	EXPANDED_ASN = 0,
+	SYS_INF = 1
+};
+
 enum NAV_SYS
 {
 	NAV_SYS_GL = 0,
 	NAV_SYS_GPS = 1,
 	NAV_SYS_GG = 2,
-	NAV_SYS_OFF = 3
 };
 
 struct KU_DateDATA
@@ -96,11 +109,13 @@ private:
 
 	QSettings sett;
 	SUBSET current_SUBSET = SUBSET_OFF;
-	NAV_SYS nav_SYS = NAV_SYS_OFF;
-
+	NAV_SYS nav_SYS = NAV_SYS_GG;
+	ASN_MODE _mode = WAIT_MODE;
+	SYS_MODE sys_mode = EXPANDED_ASN;
 	bool test; // Тест пройден/нет
 	bool OG; // Прогрет/не прогрет
 	bool radio; // Есть радиоконтакт
+	bool dost;
 
 	bool flag_on; // Вкл/выкл имитатор
 	int volt; // Принятое напряжение

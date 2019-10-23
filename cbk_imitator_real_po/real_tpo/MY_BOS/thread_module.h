@@ -5,6 +5,13 @@
 #include <QMutex>
 #include <QVariantList>
 #include "loki\Singleton.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "bos.h"
+#ifdef __cplusplus
+}
+#endif
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -21,9 +28,24 @@ class TimeThread : public QThread
 {
 	Q_OBJECT
 public:
-	TimeThread() {};
+	TimeThread() 
+	{
+		cbk_conf.vm = 0;
+		cbk_conf.rs = 0;
+		cbk_conf.er = 0;
+		cbk_conf.of = 0xF;
+		cbk_conf.m0 = 0;
+		cbk_conf.b0 = 0;
+		cbk_conf.m1 = 0;
+		cbk_conf.b1 = 0;
+		cbk_conf.no = 0;
+		cbk_conf.dv = 0;
+		cbk_conf.rg = CFGSYS_rgWork;
+
+	};
 	~TimeThread() {};
 	void run();
+	cfgSYS_t cbk_conf;
 private:
 	QTime BoardTime;
 public slots:

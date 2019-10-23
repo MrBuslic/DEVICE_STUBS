@@ -141,14 +141,15 @@ void RPC_omnibus_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_omnibus_SLOT_Object::switch_ab_os(int mko, int addr, int _os)
+void RPC_omnibus_SLOT_Object::switch_ab_os(int mko, int addr, int _os, int _s_addr)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(mko);
 	tmp_list << QVariant(addr);
 	tmp_list << QVariant(_os);
+	tmp_list << QVariant(_s_addr);
 	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call switch_ab_os %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("switch_ab_os(int, int, int)", tmp_list);
+	dynamic_call("switch_ab_os(int, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished switch_ab_os");
 }
 void RPC_omnibus_SLOT_Object::switch_ab(int mko, int addr, bool _on)

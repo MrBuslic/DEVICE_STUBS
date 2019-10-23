@@ -2,7 +2,7 @@
 #include "rpc_ports.h"
 
 #include "cbk_socket_rpc.h"
-
+#include "mko_module.h"
 
 
 CBK_MainWindow::CBK_MainWindow() : QMainWindow()
@@ -20,7 +20,7 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 	Get_Time = new QPushButton("Время");
 	////////
 	edit = new QTextEdit(this);
-	setMinimumSize(490, 500);
+	setMinimumSize(490, 300);
 	v_lay->addLayout(grid);
 	v_lay->addWidget(Get_Time);
 	v_lay->addWidget(edit);
@@ -37,8 +37,20 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 		read_settings();
 	}
 
-	QObject::connect(this, SIGNAL(vm_is_on(int)), this, SLOT(slot_vm_is_on(int)));
-	QObject::connect(this, SIGNAL(vm_is_off(int)), this, SLOT(slot_vm_is_off(int)));
+
+	for (int i = 0; i < 4; i++)
+	{
+		QTimer* tmp_timer = new QTimer;
+		tmp_timer->setInterval(SPO_START_TIME);
+		tmp_timer->setSingleShot(true);
+		connect(tmp_timer, &QTimer::timeout, this, &CBK_MainWindow::on_timeout);
+
+		on_timers.insert(tmp_timer, i);
+		on_timers_.insert(i, tmp_timer);
+	}
+
+	//QObject::connect(this, SIGNAL(vm_is_on(int)), this, SLOT(slot_vm_is_on(int)));
+	//QObject::connect(this, SIGNAL(vm_is_off(int)), this, SLOT(slot_vm_is_off(int)));
 	QObject::connect(Get_Time, SIGNAL(clicked()), this, SLOT(show_time()));
 
 
@@ -67,6 +79,11 @@ CBK_MainWindow::CBK_MainWindow() : QMainWindow()
 		this->deleteLater();
 		return;
 	}
+
+	MkoImitObject& mko_imit(SMkoImitObject::Instance());
+	mko_imit.create_slot_thread();
+	QObject::connect(&mko_imit, SIGNAL(signal_send_msg_mko(int, int, int, QVariantList&, int&)), mko_imit.get_mko_slot_thread()->get_omnibus_obj().get(), SLOT(send_msg(int, int, int, QVariantList&, int&)), Qt::DirectConnection);
+	interrupt_thread.start();
 
 	//QString ip_str = "127.0.0.1";
 	//int slot_port = CBK_SLOT;
@@ -138,9 +155,12 @@ QGroupBox *CBK_MainWindow::createVMGroup(int n_vm)
 
 void CBK_MainWindow::VM_init()
 {
+	w_state.VM = -1;
+	w_state.PO = -1;
 	for (int i = 0; i < 4; i++)
 	{
 		VMS.VMPowerState[i] = OFF;
+		VMS.running[i] = false;
 	}
 	set_VM_OFF(0);
 	set_VM_OFF(1);
@@ -161,8 +181,7 @@ void CBK_MainWindow::VM_init()
 
 void CBK_MainWindow::WorkState_init()
 {
-	w_state.VM = -1;
-	w_state.PO = -1;
+
 }
 
 void CBK_MainWindow::set_str_combo()
@@ -190,7 +209,10 @@ void CBK_MainWindow::set_VM_ON(int n_vm)
 	VMS.VMPowerState[n_vm] = ON;
 	pitanie[n_vm+1] = true;
 	VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : green; color : black; }");
-	emit(vm_is_on(n_vm));
+	//emit(vm_is_on(n_vm));
+	VMS.StartTime[n_vm] = QDateTime::currentMSecsSinceEpoch();
+	on_timers_[n_vm]->start();
+
 	set_tm_state();
 }
 
@@ -210,9 +232,24 @@ void CBK_MainWindow::VM_OFF_clicked()
 void CBK_MainWindow::set_VM_OFF(int n_vm)
 {
 	VMS.VMPowerState[n_vm] = OFF;
+	VMS.running[n_vm] = false;
 	pitanie[n_vm+1] = false;
 	VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : grey; color : black; }");
-	emit(vm_is_off(n_vm));
+	if (STimeThread::Instance().cbk_conf.vm & (1 << n_vm))
+		STimeThread::Instance().cbk_conf.vm ^= (1 << n_vm);
+
+	STimeThread::Instance().cbk_conf.of |= (1 << n_vm);
+
+	STimeThread::Instance().cbk_conf.er |= (1 << n_vm);
+
+	if ((STimeThread::Instance().cbk_conf.vm == 0) && (w_state.PO != -1))
+	{
+		shutdown_PO(w_state.PO);
+		STimeThread::Instance().cbk_conf.rs = 0;
+		STimeThread::Instance().cbk_conf.of = 0xF;
+		STimeThread::Instance().cbk_conf.er = 0xF;
+	}
+
 	set_tm_state();
 }
 
@@ -344,12 +381,122 @@ void CBK_MainWindow::new_ku(int ku_n, int length, double u, int line)
 
 
 
-void CBK_MainWindow::slot_vm_is_on(int n_vm)
+//void CBK_MainWindow::slot_vm_is_on(int n_vm)
+//{
+//	if (w_state.VM == -1)
+//	{
+//		w_state.VM = n_vm;
+//		w_state.PO = VMS.VMPOState[n_vm];
+//		switch (VMS.VMPOState[n_vm])
+//		{
+//		case(SPOBU):
+//			run_PO(SPOBU);
+//			break;
+//		case(TPO):
+//			run_PO(TPO);
+//			break;
+//		case(VACANT):
+//			break;
+//		}
+//		
+//		return;
+//	}
+//	if ((w_state.PO == VMS.VMPOState[n_vm])&&(w_state.VM != n_vm))
+//	{
+//		//VMS.VMPOState[n_vm] = VACANT;
+//		//VM_Combos[n_vm]->setCurrentIndex(VACANT);
+//		//QMessageBox::information(0, QString("VM -%1 is ON").arg(n_vm), "PO is changed to VACANT");
+//		//return;
+//	}
+//	if (((w_state.PO == SPOBU) && (VMS.VMPOState[n_vm] == TPO))&&(w_state.VM != n_vm))
+//	{
+//		VMS.VMPowerState[n_vm] = OFF;
+//		VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : grey; color : black; }");
+//		return;
+//	}
+//	if (((w_state.PO == TPO) && (VMS.VMPOState[n_vm] == SPOBU)) && (w_state.VM != n_vm))
+//	{
+//		VMS.VMPowerState[w_state.VM] = OFF;
+//		VM_Labels[w_state.VM]->setStyleSheet("QLabel { background-color : grey; color : black; }");
+//		shutdown_PO(TPO);
+//		w_state.VM = n_vm;
+//		w_state.PO = VMS.VMPOState[n_vm];
+//		run_PO(SPOBU);
+//	}
+//
+//}
+//
+//void CBK_MainWindow::slot_vm_is_off(int n_vm)
+//{
+//	bool need_shutdown = TRUE;
+//	if (w_state.VM == n_vm)
+//	{
+//		for (int i = 0; i < 4; i++)
+//		{
+//			if ((VMS.VMPowerState[i] == ON) && (i != (n_vm)) && (VMS.VMPOState[i] == VACANT))
+//			{
+//				w_state.VM = i;
+//				w_state.PO = VMS.VMPOState[i];
+//				VM_Combos[i]->setCurrentIndex(w_state.PO);
+//				need_shutdown = FALSE;
+//				break;
+//			}
+//		}
+//		if (need_shutdown)
+//		{
+//			shutdown_PO(w_state.PO);
+//			w_state.VM = -1;
+//			w_state.PO = -1;
+//		}
+//		else
+//		{
+//			return;
+//		}	
+//	}
+//	else
+//	{
+//		return;
+//	}
+//}
+
+void CBK_MainWindow::opo_loaded(int n_vm)
 {
-	if (w_state.VM == -1)
+	VMS.running[n_vm] = true;
+	STimeThread::Instance().cbk_conf.vm += (1 << n_vm);
+	if (STimeThread::Instance().cbk_conf.of & (1 << n_vm))
+		STimeThread::Instance().cbk_conf.of ^= (1 << n_vm);
+	if (STimeThread::Instance().cbk_conf.er & (1 << n_vm))
+		STimeThread::Instance().cbk_conf.er ^= (1 << n_vm);
+
+	bool need_po_start = true;
+	bool need_shutdown = true;
+	for (int i = 0; i < 4; i++)
 	{
-		w_state.VM = n_vm;
-		w_state.PO = VMS.VMPOState[n_vm];
+		if ((n_vm != i) && (VMS.VMPowerState[i] == ON) && (VMS.running[i]))
+		{
+			if (qAbs(VMS.StartTime[n_vm] - VMS.StartTime[i]) > 1000)
+			{
+				set_VM_OFF(i);
+			}
+			else
+				need_po_start = false;
+		}
+
+		need_shutdown &= VMS.running[i];
+	}
+
+
+	if (need_shutdown)
+	{
+		set_VM_OFF(3);
+		STimeThread::Instance().cbk_conf.rs += (1 << 3);
+		if (STimeThread::Instance().cbk_conf.er & (1 << 3))
+			STimeThread::Instance().cbk_conf.er ^= (1 << 3);
+	}
+
+
+	if (need_po_start)
+	{
 		switch (VMS.VMPOState[n_vm])
 		{
 		case(SPOBU):
@@ -360,66 +507,22 @@ void CBK_MainWindow::slot_vm_is_on(int n_vm)
 			break;
 		case(VACANT):
 			break;
-		}
-		
-		return;
-	}
-	if ((w_state.PO == VMS.VMPOState[n_vm])&&(w_state.VM != n_vm))
-	{
-		VMS.VMPOState[n_vm] = VACANT;
-		VM_Combos[n_vm]->setCurrentIndex(VACANT);
-		QMessageBox::information(0, QString("VM -%1 is ON").arg(n_vm), "PO is changed to VACANT");
-		return;
-	}
-	if (((w_state.PO == SPOBU) && (VMS.VMPOState[n_vm] == TPO))&&(w_state.VM != n_vm))
-	{
-		VMS.VMPowerState[n_vm] = OFF;
-		VM_Labels[n_vm]->setStyleSheet("QLabel { background-color : grey; color : black; }");
-		return;
-	}
-	if (((w_state.PO == TPO) && (VMS.VMPOState[n_vm] == SPOBU)) && (w_state.VM != n_vm))
-	{
-		VMS.VMPowerState[w_state.VM] = OFF;
-		VM_Labels[w_state.VM]->setStyleSheet("QLabel { background-color : grey; color : black; }");
-		shutdown_PO(TPO);
-		w_state.VM = n_vm;
+		};
 		w_state.PO = VMS.VMPOState[n_vm];
-		run_PO(SPOBU);
+		STimeThread::Instance().cbk_conf.m0 = n_vm + 1;
+		STimeThread::Instance().cbk_conf.m1 = n_vm + 1;
+		STimeThread::Instance().cbk_conf.dv = n_vm + 1;
+
 	}
 
 }
 
-void CBK_MainWindow::slot_vm_is_off(int n_vm)
+
+void CBK_MainWindow::on_timeout()
 {
-	bool need_shutdown = TRUE;
-	if (w_state.VM == n_vm)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			if ((VMS.VMPowerState[i] == ON) && (i != (n_vm)) && (VMS.VMPOState[i] == VACANT))
-			{
-				w_state.VM = i;
-				w_state.PO = VMS.VMPOState[i];
-				VM_Combos[i]->setCurrentIndex(w_state.PO);
-				need_shutdown = FALSE;
-				break;
-			}
-		}
-		if (need_shutdown)
-		{
-			shutdown_PO(w_state.PO);
-			w_state.VM = -1;
-			w_state.PO = -1;
-		}
-		else
-		{
-			return;
-		}	
-	}
-	else
-	{
-		return;
-	}
+	QTimer* tmp_timer = static_cast<QTimer*>(sender());
+	tmp_timer->stop();
+	opo_loaded(on_timers[tmp_timer]);
 }
 
 void CBK_MainWindow::run_PO(int PO)
@@ -434,7 +537,7 @@ void CBK_MainWindow::run_PO(int PO)
 		TimeThread& b_time(STimeThread::Instance());
 		b_time.start();
 		tpo_thread.start();
-		interrupt_thread.start();
+		
 		break;
 	}
 }
@@ -448,14 +551,13 @@ void CBK_MainWindow::shutdown_PO(int PO)
 		break;
 	case(TPO):
 		edit->append("Shutdown TPO");
-		interrupt_thread.stop_thread();
-		interrupt_thread.wait(5000);
 		tpo_thread.terminate();
 		tpo_thread.wait(5000);
 		STimeThread::Instance().quit();
 		STimeThread::Instance().wait(5000);
 		break;
 	}
+	w_state.PO = -1;
 }
 
 void CBK_MainWindow::show_time()
@@ -471,6 +573,11 @@ void CBK_MainWindow::get_power(double _volt)
 	if (_volt >= 23.0)
 	{
 		pitanie[0] = true;
+		STimeThread::Instance().cbk_conf.vm = 0;
+		STimeThread::Instance().cbk_conf.rs = 0;
+		STimeThread::Instance().cbk_conf.of = 0xF;
+		STimeThread::Instance().cbk_conf.er = 0xF;
+
 		set_tm_state();
 		for (int i = 0; i < 4; i++)
 		{

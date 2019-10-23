@@ -76,7 +76,7 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("omnibus_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &omnibus_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["switch_ab_os(int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab_os;
+		operators_map["switch_ab_os(int, int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab_os;
 		operators_map["switch_ab(int, int, bool)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab;
 		operators_map["set_new_data(int, int, int, QVariantList)"] = &omnibus_Socket_RPC_SLOT_Object::set_new_data;
 		operators_map["send_msg(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg;
@@ -334,7 +334,8 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int mko = _values.at(0).value<int>();
 			int addr = _values.at(1).value<int>();
 			int _os = _values.at(2).value<int>();
-			app->switch_ab_os(mko, addr, _os);
+			int _s_addr = _values.at(3).value<int>();
+			app->switch_ab_os(mko, addr, _os, _s_addr);
 			return 0;
 		}
 		catch(const std::exception &)

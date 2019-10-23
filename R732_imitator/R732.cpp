@@ -22,6 +22,8 @@ R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bu
 	mpvn_modules << R732_MV_MODULE(5, 0);
 	mvku_modules << R732_MV_MODULE(2, 0);
 
+	tm_data.tm_data = 0;
+
 	//setFixedSize(572, 200);
 	setWindowTitle("14Р732");
 	MU1 = new QPushButton("МУ 1", this);
@@ -159,6 +161,12 @@ R732_widg::R732_widg() : mko_counter(0), vchm_is_init(false), MKO(1), adr(2), bu
 
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k2(double)), this, SLOT(get_power(double)));
 
+	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
+	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(new_kpi(QVariantList)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+
+
 	connect(&vchm_on_timer, &QTimer::timeout, this, &R732_widg::set_vchm_on);
 	connect(&mu_on_timer, &QTimer::timeout, this, &R732_widg::set_mu_on);
 	connect(MU1, &QPushButton::clicked, this, &R732_widg::set_mu_on);
@@ -197,11 +205,11 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.subadr >= 17) && (tmp_cwd.subadr <= 29))
-	{
-		mko_counter++;
-		set_new_tm();
-	}
+	//if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.subadr >= 17) && (tmp_cwd.subadr <= 29))
+	//{
+	//	mko_counter++;
+	//	set_new_tm();
+	//}
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		if (tmp_cwd.subadr == 17)
@@ -257,7 +265,7 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 							vchm_module.set_working_chanels(vchm_chanels_init, false);
 							if (vchm_chanels_init.contains(1) && !vchm_on_timer.isActive())
 							{
-								vchm_on_timer.start(90000);
+								vchm_on_timer.start(VCHM_START_TIME);
 								vchm_is_init = true;
 							}
 						}
@@ -306,10 +314,11 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				};
 			}
 			paint_buttons();
+			mko_counter++;
+
 			set_new_tm();
 			if (need_mvku_renew)
 				new_data_mv();
-
 		}
 
 		if (tmp_cwd.subadr == 21)
@@ -321,6 +330,9 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					SCHBK[i] = words.at(i).toInt();
 				}
 				makeFuckingMagic();
+				mko_counter++;
+				set_new_tm();
+
 			}
 		}
 
@@ -344,6 +356,9 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				}
 			}
 			new_data_mv();
+			mko_counter++;
+			set_new_tm();
+
 		}
 
 		if ((tmp_cwd.subadr == 2) || (tmp_cwd.subadr == 3))
@@ -383,6 +398,11 @@ void R732_widg::set_new_tm()
 	unsigned short word_11 = 0xC0A0;
 	word_11 += (PUPS & 0x1F);
 	tm_words << word_11;
+	tm_words << 0xC000;
+	tm_words << 0xC200;
+	tm_words << 0xC400;
+	tm_words << 0xC600;
+
 	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
 }
 
@@ -449,7 +469,7 @@ QVariantList R732_widg::get_vchm_word()
 		{
 			tmp_word += 1 << vchm_index; //признак включения ВЧМ (биты 0-3)
 			tmp_word += 1 << (8 + vchm_index); //признак включения ВЧМ в рабочую конфигурацию (биты 8-11)
-			tmp_word += (PUPS & 0x1F); //пупс
+			//tmp_word += (PUPS & 0x1F); //пупс
 		}
 	}
 	tm_words << tmp_word;
@@ -531,6 +551,7 @@ void R732_widg::set_vchm_on()
 	vchm_module.set_working_chanels(vchm_chanels_init, true);
 	vchm_is_init = false;
 	paint_buttons();
+	set_new_tm();
 }
 
 void R732_widg::set_mu_on()
@@ -538,16 +559,14 @@ void R732_widg::set_mu_on()
 	mu_on_timer.stop();
 	if (!ready_to_work_hard)
 	{
-		connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-		connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
-		connect(mbk02_signal_thr.get_obj().get(), SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(new_kpi(QVariantList)));
-		connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 		omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 		ready_to_work_hard = true;
 		mu_module.switch_cur_dev(R732_CURRENT_DEV::MAIN);
 		mpvn_modules[0].switch_cur_dev(R732_CURRENT_DEV::MAIN);
 		mvku_modules[0].switch_cur_dev(R732_CURRENT_DEV::MAIN);
 		set_new_tm();
+		set_new_mbk02_tm(1, 0xFFFF);
+		set_new_mbk02_tm(4, 0xFFFF);
 		paint_buttons();
 	}
 }
@@ -567,19 +586,18 @@ void R732_widg::imit_on()
 	power_on = true;
 	mu_on_timer.start(12000);
 	vchm_chanels_init.clear();
-	vchm_chanels_init << 1 << 1 << 1 << 0;
-	vchm_on_timer.start(90000);
+	vchm_chanels_init << 1 << 1 << 1 << 1;
+	vchm_on_timer.start(VCHM_START_TIME);
 	set_power_back();
+	tm_data.PP = 1;
+	tm_data.VP_O = 1;
+	set_tm_state();
 }
 
 void R732_widg::imit_off()
 {
 	mu_on_timer.stop();
 	vchm_on_timer.stop();
-	disconnect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-	disconnect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
-	disconnect(mbk02_signal_thr.get_obj().get(), SIGNAL(msg_to_14R732(QVariantList)), this, SLOT(new_kpi(QVariantList)));
-	disconnect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	power = 0;
 	power_on = false;
@@ -592,6 +610,10 @@ void R732_widg::imit_off()
 	vchm_module.set_working_chanels(vchm_chanels_init);
 	set_power_back();
 	set_new_tm();
+	tm_data.PP = 0;
+	tm_data.VP_O = 0;
+	tm_data.VP_R = 0;
+	set_tm_state();
 	paint_buttons();
 }
 
@@ -607,16 +629,25 @@ void R732_widg::set_power_back()
 
 void R732_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
-	if (pshm != 0)
+	if ((pshm != 0) ||( (mshm < 1) && (mshm > 2)))
 		return;
 	if (mshm == 1)
+	{
+		tm_data.VP_O = 1;
+		tm_data.VP_R = 0;
 		mu_module.switch_cur_dev(R732_CURRENT_DEV::MAIN);
+	}
 	else if (mshm == 2)
+	{
+		tm_data.VP_O = 0;
+		tm_data.VP_R = 1;
 		mu_module.switch_cur_dev(R732_CURRENT_DEV::RESERVE);
+	}
 	else
 		return;
 	paint_buttons();
 	set_new_tm();
+	set_tm_state();
 }
 
 void R732_widg::new_kpi(QVariantList kpi)
@@ -697,7 +728,12 @@ unsigned short R732_MV_MODULE::get_tm()
 	if (R732_CURRENT_DEV == R732_CURRENT_DEV::OFF)
 		_word += 0xC0;
 	else
-		_word += 0x20 << (unsigned short) R732_CURRENT_DEV;
+	{
+		if (com == 5)//МПВН всегда занят в первый раз
+			_word += 0x28 << (unsigned short)R732_CURRENT_DEV;
+		else
+			_word += 0x20 << (unsigned short)R732_CURRENT_DEV;
+	}
 	return _word;
 }
 
@@ -717,10 +753,10 @@ R732_VCHM_MODULE::R732_VCHM_MODULE()
 	working.insert(VCHM1, false);
 	working.insert(VCHM2, false);
 	working.insert(VCHM3, false);
-	proc_working.insert(VCHM0, false);
-	proc_working.insert(VCHM1, false);
-	proc_working.insert(VCHM2, false);
-	proc_working.insert(VCHM3, false);
+	//proc_working.insert(VCHM0, false);
+	//proc_working.insert(VCHM1, false);
+	//proc_working.insert(VCHM2, false);
+	//proc_working.insert(VCHM3, false);
 }
 
 void R732_VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
@@ -750,8 +786,14 @@ void R732_VCHM_MODULE::set_working_proc(int chanel, int state)
 	if (state)
 	{
 		if (working[VCHM_CHANEL(chanel)])
-			proc_working[VCHM_CHANEL(chanel)] = true;
+			working[VCHM_CHANEL(chanel)] = true;
 	}
 	else
-		proc_working[VCHM_CHANEL(chanel)] = false;
+		working[VCHM_CHANEL(chanel)] = false;
+}
+
+
+void R732_widg::set_tm_state()
+{
+	mku_slot_thr.get_mku_bus_obj()->set_tm("732_TM", (uint)(tm_data.tm_data));
 }

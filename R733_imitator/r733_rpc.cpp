@@ -1,40 +1,5 @@
 #include "r733_rpc.h"
 
-void RPC_r733_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("r733 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("r733 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("r733 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_r733_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("r733 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("r733 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("r733 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_r733_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_r733_SLOT_Object>(new RPC_r733_SLOT_Object(addr, port));
@@ -181,6 +146,29 @@ void RPC_r733_SLOT_Object::new_frame_04(QString mode, QVariant frame_data)
 	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call new_frame_04 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("new_frame_04(QString, QVariant)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_frame_04");
+}
+void RPC_r733_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(line_m);
+	tmp_list << QVariant(line_p);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_mk");
+}
+void RPC_r733_SLOT_Object::set_vchm_on()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call set_vchm_on %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_vchm_on()", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished set_vchm_on");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

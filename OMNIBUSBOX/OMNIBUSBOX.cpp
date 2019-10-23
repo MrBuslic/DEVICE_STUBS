@@ -63,23 +63,31 @@ RpcOmnibusWidget::RpcOmnibusWidget(QWidget* parent) : QWidget(parent)
 RpcAbonent::RpcAbonent(int addr)
 {
 	on = false;
-	os = addr << 11;
-	for (int i = 1; i < 30; i++)
+	unsigned short tmp_os = addr << 11;
+	os.insert(0, tmp_os);
+	os.insert(31, tmp_os);
+	for (int i = 1; i < 31; i++)
 	{
 		QList<unsigned short> tmp_words;
 		for (int j = 0; j < 32; j++)
 		{
 			tmp_words << 0;
 		}
-
+		os.insert(i, tmp_os);
 		words.insert(i, tmp_words);
 	}
 }
 
-void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os)
+void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os, int _s_addr)
 {
-	abonents[mko][addr].os = _os;
-	QString _msg = QString("Абонент с адресом %1 на МКО %2 с ответным словом %3").arg(addr).arg(mko).arg(_os);
+	if (_s_addr == -1)
+		for (int i = 0; i < 32; i++)
+		{
+			abonents[mko][addr].os[i] = _os;
+		}
+	else
+		abonents[mko][addr].os[_s_addr] = _os;
+	QString _msg = QString("Абоненту с адресом %1 на МКО %2 установлено ОС %3 на подадрес %4").arg(addr).arg(mko).arg(_os).arg(_s_addr);
 	emit message_to_log(_msg);
 }
 
@@ -115,7 +123,7 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 	}
 	if (abonents[mko][tmp_cwd.adr].on)
 	{
-		os = abonents[mko][tmp_cwd.adr].os;
+		os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
 		if (tmp_cwd.tr)
 		{
 			words.clear();

@@ -17,6 +17,23 @@
 //#include "../MBK-02_imitator/MBK02_rpc.h"
 #include "../mbk04_imitator/mbk04_rpc.h"
 #include "../buses_imitator/frame_bus_rpc.h"
+
+#define VCHM_START_TIME 80000
+
+union TM_733
+{
+	quint16 tm_data;
+	struct
+	{
+		quint16 PP : 1,
+			GO : 1,
+			VP_O : 1,
+			VP_R : 1,
+			GR : 1,
+			res : 11;
+	};
+};
+
 class R733_widg : public QWidget
 {
     Q_OBJECT
@@ -24,6 +41,8 @@ public:
 	R733_widg();
 	~R733_widg() {}
 private:
+	TM_733 tm_data;
+
 	QPushButton *MU1;
 	QPushButton *MU2;
 	QPushButton *main_MPVN;
@@ -68,6 +87,9 @@ private:
 	int adr;
 	bool flag_on;
 	int num_ku;
+	
+	int PUPS = 0x01;
+
 
 	int rrr;
 	int rpk;
@@ -111,14 +133,27 @@ private:
 	QList<int> rbk_channels;
 	bool vchm_is_init;
 	QTimer vchm_on_timer;
+	QTimer mu_on_timer;
 
 	QString regime;
 	QString msg;
+
+	QVariantList get_mko_counter_word();
+	QVariantList get_pups_words_list();
+	QVariantList get_vchm_word();
+
+	unsigned short mko_counter;
+
+	void set_tm_state();
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void auto_scroll_clicked(int _state);
 	void get_power(double volt);
 	void new_frame_04(QString mode, QVariant frame_data);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+
+
+	void set_vchm_on();
 protected:
 	void closeEvent(QCloseEvent *event);
 signals:

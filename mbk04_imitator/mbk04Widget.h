@@ -35,10 +35,6 @@ public:
 	~MainWidget();
 	
 private:
-	QWidget* widg;
-	
-	QMainWindow* main_widg;
-	
 	QPushButton* o_rez_btn;
 	
 	QPushButton* r_rez_btn;

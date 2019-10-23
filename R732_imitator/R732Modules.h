@@ -140,11 +140,11 @@ public:
 	}
 	bool get_proc_working(int chanel)
 	{
-		return proc_working[VCHM_CHANEL(chanel)];
+		return working[VCHM_CHANEL(chanel)];
 	}
 private:
 	QMap<VCHM_CHANEL, bool> working;
-	QMap<VCHM_CHANEL, bool> proc_working;
+
 };
 
 #endif // R732_MODULES_H

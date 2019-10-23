@@ -21,7 +21,7 @@ public:
 	~BOOP_Socket_RPC_SIGNAL_Object()
 	{
 	}
-	void set_app(BOOP* _app);
+	void set_app(Angle* _app);
 
 	void set_socket(QTcpSocket* _rpc_socket);
 signals:
@@ -35,7 +35,7 @@ private:
 	void send_signal_func(QByteArray* _arr);
 	QTcpSocket* rpc_socket;
 	QMutex signal_mutex;
-	BOOP* app;
+	Angle* app;
 	static int obj_num;
 	static int call_number;
 	QMap<QString, std::shared_ptr<SignalData> > data_map;
@@ -47,7 +47,7 @@ class BOOP_Socket_RPC_SIGNAL_Server : public QObject
 	Q_OBJECT
 public:
 	BOOP_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
-	void set_app(BOOP* _app)
+	void set_app(Angle* _app)
 	{
 		app = _app;
 	}
@@ -55,7 +55,7 @@ public slots:
 	void tcp_slot();
 private:
 	QTcpServer* rpc_server;
-	BOOP* app;
+	Angle* app;
 	QList<std::shared_ptr<BOOP_Socket_RPC_SIGNAL_Object> > rpc_objects;
 };
 
@@ -64,7 +64,7 @@ class BOOP_Socket_RPC_SIGNAL_Thread : public QThread
 	Q_OBJECT
 public:
 	BOOP_Socket_RPC_SIGNAL_Thread();
-	void set_app(BOOP* _app)
+	void set_app(Angle* _app)
 	{
 		app = _app;
 	}
@@ -76,7 +76,7 @@ public:
 	void run();
 private:
 	BOOP_Socket_RPC_SIGNAL_Server* rpc_srv;
-	BOOP* app;
+	Angle* app;
 	QString conn_ip;
 	int conn_port;
 };
@@ -85,7 +85,7 @@ class BOOP_Socket_RPC_SLOT_Object : public QObject
 {
 	Q_OBJECT
 public:
-	BOOP_Socket_RPC_SLOT_Object(BOOP* _app, int socketDescriptor);
+	BOOP_Socket_RPC_SLOT_Object(Angle* _app, int socketDescriptor);
 	~BOOP_Socket_RPC_SLOT_Object()
 	{
 	}
@@ -93,16 +93,13 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant new_message(QVariantList& _values);
-	QVariant new_matrix_command(QVariantList& _values);
-	QVariant move_boop(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
 private:
 	OPERATORS_MAP operators_map;
 	QTcpSocket* rpc_socket;
-	BOOP* app;
+	Angle* app;
 	bool with_return;
 	static int obj_num;
 };
@@ -111,12 +108,12 @@ class BOOP_Socket_RPC_SLOT_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	BOOP_Socket_RPC_SLOT_Thread(BOOP* _app, int _socketDescriptor);
+	BOOP_Socket_RPC_SLOT_Thread(Angle* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<BOOP_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
 	private:
 	std::shared_ptr<BOOP_Socket_RPC_SLOT_Object> rpc_obj;
-	BOOP* app;
+	Angle* app;
 	int socketDescriptor;
 };
 
@@ -124,11 +121,11 @@ class BOOP_Socket_RPC_SLOT_Server : public QTcpServer
 {
 	Q_OBJECT
 public:
-	BOOP_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, BOOP* _app);
+	BOOP_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, Angle* _app);
 protected:
 	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
 private:
-	BOOP* app;
+	Angle* app;
 	QList<std::shared_ptr<BOOP_Socket_RPC_SLOT_Thread> > rpc_objects;
 };
 
@@ -137,7 +134,7 @@ class BOOP_Socket_RPC_SLOT_Server_Thread : public QThread
 	Q_OBJECT
 public:
 	BOOP_Socket_RPC_SLOT_Server_Thread();
-	void set_app(BOOP* _app)
+	void set_app(Angle* _app)
 	{
 		app = _app;
 	}
@@ -149,7 +146,7 @@ public:
 	void run();
 private:
 	BOOP_Socket_RPC_SLOT_Server* rpc_srv;
-	BOOP* app;
+	Angle* app;
 	QString conn_ip;
 	int conn_port;
 

@@ -17,6 +17,22 @@
 #include "../buses_imitator//interrupt_bus_rpc.h"
 #include "../MBK-02_imitator/MBK02_rpc.h"
 
+#define VCHM_START_TIME 80000
+
+union TM_732
+{
+	quint16 tm_data;
+	struct
+	{
+		quint16 PP : 1,
+			GO : 1,
+			VP_O : 1,
+			VP_R : 1,
+			GR : 1,
+			res : 11;
+	};
+};
+
 class R732_widg : public QWidget
 {
     Q_OBJECT
@@ -24,6 +40,7 @@ public:
 	R732_widg();
 	~R732_widg();
 private:
+	TM_732 tm_data;
 	QPushButton *MU1;
 	QPushButton *MU2;
 	QPushButton *main_MPVN;
@@ -91,6 +108,7 @@ private:
 	void imit_off();
 	void set_power_back();
 	void restart_vchm_proc(int chanel);
+	void set_tm_state();
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:

@@ -23,27 +23,26 @@ union MKOWord
 
 MainWidget::MainWidget()  
 {
-	widg = new QWidget(this);
 	//this->setFixedSize(1910, 1130);
 	setWindowTitle("Имитатор МБК04");
 
 	o_rez_btn = new QPushButton("О", this);
 	o_rez_btn->setCheckable(true);
-	o_rez_btn->setFixedWidth(200);
-	o_rez_btn->setFixedHeight(150);
+	o_rez_btn->setFixedWidth(100);
+	o_rez_btn->setFixedHeight(50);
 	r_rez_btn = new QPushButton("Р", this);
 	r_rez_btn->setCheckable(true);
-	r_rez_btn->setFixedWidth(200);
-	r_rez_btn->setFixedHeight(150);
+	r_rez_btn->setFixedWidth(100);
+	r_rez_btn->setFixedHeight(50);
 	ik15_btn = new QPushButton("ИК15", this);
 	ik15_btn->setCheckable(true);
-	ik15_btn->setFixedHeight(70);
+	ik15_btn->setFixedHeight(50);
 	ik8_btn = new QPushButton("ИК8", this);
 	ik8_btn->setCheckable(true);
-	ik8_btn->setFixedHeight(70);
+	ik8_btn->setFixedHeight(50);
 	vtf_btn = new QPushButton("ВТФ", this);
 	vtf_btn->setCheckable(true);
-	vtf_btn->setFixedHeight(70);
+	vtf_btn->setFixedHeight(50);
 
 
 
@@ -62,11 +61,6 @@ MainWidget::MainWidget()
 	v_l->addLayout(h_l);
 	v_l->addLayout(h_2);
 
-	main_widg = new QMainWindow;
-	QWidget* central = new QWidget;
-	central->setFixedWidth(1);
-	main_widg->setCentralWidget(central);
-	v_l->addWidget(main_widg);
 	this->setLayout(v_l);
 	o_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 	r_rez_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -158,6 +152,9 @@ void MainWidget::new_ku(int ku_n, int length, double u)
 void MainWidget::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	if (!power_flag)
+		return;
+
+	if (current_dev == CURRENT_DEV::OFF)
 		return;
 
 	MKOWord tmp_cwd;
@@ -252,71 +249,70 @@ void MainWidget::state_changed()
 	}
 	tmp_new_tm = tmp_new_tm & 0xFFFE | (new_ok0 << 0);
 	tmp_new_tm = tmp_new_tm & 0xFFFD | (new_ok1 << 1);
-	if (current_dev != CURRENT_DEV::OFF)
+
+	timer = new QTimer(this);
+
+	connect(timer, &QTimer::timeout, this, &MainWidget::send_frame);
+
+
+	switch (current_rezh)
 	{
-		timer = new QTimer(this);
+	case REZH_FRAME::VTF:
+		new_ok2 = 0;
+		new_ok3 = 0;
+		new_ok4 = 1;
+		current_mode = "ВТФ";
+		clean_frame_data(current_mode);
+		timer->start(11000);
+		str_num_timer.start();
+		ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		vtf_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+		break;
+	case REZH_FRAME::PI8:
+		new_ok2 = 0;
+		new_ok3 = 1;
+		new_ok4 = 0;
+		current_mode = "ПИ8";
+		str_num_timer.start();
+		clean_frame_data(current_mode);
+		timer->start(4000);
+		ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+		vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case REZH_FRAME::PI15:
+		new_ok2 = 1;
+		new_ok3 = 0;
+		new_ok4 = 0;
+		current_mode = "ПИ15";
+		str_num_timer.start();
+		clean_frame_data(current_mode);
+		timer->start(4000);
+		ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
+		ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case REZH_FRAME::OFF_REZH:
+		new_ok2 = 1;
+		new_ok3 = 1;
+		new_ok4 = 1;
+		timer->stop();
+		current_mode = "ВЫКЛ";
+		str_num_timer.elapsed();
+		ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
 
-		connect(timer, &QTimer::timeout, this, &MainWidget::send_frame);
-
-
-		switch (current_rezh)
-		{
-		case REZH_FRAME::VTF:
-			new_ok2 = 0;
-			new_ok3 = 0;
-			new_ok4 = 1;
-			current_mode = "ВТФ";
-			clean_frame_data(current_mode);
-			timer->start(11000);
-			str_num_timer.start();
-			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			vtf_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-			break;
-		case REZH_FRAME::PI8:
-			new_ok2 = 0;
-			new_ok3 = 1;
-			new_ok4 = 0;
-			current_mode = "ПИ8";
-			str_num_timer.start();
-			clean_frame_data(current_mode);
-			timer->start(4000);
-			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-		case REZH_FRAME::PI15:
-			new_ok2 = 1;
-			new_ok3 = 0;
-			new_ok4 = 0;
-			current_mode = "ПИ15";
-			str_num_timer.start();
-			clean_frame_data(current_mode);
-			timer->start(4000);
-			ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
-			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-		case REZH_FRAME::OFF_REZH:
-			new_ok2 = 1;
-			new_ok3 = 1;
-			new_ok4 = 1;
-			timer->stop();
-			current_mode = "ВЫКЛ";
-			str_num_timer.elapsed();
-			ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			vtf_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
-			break;
-
-		default:
-			break;
-		}
-		
-		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
-		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
-		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
+	default:
+		break;
 	}
+		
+	tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+	tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+	tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
+
 	emit new_tm(tmp_new_tm);
 }
 
@@ -388,11 +384,11 @@ void MainWidget::send_frame()
 
 void MainWidget::get_power(double volt)
 {
-	if (volt >= 20.0)
+	if ((volt >= 20.0) && (!power_flag))
 		power_flag = true;
 
 	else
-	if (volt < 0) 
+	if ((volt < 0) && (power_flag))
 	{
 		imit_off();
 		power_flag = false;

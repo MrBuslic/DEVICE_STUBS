@@ -12,6 +12,22 @@
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 
+class Angle
+{
+public:
+	Angle() : cur_pos(0), null_pos(0), plus_stop(0), minus_stop(0), saw_n(0) {}
+	void calc_angle(int steps = 0);
+	int cur_pos;
+	int null_pos;
+	int plus_stop;
+	int minus_stop;
+	double _angle;
+	QString angle_string;
+	int saw_n;
+	static const double ShD_bit;
+	static const double DU_bit;
+};
+
 union BOOPDataWords
 {
 	BOOPDataWords()
@@ -22,34 +38,34 @@ union BOOPDataWords
 	quint16 data_words[11];
 
 	struct {
-		quint16 upsilon_servo_power_status : 1,
+		quint16 nu_servo_power_status : 1,
 			phi_servo_power_status : 1,
-			upsilon_angle_sensor_power_status : 1,
+			nu_angle_sensor_power_status : 1,
 			phi_angle_sensor_power_status : 1,
-			upsilon_channel_work_status : 1,
+			nu_channel_work_status : 1,
 			phi_channel_work_status : 1,
 			previous_message_error : 1,
 			half_set_engage : 1,
 			temperature : 8;
 
-		quint16 upsilon_pulse_amount : 15,
-			upsilon_rotation_direction : 1;
+		quint16 nu_pulse_amount : 15,
+			nu_rotation_direction : 1;
 
 		quint16 phi_pulse_amount : 15,
 			phi_rotation_direction : 1;
 
-		quint16 uplsilon_pulse_frequency : 9,
+		quint16 nu_pulse_frequency : 9,
 			: 7;
 
 		quint16 phi_pulse_frequency : 9,
 			: 7;
 
-		quint16 upsilon_angle;
+		quint16 nu_angle;
 
 		quint16 phi_angle;
 
-		quint16 upsilon_pulse_summ : 15,
-			usplison_summ_sign : 1;
+		quint16 nu_pulse_summ : 15,
+			nu_summ_sign : 1;
 
 		quint16 phi_pulse_summ : 15,
 			phi_summ_sign : 1;
@@ -66,7 +82,7 @@ union BOOPDataWords
 			: 7,
 			bit4 : 1;
 
-		quint16 upsilon_min_angle;
+		quint16 nu_min_angle;
 
 		quint16 phi_min_angle;
 
@@ -108,13 +124,13 @@ private:
 	QCheckBox *bit4;
 
 	// Uplilon channel servo controls
-	QLabel *upsilonAngleValue;
-	QLabel *upsilonAnglePiValue;
-	QLabel *upsilonSawNumber;
-	QCheckBox *upsilonAngleSensorPower;
-	QCheckBox *upsilonAngleServoPower;
-	QPushButton *increaseUpsilonAngle;
-	QPushButton *decreaseUpsilonAngle;
+	QLabel *nuAngleValue;
+	QLabel *nuAnglePiValue;
+	QLabel *nuSawNumber;
+	QCheckBox *nuAngleSensorPower;
+	QCheckBox *nuAngleServoPower;
+	QPushButton *increaseNuAngle;
+	QPushButton *decreaseNuAngle;
 
 	// Phi channel servo controls
 	QLabel *phiAngleValue;
@@ -128,18 +144,18 @@ private:
 	// Log area
 	QTextEdit *logArea;
 	BOOPDataWords word_for_cbk;
-	int upsilon_sec = 0, phi_sec = 0;
-	int upsilon_angl_amount;
+	int nu_sec = 0, phi_sec = 0;
+	int nu_angl_amount;
 	int phi_angl_amount;
-	double angl_val_phi, angl_val_ups;
 	bool need_to_move;
 	int timer_count;
-	quint16 upsilon_rotation_direction, phi_rotation_direction;
-	int cur_pos_ups, cur_pos_phi; 
-	double ShD_bit, DU_bit;
-	int saw_numb_phi, saw_numb_ups;
-	QString pos_ups, pos_phi;
-	
+	quint16 nu_rotation_direction, phi_rotation_direction;
+
+	Angle nu_angle;
+	Angle phi_angle;
+
+	//QString pos_nu, pos_phi;
+
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
