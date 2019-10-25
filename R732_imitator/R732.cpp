@@ -205,11 +205,11 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	//if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.subadr >= 17) && (tmp_cwd.subadr <= 29))
-	//{
-	//	mko_counter++;
-	//	set_new_tm();
-	//}
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.subadr >= 17) && (tmp_cwd.subadr <= 29))
+	{
+		mko_counter++;
+		set_new_tm();
+	}
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		if (tmp_cwd.subadr == 17)
@@ -314,7 +314,6 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				};
 			}
 			paint_buttons();
-			mko_counter++;
 
 			set_new_tm();
 			if (need_mvku_renew)
@@ -330,8 +329,6 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					SCHBK[i] = words.at(i).toInt();
 				}
 				makeFuckingMagic();
-				mko_counter++;
-				set_new_tm();
 
 			}
 		}
@@ -356,8 +353,6 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				}
 			}
 			new_data_mv();
-			mko_counter++;
-			set_new_tm();
 
 		}
 
@@ -395,7 +390,7 @@ void R732_widg::set_new_tm()
 	tm_words << get_mko_counter_word();
 	tm_words << get_pups_words_list();
 	tm_words << get_vchm_word();
-	unsigned short word_11 = 0xC0A0;
+	unsigned short word_11 = 0xC080;
 	word_11 += (PUPS & 0x1F);
 	tm_words << word_11;
 	tm_words << 0xC000;
@@ -551,6 +546,7 @@ void R732_widg::set_vchm_on()
 	vchm_module.set_working_chanels(vchm_chanels_init, true);
 	vchm_is_init = false;
 	paint_buttons();
+	PUPS = 0x13;
 	set_new_tm();
 }
 
