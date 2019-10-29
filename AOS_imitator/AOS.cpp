@@ -16,7 +16,7 @@ union MKOWord
 	};
 };
 
-AOS_widg::AOS_widg(QWidget *parent) : LKA_sett(QCoreApplication::applicationDirPath() + "/bech.ini", QSettings::IniFormat)
+AOS_widg::AOS_widg(QWidget *parent)
 {
 	setWindowTitle("АОС");
 
@@ -41,7 +41,7 @@ AOS_widg::AOS_widg(QWidget *parent) : LKA_sett(QCoreApplication::applicationDirP
 
 	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku");
 		this->deleteLater();
 		return;
 	}
@@ -81,13 +81,13 @@ void AOS_widg::imit_on()
 
 }
 
-void AOS_widg::new_ku(int ku, int length_ku, double u_ku, int line_ku);
+void AOS_widg::new_ku(int ku, int length_ku, double u_ku, int line_ku)
 {
 
 }
 
 
-void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	MKOWord tmp_cwd;
 	tmp_cwd.com_word = cwd;
@@ -102,12 +102,12 @@ void BECH_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 }
 
 
-void BECH_widg::update_graphics()
+void AOS_widg::update_graphics()
 {
 
 }
 
-void BECH_widg::set_new_tm()
+void AOS_widg::set_new_tm()
 {
 	unsigned short _word = 0;
 	QVariantList tmp_list;
