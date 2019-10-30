@@ -25,7 +25,7 @@ struct RpcAbonent
 	RpcAbonent(){}
 	RpcAbonent(int addr);
 	QMap<int, QList<unsigned short>> words;
-	QMap<int, unsigned short> os;
+	QMap<int, int> os;
 	bool on;
 };
 

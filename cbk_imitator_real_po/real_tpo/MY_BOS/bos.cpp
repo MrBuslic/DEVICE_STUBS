@@ -99,6 +99,7 @@ extern "C" {
 		sprIQClear(
 		UINT numChan    /* номер канала */
 		){
+		SInterImitObject::Instance().clear_irq_channel(numChan);
 			return 0;
 		}
 
@@ -176,7 +177,7 @@ extern "C" {
 		sprIGetF(
 		UINT numChan    /* номер канала */
 		){
-			return 0;
+		return SInterImitObject::Instance().get_irq_channel(numChan);
 		}
 
 

@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QMainWindow>
 #include "R733Modules.h"
+#include "LKAModules.h"
 #include "instruments.h"
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
@@ -17,8 +18,6 @@
 //#include "../MBK-02_imitator/MBK02_rpc.h"
 #include "../mbk04_imitator/mbk04_rpc.h"
 #include "../buses_imitator/frame_bus_rpc.h"
-
-#define VCHM_START_TIME 80000
 
 union TM_733
 {
@@ -34,7 +33,7 @@ union TM_733
 	};
 };
 
-class R733_widg : public QWidget
+class R733_widg : public LKA06_MODULE
 {
     Q_OBJECT
 public:
@@ -64,18 +63,7 @@ private:
 
 	REGIME regime_upi;
 
-	MU_MODULE mu_module;
 	UPI_MODULE upi_module;
-	QList<MV_MODULE> mpvn_modules;
-	QList<MV_MODULE> mvku_modules;
-	QList<UPI_MODULE> upi_modules;
-	R733_VCHM_MODULE vchm_module;
-
-	RPC_omnibus_SLOT_Thread omni_slot_thr;
-	RPC_omnibus_SIGNAL_Thread omni_signal_thr;
-
-	RPC_mku_bus_SLOT_Thread mku_slot_thr;
-	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
@@ -83,20 +71,14 @@ private:
 	RPC_frame_bus_SLOT_Thread frame_slot_thr;
 	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
 
-	int MKO;
-	int adr;
 	bool flag_on;
 	int num_ku;
 	
-	int PUPS = 0x01;
-
-
 	int rrr;
 	int rpk;
 	int rkm;
 	int rbk;
-	int rpk_1;
-	int rpk_2;
+
 	QTextDocument* _doc;
 	QTextEdit* edit_info;
 	QStringList log_buffer;
@@ -108,6 +90,10 @@ private:
 	void paint_buttons();
 	void new_data_mv();
 	void set_new_tm();
+
+	void set_rsk();
+	void set_rrr_rsh();
+
 	void msg_to_log(const QString& _msg);
 
 	QMap<int, QString> mode_names;
@@ -120,29 +106,17 @@ private:
 	int bus = 3;
 	int power = 0;
 	double volt;
-	QTimer *AbOn_tmr;
 	void imit_off();
 	void imit_on();
 	void change_power();
-	void omni_connect();
 	void set_power_back();
 
 	QList<int> upi_state_channels;
-	QList<int> vchm_chanels_init;
 	QList<int> rkm_channels;
 	QList<int> rbk_channels;
-	bool vchm_is_init;
-	QTimer vchm_on_timer;
-	QTimer mu_on_timer;
 
 	QString regime;
 	QString msg;
-
-	QVariantList get_mko_counter_word();
-	QVariantList get_pups_words_list();
-	QVariantList get_vchm_word();
-
-	unsigned short mko_counter;
 
 	void set_tm_state();
 public slots:
@@ -152,8 +126,6 @@ public slots:
 	void new_frame_04(QString mode, QVariant frame_data);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 
-
-	void set_vchm_on();
 protected:
 	void closeEvent(QCloseEvent *event);
 signals:

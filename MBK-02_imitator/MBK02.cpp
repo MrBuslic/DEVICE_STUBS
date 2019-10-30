@@ -199,10 +199,10 @@ void MBK02_widg::break_warm()//дебаг кнопка
 void MBK02_widg::get_power(double _volt)
 {
 	volt = _volt;
-	if (volt >= 20.0)
+/*	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt < 1) imit_off();
+		*/if (volt < 1) imit_off();
 }
 
 void MBK02_widg::change_power(bool switch_chanel)
@@ -248,8 +248,7 @@ void MBK02_widg::imit_on()
 		return;
 	flag_on = true;
 	msg_to_log("Питание включено");
-	current_chanel = CHANEL_1;
-	current_ant = MHA1MY;
+	current_ant = MBK02_ANTENNA(1 + current_chanel*2 );
 	warm_chanel_tmr->start(standart_tm);
 	t_ant_ch->start(5000);
 	change_power(true);
@@ -278,25 +277,23 @@ void MBK02_widg::new_ku_732(int ku_n, int length, double u, int line)
 	if (volt != 0)
 	{
 		int tmp_ku_n = ku_n;
-		if (current_chanel != tmp_ku_n)
+		imit_off();
+		if (tmp_ku_n == CHANEL_ERR)
 		{
-			switch (tmp_ku_n)
-			{
-			case CHANEL_1:
-				current_ant = MHA1MY;
-				break;
-			case CHANEL_2:
-				current_ant = MHA2MY;
-				break;
-			}
-			set_warm_chanel();
-			current_chanel = CHANEL(tmp_ku_n);
-			if (!t_ant_ch->isActive())
-				t_ant_ch->start(5000);
-			update_graphics();
-			_update_time();
 			update_tm(1);
+			return;
 		}
+
+		current_chanel = CHANEL(tmp_ku_n);
+
+		imit_on();
+		
+		set_warm_chanel();
+		if (!t_ant_ch->isActive())
+			t_ant_ch->start(5000);
+
+		_update_time();
+		update_tm(1);
 	}
 }
 
@@ -528,6 +525,11 @@ void MBK02_widg::update_tm(int sadr)
 	switch (_sadr)
 	{
 	case 1:
+		if (current_chanel == CHANEL_OFF)
+		{
+			emit set_new_tm(1, 0xFFFF);
+			return;
+		}
 		if (signal_con)	word += current_chanel + 1;
 		switch (current_ant)
 		{

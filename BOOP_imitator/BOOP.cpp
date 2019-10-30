@@ -91,38 +91,41 @@ BOOP::BOOP()
 
   //  // Temp control block
 
-  QLabel *temperatureLabel1 = new QLabel("Температура ", this);
-  QLabel *temperatureLabel2 = new QLabel("°C", this);
+	for (int i = 0; i < 13; i++)
+		word_for_cbk.data_words[i] = 0;
 
-  temperatureEdit = new QLineEdit("20", this);
-  temperatureEdit->setAlignment(Qt::AlignCenter);
-  temperatureEdit->setFixedWidth(42);
+	QLabel *temperatureLabel1 = new QLabel("Температура ", this);
+	QLabel *temperatureLabel2 = new QLabel("°C", this);
 
-  QHBoxLayout *temperatureBlock = new QHBoxLayout();
-  temperatureBlock->addWidget(temperatureLabel1);
-  temperatureBlock->addWidget(temperatureEdit);
-  temperatureBlock->addWidget(temperatureLabel2);
+	temperatureEdit = new QLineEdit("20", this);
+	temperatureEdit->setAlignment(Qt::AlignCenter);
+	temperatureEdit->setFixedWidth(42);
 
-  //  // Half-set selection block
+	QHBoxLayout *temperatureBlock = new QHBoxLayout();
+	temperatureBlock->addWidget(temperatureLabel1);
+	temperatureBlock->addWidget(temperatureEdit);
+	temperatureBlock->addWidget(temperatureLabel2);
 
-  mainSetButton = new QPushButton("Основной полукомплект", this);
-  mainSetButton->setFixedWidth(180);
+	//  // Half-set selection block
+
+	mainSetButton = new QPushButton("Основной полукомплект", this);
+	mainSetButton->setFixedWidth(180);
 	mainSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 
-  reserveSetButton = new QPushButton("Резервный полукомплект", this);
-  reserveSetButton->setFixedWidth(180);
+	reserveSetButton = new QPushButton("Резервный полукомплект", this);
+	reserveSetButton->setFixedWidth(180);
 	reserveSetButton->setStyleSheet("background-color: rgb(204, 204, 204);");
 
-  QHBoxLayout *halfSetBlock = new QHBoxLayout();
-  halfSetBlock->addWidget(mainSetButton);
-  halfSetBlock->addWidget(reserveSetButton);
+	QHBoxLayout *halfSetBlock = new QHBoxLayout();
+	halfSetBlock->addWidget(mainSetButton);
+	halfSetBlock->addWidget(reserveSetButton);
 
-  QHBoxLayout *firstStripe = new QHBoxLayout();
-  firstStripe->addLayout(temperatureBlock);
-  firstStripe->addStretch(1);
-  firstStripe->addLayout(halfSetBlock);
+	QHBoxLayout *firstStripe = new QHBoxLayout();
+	firstStripe->addLayout(temperatureBlock);
+	firstStripe->addStretch(1);
+	firstStripe->addLayout(halfSetBlock);
 
-  // Self-diagnostic block
+	// Self-diagnostic block
 
 	//  // First self-diagnostic column
 
@@ -141,12 +144,12 @@ BOOP::BOOP()
 	//bit15 = new QCheckBox("Исправность интерфейса с ДУ (канал φ)", this);
 	//bit15->setChecked(true);
 
- // QVBoxLayout *firstDiagnosticColumn = new QVBoxLayout();
- // firstDiagnosticColumn->addWidget(bit19);
- // firstDiagnosticColumn->addWidget(bit18);
- // firstDiagnosticColumn->addWidget(bit17);
- // firstDiagnosticColumn->addWidget(bit16);
- // firstDiagnosticColumn->addWidget(bit15);
+	// QVBoxLayout *firstDiagnosticColumn = new QVBoxLayout();
+	// firstDiagnosticColumn->addWidget(bit19);
+	// firstDiagnosticColumn->addWidget(bit18);
+	// firstDiagnosticColumn->addWidget(bit17);
+	// firstDiagnosticColumn->addWidget(bit16);
+	// firstDiagnosticColumn->addWidget(bit15);
 
 	////  // Second self-diagnostic column
 
@@ -162,166 +165,166 @@ BOOP::BOOP()
 	//bit4 = new QCheckBox("Интегральный признак исправности БУП(Е)", this);
 	//bit4->setChecked(true);
 
- // QVBoxLayout *secondDiagnosticColumn = new QVBoxLayout();
- // secondDiagnosticColumn->addWidget(bit14);
- // secondDiagnosticColumn->addWidget(bit13);
- // secondDiagnosticColumn->addWidget(bit12);
- // secondDiagnosticColumn->addWidget(bit4);
+	// QVBoxLayout *secondDiagnosticColumn = new QVBoxLayout();
+	// secondDiagnosticColumn->addWidget(bit14);
+	// secondDiagnosticColumn->addWidget(bit13);
+	// secondDiagnosticColumn->addWidget(bit12);
+	// secondDiagnosticColumn->addWidget(bit4);
 
- // QHBoxLayout* secondStripe = new QHBoxLayout();
- // secondStripe->addLayout(firstDiagnosticColumn);
- // secondStripe->addStretch(1);
- // secondStripe->addLayout(secondDiagnosticColumn);
+	// QHBoxLayout* secondStripe = new QHBoxLayout();
+	// secondStripe->addLayout(firstDiagnosticColumn);
+	// secondStripe->addStretch(1);
+	// secondStripe->addLayout(secondDiagnosticColumn);
 
-  // Servo controls block
+	// Servo controls block
 
-  // // nu channel controls
+	// // nu channel controls
 
-  // // // First nu channel controls strip
+	// // // First nu channel controls strip
 
-  QLabel *nuAngleLabel = new QLabel("Угол: ", this);
-  nuAngleValue = new QLabel("0000", this);
+	QLabel *nuAngleLabel = new QLabel("Угол: ", this);
+	nuAngleValue = new QLabel("0000", this);
 
-  nuAnglePiValue = new QLabel("000", this);
+	nuAnglePiValue = new QLabel("000", this);
 
-  QHBoxLayout *nuAngleIndicatorBloc = new QHBoxLayout();
-  nuAngleIndicatorBloc->addWidget(nuAngleLabel);
-  nuAngleIndicatorBloc->addWidget(nuAngleValue);
+	QHBoxLayout *nuAngleIndicatorBloc = new QHBoxLayout();
+	nuAngleIndicatorBloc->addWidget(nuAngleLabel);
+	nuAngleIndicatorBloc->addWidget(nuAngleValue);
   
 
 
-  QHBoxLayout *nuAnglePiIndicatorBloc = new QHBoxLayout();
-  nuAnglePiIndicatorBloc->addWidget(nuAnglePiValue);
+	QHBoxLayout *nuAnglePiIndicatorBloc = new QHBoxLayout();
+	nuAnglePiIndicatorBloc->addWidget(nuAnglePiValue);
   
 
-  nuAngleSensorPower = new QCheckBox("ДУ", this);
- // nuAngleSensorPower->setFixedWidth(84);
+	nuAngleSensorPower = new QCheckBox("ДУ", this);
+	// nuAngleSensorPower->setFixedWidth(84);
 
-  nuAngleServoPower = new QCheckBox("ШД", this);
- // nuAngleServoPower->setFixedWidth(84);
+	nuAngleServoPower = new QCheckBox("ШД", this);
+	// nuAngleServoPower->setFixedWidth(84);
 
-  QHBoxLayout *nuDuShwPanel = new QHBoxLayout();
-  nuDuShwPanel->addWidget(nuAngleSensorPower);
-  nuDuShwPanel->addWidget(nuAngleServoPower);
-
-
-  QHBoxLayout *nuFirstControlsStrip = new QHBoxLayout();
-  nuFirstControlsStrip->addLayout(nuAngleIndicatorBloc);
-  nuFirstControlsStrip->addLayout(nuAnglePiIndicatorBloc);
- // nuFirstControlsStrip->addWidget(nuAngleSensorPower);
-  nuFirstControlsStrip->addLayout(nuDuShwPanel);
- // nuFirstControlsStrip->addStretch(1);
-  // // // Second nu channel controls strip
-
-  QLabel *nuRotationLabel = new QLabel("Вращение", this);
- // nuRotationLabel->setFixedWidth(64);
-
-  decreaseNuAngle = new QPushButton("−", this);
-//  decreasenuAngle->setFixedWidth(40);
-
-  increaseNuAngle = new QPushButton("+", this);
- // increasenuAngle->setFixedWidth(40);
+	QHBoxLayout *nuDuShwPanel = new QHBoxLayout();
+	nuDuShwPanel->addWidget(nuAngleSensorPower);
+	nuDuShwPanel->addWidget(nuAngleServoPower);
 
 
-  QLabel *nuSawLabel = new QLabel("Пила ", this);
-  nuSawNumber = new QLabel("0", this);
+	QHBoxLayout *nuFirstControlsStrip = new QHBoxLayout();
+	nuFirstControlsStrip->addLayout(nuAngleIndicatorBloc);
+	nuFirstControlsStrip->addLayout(nuAnglePiIndicatorBloc);
+	// nuFirstControlsStrip->addWidget(nuAngleSensorPower);
+	nuFirstControlsStrip->addLayout(nuDuShwPanel);
+	// nuFirstControlsStrip->addStretch(1);
+	// // // Second nu channel controls strip
 
-  QHBoxLayout *nuThirdControlsStrip = new QHBoxLayout();
-  nuThirdControlsStrip->addWidget(nuRotationLabel);
- // nuThirdControlsStrip->addStretch(1);
-  nuThirdControlsStrip->addWidget(decreaseNuAngle);
-  nuThirdControlsStrip->addWidget(increaseNuAngle);
-  //nuThirdControlsStrip->addStretch(1);
-  nuThirdControlsStrip->addWidget(nuSawLabel);
-  nuThirdControlsStrip->addWidget(nuSawNumber);
+	QLabel *nuRotationLabel = new QLabel("Вращение", this);
+	// nuRotationLabel->setFixedWidth(64);
 
-  QVBoxLayout *nuChannelControls = new QVBoxLayout();
-  nuChannelControls->addLayout(nuFirstControlsStrip);
-  nuChannelControls->addLayout(nuThirdControlsStrip);
+	decreaseNuAngle = new QPushButton("−", this);
+	//  decreasenuAngle->setFixedWidth(40);
 
-  QGroupBox *nuGoupBox = new QGroupBox("Канал υ", this);
-  nuGoupBox->setLayout(nuChannelControls);
+	increaseNuAngle = new QPushButton("+", this);
+	// increasenuAngle->setFixedWidth(40);
 
-  // // Phi channel controls
 
-  // // // First Phi channel controls strip
+	QLabel *nuSawLabel = new QLabel("Пила ", this);
+	nuSawNumber = new QLabel("0", this);
 
-  QLabel *phiAngleLabel = new QLabel("Угол: ", this);
-  phiAngleValue = new QLabel("0000", this);
-  phiAnglePiValue = new QLabel("000", this);
+	QHBoxLayout *nuThirdControlsStrip = new QHBoxLayout();
+	nuThirdControlsStrip->addWidget(nuRotationLabel);
+	// nuThirdControlsStrip->addStretch(1);
+	nuThirdControlsStrip->addWidget(decreaseNuAngle);
+	nuThirdControlsStrip->addWidget(increaseNuAngle);
+	//nuThirdControlsStrip->addStretch(1);
+	nuThirdControlsStrip->addWidget(nuSawLabel);
+	nuThirdControlsStrip->addWidget(nuSawNumber);
 
-  QHBoxLayout *phiAngleIndicatorBloc = new QHBoxLayout();
-  phiAngleIndicatorBloc->addWidget(phiAngleLabel);
-  phiAngleIndicatorBloc->addWidget(phiAngleValue);
+	QVBoxLayout *nuChannelControls = new QVBoxLayout();
+	nuChannelControls->addLayout(nuFirstControlsStrip);
+	nuChannelControls->addLayout(nuThirdControlsStrip);
 
-  QHBoxLayout *phiAnglePiIndicatorBloc = new QHBoxLayout();
-  phiAnglePiIndicatorBloc->addWidget(phiAnglePiValue);
+	QGroupBox *nuGoupBox = new QGroupBox("Канал υ", this);
+	nuGoupBox->setLayout(nuChannelControls);
+
+	// // Phi channel controls
+
+	// // // First Phi channel controls strip
+
+	QLabel *phiAngleLabel = new QLabel("Угол: ", this);
+	phiAngleValue = new QLabel("0000", this);
+	phiAnglePiValue = new QLabel("000", this);
+
+	QHBoxLayout *phiAngleIndicatorBloc = new QHBoxLayout();
+	phiAngleIndicatorBloc->addWidget(phiAngleLabel);
+	phiAngleIndicatorBloc->addWidget(phiAngleValue);
+
+	QHBoxLayout *phiAnglePiIndicatorBloc = new QHBoxLayout();
+	phiAnglePiIndicatorBloc->addWidget(phiAnglePiValue);
   
 
-  phiAngleSensorPower = new QCheckBox("ДУ", this);
-//  phiAngleSensorPower->setFixedWidth(84);
+	phiAngleSensorPower = new QCheckBox("ДУ", this);
+	//  phiAngleSensorPower->setFixedWidth(84);
 
-  phiAngleServoPower = new QCheckBox("ШД", this);
-//  phiAngleServoPower->setFixedWidth(84);
+	phiAngleServoPower = new QCheckBox("ШД", this);
+	//  phiAngleServoPower->setFixedWidth(84);
 
-  QHBoxLayout *phiDuShwPanel = new QHBoxLayout();
-  phiDuShwPanel->addWidget(phiAngleSensorPower);
-  phiDuShwPanel->addWidget(phiAngleServoPower);
+	QHBoxLayout *phiDuShwPanel = new QHBoxLayout();
+	phiDuShwPanel->addWidget(phiAngleSensorPower);
+	phiDuShwPanel->addWidget(phiAngleServoPower);
 
-  QHBoxLayout *phiFirstControlsStrip = new QHBoxLayout();
-  phiFirstControlsStrip->addLayout(phiAngleIndicatorBloc);
-  phiFirstControlsStrip->addLayout(phiAnglePiIndicatorBloc);
- // phiFirstControlsStrip->addStretch(1);
-  phiFirstControlsStrip->addLayout(phiDuShwPanel);
- // phiFirstControlsStrip->addWidget(phiAngleSensorPower);
- // phiFirstControlsStrip->addWidget(phiAngleServoPower);
- // phiFirstControlsStrip->addWidget(phiSawLabel);
+	QHBoxLayout *phiFirstControlsStrip = new QHBoxLayout();
+	phiFirstControlsStrip->addLayout(phiAngleIndicatorBloc);
+	phiFirstControlsStrip->addLayout(phiAnglePiIndicatorBloc);
+	// phiFirstControlsStrip->addStretch(1);
+	phiFirstControlsStrip->addLayout(phiDuShwPanel);
+	// phiFirstControlsStrip->addWidget(phiAngleSensorPower);
+	// phiFirstControlsStrip->addWidget(phiAngleServoPower);
+	// phiFirstControlsStrip->addWidget(phiSawLabel);
 
-  // // // Second phi channel controls strip
+	// // // Second phi channel controls strip
 
-  QLabel *phiRotationLabel = new QLabel("Вращение", this);
-//  phiRotationLabel->setFixedWidth(64);
+	QLabel *phiRotationLabel = new QLabel("Вращение", this);
+	//  phiRotationLabel->setFixedWidth(64);
 
-  decreasePhiAngle = new QPushButton("−", this);
-//  decreasePhiAngle->setFixedWidth(40);
+	decreasePhiAngle = new QPushButton("−", this);
+	//  decreasePhiAngle->setFixedWidth(40);
 
-  increasePhiAngle = new QPushButton("+", this);
-//  increasePhiAngle->setFixedWidth(40);
+	increasePhiAngle = new QPushButton("+", this);
+	//  increasePhiAngle->setFixedWidth(40);
 
-  QLabel *phiSawLabel = new QLabel("Пила ", this);
+	QLabel *phiSawLabel = new QLabel("Пила ", this);
 
-  phiSawNumber = new QLabel("0", this);
+	phiSawNumber = new QLabel("0", this);
 
-  QHBoxLayout *phiThirdControlsStrip = new QHBoxLayout();
-  phiThirdControlsStrip->addWidget(phiRotationLabel);
- // phiThirdControlsStrip->addStretch(1);
-  phiThirdControlsStrip->addWidget(decreasePhiAngle);
-  phiThirdControlsStrip->addWidget(increasePhiAngle);
- // phiThirdControlsStrip->addStretch(1);
-  phiThirdControlsStrip->addWidget(phiSawLabel);
-  phiThirdControlsStrip->addWidget(phiSawNumber);
+	QHBoxLayout *phiThirdControlsStrip = new QHBoxLayout();
+	phiThirdControlsStrip->addWidget(phiRotationLabel);
+	// phiThirdControlsStrip->addStretch(1);
+	phiThirdControlsStrip->addWidget(decreasePhiAngle);
+	phiThirdControlsStrip->addWidget(increasePhiAngle);
+	// phiThirdControlsStrip->addStretch(1);
+	phiThirdControlsStrip->addWidget(phiSawLabel);
+	phiThirdControlsStrip->addWidget(phiSawNumber);
 
-  QVBoxLayout *phiChannelControls = new QVBoxLayout();
-  phiChannelControls->addLayout(phiFirstControlsStrip);
-  phiChannelControls->addLayout(phiThirdControlsStrip);
+	QVBoxLayout *phiChannelControls = new QVBoxLayout();
+	phiChannelControls->addLayout(phiFirstControlsStrip);
+	phiChannelControls->addLayout(phiThirdControlsStrip);
 
-  QGroupBox *phiGroupBox = new QGroupBox("Канал φ", this);
-  phiGroupBox->setLayout(phiChannelControls);
+	QGroupBox *phiGroupBox = new QGroupBox("Канал φ", this);
+	phiGroupBox->setLayout(phiChannelControls);
 
-  QHBoxLayout* thirdStripe = new QHBoxLayout();
-  thirdStripe->addWidget(nuGoupBox);
- // thirdStripe->addStretch(1);
-  thirdStripe->addWidget(phiGroupBox);
+	QHBoxLayout* thirdStripe = new QHBoxLayout();
+	thirdStripe->addWidget(nuGoupBox);
+	// thirdStripe->addStretch(1);
+	thirdStripe->addWidget(phiGroupBox);
 
-  // Log message area
+	// Log message area
 
-  logArea = new QTextEdit();
+	logArea = new QTextEdit();
 
-  QVBoxLayout* mainLayout = new QVBoxLayout(this);
-  mainLayout->addLayout(firstStripe);
-//  mainLayout->addLayout(secondStripe);
-  mainLayout->addLayout(thirdStripe);
-  mainLayout->addWidget(logArea);
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	mainLayout->addLayout(firstStripe);
+	//  mainLayout->addLayout(secondStripe);
+	mainLayout->addLayout(thirdStripe);
+	mainLayout->addWidget(logArea);
 
 
 
@@ -372,6 +375,22 @@ BOOP::BOOP()
 	nu_angle.minus_stop = angles.value("minus_stop_nu").toInt();
 	phi_angle.minus_stop = angles.value("minus_stop_phi").toInt();
  
+
+	word_for_cbk.nu_min_angle = nu_angle.null_pos;
+	word_for_cbk.phi_min_angle = phi_angle.null_pos;
+
+
+	word_for_cbk.bit19 = 1;
+	word_for_cbk.bit18 = 1;
+	word_for_cbk.bit17 = 1;
+	word_for_cbk.bit16 = 1;
+	word_for_cbk.bit15 = 1;
+	word_for_cbk.bit14 = 1;
+	word_for_cbk.bit13 = 1;
+	word_for_cbk.bit12 = 1;
+	word_for_cbk.bit4 = 1;
+
+
 	nu_angle.calc_angle();
 	phi_angle.calc_angle();
 
@@ -565,21 +584,9 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 		//bit12->isChecked() ? word_for_cbk.bit13 = 1 : word_for_cbk.bit12 = 0;
 		//bit4->isChecked() ? word_for_cbk.bit4 = 1 : word_for_cbk.bit4 = 0;
 
-		word_for_cbk.bit19 = 1;
-		word_for_cbk.bit18 = 1;
-		word_for_cbk.bit17 = 1;
-		word_for_cbk.bit16 = 1;
-		word_for_cbk.bit15 = 1;
-		word_for_cbk.bit14 = 1;
-		word_for_cbk.bit13 = 1;
-		word_for_cbk.bit4 = 1;
+
 
 	}
-
-	//контрольная сумма
-	for (int i = 0; i < 10; i++)
-		word_for_cbk.checksum += word_for_cbk.data_words[i];
-	word_for_cbk.checksum = word_for_cbk.checksum & 0xFFFF;
 
 	logArea->append(_message);
 
@@ -589,8 +596,14 @@ void BOOP::new_message(QVariant dt, int MKO, int line, int command_word, QVarian
 void BOOP::new_tm()
 {
 
+	word_for_cbk.checksum = 0;
+
+	for (int i = 0; i < 12; i++)
+		word_for_cbk.checksum += word_for_cbk.data_words[i];
+	word_for_cbk.checksum = word_for_cbk.checksum & 0xFFFF;
+
 	QVariantList tmp_list;
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 13; i++)
 		tmp_list.push_back(word_for_cbk.data_words[i]);
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, address, 2, tmp_list);
 }

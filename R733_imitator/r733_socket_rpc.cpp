@@ -81,7 +81,6 @@ int r733_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["get_power(double)"] = &r733_Socket_RPC_SLOT_Object::get_power;
 		operators_map["new_frame_04(QString, QVariant)"] = &r733_Socket_RPC_SLOT_Object::new_frame_04;
 		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &r733_Socket_RPC_SLOT_Object::new_mk;
-		operators_map["set_vchm_on()"] = &r733_Socket_RPC_SLOT_Object::set_vchm_on;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -389,22 +388,6 @@ int r733_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int line_m = _values.at(7).value<int>();
 			int line_p = _values.at(8).value<int>();
 			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant r733_Socket_RPC_SLOT_Object::set_vchm_on(QVariantList& _values)
-	{
-		try
-		{
-			app->set_vchm_on();
 			return 0;
 		}
 		catch(const std::exception &)

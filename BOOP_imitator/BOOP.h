@@ -35,7 +35,7 @@ union BOOPDataWords
 		// Form data words
 	}
 
-	quint16 data_words[11];
+	quint16 data_words[13];
 
 	struct {
 		quint16 nu_servo_power_status : 1,

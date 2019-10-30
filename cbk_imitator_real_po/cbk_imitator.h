@@ -12,7 +12,7 @@
 enum PowerState{ON, OFF, CRASH};
 enum POState{SPOBU, TPO, VACANT, UNDEFINED};
 
-#define SPO_START_TIME 80000
+#define SPO_START_TIME 30000
 
 struct VM_State
 {

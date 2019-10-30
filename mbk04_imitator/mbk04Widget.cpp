@@ -262,6 +262,11 @@ void MainWidget::state_changed()
 		new_ok3 = 0;
 		new_ok4 = 1;
 		current_mode = "ВТФ";
+		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
+
+		emit new_tm(tmp_new_tm);
 		clean_frame_data(current_mode);
 		timer->start(11000);
 		str_num_timer.start();
@@ -274,8 +279,14 @@ void MainWidget::state_changed()
 		new_ok3 = 1;
 		new_ok4 = 0;
 		current_mode = "ПИ8";
-		str_num_timer.start();
+		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
+
+		emit new_tm(tmp_new_tm);
 		clean_frame_data(current_mode);
+		str_num_timer.start();
+
 		timer->start(4000);
 		ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
 		ik8_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
@@ -286,8 +297,14 @@ void MainWidget::state_changed()
 		new_ok3 = 0;
 		new_ok4 = 0;
 		current_mode = "ПИ15";
-		str_num_timer.start();
+		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
+
+		emit new_tm(tmp_new_tm);
+		
 		clean_frame_data(current_mode);
+		str_num_timer.start();
 		timer->start(4000);
 		ik15_btn->setStyleSheet("background-color: rgb(142, 198, 156);");
 		ik8_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -298,6 +315,11 @@ void MainWidget::state_changed()
 		new_ok3 = 1;
 		new_ok4 = 1;
 		timer->stop();
+		tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
+		tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
+		tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
+
+		emit new_tm(tmp_new_tm);
 		current_mode = "ВЫКЛ";
 		str_num_timer.elapsed();
 		ik15_btn->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -309,11 +331,7 @@ void MainWidget::state_changed()
 		break;
 	}
 		
-	tmp_new_tm = tmp_new_tm & 0xFFEF | (new_ok4 << 4);
-	tmp_new_tm = tmp_new_tm & 0xFFF7 | (new_ok3 << 3);
-	tmp_new_tm = tmp_new_tm & 0xFFFB | (new_ok2 << 2);
 
-	emit new_tm(tmp_new_tm);
 }
 
 //void MainWidget::run()

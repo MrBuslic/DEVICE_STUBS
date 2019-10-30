@@ -24,6 +24,7 @@ include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("../../lib/socket_rpc/include")
+include_directories("../LKAModules")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 	
 set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
@@ -38,7 +39,7 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(BKUPI_HEADERS LKA05.h LKA05Modules.h)
+SET(BKUPI_HEADERS LKA05.h)
 SET(BKUPI_SOURCES main.cpp LKA05.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
@@ -48,7 +49,7 @@ SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOUR
 
 add_executable(LKA-05_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} icon.rc)
 target_link_libraries (LKA-05_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc LKAModules) 
 
 if(WIN32)
   qt5_use_modules(LKA-05_imitator Core Widgets Network Gui)

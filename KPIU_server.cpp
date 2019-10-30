@@ -71,6 +71,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 0");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 1");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mn8i");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_vvk4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/RM_MBK07_imitator");
 	QThread::currentThread()->sleep(3);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");

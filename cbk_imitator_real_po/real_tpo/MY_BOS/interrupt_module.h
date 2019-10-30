@@ -22,11 +22,16 @@
 		public slots:
 		void get_new_interrupt(int _n, short _chan, double _u, double _t);
 		void set_IrqMask(int tmp_mask);
+
+		void clear_irq_channel(int _n);
+		int get_irq_channel(int _n);
+
 		RPC_interrupt_bus_SIGNAL_Thread* get_interrupt_signal_thread() { return interrupt_signal_thread; };
 		RPC_interrupt_bus_SLOT_Thread* get_interrupt_slot_thread() { return interrupt_slot_thread; };
 
 	private:
 		int IrqMask;
+		int GotIrqMask;
 		RPC_interrupt_bus_SLOT_Thread* interrupt_slot_thread;
 		RPC_interrupt_bus_SIGNAL_Thread* interrupt_signal_thread;
 		QString log_filename;

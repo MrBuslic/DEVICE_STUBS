@@ -163,13 +163,6 @@ void RPC_r733_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p
 	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_mk");
 }
-void RPC_r733_SLOT_Object::set_vchm_on()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call set_vchm_on %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("set_vchm_on()", tmp_list);
-	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished set_vchm_on");
-}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
