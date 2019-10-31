@@ -44,7 +44,10 @@ SET(BKUPI_SOURCES main.cpp LKA05.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.h ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp lka05_socket_rpc.h lka05_socket_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.h ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp lka05_socket_rpc.h lka05_socket_rpc.cpp
+		 ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp
+		 	${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h 
+	${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp )
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_executable(LKA-05_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} icon.rc)

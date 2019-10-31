@@ -63,8 +63,10 @@ RpcOmnibusWidget::RpcOmnibusWidget(QWidget* parent) : QWidget(parent)
 RpcAbonent::RpcAbonent(int addr)
 {
 	on = false;
+	line = 3;
 	unsigned short tmp_os = addr << 11;
 	os.insert(0, tmp_os);
+	last_os = tmp_os;
 	os.insert(31, tmp_os);
 	for (int i = 1; i < 31; i++)
 	{
@@ -121,25 +123,49 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 		emit message_to_log(_msg);
 		return;
 	}
-	if (abonents[mko][tmp_cwd.adr].on)
+	if (abonents[mko][tmp_cwd.adr].on && (work_line & abonents[mko][tmp_cwd.adr].line))
 	{
-		os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
-		if (tmp_cwd.tr && (os != -1))
+		if ((tmp_cwd.subadr ==0) || (tmp_cwd.subadr == 31))
 		{
-			words.clear();
-			int tmp_word_count = tmp_cwd.count;
-			if (tmp_cwd.count == 0)
-				tmp_word_count = 32;
-			words.reserve(tmp_word_count);
-			for (int i = 0; i < tmp_word_count; i++)
-				words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
+			switch (tmp_cwd.count)
+			{
+			case TRANSMIT_BW:
+				os = abonents[mko][tmp_cwd.adr].last_os;
+				break;
+			case BLOCK_TRANSMITTER:
+				os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+				abonents[mko][tmp_cwd.adr].line ^ work_line;
+				break;
+			case DEBLOCK_TRANSMITTER:
+				os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+				abonents[mko][tmp_cwd.adr].line += 2 - 2*line;
+				break;
+			}
+		}
+		else
+		{
+			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+			if (tmp_cwd.tr && (os != -1))
+			{
+				words.clear();
+				int tmp_word_count = tmp_cwd.count;
+				if (tmp_cwd.count == 0)
+					tmp_word_count = 32;
+				words.reserve(tmp_word_count);
+				for (int i = 0; i < tmp_word_count; i++)
+					words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
+			}
 		}
 	}
 	else
 	{
 		os = -1;
 	}
-	QString _msg = QString("Обмен на МКО %1 КС 0x%2").arg(mko).arg(cwd, 4, 16, QChar('0'));
+
+	if (os != -1)
+		abonents[mko][tmp_cwd.adr].last_os = os;
+
+	QString _msg = QString("Обмен на МКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(cwd, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
 	emit message_to_log(_msg);
 	emit new_message(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
 }
@@ -163,8 +189,11 @@ void RpcOmnibusWidget::send_msg_mpko(int mko, int line, int cwd, QVariantList& w
 		if (tmp_cwd.tr && (os != -1))
 		{
 			words.clear();
-			words.reserve(tmp_cwd.count);
-			for (int i = 0; i < tmp_cwd.count; i++)
+			int tmp_word_count = tmp_cwd.count;
+			if (tmp_cwd.count == 0)
+				tmp_word_count = 32;
+			words.reserve(tmp_word_count);
+			for (int i = 0; i < tmp_word_count; i++)
 				words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
 		}
 	}
@@ -172,7 +201,7 @@ void RpcOmnibusWidget::send_msg_mpko(int mko, int line, int cwd, QVariantList& w
 	{
 		os = -1;
 	}
-	QString _msg = QString("Обмен на МПКО %1 КС 0x%2").arg(mko).arg(cwd, 4, 16, QChar('0'));
+	QString _msg = QString("Обмен на МПКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(cwd, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
 	emit message_to_log(_msg);
 	emit new_message_mpko(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
 }

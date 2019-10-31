@@ -166,6 +166,8 @@ mkoPackIniStart(
 		os = 0;
 		QVariantList words;
 		int word_count = CMWord.count_word;
+		if (word_count == 0)
+			word_count = 32;
 		if (trans_dir == 0)
 		{
 			for (int j = 0; j < word_count; j++)

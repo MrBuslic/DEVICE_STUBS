@@ -18,6 +18,28 @@
 #include "rpc_ports.h"
 #include "rpc_loger.h"
 
+enum F4_COMMAND
+{
+	BEGIN = -1,
+	TAKE_COMMAND,
+	SYNC,
+	TRANSMIT_BW,
+	START_SELFTEST,
+	BLOCK_TRANSMITTER,
+	DEBLOCK_TRANSMITTER,
+	BLOCK_ERROR_FLAG,
+	DEBLOCK_ERROR_FLAG,
+	REINIT,
+	RESERVE,/*********************/
+	SEND_VECTOR_WORD = 16,
+	SYNC_WITH_DW,
+	SEND_LAST_CMD,
+	SEND_VSK_WORD,
+	BLOCK_Nth_TRANSMITTER,
+	DEBLOCK_Nth_TRANSMITTER,
+	END
+};
+
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 struct RpcAbonent
@@ -27,6 +49,8 @@ struct RpcAbonent
 	QMap<int, QList<unsigned short>> words;
 	QMap<int, int> os;
 	bool on;
+	int line;
+	int last_os;
 };
 
 class RpcOmnibusWidget : public QWidget
