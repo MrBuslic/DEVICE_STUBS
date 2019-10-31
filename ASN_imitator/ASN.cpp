@@ -603,7 +603,7 @@ void ASN_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 {
 	if (volt != 0)
 	{
-		if ((pshm != 1) && (mshm > 2))
+		if ((pshm != 1) || (mshm > 2))
 			return;
 		QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 		text->append(_msg);

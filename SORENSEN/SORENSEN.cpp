@@ -76,9 +76,9 @@ void SORENSENWidget::read_data()
 		SRPCSignalClass::Instance().toLog(command);
 		QStringList command_list = command.split("\r\n");
 		command_list.pop_back();
-		for (int i = 0; i < command_list.count(); ++i)
+		for (int ii = 0; ii < command_list.count(); ++ii)
 		{
-			command = command_list.at(i);
+			command = command_list.at(ii);
 			QStringList params;
 			QString command_string;
 			if (command.contains(" "))

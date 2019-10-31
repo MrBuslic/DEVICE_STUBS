@@ -521,7 +521,7 @@ void MBK02_widg::lose_cont()
 void MBK02_widg::update_tm(int sadr)
 {
 	int _sadr = sadr;
-	unsigned short word = 0x48;
+	unsigned short word = 0x30;
 	switch (_sadr)
 	{
 	case 1:
@@ -533,33 +533,32 @@ void MBK02_widg::update_tm(int sadr)
 		if (signal_con)	word += current_chanel + 1;
 		switch (current_ant)
 		{
-		case MHA1MY: word += 4; break;
-		case MHA1PY:break;
-		case MHA2MY: word += 8; break;
-		case MHA2PY:break;
+			case MHA1MY: word += 4; break;
+			case MHA1PY:break;
+			case MHA2MY: word += 8; break;
+			case MHA2PY:break;
 		}
-		if (ready_chanel)
+
+		switch (current_chanel)
 		{
-			switch (current_chanel)
-			{
-			case CHANEL_1: word = word - 0x32; break;
-			case CHANEL_2: word = word - 0x16; break;
-			}
+			case CHANEL_1: word = word - 0x10; break;
+			case CHANEL_2: word = word - 0x20; break;
 		}
+
 		word += (word << 8);
 		emit set_new_tm(_sadr, word);
 		break;
 	case 4:
 		switch (current_lit)
 		{
-		case 1: word += 0x18; break;
-		case 2: word += 0x20; break;
-		case 3: word += 0x28; break;
-		case 4: word += 0x30; break;
-		case 5: word += 0x38; break;
-		case 6: word += 0x40; break;
-		case 7: word += 0x48; break;
-		case 8: word += 0x50; break;
+		case 1: word = 0x18; break;
+		case 2: word = 0x20; break;
+		case 3: word = 0x28; break;
+		case 4: word = 0x30; break;
+		case 5: word = 0x38; break;
+		case 6: word = 0x40; break;
+		case 7: word = 0x48; break;
+		case 8: word = 0x50; break;
 		}
 		word += (word << 8);
 		emit set_new_tm(_sadr, word);

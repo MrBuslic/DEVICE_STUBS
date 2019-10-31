@@ -225,6 +225,24 @@ void R732_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			}
 		}
 
+		if (tmp_cwd.subadr == 18)
+		{
+			if (!words.empty())
+			{
+				MKOWord tmp_mpko_cwd;
+				tmp_mpko_cwd.com_word = words.at(0).toInt();
+				words.pop_front();
+				QVariantList tmp_mpko_words = words;
+				int tmp_mpko_os;
+				omni_slot_thr.get_omnibus_obj()->send_msg_mpko(mko, line, tmp_mpko_cwd.com_word, tmp_mpko_words, tmp_mpko_os);
+				if (tmp_mpko_os != -1)
+				{
+					if (tmp_mpko_cwd.trans_dir == 1)
+						omni_slot_thr.get_omnibus_obj()->set_new_data(mko, adr, 18, tmp_mpko_words);
+				}
+			}
+
+		}
 		if (tmp_cwd.subadr == 29) //KU
 		{
 			int ku;
