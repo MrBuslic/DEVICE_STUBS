@@ -127,17 +127,17 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 	{
 		if ((tmp_cwd.subadr ==0) || (tmp_cwd.subadr == 31))
 		{
+			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+
 			switch (tmp_cwd.count)
 			{
 			case TRANSMIT_BW:
 				os = abonents[mko][tmp_cwd.adr].last_os;
 				break;
 			case BLOCK_TRANSMITTER:
-				os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
-				abonents[mko][tmp_cwd.adr].line ^ work_line;
+				abonents[mko][tmp_cwd.adr].line ^= work_line;
 				break;
 			case DEBLOCK_TRANSMITTER:
-				os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
 				abonents[mko][tmp_cwd.adr].line += 2 - 2*line;
 				break;
 			}
@@ -176,7 +176,8 @@ void RpcOmnibusWidget::send_msg_mpko(int mko, int line, int cwd, QVariantList& w
 	MkoWord tmp_cwd;
 	tmp_cwd.cw = cwd;
 	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
-
+	tmp_cwd.adr = 4;
+	qDebug() << QString("mpko %1 %2 %3").arg(tmp_cwd.adr).arg(tmp_cwd.subadr).arg(tmp_cwd.count);
 	if (!(map_channels[mko] & work_line))
 	{
 		QString _msg = QString("МКО %1 канал %2 не работает").arg(mko).arg(line);
@@ -201,9 +202,9 @@ void RpcOmnibusWidget::send_msg_mpko(int mko, int line, int cwd, QVariantList& w
 	{
 		os = -1;
 	}
-	QString _msg = QString("Обмен на МПКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(cwd, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
+	QString _msg = QString("Обмен на МПКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(tmp_cwd.cw, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
 	emit message_to_log(_msg);
-	emit new_message_mpko(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
+	emit new_message_mpko(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, tmp_cwd.cw, words, os);
 }
 
 
