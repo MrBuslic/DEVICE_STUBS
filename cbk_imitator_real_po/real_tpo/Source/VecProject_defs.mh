@@ -1,0 +1,14 @@
+MAKEDIR=D:/SUBMIC/TSRP/CDS/MAKE
+PROJECTDIR=D:/Roman/TPO/Source
+VecProject_Prep=0
+
+VecProject_Added_CppFlags=-D__MACHINE__=__CBK__
+VecProject_Added_CFlags=-D__MACHINE__=__CBK__
+VecProject_Added_AsFlags=
+VecProject_Added_LdFlags=
+
+VecProject_Include=$(SubMicPath)/Target/BOS/BOS_h; $(SubMicPath)/Target/OPO/OPO_h; $(SubMicPath)/TSRP/CDS/INCLUDE; $(SubMicPath)/Target/Target_h; $(SubMicPath)/Target/BRPO/BRPO_h;
+VecProject_Lib=$(SubMicPath)/Target/Bos/CBK/Lib/libBOS.a; $(SubMicPath)/TSRP/CDS/LIB/libR3.a
+
+VecProject_Prf=D:/Roman/TPO/Source/VecUnit.c 
+VecProject_Dep=D:/Roman/TPO/Source/MainProject.e 

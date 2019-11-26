@@ -1,0 +1,228 @@
+**FILES**
+
+  D:/Roman/TPO/Source/VersionUnit.o
+00000000 00000000 2** 4d .text
+00000000 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000000 00000018 2** 2d .reginfo
+00000000 00000540 2** 2d .stab
+00000000 0000250e 2** 0d .stabstr
+00000000 00000030 2** 4d .rodata
+
+**GLOBAL SYMBOLS**
+
+offset    section    offset   symbol
+00000000  .data      1fc80000 _fdata
+00000000  .rodata    00000000 SpoVersionCode
+1fc80048  *ABS*      1fc80048 _etext
+1fc88000  *ABS*      1fc88000 _gp
+00000000  *ABS*      00000000 _DYNAMIC_LINK
+00000004  .rodata    00000004 SpoVersionStr
+00000000  .text      1fc80000 _ftext
+1fc80000  *ABS*      1fc80000 __bss_start
+1fc80000  *ABS*      1fc80000 _edata
+1fc80000  *ABS*      1fc80000 _end
+1fc80000  *ABS*      1fc80000 _fbss
+**MEMORY CONFIGURATION**
+
+name		origin   length   r_size   c_size    is    attributes
+*default*       00000000 ffffffff 00000000 0000250e ()
+
+
+**LINK EDITOR MEMORY MAP**
+
+output   input     virtual
+section  section   address    tsize
+
+
+*ABS*             00000000     0     0 2**0 
+LOAD D:/Roman/TPO/Source/VersionUnit.o
+LOAD S:/Target/BOS/CBK/LIB/libBOS.a
+LOAD S:/TSRP/CDS/LIB/libR3.a
+address
+address
+                  00000000 00000000 _DYNAMIC_LINK =00000000
+                  00000000 00400094 . =(00400000+SIZEOF_HEADERS)
+
+.interp  (no attached output section)
+ from *(.interp)
+
+.hash    (no attached output section)
+ from *(.hash)
+
+.dynsym  (no attached output section)
+ from *(.dynsym)
+
+.dynstr  (no attached output section)
+ from *(.dynstr)
+
+.rel.text (no attached output section)
+ from *(.rel.text)
+
+.rela.text (no attached output section)
+ from *(.rela.text)
+
+.rel.data (no attached output section)
+ from *(.rel.data)
+
+.rela.data (no attached output section)
+ from *(.rela.data)
+
+.rel.rodata (no attached output section)
+ from *(.rel.rodata)
+
+.rela.rodata (no attached output section)
+ from *(.rela.rodata)
+
+.rel.got (no attached output section)
+ from *(.rel.got)
+
+.rela.got (no attached output section)
+ from *(.rela.got)
+
+.rel.ctors (no attached output section)
+ from *(.rel.ctors)
+
+.rela.ctors (no attached output section)
+ from *(.rela.ctors)
+
+.rel.dtors (no attached output section)
+ from *(.rel.dtors)
+
+.rela.dtors (no attached output section)
+ from *(.rela.dtors)
+
+.rel.init (no attached output section)
+ from *(.rel.init)
+
+.rela.init (no attached output section)
+ from *(.rela.init)
+
+.rel.fini (no attached output section)
+ from *(.rel.fini)
+
+.rela.fini (no attached output section)
+ from *(.rela.fini)
+
+.rel.bss (no attached output section)
+ from *(.rel.bss)
+
+.rela.bss (no attached output section)
+ from *(.rela.bss)
+
+.rel.plt (no attached output section)
+ from *(.rel.plt)
+
+.rela.plt (no attached output section)
+ from *(.rela.plt)
+
+.init    (no attached output section)
+ from *(.init)
+
+.plt     (no attached output section)
+ from *(.plt)
+
+.text             1fc80000     0     0 2**4 load alloc contents 
+                  1fc80000 00000000 _ftext =.
+ from *(.text)
+ from *(.gnu.warning)
+
+.fini    (no attached output section)
+ from *(.fini)
+
+.rodata           1fc80000    30     0 2**4 load alloc contents 
+ from *(.rodata)
+         .rodata  1fc80000    30    30 2**4  elf32-littlemips D:/Roman/TPO/Source/VersionUnit.o(overhead 4056 bytes)
+                  1fc80000              SpoVersionCode
+                  1fc80004              SpoVersionStr
+
+.rodata1 (no attached output section)
+ from *(.rodata1)
+
+.reginfo          1fc80030    18     0 2**2 load alloc contents 
+ from *(.reginfo)
+         .reginfo 1fc80030    18    18 2**2  elf32-littlemips D:/Roman/TPO/Source/VersionUnit.o(overhead 4056 bytes)
+                  1fc80048 1fc80048 _etext =.
+                  1fc80048 1fc80048 PROVIDE (etext, .)
+                  1fc80048 1fc80048 . =.
+
+.data             1fc80000     0     0 2**4 load alloc contents 
+                  1fc80000 00000000 _fdata =.
+ from *(.data)
+constructors:
+
+.data1   (no attached output section)
+ from *(.data1)
+                  1fc80000 1fc88000 _gp =(.+00008000)
+
+.lit8    (no attached output section)
+ from *(.lit8)
+
+.lit4    (no attached output section)
+ from *(.lit4)
+
+.ctors   (no attached output section)
+ from *(.ctors)
+
+.dtors   (no attached output section)
+ from *(.dtors)
+
+.got     (no attached output section)
+ from *(.got.plt)
+ from *(.got)
+
+.dynamic (no attached output section)
+ from *(.dynamic)
+
+.sdata   (no attached output section)
+ from *(.sdata)
+                  1fc80000 1fc80000 _edata =.
+                  1fc80000 1fc80000 PROVIDE (edata, .)
+                  1fc80000 1fc80000 __bss_start =.
+                  1fc80000 1fc80000 _fbss =.
+
+.sbss    (no attached output section)
+ from *(.sbss)
+ from *(.scommon)
+
+.bss              1fc80000     0     0 2**4 alloc 
+ from *(.dynbss)
+ from *(.bss)
+ from *(COMMON)
+                  1fc80000 1fc80000 _end =.
+                  1fc80000 1fc80000 PROVIDE (end, .)
+
+.stab             00000000   540     0 2**2 contents 
+ from *(.stab)
+         .stab    00000000   540   540 2**2  elf32-littlemips D:/Roman/TPO/Source/VersionUnit.o(overhead 4056 bytes)
+
+.stabstr          00000000  250e     0 2**0 contents 
+ from *(.stabstr)
+         .stabstr 00000000  250e  250e 2**0  elf32-littlemips D:/Roman/TPO/Source/VersionUnit.o(overhead 4056 bytes)
+
+.debug   (no attached output section)
+ from *(.debug)
+
+.debug_srcinfo0 (no attached output section)
+ from *(.debug_srcinfo)
+
+.debug_aranges0 (no attached output section)
+ from *(.debug_aranges)
+
+.debug_pubnames (no attached output section)
+ from *(.debug_pubnames)
+
+.debug_sfnames0 (no attached output section)
+ from *(.debug_sfnames)
+
+.line    (no attached output section)
+ from *(.line)
+
+.gptab.sdata (no attached output section)
+ from *(.gptab.data)
+ from *(.gptab.sdata)
+
+.gptab.sbss (no attached output section)
+ from *(.gptab.bss)
+ from *(.gptab.sbss)
+OUTPUT(VersionProject.e elf32-littlemips)

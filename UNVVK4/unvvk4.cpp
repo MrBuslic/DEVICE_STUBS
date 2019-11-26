@@ -1,4 +1,9 @@
 #include <unvvk4.h>
+#include <socket_rpc.h>
+#include <windows.h>
+#include "vvk4_rpc.h"
+#include "unvvk4_h.h"
+
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
@@ -62,9 +67,23 @@ ViStatus _VI_FUNC unvvk4_close (ViSession vi){ return 0; }
 ViStatus _VI_FUNC unvvk4_start_commut (ViSession vi_vvk4){ return 0; }
 
 // Функция "Подключение выхода"	   //
-ViStatus _VI_FUNC unvvk4_commut_Output (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViInt16 state){ return 0; }				
+ViStatus _VI_FUNC unvvk4_commut_Output (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViInt16 state)
+{
+	int res = -1;
+	QString chanel = QString::number(output);
+	if (state == 0)
+		res = Srpc_buffer_class::Instance().vvk4_slot_thr.get_vvk4_obj()->unvvk4_commut_ListOutput(line, "", chanel);
+	else if (state == 1)
+		res = Srpc_buffer_class::Instance().vvk4_slot_thr.get_vvk4_obj()->unvvk4_commut_ListOutput(line, chanel, "");
+	return res;
+}				
 // Функция "Коммутация группы выходов"	   0-снять конфигурацию, 1-сконфигурировать 
-ViStatus _VI_FUNC unvvk4_commut_ListOutput (ViSession vi_vvk4, ViInt16 line, ViPChar MasOn, ViPChar MasOff){ return 0; }
+ViStatus _VI_FUNC unvvk4_commut_ListOutput (ViSession vi_vvk4, ViInt16 line, ViPChar MasOn, ViPChar MasOff)
+{
+	QString masOnStr = MasOn;
+	QString masOffStr = MasOff;
+	return Srpc_buffer_class::Instance().vvk4_slot_thr.get_vvk4_obj()->unvvk4_commut_ListOutput(line, masOnStr, masOffStr);
+}
 // Функция "Коммутация всех выходов"	 
 ViStatus _VI_FUNC unvvk4_commut_AllOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *NN_output){ return 0; }
 // Функция "Коммутация измерительных линий" :	 0-отключить, 1-подключить	  
@@ -73,11 +92,14 @@ ViStatus _VI_FUNC unvvk4_commut_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine,
 // Функция "Конфигурация выхода"
 ViStatus _VI_FUNC unvvk4_config_Output (ViSession vi_vvk4, ViInt16 line, ViInt16 output, ViInt16 state){ return 0; }
 // Функция "Конфигурация группы выходов"	   0-снять конфигурацию, 1-сконфигурировать 
-ViStatus _VI_FUNC unvvk4_config_ListOutput (ViSession vi_vvk4, ViInt16 line, ViPChar MasOn, ViPChar MasOff){ return 0; }
+ViStatus _VI_FUNC unvvk4_config_ListOutput (ViSession vi_vvk4, ViInt16 line, ViPChar MasOn, ViPChar MasOff){	return 0; }
 // Функция "Конфигурация всех выходов"	   0-снять конфигурацию, 1-сконфигурировать 
 ViStatus _VI_FUNC unvvk4_config_AllOutput (ViSession vi_vvk4, ViInt16 line, ViInt16 *NN_output){ return 0; }
 // Функция "Конфигурация измерительных линий" :	 0-отключить, 1-подключить	  
-ViStatus _VI_FUNC unvvk4_config_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine, ViInt16 state){ return 0; }
+ViStatus _VI_FUNC unvvk4_config_MeasureLine (ViSession vi_vvk4, ViInt16 IzmLine, ViInt16 state)
+{ 
+	return Srpc_buffer_class::Instance().vvk4_slot_thr.get_vvk4_obj()->unvvk4_config_MeasureLine(IzmLine, state);
+}
 
 // Функция "Запрос состояния конфигурации входных измерительных линий"  
 ViStatus _VI_FUNC unvvk4_config_MeasureLine_Q (ViSession vi_vvk4, ViInt16 *Mas){ return 0; }

@@ -1,0 +1,66 @@
+# Стартовый командный файл
+UINT tmp;
+
+echo_on
+dinopros 4
+VM 0123
+stop
+delete
+kill all
+
+pwPut_27 0x0;      sleep(1000)
+pwPut_27 0xF;      sleep(1000)
+pwPut_On $(vmMap); sleep(1000)
+tmp=$(vmMap); tmp=tmp^0xFFFFFFFF; tmp=tmp&0xF; pwPut_Off ^tmp
+sleep(1000);
+stop;go;stop; reset; delete; kill all; ResCIT;
+
+MV_Enable 1
+
+echo_on
+
+tmp=$(vmMap)&1; if(tmp!=0) putenv("__VM0__=1")
+tmp=$(vmMap)&2; if(tmp!=0) putenv("__VM1__=1")
+tmp=$(vmMap)&4; if(tmp!=0) putenv("__VM2__=1")
+tmp=$(vmMap)&8; if(tmp!=0) putenv("__VM3__=1")
+
+#if($(vmMap)==0xF) {
+#   putenv("__VM3__=0")
+#   putenv("vmMap=0x7")
+#   putenv("vmList=012")
+#}
+vm $(vmList)
+otkl intkom;
+trace 10000
+traceevent
+
+#####################################################################
+# Настройка переменных среды
+#--------------------------------------------------------------------
+putenv(__MACHINE__=CBK) # каталог машины
+putenv(__STEND__=NOK_2) # каталог стенда (м.б. TSRP,SOP,NOK_1,NOK_2,TNA,KIA...)
+putenv(__PREFIX__=)     # префикс имени файла; м.б.:
+			  #   (пусто) - для поставки заказчику
+			  #   bos_    - для частной КДЗ БОС
+			  #   kdz_    - для КДЗ ОПО
+			  #   bdo_    - для частной КДЗ БДО
+			  #   brpo_  - для частной КДЗ БРПО
+			  #   btpo_   - для частной КДЗ БТПО
+putenv("__SUFFIX__=CBK")  # суффикс, отличающий ModDbg.exe от ModCBK.exe
+
+putenv(SubMicAcceleration=0) # 1- для ускорения динамического останова
+
+if(exist   __environ__.dbg) {
+   command __environ__.dbg
+}
+
+
+#####################################################################
+# Вывод некоторых переменных среды на экран
+command $(SubMicPath)\ComFiles\showEnviron.dbg
+
+#####################################################################
+
+# Запуск командного файла boot.dbg
+param bootCBK.dbg final
+command $(SubMicPath)\ComFiles\ComSPO.dbg

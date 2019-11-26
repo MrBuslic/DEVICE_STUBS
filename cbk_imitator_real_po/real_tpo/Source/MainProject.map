@@ -1,0 +1,2547 @@
+taskLib.o needed due to taskCreate
+timeLib.o needed due to timeRead
+semLib.o needed due to semCreate
+mkoLib.o needed due to mkoWait
+errLib.o needed due to ErrCodGet
+testLib.o needed due to testStart
+addLib.o needed due to sprIGetF
+rand.o needed due to srand
+memcmp.o needed due to memcmp
+memcpy.o needed due to memcpy
+memmove.o needed due to memmove
+memset.o needed due to memset
+strlen.o needed due to strlen
+Allocating common Pause_BUM: 6 at 0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common CbkConfig: 4 at 0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Pause_OTKL_AFAR: 4 at 8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common AsnStatusPrevTime: 4 at 4 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressMsgCount: 4 at 0 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common PacketMkoIntQueueCount: 4 at 0 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common BUFAR_Sbros: 4 at c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_PackList: 10800 at 0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common FailVmDiag: 1000 at 0 D:/Roman/TPO/Source/MainUnit.o
+Allocating common CbkErrCtrlCallBackType: 4 at 8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common TestTaskIn: 4 at c D:/Roman/TPO/Source/DataUnit.o
+Allocating common ReConfigBuffer: 10 at 0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MainTaskPdoCount: 4 at 10 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PostMdiDataSize: 4 at 14 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnStatusBeginTime: 4 at 18 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnPeriodicTaskTime: 8 at 20 D:/Roman/TPO/Source/DataUnit.o
+Allocating common RedefinedTxRnsValue: 2 at 10 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13RxIndex: 2 at 12 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13BrtkMode2Enabled: 4 at 14 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Control_NumList: 80 at 0 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common Pause_Proverki_TM_AFAR: 4 at 18 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Otriz_Kvit: 4 at 1c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMsgPtrX: 4 at 28 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMsgResC: 108 at 10 D:/Roman/TPO/Source/DataUnit.o
+Allocating common ExtTaskCount: 4 at 2c D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnIrqCount: 4 at 30 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13TxBuffer: 800 at 10800 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorBadWords: 2 at 0 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common FlashDataBuffer: 40000 at 120 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq10PackRes: 4 at 0 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common Irq13PrevTxMsgLen: 4 at 20 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Control_Tm_AFAR: 4 at 24 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common DebugPackRes: 4 at 34 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnMkoFailCount: 4 at 38 D:/Roman/TPO/Source/DataUnit.o
+Allocating common XchgBTrack: 4 at 0 D:/Roman/TPO/Source/MkoXchgUnit.o
+Allocating common PacketMkoMsgList: 12000 at 0 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Pause_MkoTx: 4 at 28 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common FlashDataAddr: 4 at 3c D:/Roman/TPO/Source/DataUnit.o
+Allocating common PacketMkoMsgCount: 4 at 4 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common BehWaitForFirstIrq: 4 at 40 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PeriodicMkoMsgLock: 4 at 0 D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o
+Allocating common Baloi_DisabledReplyList: 200 at 11000 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Control_BUM: 4 at 2c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common RedefinedTxRns: 4 at 30 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common AsnTaskDeltaTimeTimer: 4 at 44 D:/Roman/TPO/Source/DataUnit.o
+Allocating common LPH: 4 at 34 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common PacketMkoIntCount: 4 at 8 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common MkoMsgPtrC: 84 at 40120 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressErrorCount: 4 at 4 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common MkoMirrorWrLen: 4 at 4 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common MkoPackResA: 4 at 48 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13SingleEvent: 4 at 38 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_DisabledMsgList: 200 at 11200 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehControlEnabled: 4 at 4c D:/Roman/TPO/Source/DataUnit.o
+Allocating common KPADetected: 1 at 50 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_DebugReadListCount: 4 at 3c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common PacketMkoIntQueue1List: 1100 at 12000 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common AsnPostDeltaTime: 4 at 54 D:/Roman/TPO/Source/DataUnit.o
+Allocating common TrackPack: 4 at c D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Control_ChangedList: 1000 at 80 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common AsnWaitForFirstIrq: 4 at 58 D:/Roman/TPO/Source/DataUnit.o
+Allocating common SAA_Ustanovlena: 4 at 40 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_MkoPackSem: 4 at 44 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common KPI_Etalon: 680 at 11400 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common DebugMki: 1000 at 401b0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMirrorXchgTotal: 2 at 8 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common SubsDataBuffer: 800 at 411b0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMirrorRdLen: 4 at c D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common MainTaskIn: 4 at 5c D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_MkoPackMsg: 300 at 11a80 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorAddr: 4 at 10 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common MkoMsgResB: 108 at 419b0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Control_AddrList: 80 at 1080 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common KpaCommand: 10 at 41ac0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common LastError: 100 at 41ad0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common FlashDataIndex: 4 at 60 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoPackX: 8 at 68 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnControlStopTime: 8 at 70 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BUFAR: 4 at 48 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common PacketMkoIntQueue0List: 1100 at 13100 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common LPH_Vkluchena: 4 at 4c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehEnabledZone: 8 at 78 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnExcIrqCount: 4 at 80 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehPostDeltaTime: 4 at 84 D:/Roman/TPO/Source/DataUnit.o
+Allocating common RES_STD_DBG: 4 at 4 D:/Roman/TPO/Source/MkoXchgUnit.o
+Allocating common AsnTimeIrqPrev: 8 at 88 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnTaskDeltaTimeInterval: 4 at 90 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_PackMkoLine: 20 at 11d80 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorRdChan: 4 at 14 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common AsnTaskDeltaTimeFlag: 4 at 94 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PostMdiDataBuf: 1600 at 41bd0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq10PackMsgRes: 90 at 0 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common Baloi_PackSendCount: 80 at 11da0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehExcFhvIrqCount: 4 at 98 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq10Pack: 8 at 8 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common BehIrqCount: 4 at 9c D:/Roman/TPO/Source/DataUnit.o
+Allocating common CallBackCount: 4 at a0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common ProhibitedMkoMsgCount: 4 at 0 D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o
+Allocating common BehIrqAlreadySet: 4 at a4 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressLinkErrorCount: 4 at 8 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Otkl_AT: 4 at 50 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common KPI_Etalon_Len: 4 at 54 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common RunPacketBeginTime: 8 at 10 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Baloi_MkoPackMsgRes: 100 at 11e20 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehControlStopTime: 8 at a8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common IrqTime: 8 at b0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_DisabledCrcList: 200 at 11f20 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoStressLastPackResult: 40c at 0 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common AsnTimeList: 1c20 at 431d0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common KPI_Kvit: 4 at 58 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMsgResX: 8 at b8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13LastMsg: 2 at 5c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common AsnIrqAlreadySet: 4 at c0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq10Data: 480 at 90 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common Code_DB: 4 at 60 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq10Result: 4 at 10 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common MkoPackResC: 4 at c4 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnEnabledZone: 8 at c8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Control_ZTM_BUFAR: 4 at 64 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq10PackMsgBuf: 480 at 510 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common VmStateData: 60 at 44df0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_PackErrSendCount: 80 at 12120 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Control_StateList: 800 at 1100 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common MkoMirrorXchgWithError: 2 at 18 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common PacketMkoMsgResultBuf: 2010 at 14200 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common ErrorTaskIn: 4 at d0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PostMkiDataBuf: 60 at 44e50 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Komplekt_APD_MT: 4 at 68 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13WaitReplyFlag: 4 at 6c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_MkoPackMsgList: 80 at 121a0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehFhvPeriod: 4 at d4 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoPackC: 8 at d8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnControlEnabled: 4 at e0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_Send_Bau_OK_Time: 8 at 70 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoBufX: 40 at 44eb0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Control_ChangedCount: 4 at 0 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common Baloi_DisabledCrcListCount: 4 at 78 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common SubsAddrBuffer: 40 at 44ef0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PacketMkoIntCntCount: 4 at 18 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common ProhibitedMkoMsgList: 8200 at 0 D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o
+Allocating common Baloi_ReplyTypeList: 400 at 12220 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common B732PupsList: c350 at 44f30 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Otkl_BPA_AT: 4 at 7c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Pause_MFS: 8 at 80 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoPackB: 8 at e8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressTermErrorCount: 4 at c D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common MkoMsgPtrB: 84 at 51280 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehMissFinikIrqCount: 4 at f0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnTaskOut: 4 at f4 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoBufStub: 40 at 51310 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressNoOsErrorCount: 4 at 10 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common PacketMkoIntList: 1100 at 16210 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Vkl_AFAR_PRD: 460 at 12620 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13LastRns: 2 at 88 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Nomer_Shetverti: 4 at 8c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common TrackPackCount: 4 at 1c D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Irq13CmdFifoHead: 4 at 90 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common PacketMkoMsgResultList: 2000 at 17310 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common BehExcIrqCount: 4 at f8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MainTaskCmdFail: 4 at fc D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressShowLastPackResult: 4 at 14 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common AsnTimerFailCount: 4 at 100 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Control_DeviceList: 20 at 1900 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common LastResult: 4 at 20 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common MkoMsgB: 318 at 51350 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressMsgErrorCount: 4 at 18 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Komplekt_ALPS: 4 at 94 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_ReplyTypeListCount: 4 at 98 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehMissFhvIrqCount: 4 at 104 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Tm_AFAR_BUM: 14 at 12a80 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common AsnMissIrqCount: 4 at 108 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoPackResB: 4 at 10c D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehFhvIrqCount: 4 at 110 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnTimeListSize: 4 at 114 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PostParam: 4 at 118 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehPreDeltaTime: 4 at 11c D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13PrevTxIndex: 2 at 9c D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13PrevTxBuffer: 800 at 12aa0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq10PackMsgList: 48 at 990 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common MkoMsgResA: 108 at 51670 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PeriodicMkoMsgList: 5400 at 0 D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o
+Allocating common Vkl_PRD_0: e0 at 132a0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common AFAR_AT_M: 4 at a0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_DisabledMsgListCount: 4 at a4 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common AsnTaskDeltaTimeId: 4 at 120 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13DevState: 3c at 13380 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMsgX: 18 at 51780 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehFinikFlag: 4 at 124 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Index_AFAR: 4 at a8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMsgC: 318 at 517a0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Komplekt_MFS: 4 at ac D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_DebugReadList: 200 at 133c0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoBufC: 840 at 51ac0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common ErrorTaskOut: 4 at 128 D:/Roman/TPO/Source/DataUnit.o
+Allocating common FlashJob: 1b10 at 52300 D:/Roman/TPO/Source/DataUnit.o
+Allocating common SpoConfig: f8 at 53e10 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnTaskIn: 4 at 12c D:/Roman/TPO/Source/DataUnit.o
+Allocating common CmdHandlerTable: 400 at 53f10 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PacketMkoIntCntList: 3100 at 19310 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common PostMkiDataSize: 4 at 130 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoBufB: 840 at 54310 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MainTaskTime0: 8 at 138 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Rejim_3_Rasch: 4 at b0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13TxIndex: 2 at b4 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Pause_Rasch_3: 4 at b8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common RunPacketCurrTime: 8 at 28 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Vkl_AFAR_BUM: 14 at 135c0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common B732PupsListSize: 4 at 140 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMirrorInterval: 4 at 1c D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common Tm_AFAR_PRD: 96 at 135e0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq10PackMsg: 1b0 at 9e0 D:/Roman/TPO/Source/IrqHandlerUnit.o
+Allocating common MkoStressAbErrorCount: 4 at 1c D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Irq13CmdFifo: 8040 at 13680 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common OpoVersionString: 40 at 54b50 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13UserMsgData: 800 at 1b6c0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common PacketRdDataInfo: 8 at 30 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common Ctrl_Ispravnosti: 4 at bc D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_PackPrepPause: 40 at 1bec0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13TxMsgLen: 4 at c0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13CmdFifoTail: 4 at c4 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorAbWrError: 2 at 20 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common CbkDataImit: 840 at 54b90 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_Read_OK_Time: 8 at c8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorWrChan: 4 at 24 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common MkoMirrorLine: 4 at 28 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common AsnSecondIrqTime: 8 at 148 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnPreDeltaTime: 4 at 150 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13BaloiFail: 4 at d0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_PackMkoChan: 20 at 1bf00 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Data_OTKL_AFAR: 10 at 1bf20 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MdiBuffer: 200 at 553d0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehMissIrqCount: 4 at 154 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMirrorDebug: 4 at 2c D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common Irq13WaitReplyTimer: 8 at d8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoBufA: 840 at 555d0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressBusyErrorCount: 4 at 20 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Baloi_DisabledReplyListCount: 4 at e0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_PackOkSendCount: 80 at 1bf30 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_MkoPackRes: 4 at e4 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehFinikPeriod: 4 at 158 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehExcFinikIrqCount: 4 at 15c D:/Roman/TPO/Source/DataUnit.o
+Allocating common IrqTaskIn: 4 at 160 D:/Roman/TPO/Source/DataUnit.o
+Allocating common DN_Vvedena: 4 at e8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehMkoFailCount: 4 at 164 D:/Roman/TPO/Source/DataUnit.o
+Allocating common IrqTaskOut: 4 at 168 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Pause_LPH: 4 at ec D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common BehFhvFlag: 4 at 16c D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressPackResList: 10000 at 410 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common AsnStartTimer: 4 at 170 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_PackMsgCount: 20 at 1bfb0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_Read_OK: 4 at f0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorAbRdError: 2 at 30 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common CNT_DBG: 4 at 8 D:/Roman/TPO/Source/MkoXchgUnit.o
+Allocating common Pause_AFAR: 4 at f4 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorCycles: 4 at 34 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common Pause_PRD: 4 at f8 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common GRES_DBG: 4 at 38 D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+Allocating common MainTaskTime1: 8 at 178 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoPackA: 8 at 180 D:/Roman/TPO/Source/DataUnit.o
+Allocating common PeriodicMkoMsgCount: 4 at 4 D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o
+Allocating common MkoStressLastOS: 4 at 24 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Irq13RxBuffer: 800 at 1bfd0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common TestTaskOut: 4 at 188 D:/Roman/TPO/Source/DataUnit.o
+Allocating common AsnParamFailCount: 4 at 18c D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoStressMsgResCount: 4 at 28 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Irq13CmdFifoEnabled: 4 at fc D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common FlashSectorCSumTable: 40 at 55e10 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMsgPtrA: 84 at 55e50 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13LastSum: 2 at 100 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Otkl_AFAR: 4 at 104 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoStressDataErrorCount: 4 at 2c D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Control_DataAvail: 400 at 1920 D:/Roman/TPO/Source/ControlUnit.o
+Allocating common MkoStressPackResCount: 4 at 30 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common BehStartTimer: 4 at 190 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Rejim_BRTK: 4 at 108 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoPackResX: 4 at 194 D:/Roman/TPO/Source/DataUnit.o
+Allocating common DebugFlag: 4 at 198 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehFinikIrqCount: 4 at 19c D:/Roman/TPO/Source/DataUnit.o
+Allocating common Pause_AOS: 8 at 110 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoStressMsgResList: 20000 at 10410 D:/Roman/TPO/Source/MkoStressTestUnit.o
+Allocating common Komplekt_AOS: 4 at 118 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkiBuffer: 800 at 55ee0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Irq13TimeSEV: 6 at 120 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorBadBits: 2 at 38 D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common Baloi_MkoPack: 8 at 128 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Baloi_PackInterval: 40 at 1c7d0 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Chislo_Proverok_TM_AFAR: 4 at 130 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Ctrl_Ispravnosti_Time: 8 at 138 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common Irq13SendNackEnabled: 4 at 140 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common MkoMirrorXchgMask: 4 at 3c D:/Roman/TPO/Source/MkoMirrorUnit.o
+Allocating common Ctrl_Ispravnosti_Enabled: 4 at 144 D:/Roman/TPO/Source/BaloiUnit_v11.o
+Allocating common PassBeginTime: 8 at 1a0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common MkoMsgA: 318 at 566e0 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehFhvTmpCount: 4 at 1a8 D:/Roman/TPO/Source/DataUnit.o
+Allocating common BehFinikTmpCount: 4 at 1ac D:/Roman/TPO/Source/DataUnit.o
+Allocating common IrqHandlerTable: 40 at 56a00 D:/Roman/TPO/Source/DataUnit.o
+Allocating common Baloi_Send_Bau_OK: 4 at 148 D:/Roman/TPO/Source/BaloiUnit_v11.o
+**FILES**
+
+  D:/Roman/TPO/Source/MainUnit.o
+00000000 00000750 2** 4d .text
+0000000c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000000 00000018 2** 2d .reginfo
+00000000 00000de0 2** 2d .stab
+00000000 0000271d 2** 0d .stabstr
+00000000 00001000 2** 4d COMMON
+
+  D:/Roman/TPO/Source/DataUnit.o
+00000750 00000490 2** 4d .text
+0000000c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00000de0 00001014 2** 2d .stab
+0000271d 00002ff5 2** 0d .stabstr
+00001000 00056a40 2** 4d COMMON
+00000000 000001b0 2** 3d .scommon
+
+  D:/Roman/TPO/Source/FuncUnit.o
+00000be0 00001de0 2** 4d .text
+0000000c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00001df4 00002b5c 2** 2d .stab
+00005712 00002e46 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/IrqHandlerUnit.o
+000029c0 00001c70 2** 4d .text
+0000000c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00004950 000021c0 2** 2d .stab
+00008558 00002c9e 2** 0d .stabstr
+000001b0 00000014 2** 3d .scommon
+00057a40 00000b90 2** 4d COMMON
+
+  D:/Roman/TPO/Source/MkoXchgUnit.o
+00004630 000031d0 2** 4d .text
+0000000c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00006b10 00002eb0 2** 2d .stab
+0000b1f6 00002deb 2** 0d .stabstr
+00000000 00000040 2** 4d .rodata
+000001c4 0000000c 2** 2d .scommon
+
+  D:/Roman/TPO/Source/ControlUnit.o
+00007800 00000990 2** 4d .text
+0000000c 00000e80 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+000099c0 00001470 2** 2d .stab
+0000dfe1 0000315e 2** 0d .stabstr
+000585d0 00001d20 2** 4d COMMON
+000001d0 00000004 2** 2d .scommon
+
+  D:/Roman/TPO/Source/CrcUnit.o
+00008190 000001a0 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0000ae30 00000594 2** 2d .stab
+0001113f 000005a0 2** 0d .stabstr
+00000040 00000700 2** 4d .rodata
+
+  D:/Roman/TPO/Source/CmdHandlerUnit.o
+00008330 00007f00 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0000b3c4 0000966c 2** 2d .stab
+000116df 00004bf1 2** 0d .stabstr
+00000740 00000020 2** 4d .rodata
+
+  D:/Roman/TPO/Source/DebugUnit.o
+00010230 00000000 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00014a30 00000108 2** 2d .stab
+000162d0 000002b9 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/CmdHandlerKoiUnit.o
+00010230 00000000 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00014b38 00000528 2** 2d .stab
+00016589 000024ea 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/CmdHandlerErtiUnit.o
+00010230 00001200 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00015060 000016f8 2** 2d .stab
+00018a73 00002942 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/IrqHandlerKoiUnit.o
+00011430 00000000 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00016758 00000528 2** 2d .stab
+0001b3b5 000024ea 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/IrqHandlerErtiUnit.o
+00011430 00000b80 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00016c80 00000fb4 2** 2d .stab
+0001d89f 00002650 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o
+00011fb0 00000f40 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00017c34 000014e8 2** 2d .stab
+0001feef 00002b99 2** 0d .stabstr
+000001d4 00000008 2** 2d .scommon
+0005a2f0 00005400 2** 4d COMMON
+
+  D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o
+00012ef0 00000a80 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0001911c 00001014 2** 2d .stab
+00022a88 00002a3a 2** 0d .stabstr
+000001dc 00000004 2** 2d .scommon
+0005f6f0 00008200 2** 4d COMMON
+
+  D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+00013970 000045a0 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0001a130 000050d0 2** 2d .stab
+000254c2 00003f86 2** 0d .stabstr
+000001e0 0000003c 2** 3d .scommon
+000678f0 0001c410 2** 4d COMMON
+
+  D:/Roman/TPO/Source/MkoMirrorUnit.o
+00017f10 00000c20 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0001f200 0000126c 2** 2d .stab
+00029448 000028ac 2** 0d .stabstr
+0000021c 00000040 2** 2d .scommon
+
+  D:/Roman/TPO/Source/MkoStressTestUnit.o
+00018b30 000020c0 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002046c 00002364 2** 2d .stab
+0002bcf4 00002f1c 2** 0d .stabstr
+0000025c 00000034 2** 2d .scommon
+00083d00 00030410 2** 4d COMMON
+
+  D:/Roman/TPO/Source/BkoiUnit.o
+0001abf0 00000000 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+000227d0 00000528 2** 2d .stab
+0002ec10 000024d8 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/BkoiTableUnit.o
+0001abf0 00000000 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00022cf8 00000528 2** 2d .stab
+000310e8 000024e2 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/BaloiUnit_v11.o
+0001abf0 000074f0 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+00023220 00007fec 2** 2d .stab
+000335ca 00004b7d 2** 0d .stabstr
+000b4110 0001c810 2** 4d COMMON
+00000290 0000014c 2** 3d .scommon
+
+  D:/Roman/TPO/Source/VersionProject.e
+ symbols only
+
+  taskLib.o
+000220e0 000001f0 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  timeLib.o
+000222d0 00000030 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  semLib.o
+00022300 00000050 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  mkoLib.o
+00022350 00000080 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  errLib.o
+000223d0 00000020 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  testLib.o
+000223f0 00000060 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  addLib.o
+00022450 000001d0 2** 4d .text
+00000e8c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+
+  rand.o
+00022620 00000050 2** 4d .text
+00000e8c 00000010 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002b20c 0000021c 2** 2d .stab
+00038147 00000889 2** 0d .stabstr
+
+  memcmp.o
+00022670 00000110 2** 4d .text
+00000e9c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002b428 0000030c 2** 2d .stab
+000389d0 0000034d 2** 0d .stabstr
+
+  memcpy.o
+00022780 00000480 2** 4d .text
+00000e9c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002b734 00000558 2** 2d .stab
+00038d1d 0000039b 2** 0d .stabstr
+
+  memmove.o
+00022c00 00000090 2** 4d .text
+00000e9c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002bc8c 00000270 2** 2d .stab
+000390b8 0000035a 2** 0d .stabstr
+
+  memset.o
+00022c90 00000260 2** 4d .text
+00000e9c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002befc 000004ec 2** 2d .stab
+00039412 00000366 2** 0d .stabstr
+
+  strlen.o
+00022ef0 000000e0 2** 4d .text
+00000e9c 00000000 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000018 00000018 2** 2d .reginfo
+0002c3e8 00000228 2** 2d .stab
+00039778 0000033c 2** 0d .stabstr
+
+**GLOBAL SYMBOLS**
+
+offset    section    offset   symbol
+00000000  .scommon   00000000 Pause_BUM
+00000130  .text      00000130 synchRecIncVM
+00000000  .scommon   00000000 CbkConfig
+00000008  .scommon   00000008 Pause_OTKL_AFAR
+00000004  .scommon   00000004 AsnStatusPrevTime
+00000000  .scommon   00000000 MkoStressMsgCount
+000024c0  .text      000024c0 CheckFsvuPower
+000008e8  .text      000008e8 ControlOkNumberToDevice
+000000b0  .text      000000b0 taskAllDelete
+00000e68  .data      00000e68 Control_NumList1C
+0000219c  .text      0000219c Irq13Msg0x8756
+00000000  .scommon   00000000 PacketMkoIntQueueCount
+00000764  .data      00000764 Control_AddrList1D
+00000040  .text      00000040 WdReset
+00006040  .text      00006040 KpaCommand37
+00000030  .text      00000030 taskInipTime
+00002b00  .text      00002b00 CheckMkoXchg
+000066f0  .text      000066f0 BaloiPeriodicTask
+000001b8  .text      000001b8 GetPeriodicMkoMsgLock
+00002900  .text      00002900 Irq13Msg0xC918
+000000b0  .text      000000b0 sprIQClear
+0000000c  .scommon   0000000c BUFAR_Sbros
+00000000  COMMON     00000000 Baloi_PackList
+00000000  COMMON     00000000 FailVmDiag
+00000008  .scommon   00000008 CbkErrCtrlCallBackType
+0000000c  .scommon   0000000c TestTaskIn
+00000000  COMMON     00000000 ReConfigBuffer
+00001824  .text      00001824 Irq13SendMsgBn
+00000e44  .data      00000e44 Control_NumList13
+0000368c  .text      0000368c Control_AFAR_Fail
+00000010  .scommon   00000010 MainTaskPdoCount
+00007460  .text      00007460 Control_BUFAR
+00000014  .scommon   00000014 PostMdiDataSize
+00002e94  .text      00002e94 Irq13Msg0xDB3A
+00000018  .scommon   00000018 AsnStatusBeginTime
+00000020  .scommon   00000020 AsnPeriodicTaskTime
+00003e40  .text      00003e40 Irq13Error
+00003ef4  .text      00003ef4 Irq13CalcSum
+0000083c  .data      0000083c Control_NumList03
+00000010  .scommon   00000010 RedefinedTxRnsValue
+0000082c  .text      0000082c InitProhibitedMkoMsg
+00000012  .scommon   00000012 Irq13RxIndex
+00000000  .text      00000000 HandleIrqBA
+000003c4  .text      000003c4 ControlCheckDevice
+00003718  .text      00003718 Irq13Msg0xDE3F
+000026f4  .text      000026f4 AddPacketMko_CntPiPo_IntToList
+00000014  .scommon   00000014 Irq13BrtkMode2Enabled
+000000f8  .text      000000f8 MainTaskRun
+00000000  .data      00080004 _fdata
+00000368  .text      00000368 InitMkoMsgC
+00003f38  .text      00003f38 RunPacketMko_CntQue_PreparePacket1
+00000020  .text      00000020 KpaCommand65
+00000f98  .text      00000f98 MkoStressPreparePacket2
+00000000  .rodata    1fc80000 SpoVersionCode
+00000000  COMMON     00000000 Control_NumList
+00000018  .scommon   00000018 Pause_Proverki_TM_AFAR
+00000000  .text      00000000 mkoWait
+0000001c  .scommon   0000001c Otriz_Kvit
+00000028  .scommon   00000028 MkoMsgPtrX
+00004340  .text      00004340 KpaCommand15
+00000020  .text      00000020 taskCreate
+00000010  COMMON     00000010 MkoMsgResC
+00000108  .text      00000108 CSumLong
+000005e4  .data      000005e4 Control_AddrList07
+0000002c  .scommon   0000002c ExtTaskCount
+00000000  .text      00000000 KpaCommand08
+000017dc  .text      000017dc MainTaskCheckCbkConfig
+000000e4  .data      000000e4 Control_AddrList02
+0000181c  .text      0000181c IrqHandler07
+00000030  .scommon   00000030 AsnIrqCount
+00000ed8  .text      00000ed8 RunPacketMkoSingleMsg
+00001b44  .text      00001b44 IrqHandler0B
+000049dc  .text      000049dc Irq13ReplyTypeRedefined
+000001a0  .text      000001a0 tlmSendOut
+00000cf4  .data      00000cf4 Control_NumList07
+00010800  COMMON     00010800 Irq13TxBuffer
+00000000  .scommon   00000000 MkoMirrorBadWords
+00000328  .text      00000328 IrqHandler00
+00000120  COMMON     00000120 FlashDataBuffer
+0000322c  .text      0000322c RunPacketMko_SecQue_IntList
+00000000  .scommon   00000000 Irq10PackRes
+00000000  .text      00000000 memmove
+00001f74  .text      00001f74 MkoStressSendStatistic
+00000020  .scommon   00000020 Irq13PrevTxMsgLen
+000015d0  .text      000015d0 PacketMkoMsgStoreRxData
+00000024  .scommon   00000024 Control_Tm_AFAR
+00000034  .scommon   00000034 DebugPackRes
+00000050  .text      00000050 taskErrExit
+00000038  .scommon   00000038 AsnMkoFailCount
+0000421c  .text      0000421c KpaCommand11
+00000000  .text      00000000 __errno
+00000000  .scommon   00000000 XchgBTrack
+000007b8  .text      000007b8 ProhibitedMkoMsgDataCmp
+00000000  .text      00000000 KpaCommand61
+00004b88  .text      00004b88 KpaCommand26
+00000000  COMMON     00000000 PacketMkoMsgList
+000025d0  .text      000025d0 Irq13Msg0xC312
+00000028  .scommon   00000028 Pause_MkoTx
+00005020  .text      00005020 Irq13LoadTableData
+000007c8  .data      000007c8 Control_NumList01
+00002848  .text      00002848 RunPacketMko_CntPiPo_IntList
+0000003c  .scommon   0000003c FlashDataAddr
+00000000  .text      00000000 timeSet
+00000004  .scommon   00000004 PacketMkoMsgCount
+00000040  .scommon   00000040 BehWaitForFirstIrq
+00003eac  .text      00003eac RunPacketMko_CntQue_CheckList
+00000000  .scommon   00000000 PeriodicMkoMsgLock
+00011000  COMMON     00011000 Baloi_DisabledReplyList
+000003f8  .text      000003f8 MkoXchgBn
+00003ea4  .text      00003ea4 BUPE_Chan1_Enable
+00002504  .text      00002504 CheckFsmuOK
+00000130  .text      00000130 taskReStart
+0000002c  .scommon   0000002c Control_BUM
+00000810  .text      00000810 ReadPacketMkoMsgData
+00003b98  .text      00003b98 Otkluchenie_AT_Fail
+1fca3848  *ABS*      1fca3848 _etext
+00000030  .scommon   00000030 RedefinedTxRns
+00000d80  .text      00000d80 MkoXchgBnMini
+00000044  .scommon   00000044 AsnTaskDeltaTimeTimer
+00000034  .scommon   00000034 LPH
+0000528c  .text      0000528c KpaCommand2D
+00000008  .scommon   00000008 PacketMkoIntCount
+000055d4  .text      000055d4 KpaCommand31
+00040120  COMMON     00040120 MkoMsgPtrC
+000037c4  .text      000037c4 Irq13InfoMsg0x33D2
+00000004  .scommon   00000004 MkoStressErrorCount
+000018b8  .text      000018b8 RunPacketMkoSingleMsgResult
+00000e34  .data      00000e34 Control_NumList0F
+00001b80  .text      00001b80 RunPacketMkoMultiMsgResult
+00006744  .text      00006744 KpaCommandFD
+00001af4  .text      00001af4 Irq13SendMsgAn
+00088ea0  *ABS*      00088ea0 _gp
+00000004  .scommon   00000004 MkoMirrorWrLen
+00000060  .text      00000060 mkoNumPackMsgWait
+000000e0  .text      000000e0 synchRecInfArrVM
+00000000  .text      00000000 IrqHandler02
+00000048  .scommon   00000048 MkoPackResA
+00000038  .scommon   00000038 Irq13SingleEvent
+00011200  COMMON     00011200 Baloi_DisabledMsgList
+00004518  .text      00004518 KpaCommand18
+0000004c  .scommon   0000004c BehControlEnabled
+00003b1c  .text      00003b1c Oper_0962
+0000018c  .text      0000018c CalcCrc32Done
+00004ccc  .text      00004ccc Irq13ChangeDebugReadList
+00000050  .scommon   00000050 KPADetected
+0000126c  .text      0000126c PacketMkoMsgPrepareBlock
+00001abc  .text      00001abc KpaCommand0CBase
+0000003c  .scommon   0000003c Baloi_DebugReadListCount
+00012000  COMMON     00012000 PacketMkoIntQueue1List
+00004bac  .text      00004bac CbkChanPowerOn
+00000054  .scommon   00000054 AsnPostDeltaTime
+00006c1c  .text      00006c1c Irq13PackSetup
+000004c8  .text      000004c8 AddPacketMkoSingleMsg
+00000210  .text      00000210 AddPeriodicMkoMsg
+0000000c  .scommon   0000000c TrackPack
+000029a4  .text      000029a4 Irq13Msg0xD435
+00001dc4  .text      00001dc4 Irq13MsgHandler
+00001d94  .text      00001d94 AddPacketMko_SecPiPo_MsgToInt
+00000000  .text      00000000 memcpy
+00000080  COMMON     00000080 Control_ChangedList
+00004df0  .text      00004df0 Irq13DoDebugReadBn
+00005114  .text      00005114 KpaCommand2C
+00000e1c  .data      00000e1c Control_NumList09
+0000064c  .text      0000064c FindProhibitedMkoMsg
+00000180  .text      00000180 numVMGet
+00000058  .scommon   00000058 AsnWaitForFirstIrq
+00000bf8  .text      00000bf8 DoPeriodicMkoMsg
+00000600  .text      00000600 OpoToSpoHookProc
+000010e4  .text      000010e4 Read733Config
+0000003c  .text      0000003c KpaCommand01
+00000040  .scommon   00000040 SAA_Ustanovlena
+00000044  .scommon   00000044 Baloi_MkoPackSem
+00007e00  .text      00007e00 CheckVmDeSynch
+00000550  .text      00000550 DelPeriodicMkoMsg
+00011400  COMMON     00011400 KPI_Etalon
+00006438  .text      00006438 Control_LPH
+00004ac0  .text      00004ac0 KpaCommand21
+000401b0  COMMON     000401b0 DebugMki
+00000100  .text      00000100 taskPeriod
+00001408  .text      00001408 IrqHandler06
+00000050  .text      00000050 mkoNumPackStop
+00000d80  .data      00000d80 Control_NumList08
+00000008  .scommon   00000008 MkoMirrorXchgTotal
+000065e8  .text      000065e8 ReadExtMsgData
+0000012c  .text      0000012c CalcCrc32Init
+00000724  .data      00000724 Control_AddrList0D
+000002fc  .text      000002fc DelProhibitedMkoMsg
+000029d8  .text      000029d8 RunPacketMko_CntPiPo_CheckList
+00002010  .text      00002010 RunPacketMko_SecPiPo_CheckList
+00000580  .text      00000580 AsnPeriodicTask
+000000c0  .text      000000c0 sprIMaskVec
+00000674  .data      00000674 Control_AddrList08
+00003190  .text      00003190 Vkluchenie_AFAR
+00004b1c  .text      00004b1c KpaCommand23
+00003814  .text      00003814 Irq13Msg0xDD3C
+000411b0  COMMON     000411b0 SubsDataBuffer
+00002af8  .text      00002af8 MkoXchgStub
+0000000c  .scommon   0000000c MkoMirrorRdLen
+00001b5c  .text      00001b5c RunPacketMkoMultiMsg
+00000058  .text      00000058 CalcCrc16
+00002c90  .text      00002c90 Control_ZTM
+00000854  .data      00000854 Control_NumList04
+00000758  .data      00000758 Control_AddrList1A
+0000005c  .scommon   0000005c MainTaskIn
+00011a80  COMMON     00011a80 Baloi_MkoPackMsg
+00000e60  .data      00000e60 Control_NumList1A
+00000010  .scommon   00000010 MkoMirrorAddr
+000419b0  COMMON     000419b0 MkoMsgResB
+00001080  COMMON     00001080 Control_AddrList
+00041ac0  COMMON     00041ac0 KpaCommand
+00041ad0  COMMON     00041ad0 LastError
+00000170  .text      00000170 taskDelayTime
+00000060  .scommon   00000060 FlashDataIndex
+00000284  .text      00000284 MkoMirrorDoXchg
+00000000  .text      00000000 InitMkoStressTest
+00000068  .scommon   00000068 MkoPackX
+00000150  .text      00000150 VecStRead
+00000170  .text      00000170 cfgSysGet
+000016d8  .text      000016d8 SendCbkConfigToKPA
+00000070  .scommon   00000070 AsnControlStopTime
+00000048  .scommon   00000048 BUFAR
+00013100  COMMON     00013100 PacketMkoIntQueue0List
+0000004c  .scommon   0000004c LPH_Vkluchena
+0000384c  .text      0000384c Otkluchenie_AT
+000000e0  .text      000000e0 taskTimerMin
+000001b0  .text      000001b0 VecStCreate
+00000770  .data      00000770 Control_NumList00
+00004d1c  .text      00004d1c KpaCommand29
+00000000  .text      00000000 KpaCommand64
+00000078  .scommon   00000078 BehEnabledZone
+00000080  .scommon   00000080 AsnExcIrqCount
+00000084  .scommon   00000084 BehPostDeltaTime
+000002ac  .text      000002ac CheckAsnDeltaTime
+00001c00  .text      00001c00 SendIrqMessageToKPA
+00003bd0  .text      00003bd0 Otkluchenie_BUM_AFAR
+00000030  .text      00000030 mkoBcInit
+000068c8  .text      000068c8 KpaCommandFE
+00000004  .scommon   00000004 RES_STD_DBG
+00000000  *ABS*      00000000 _DYNAMIC_LINK
+00000088  .scommon   00000088 AsnTimeIrqPrev
+00000090  .scommon   00000090 AsnTaskDeltaTimeInterval
+00000744  .data      00000744 Control_AddrList15
+00011d80  COMMON     00011d80 Baloi_PackMkoLine
+00000a30  .text      00000a30 GetPeriodicMkoMsgCount
+0000083c  .text      0000083c IsProhibitedMkoMsg
+00000014  .scommon   00000014 MkoMirrorRdChan
+00000094  .scommon   00000094 AsnTaskDeltaTimeFlag
+000008e4  .text      000008e4 MkoXchgBnStd
+00000f04  .text      00000f04 MkoStressPreparePacket1
+00041bd0  COMMON     00041bd0 PostMdiDataBuf
+00004d6c  .text      00004d6c CbkChanPowerOff
+00000010  .text      00000010 taskTimerCorr
+00001b8c  .text      00001b8c MainTaskDoReplyImit
+00000000  COMMON     00000000 Irq10PackMsgRes
+000042b4  .text      000042b4 KpaCommand13
+00007024  .text      00007024 Irq13PackRun
+00000000  .text      00000000 DataInit
+00011da0  COMMON     00011da0 Baloi_PackSendCount
+0000073c  .data      0000073c Control_AddrList13
+00000098  .scommon   00000098 BehExcFhvIrqCount
+000048bc  .text      000048bc Irq13ChangeDisabledCrcList
+00004b40  .text      00004b40 KpaCommand24
+00000e74  .data      00000e74 Control_NumList1F
+00003884  .text      00003884 KpaCommand0F
+00000910  .text      00000910 KpaCommand07
+00000008  .scommon   00000008 Irq10Pack
+00000160  .text      00000160 synchMasterChVM
+0000009c  .scommon   0000009c BehIrqCount
+00000c6c  .text      00000c6c ProcessPeriodicMkoMsg
+000046d4  .text      000046d4 Irq13ReplyIsDisabled
+00000454  .text      00000454 MkoStressSendTest
+000000a0  .scommon   000000a0 CallBackCount
+00000f5c  .text      00000f5c DetectMkoLine
+00000000  .scommon   00000000 ProhibitedMkoMsgCount
+00000100  .text      00000100 synchReadVM
+000001c0  .text      000001c0 tlmByteOut
+000000a4  .scommon   000000a4 BehIrqAlreadySet
+000043b8  .text      000043b8 KpaCommand17
+00000008  .scommon   00000008 MkoStressLinkErrorCount
+00000050  .scommon   00000050 Otkl_AT
+00000054  .scommon   00000054 KPI_Etalon_Len
+000045b4  .text      000045b4 Irq13ChangeDisabledMsgList
+00000010  .scommon   00000010 RunPacketBeginTime
+00011e20  COMMON     00011e20 Baloi_MkoPackMsgRes
+000000a8  .scommon   000000a8 BehControlStopTime
+0000087c  .text      0000087c ControlResetDeviceState
+00000020  .text      00000020 testMDIGet
+000000b0  .scommon   000000b0 IrqTime
+00005fa0  .text      00005fa0 KpaCommand36
+00011f20  COMMON     00011f20 Baloi_DisabledCrcList
+000000f0  .text      000000f0 taskInitDelay
+000009c0  .data      000009c0 Control_NumList06
+00000000  COMMON     00000000 MkoStressLastPackResult
+000431d0  COMMON     000431d0 AsnTimeList
+00000120  .text      00000120 synchRecEnable
+00000058  .scommon   00000058 KPI_Kvit
+00000110  .text      00000110 synchInf
+00000e30  .text      00000e30 IrqHandler05
+000000b8  .scommon   000000b8 MkoMsgResX
+0000005c  .scommon   0000005c Irq13LastMsg
+000000c0  .scommon   000000c0 AsnIrqAlreadySet
+00001e40  .text      00001e40 RunPacketMko_SecPiPo_IntList
+00003370  .text      00003370 KpaCommand0E
+00000090  COMMON     00000090 Irq10Data
+00000030  .text      00000030 semDelete
+00001b68  .text      00001b68 IrqHandler0C
+000037d4  .text      000037d4 RunPacketMko_SecQue_PreparePacket2
+00000060  .scommon   00000060 Code_DB
+00000070  .text      00000070 taskIdListGet
+00000e20  .data      00000e20 Control_NumList0A
+00000010  .scommon   00000010 Irq10Result
+00001110  .text      00001110 DeltaTimeMSec
+00002f7c  .text      00002f7c Control_AFAR
+00000000  .text      00000000 Irq13InitSys
+00004268  .text      00004268 RunPacketMko_CntQue_PreparePacket2
+00000a74  .text      00000a74 AbonentToAbonentMkoMsg
+000029f8  .text      000029f8 Irq13Msg0xD839
+00000e50  .data      00000e50 Control_NumList16
+00006674  .text      00006674 KpaCommandFB
+00004550  .text      00004550 Irq13MsgIsDisabled
+000062c8  .text      000062c8 KpaCommand3A
+00000ae0  .text      00000ae0 MkoMirrorSendDebugInfo
+0000253c  .text      0000253c Irq13Msg0x8455
+00000060  .text      00000060 taskDelay
+0000072c  .data      0000072c Control_AddrList0F
+00000004  .rodata    1fc80004 SpoVersionStr
+00006588  .text      00006588 KpaCommand40
+00004858  .text      00004858 Irq13CrcIsDisabled
+00000aa8  .text      00000aa8 IrqHandler04
+000000c4  .scommon   000000c4 MkoPackResC
+00000400  .rodata    00000400 Crc16Table
+00000730  .data      00000730 Control_AddrList10
+00000000  .text      00000000 CalcCrc32
+000019dc  .text      000019dc MkoStressCheckRxPacket2
+00004f08  .text      00004f08 Irq13DoDebugReadAn
+000023a4  .text      000023a4 MkoXchgBnBlock
+00000000  .text      00000000 MkoXchgAn
+000000c8  .scommon   000000c8 AsnEnabledZone
+000000f0  .text      000000f0 synchWriteVM
+00001668  .text      00001668 Irq13MsgToFifo
+00000090  .text      00000090 sprIGetMask
+00000064  .scommon   00000064 Control_ZTM_BUFAR
+00000a9c  .text      00000a9c MainTaskIdle
+00000510  COMMON     00000510 Irq10PackMsgBuf
+0000657c  .text      0000657c K_BRTK_A
+00044df0  COMMON     00044df0 VmStateData
+00001608  .text      00001608 Irq13SendMsgBnOverFifo
+00012120  COMMON     00012120 Baloi_PackErrSendCount
+00000130  .text      00000130 ErrorTask
+00002794  .text      00002794 AddPacketMko_CntPiPo_MsgToInt
+00001100  COMMON     00001100 Control_StateList
+00000044  .data      00000044 Control_AddrList00
+00003d20  .text      00003d20 Irq13Msg0x9C4D
+00000018  .scommon   00000018 MkoMirrorXchgWithError
+00014200  COMMON     00014200 PacketMkoMsgResultBuf
+000026fc  .text      000026fc CheckGenOK
+00003c30  .text      00003c30 KpaCommand10
+000000c0  .text      000000c0 taskVerify
+00000000  .text      00000000 MainTaskInit
+00004c68  .text      00004c68 Irq13DebugReadIsEnabled
+00002644  .text      00002644 Irq13Msg0xC514
+00000024  .text      00000024 KpaCommand63
+000000d0  .scommon   000000d0 ErrorTaskIn
+00044e50  COMMON     00044e50 PostMkiDataBuf
+00001b1c  .text      00001b1c MakeShbkBuffer
+0000011c  .data      0000011c Control_AddrList03
+00001840  .text      00001840 IrqHandler08
+00004a60  .text      00004a60 Irq13ChangeReplyTypeList
+00000068  .scommon   00000068 Komplekt_APD_MT
+0000006c  .scommon   0000006c Irq13WaitReplyFlag
+00002be8  .text      00002be8 DECODE_XCHG_ERROR
+00003df8  .text      00003df8 Irq13InfoMsg0x5382
+00002b7c  .text      00002b7c Vkluchenie_BPA_AT
+00000190  .text      00000190 flashCorr
+00001608  .text      00001608 KpaCommand0A_Koi
+00000e70  .data      00000e70 Control_NumList1E
+000121a0  COMMON     000121a0 Baloi_MkoPackMsgList
+00000f38  .text      00000f38 MkoXchgBnExt
+0000669c  .text      0000669c KpaCommandFC
+000000d4  .scommon   000000d4 BehFhvPeriod
+0000311c  .text      0000311c Output
+000065c8  .text      000065c8 KpaCommand41
+000000d8  .scommon   000000d8 MkoPackC
+00003f30  .text      00003f30 Irq13MkoXchgBn
+00000720  .data      00000720 Control_AddrList0C
+00000000  .text      00000000 KpaCommandUnknown
+00000750  .data      00000750 Control_AddrList18
+000008b0  .text      000008b0 IrqHandler01
+000000e0  .scommon   000000e0 AsnControlEnabled
+00000070  .scommon   00000070 Baloi_Send_Bau_OK_Time
+00044eb0  COMMON     00044eb0 MkoBufX
+000017e8  .text      000017e8 XchgSubAddrPacketMkoMsgList
+00000734  .data      00000734 Control_AddrList11
+00000000  .text      00000000 InitPacketMkoMsg
+00000000  .scommon   00000000 Control_ChangedCount
+00000080  .text      00000080 sprIUnMask
+0000309c  .text      0000309c AddPacketMko_SecQue_IntToList
+00000078  .scommon   00000078 Baloi_DisabledCrcListCount
+00001e9c  .text      00001e9c MkoStressSaveStateC
+00000000  .text      1fc80100 _ftext
+000029b8  .text      000029b8 Irq13Msg0xD736
+00044ef0  COMMON     00044ef0 SubsAddrBuffer
+000035c4  .text      000035c4 Otkl_kanalov_AFAR
+00000018  .scommon   00000018 PacketMkoIntCntCount
+00001190  .text      00001190 Read733UpiConfig
+00000e58  .data      00000e58 Control_NumList18
+000001b0  .text      000001b0 tlmReadyOut
+00000000  COMMON     00000000 ProhibitedMkoMsgList
+00002ce8  .text      00002ce8 ReplyToKpaNoData
+00003eac  .text      00003eac Irq13SingleEventMsg
+00012220  COMMON     00012220 Baloi_ReplyTypeList
+00000010  .text      00000010 rand
+00044f30  COMMON     00044f30 B732PupsList
+0000007c  .scommon   0000007c Otkl_BPA_AT
+0000256c  .text      0000256c Irq13Msg0xCF1E
+00000080  .scommon   00000080 Pause_MFS
+000000e8  .scommon   000000e8 MkoPackB
+0000380c  .text      0000380c Irq13Msg0x9647
+000011d4  .text      000011d4 Irq13IdleTask
+0000000c  .scommon   0000000c MkoStressTermErrorCount
+00051280  COMMON     00051280 MkoMsgPtrB
+00005d58  .text      00005d58 KpaCommand35
+000000f0  .scommon   000000f0 BehMissFinikIrqCount
+000054dc  .text      000054dc KpaCommand2E
+000000f4  .scommon   000000f4 AsnTaskOut
+0000160c  .text      0000160c SendNextPassMsgToKPA
+00051310  COMMON     00051310 MkoBufStub
+00000010  .scommon   00000010 MkoStressNoOsErrorCount
+00000000  .text      00000000 testStart
+00000e40  .data      00000e40 Control_NumList12
+00000184  .text      00000184 KpaCommand03
+00016210  COMMON     00016210 PacketMkoIntList
+00012620  COMMON     00012620 Vkl_AFAR_PRD
+00002608  .text      00002608 CheckFsvuOK
+00004a90  .text      00004a90 KpaCommand20
+00000088  .scommon   00000088 Irq13LastRns
+00000430  .text      00000430 TestTask
+00000a58  .text      00000a58 Irq13Handler
+00000120  .text      00000120 AddProhibitedMkoMsg
+000014b8  .text      000014b8 PacketMkoMsgCheckMessages
+00003bb4  .text      00003bb4 AddPacketMko_CntQue_MsgToInt
+0000008c  .scommon   0000008c Nomer_Shetverti
+0000001c  .scommon   0000001c TrackPackCount
+00002d6c  .text      00002d6c RunPacketMko_CntPiPo_PreparePacket2
+00002210  .text      00002210 DisableMBK07x
+000004e0  .text      000004e0 AsnControlProc
+000069fc  .text      000069fc Irq13PackReset
+00000a44  .text      00000a44 ClrPeriodicMkoMsgList
+00000e38  .data      00000e38 Control_NumList10
+00000090  .scommon   00000090 Irq13CmdFifoHead
+000014a0  .text      000014a0 SendMdiDataToKPA
+000026b8  .text      000026b8 Irq13Msg0xA021
+00004af4  .text      00004af4 KpaCommand22
+00000010  .text      00000010 ErrVMDIget
+0000021c  .data      0000021c Control_AddrList05
+00000e6c  .data      00000e6c Control_NumList1D
+00000628  .text      00000628 KpaCommand05
+00017310  COMMON     00017310 PacketMkoMsgResultList
+00005c78  .text      00005c78 KpaCommand34
+000000f8  .scommon   000000f8 BehExcIrqCount
+000062e0  .text      000062e0 Vkluchenie_LPH
+00004240  .text      00004240 Irq13MkoXchgAn
+00000000  .text      00000000 memcmp
+000000fc  .scommon   000000fc MainTaskCmdFail
+00000014  .scommon   00000014 MkoStressShowLastPackResult
+00000020  .text      00000020 timeRead
+00000100  .scommon   00000100 AsnTimerFailCount
+00001900  COMMON     00001900 Control_DeviceList
+00000e24  .data      00000e24 Control_NumList0B
+00000020  .scommon   00000020 LastResult
+00051350  COMMON     00051350 MkoMsgB
+00000c78  .text      00000c78 PacketMkoMsgDataCmp
+00000018  .scommon   00000018 MkoStressMsgErrorCount
+00000094  .scommon   00000094 Komplekt_ALPS
+00000098  .scommon   00000098 Baloi_ReplyTypeListCount
+00000670  .text      00000670 KpaCommand0B
+00000104  .scommon   00000104 BehMissFhvIrqCount
+0000102c  .text      0000102c MkoStressCheckTxPacket1
+00000728  .data      00000728 Control_AddrList0E
+00000080  .text      00000080 taskVsListGet
+00003cac  .text      00003cac RunPacketMko_CntQue_IntList
+00012a80  COMMON     00012a80 Tm_AFAR_BUM
+00000108  .scommon   00000108 AsnMissIrqCount
+0000010c  .scommon   0000010c MkoPackResB
+00000050  .text      00000050 taskResume
+00000110  .scommon   00000110 BehFhvIrqCount
+00000180  .text      00000180 taskIdVerify
+00000120  .text      00000120 taskIdSelf
+00002074  .text      00002074 RunPacketMko_SecPiPo_PreparePacket1
+00000114  .scommon   00000114 AsnTimeListSize
+00000118  .scommon   00000118 PostParam
+00000808  .data      00000808 Control_NumList02
+00000600  .rodata    00000600 Crc8Table
+00004cf4  .text      00004cf4 KpaCommand28
+00000dd8  .text      00000dd8 ClrPacketMkoMsgList
+0000011c  .scommon   0000011c BehPreDeltaTime
+000055b0  .text      000055b0 KpaCommand30
+0000009c  .scommon   0000009c Irq13PrevTxIndex
+0000079c  .text      0000079c BehControlProc
+00012aa0  COMMON     00012aa0 Irq13PrevTxBuffer
+00000990  COMMON     00000990 Irq10PackMsgList
+000027e4  .text      000027e4 Irq13Msg0xB474
+00051670  COMMON     00051670 MkoMsgResA
+00080ea0  *ABS*      00080ea0 __bss_start
+00000cc8  .text      00000cc8 DelPacketMkoMsgByIndex
+00000010  .text      00000010 cacheDflush
+00000000  .text      00000000 memset
+00000000  COMMON     00000000 PeriodicMkoMsgList
+00000e48  .data      00000e48 Control_NumList14
+000011b8  .text      000011b8 SendStartMsgToKPA
+000132a0  COMMON     000132a0 Vkl_PRD_0
+00000e5c  .data      00000e5c Control_NumList19
+000000a0  .scommon   000000a0 AFAR_AT_M
+000000a4  .scommon   000000a4 Baloi_DisabledMsgListCount
+00000010  .text      00000010 timeReadmics
+00006288  .text      00006288 KpaCommand39
+00000760  .data      00000760 Control_AddrList1C
+00000c24  .text      00000c24 MkoStressPrepareSet1
+00000000  .text      00000000 srand
+00000120  .scommon   00000120 AsnTaskDeltaTimeId
+00013380  COMMON     00013380 Irq13DevState
+00051780  COMMON     00051780 MkoMsgX
+00000124  .scommon   00000124 BehFinikFlag
+000001a0  .text      000001a0 taskDelayFixTime
+00002268  .text      00002268 Irq13Msg0xB171
+00000aa4  .text      00000aa4 SetDefaultConfig
+00000134  .text      00000134 CalcCrc32Block
+000000a8  .scommon   000000a8 Index_AFAR
+00000820  .text      00000820 KpaCommand06
+00000000  .text      00000000 cacheFlush
+0000170c  .text      0000170c XchgAddrPacketMkoMsgList
+000517a0  COMMON     000517a0 MkoMsgC
+0000076c  .data      0000076c Control_AddrList1F
+00000634  .text      00000634 AddPacketMkoMultiMsg
+00000040  .text      00000040 mkoPackIniStart
+000001e0  .text      000001e0 taskTimerZero
+000000ac  .scommon   000000ac Komplekt_MFS
+000000bc  .text      000000bc CalcCrc8
+00000748  .data      00000748 Control_AddrList16
+000133c0  COMMON     000133c0 Baloi_DebugReadList
+000015f4  .text      000015f4 MkoStressCheckRxPacket1
+00051ac0  COMMON     00051ac0 MkoBufC
+000023b4  .text      000023b4 RunPacketMko_SecPiPo_PreparePacket2
+000000e4  .text      000000e4 Irq13InitData
+0000193c  .text      0000193c MainTaskDoShbkImit
+00000140  .text      00000140 synchPowerOff
+000001d4  .text      000001d4 SetPeriodicMkoMsgLock
+00000128  .scommon   00000128 ErrorTaskOut
+00052300  COMMON     00052300 FlashJob
+00053e10  COMMON     00053e10 SpoConfig
+0000012c  .scommon   0000012c AsnTaskIn
+00053f10  COMMON     00053f10 CmdHandlerTable
+000060b8  .text      000060b8 KpaCommand38
+00019310  COMMON     00019310 PacketMkoIntCntList
+00000130  .scommon   00000130 PostMkiDataSize
+00000718  .text      00000718 Reconfig733
+00054310  COMMON     00054310 MkoBufB
+00000718  .data      00000718 Control_AddrList0A
+00000138  .scommon   00000138 MainTaskTime0
+000000b0  .scommon   000000b0 Rejim_3_Rasch
+00000e3c  .data      00000e3c Control_NumList11
+00002938  .text      00002938 MkoXchgXn
+00000be0  .text      00000be0 InitPeriodicMkoMsg
+000000b4  .scommon   000000b4 Irq13TxIndex
+000000b8  .scommon   000000b8 Pause_Rasch_3
+00000028  .scommon   00000028 RunPacketCurrTime
+000002ac  .data      000002ac Control_AddrList06
+000135c0  COMMON     000135c0 Vkl_AFAR_BUM
+00000140  .scommon   00000140 B732PupsListSize
+00000150  .text      00000150 synchPowerOn
+00003dd8  .text      00003dd8 Sbros_Priznakov
+0000081c  .text      0000081c ClrProhibitedMkoMsgList
+00000010  .text      00000010 semLock
+0000001c  .scommon   0000001c MkoMirrorInterval
+000019cc  .text      000019cc IrqHandler0A
+000135e0  COMMON     000135e0 Tm_AFAR_PRD
+00000020  .text      00000020 mkoOFF
+000000a0  .text      000000a0 taskDelete
+0000087c  .text      0000087c IrqHandler00TaskDeltaTime
+00004060  .text      00004060 BUPE_Chan2_Enable
+000055f8  .text      000055f8 Get_OK_OKK_Data
+000009e0  COMMON     000009e0 Irq10PackMsg
+00005524  .text      00005524 KpaCommand2F
+000009e0  .text      000009e0 PeriodicMkoMsgDataCmp
+00001154  .text      00001154 SleepMSec
+00000728  .text      00000728 MkoStressRecvTest
+00001dc4  .text      00001dc4 MkoStressSaveStateB
+00001528  .text      00001528 Irq13SendUserMsg
+00000248  .text      00000248 InitMkoMsgA
+00000368  .text      00000368 ControlCheckList
+00000b00  .text      00000b00 FindPacketMkoMsg
+00000020  .text      00000020 semUnlock
+0000001c  .scommon   0000001c MkoStressAbErrorCount
+00013680  COMMON     00013680 Irq13CmdFifo
+00000e30  .data      00000e30 Control_NumList0E
+00007c7c  .text      00007c7c CbkErrCtrlCallBack
+00054b50  COMMON     00054b50 OpoVersionString
+00000d94  .text      00000d94 MkoStressPrepareSet2
+0001b6c0  COMMON     0001b6c0 Irq13UserMsgData
+00001450  .text      00001450 PacketMkoMsgCheckPacket
+00000030  .scommon   00000030 PacketRdDataInfo
+000023b0  .text      000023b0 Irq13Msg0xB272
+00000a84  .text      00000a84 IrqHandler03
+0000437c  .text      0000437c KpaCommand16
+00002a3c  .text      00002a3c RunPacketMko_CntPiPo_PreparePacket1
+00000938  .text      00000938 CheckProhibitedMkoMsg
+000000bc  .scommon   000000bc Ctrl_Ispravnosti
+0001bec0  COMMON     0001bec0 Baloi_PackPrepPause
+00001684  .text      00001684 SendCbkReConfigMsgToKPA
+00000be0  .text      00000be0 KpaCommand09
+00002ec8  .text      00002ec8 ReplyToKpaWithDataX
+000000c0  .scommon   000000c0 Irq13TxMsgLen
+000001d0  .text      000001d0 taskAllInfoGet
+00001b8c  .text      00001b8c IrqHandler0D
+000000c4  .scommon   000000c4 Irq13CmdFifoTail
+00001020  .text      00001020 MainTaskGetMkiData
+00001088  .text      00001088 MainTaskGetMdiData
+00001bb8  .text      00001bb8 IrqHandler0E
+00006250  .text      00006250 MsgProc0xDB3AExt
+00000070  .text      00000070 mkoNumPackWait
+00000020  .scommon   00000020 MkoMirrorAbWrError
+00054b90  COMMON     00054b90 CbkDataImit
+00002e50  .text      00002e50 Irq13Msg0x9041
+00000090  .text      00000090 taskExit
+00000070  .text      00000070 sprIMask
+00000060  .text      00000060 sprIGetVecMask
+00001888  .text      00001888 Irq10PackInit
+00000750  .text      00000750 ReadPeriodicMkoMsgData
+000000c8  .scommon   000000c8 Baloi_Read_OK_Time
+00000b64  .text      00000b64 HandlerTableInit
+00000024  .scommon   00000024 MkoMirrorWrChan
+000072f0  .text      000072f0 Irq13PackReadInfo
+00000028  .scommon   00000028 MkoMirrorLine
+00000148  .scommon   00000148 AsnSecondIrqTime
+00000040  .text      00000040 timeMarktst
+00000150  .scommon   00000150 AsnPreDeltaTime
+00000040  .text      00000040 taskSuspend
+000000d0  .scommon   000000d0 Irq13BaloiFail
+0000040c  .text      0000040c KpaCommand62
+0001bf00  COMMON     0001bf00 Baloi_PackMkoChan
+00000000  .text      00000000 semCreate
+00001334  .text      00001334 SendMkiDataToKPA
+00000020  .text      00000020 mkoSetChan
+00000190  .text      00000190 taskIniFixTime
+00000934  .data      00000934 Control_NumList05
+0001bf20  COMMON     0001bf20 Data_OTKL_AFAR
+00000dc4  .text      00000dc4 GetPacketMkoMsgCount
+00007d80  .text      00007d80 CheckTimeMarkInInt
+000553d0  COMMON     000553d0 MdiBuffer
+00000e64  .data      00000e64 Control_NumList1B
+000000d0  .text      000000d0 taskReVerify
+0000120c  .text      0000120c SendVmStateToKPA
+00000154  .scommon   00000154 BehMissIrqCount
+000000d0  .text      000000d0 synchRecInfVM
+00003070  .text      00003070 Input
+00000030  .text      00000030 testErrGet
+00004fa0  .text      00004fa0 KpaCommand2B
+000000a0  .data      000000a0 Control_AddrList01
+00005bac  .text      00005bac KpaCommand32
+0000002c  .scommon   0000002c MkoMirrorDebug
+000000d8  .scommon   000000d8 Irq13WaitReplyTimer
+000555d0  COMMON     000555d0 MkoBufA
+00000020  .scommon   00000020 MkoStressBusyErrorCount
+000000e0  .scommon   000000e0 Baloi_DisabledReplyListCount
+00080ea0  *ABS*      00080ea0 _edata
+0001bf30  COMMON     0001bf30 Baloi_PackOkSendCount
+000000e4  .scommon   000000e4 Baloi_MkoPackRes
+00000158  .scommon   00000158 BehFinikPeriod
+00000160  .text      00000160 VecStModify
+0000071c  .data      0000071c Control_AddrList0B
+00000a4c  .text      00000a4c MainTaskRunCheck
+00004d44  .text      00004d44 KpaCommand2A
+00151ba0  *ABS*      00151ba0 _end
+0000074c  .data      0000074c Control_AddrList17
+0000459c  .text      0000459c KpaCommand19
+00000030  .text      00000030 mkoGetChan
+0000015c  .scommon   0000015c BehExcFinikIrqCount
+00003418  .text      00003418 RunPacketMko_SecQue_CheckList
+00002954  .text      00002954 Irq13Msg0xA524
+00000e4c  .data      00000e4c Control_NumList15
+00000160  .scommon   00000160 IrqTaskIn
+00000050  .text      00000050 WdSet
+000003f8  .text      000003f8 InitMkoMsgX
+00000000  .rodata    00000000 Crc32Table
+000000e8  .scommon   000000e8 DN_Vvedena
+000017f4  .text      000017f4 Irq13AddToMsg
+00000164  .scommon   00000164 BehMkoFailCount
+00000808  .text      00000808 GetProhibitedMkoMsgCount
+00000168  .scommon   00000168 IrqTaskOut
+00000000  .text      00000000 MainTask
+000000ec  .scommon   000000ec Pause_LPH
+00000000  .data      00000000 Control_BitMap
+00000010  .text      00000010 mkoSendPri
+0000016c  .scommon   0000016c BehFhvFlag
+00004bbc  .text      00004bbc Irq13ChangeCurrentTxRns
+00000410  COMMON     00000410 MkoStressPackResList
+00003b14  .text      00003b14 AddPacketMko_CntQue_IntToList
+00000170  .scommon   00000170 AsnStartTimer
+0001bfb0  COMMON     0001bfb0 Baloi_PackMsgCount
+00000380  .text      00000380 IrqTask
+00003494  .text      00003494 RunPacketMko_SecQue_PreparePacket1
+000000f0  .scommon   000000f0 Baloi_Read_OK
+00000030  .scommon   00000030 MkoMirrorAbRdError
+00000000  .text      00000000 ControlInitTables
+000000b0  .text      000000b0 KpaCommand02
+00000738  .data      00000738 Control_AddrList12
+00000008  .scommon   00000008 CNT_DBG
+000000f4  .scommon   000000f4 Pause_AFAR
+00000e9c  .text      00000e9c KpaCommand0A_Erti
+00000034  .scommon   00000034 MkoMirrorCycles
+00001db0  .text      00001db0 BitCount
+000000f8  .scommon   000000f8 Pause_PRD
+00000038  .scommon   00000038 GRES_DBG
+0000084c  .text      0000084c FindPeriodicMkoMsg
+00002474  .text      00002474 CheckFsmuPower
+0000090c  .text      0000090c DelPacketMkoMsgByMsg
+000009fc  .text      000009fc MkoStressSendF4Test
+00000178  .scommon   00000178 MainTaskTime1
+000024f4  .text      000024f4 Send_KPI_Kvit
+00000180  .scommon   00000180 MkoPackA
+00000e2c  .data      00000e2c Control_NumList0D
+00000714  .data      00000714 Control_AddrList09
+00000040  .text      00000040 semStateGet
+00000004  .scommon   00000004 PeriodicMkoMsgCount
+00000404  .text      00000404 KpaCommand04
+00000138  .data      00000138 Control_AddrList04
+00001d04  .text      00001d04 AddPacketMko_SecPiPo_IntToList
+00005bf8  .text      00005bf8 KpaCommand33
+00000024  .scommon   00000024 MkoStressLastOS
+0001bfd0  COMMON     0001bfd0 Irq13RxBuffer
+00002e10  .text      00002e10 Irq13Msg0xA322
+0000075c  .data      0000075c Control_AddrList1B
+00000188  .scommon   00000188 TestTaskOut
+0000018c  .scommon   0000018c AsnParamFailCount
+00000028  .scommon   00000028 MkoStressMsgResCount
+00002990  .text      00002990 Irq13Msg0xD233
+00000000  .text      00000000 strlen
+000000fc  .scommon   000000fc Irq13CmdFifoEnabled
+00000000  .text      00000000 ErrCodGet
+000000a0  .text      000000a0 sprIGetF
+00055e10  COMMON     00055e10 FlashSectorCSumTable
+00000110  .text      00000110 taskPeriodPlus
+00003138  .text      00003138 AddPacketMko_SecQue_MsgToInt
+00055e50  COMMON     00055e50 MkoMsgPtrA
+00000100  .scommon   00000100 Irq13LastSum
+00000104  .scommon   00000104 Otkl_AFAR
+0000002c  .scommon   0000002c MkoStressDataErrorCount
+00001310  .text      00001310 MkoStressCheckTxPacket2
+00001920  COMMON     00001920 Control_DataAvail
+00000030  .scommon   00000030 MkoStressPackResCount
+00000190  .scommon   00000190 BehStartTimer
+00000108  .scommon   00000108 Rejim_BRTK
+00000194  .scommon   00000194 MkoPackResX
+000036d0  .text      000036d0 Irq13InfoMsg0x35D4
+00000198  .scommon   00000198 DebugFlag
+000001c0  .text      000001c0 taskInfoGet
+000017b8  .text      000017b8 Irq13InitMsg
+0000019c  .scommon   0000019c BehFinikIrqCount
+00004ccc  .text      00004ccc KpaCommand27
+00001bdc  .text      00001bdc IrqHandler0F
+00000e54  .data      00000e54 Control_NumList17
+00001864  .text      00001864 IrqHandler09
+00006970  .text      00006970 KpaCommandFF
+00000110  .scommon   00000110 Pause_AOS
+00010410  COMMON     00010410 MkoStressMsgResList
+00000118  .scommon   00000118 Komplekt_AOS
+00004738  .text      00004738 Irq13ChangeDisabledReplyList
+00055ee0  COMMON     00055ee0 MkiBuffer
+00000120  .scommon   00000120 Irq13TimeSEV
+00000038  .scommon   00000038 MkoMirrorBadBits
+00000128  .scommon   00000128 Baloi_MkoPack
+0001c7d0  COMMON     0001c7d0 Baloi_PackInterval
+000002d8  .text      000002d8 InitMkoMsgB
+00000010  .text      00000010 ErrMKIGet
+00080ea0  *ABS*      00080ea0 _fbss
+000027d4  .text      000027d4 Irq13Msg0xBE71
+00000130  .scommon   00000130 Chislo_Proverok_TM_AFAR
+00000754  .data      00000754 Control_AddrList19
+00002d20  .text      00002d20 ReplyToKpaWithData
+00000e28  .data      00000e28 Control_NumList0C
+00001a6c  .text      00001a6c KpaCommand0C
+00000138  .scommon   00000138 Ctrl_Ispravnosti_Time
+000042f8  .text      000042f8 KpaCommand14
+00000140  .scommon   00000140 Irq13SendNackEnabled
+00000550  .text      00000550 ReadProhibitedMkoMsgData
+00000740  .data      00000740 Control_AddrList14
+0000003c  .scommon   0000003c MkoMirrorXchgMask
+00000000  .text      00000000 KpaCommand60
+00000144  .scommon   00000144 Ctrl_Ispravnosti_Enabled
+00004b64  .text      00004b64 KpaCommand25
+000001a0  .scommon   000001a0 PassBeginTime
+000027a8  .text      000027a8 KpaCommand0D
+00003d44  .text      00003d44 Irq13Msg0x9xxx
+00000768  .data      00000768 Control_AddrList1E
+000566e0  COMMON     000566e0 MkoMsgA
+00000140  .text      00000140 taskAllDelAbs
+000001a8  .scommon   000001a8 BehFhvTmpCount
+000001ac  .scommon   000001ac BehFinikTmpCount
+00056a00  COMMON     00056a00 IrqHandlerTable
+00000148  .scommon   00000148 Baloi_Send_Bau_OK
+**MEMORY CONFIGURATION**
+
+name		origin   length   r_size   c_size    is    attributes
+*default*       00000000 ffffffff 00000000 00039ab4 ()
+
+
+**LINK EDITOR MEMORY MAP**
+
+output   input     virtual
+section  section   address    tsize
+
+
+*ABS*             00000000     0     0 2**0 
+LOAD D:/Roman/TPO/Source/MainUnit.o
+LOAD D:/Roman/TPO/Source/DataUnit.o
+LOAD D:/Roman/TPO/Source/FuncUnit.o
+LOAD D:/Roman/TPO/Source/IrqHandlerUnit.o
+LOAD D:/Roman/TPO/Source/MkoXchgUnit.o
+LOAD D:/Roman/TPO/Source/ControlUnit.o
+LOAD D:/Roman/TPO/Source/CrcUnit.o
+LOAD D:/Roman/TPO/Source/CmdHandlerUnit.o
+LOAD D:/Roman/TPO/Source/DebugUnit.o
+LOAD D:/Roman/TPO/Source/CmdHandlerKoiUnit.o
+LOAD D:/Roman/TPO/Source/CmdHandlerErtiUnit.o
+LOAD D:/Roman/TPO/Source/IrqHandlerKoiUnit.o
+LOAD D:/Roman/TPO/Source/IrqHandlerErtiUnit.o
+LOAD D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o
+LOAD D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o
+LOAD D:/Roman/TPO/Source/PacketMkoMsgUnit.o
+LOAD D:/Roman/TPO/Source/MkoMirrorUnit.o
+LOAD D:/Roman/TPO/Source/MkoStressTestUnit.o
+LOAD D:/Roman/TPO/Source/BkoiUnit.o
+LOAD D:/Roman/TPO/Source/BkoiTableUnit.o
+LOAD D:/Roman/TPO/Source/BaloiUnit_v11.o
+LOAD D:/Roman/TPO/Source/VersionProject.e
+LOAD S:/Target/BOS/CBK/LIB/libBOS.a
+LOAD S:/TSRP/CDS/LIB/libR3.a
+address
+address
+                  00000000 00000000 _DYNAMIC_LINK =00000000
+                  00000000 00400094 . =(00400000+SIZEOF_HEADERS)
+
+.interp  (no attached output section)
+ from *(.interp)
+
+.hash    (no attached output section)
+ from *(.hash)
+
+.dynsym  (no attached output section)
+ from *(.dynsym)
+
+.dynstr  (no attached output section)
+ from *(.dynstr)
+
+.rel.text (no attached output section)
+ from *(.rel.text)
+
+.rela.text (no attached output section)
+ from *(.rela.text)
+
+.rel.data (no attached output section)
+ from *(.rel.data)
+
+.rela.data (no attached output section)
+ from *(.rela.data)
+
+.rel.rodata (no attached output section)
+ from *(.rel.rodata)
+
+.rela.rodata (no attached output section)
+ from *(.rela.rodata)
+
+.rel.got (no attached output section)
+ from *(.rel.got)
+
+.rela.got (no attached output section)
+ from *(.rela.got)
+
+.rel.ctors (no attached output section)
+ from *(.rel.ctors)
+
+.rela.ctors (no attached output section)
+ from *(.rela.ctors)
+
+.rel.dtors (no attached output section)
+ from *(.rel.dtors)
+
+.rela.dtors (no attached output section)
+ from *(.rela.dtors)
+
+.rel.init (no attached output section)
+ from *(.rel.init)
+
+.rela.init (no attached output section)
+ from *(.rela.init)
+
+.rel.fini (no attached output section)
+ from *(.rel.fini)
+
+.rela.fini (no attached output section)
+ from *(.rela.fini)
+
+.rel.bss (no attached output section)
+ from *(.rel.bss)
+
+.rela.bss (no attached output section)
+ from *(.rela.bss)
+
+.rel.plt (no attached output section)
+ from *(.rel.plt)
+
+.rela.plt (no attached output section)
+ from *(.rela.plt)
+
+.init    (no attached output section)
+ from *(.init)
+
+.plt     (no attached output section)
+ from *(.plt)
+
+.text             1fc80100 22fd0     0 2**4 load alloc contents 
+                  1fc80100 00000000 _ftext =.
+ from *(.text)
+         .text    1fc80100   750   750 2**4  elf32-littlemips D:/Roman/TPO/Source/MainUnit.o(overhead 8112 bytes)
+                  1fc80700              OpoToSpoHookProc
+                  1fc80680              AsnPeriodicTask
+                  1fc80230              ErrorTask
+                  1fc80530              TestTask
+                  1fc80100              MainTask
+                  1fc80480              IrqTask
+         .text    1fc80850   490   490 2**4  elf32-littlemips D:/Roman/TPO/Source/DataUnit.o(overhead 8112 bytes)
+                  1fc80bb8              InitMkoMsgC
+                  1fc80850              DataInit
+                  1fc80a98              InitMkoMsgA
+                  1fc80c48              InitMkoMsgX
+                  1fc80b28              InitMkoMsgB
+         .text    1fc80ce0  1de0  1de0 2**4  elf32-littlemips D:/Roman/TPO/Source/FuncUnit.o(overhead 14684 bytes)
+                  1fc80dd8              MainTaskRun
+                  1fc824bc              MainTaskCheckCbkConfig
+                  1fc823b8              SendCbkConfigToKPA
+                  1fc80f8c              CheckAsnDeltaTime
+                  1fc8286c              MainTaskDoReplyImit
+                  1fc81c3c              DetectMkoLine
+                  1fc81df0              DeltaTimeMSec
+                  1fc8177c              MainTaskIdle
+                  1fc80ce0              MainTaskInit
+                  1fc827fc              MakeShbkBuffer
+                  1fc822ec              SendNextPassMsgToKPA
+                  1fc811c0              AsnControlProc
+                  1fc82180              SendMdiDataToKPA
+                  1fc8147c              BehControlProc
+                  1fc81e98              SendStartMsgToKPA
+                  1fc81784              SetDefaultConfig
+                  1fc8261c              MainTaskDoShbkImit
+                  1fc81e34              SleepMSec
+                  1fc82364              SendCbkReConfigMsgToKPA
+                  1fc81d00              MainTaskGetMkiData
+                  1fc81d68              MainTaskGetMdiData
+                  1fc81844              HandlerTableInit
+                  1fc82014              SendMkiDataToKPA
+                  1fc81eec              SendVmStateToKPA
+                  1fc8172c              MainTaskRunCheck
+                  1fc82a90              BitCount
+         .text    1fc82ac0  1c70  1c70 2**4  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerUnit.o(overhead 14228 bytes)
+                  1fc82ac0              HandleIrqBA
+                  1fc842dc              IrqHandler07
+                  1fc84604              IrqHandler0B
+                  1fc82de8              IrqHandler00
+                  1fc83ec8              IrqHandler06
+                  1fc846c0              SendIrqMessageToKPA
+                  1fc838f0              IrqHandler05
+                  1fc84628              IrqHandler0C
+                  1fc83568              IrqHandler04
+                  1fc84300              IrqHandler08
+                  1fc83370              IrqHandler01
+                  1fc8448c              IrqHandler0A
+                  1fc8333c              IrqHandler00TaskDeltaTime
+                  1fc83544              IrqHandler03
+                  1fc8464c              IrqHandler0D
+                  1fc84678              IrqHandler0E
+                  1fc84348              Irq10PackInit
+                  1fc8469c              IrqHandler0F
+                  1fc84324              IrqHandler09
+         .text    1fc84730  31d0  31d0 2**4  elf32-littlemips D:/Roman/TPO/Source/MkoXchgUnit.o(overhead 17204 bytes)
+                  1fc87230              CheckMkoXchg
+                  1fc84b28              MkoXchgBn
+                  1fc854b0              MkoXchgBnMini
+                  1fc87228              MkoXchgStub
+                  1fc85014              MkoXchgBnStd
+                  1fc86ad4              MkoXchgBnBlock
+                  1fc84730              MkoXchgAn
+                  1fc87318              DECODE_XCHG_ERROR
+                  1fc85668              MkoXchgBnExt
+                  1fc8784c              Output
+                  1fc87418              ReplyToKpaNoData
+                  1fc87068              MkoXchgXn
+                  1fc875f8              ReplyToKpaWithDataX
+                  1fc877a0              Input
+                  1fc87450              ReplyToKpaWithData
+         .text    1fc87900   990   990 2**4  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+                  1fc881e8              ControlOkNumberToDevice
+                  1fc87cc4              ControlCheckDevice
+                  1fc8817c              ControlResetDeviceState
+                  1fc87c68              ControlCheckList
+                  1fc87900              ControlInitTables
+         .text    1fc88290   1a0   1a0 2**4  elf32-littlemips D:/Roman/TPO/Source/CrcUnit.o(overhead 4056 bytes)
+                  1fc88398              CSumLong
+                  1fc8841c              CalcCrc32Done
+                  1fc883bc              CalcCrc32Init
+                  1fc882e8              CalcCrc16
+                  1fc88290              CalcCrc32
+                  1fc883c4              CalcCrc32Block
+                  1fc8834c              CalcCrc8
+         .text    1fc88430  7f00  7f00 2**4  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerUnit.o(overhead 25892 bytes)
+                  1fc8a8f0              CheckFsvuPower
+                  1fc8e470              KpaCommand37
+                  1fc8c770              KpaCommand15
+                  1fc8c64c              KpaCommand11
+                  1fc8cfb8              KpaCommand26
+                  1fc8c2d4              BUPE_Chan1_Enable
+                  1fc8a934              CheckFsmuOK
+                  1fc8d6bc              KpaCommand2D
+                  1fc8da04              KpaCommand31
+                  1fc8eb74              KpaCommandFD
+                  1fc8c948              KpaCommand18
+                  1fc89eec              KpaCommand0CBase
+                  1fc8cfdc              CbkChanPowerOn
+                  1fc8d544              KpaCommand2C
+                  1fc8846c              KpaCommand01
+                  1fc90230              CheckVmDeSynch
+                  1fc8cef0              KpaCommand21
+                  1fc8cf4c              KpaCommand23
+                  1fc8d14c              KpaCommand29
+                  1fc8ecf8              KpaCommandFE
+                  1fc8d19c              CbkChanPowerOff
+                  1fc8c6e4              KpaCommand13
+                  1fc8cf70              KpaCommand24
+                  1fc8bcb4              KpaCommand0F
+                  1fc88d40              KpaCommand07
+                  1fc8c7e8              KpaCommand17
+                  1fc8e3d0              KpaCommand36
+                  1fc8b7a0              KpaCommand0E
+                  1fc8eaa4              KpaCommandFB
+                  1fc8e6f8              KpaCommand3A
+                  1fc8e9b8              KpaCommand40
+                  1fc8ab2c              CheckGenOK
+                  1fc8c060              KpaCommand10
+                  1fc89a38              KpaCommand0A_Koi
+                  1fc8eacc              KpaCommandFC
+                  1fc8e9f8              KpaCommand41
+                  1fc88430              KpaCommandUnknown
+                  1fc8e188              KpaCommand35
+                  1fc8d90c              KpaCommand2E
+                  1fc885b4              KpaCommand03
+                  1fc8aa38              CheckFsvuOK
+                  1fc8cec0              KpaCommand20
+                  1fc8a640              DisableMBK07x
+                  1fc8cf24              KpaCommand22
+                  1fc88a58              KpaCommand05
+                  1fc8e0a8              KpaCommand34
+                  1fc8d124              KpaCommand28
+                  1fc8d9e0              KpaCommand30
+                  1fc8e6b8              KpaCommand39
+                  1fc88c50              KpaCommand06
+                  1fc8e4e8              KpaCommand38
+                  1fc8c490              BUPE_Chan2_Enable
+                  1fc8da28              Get_OK_OKK_Data
+                  1fc8d954              KpaCommand2F
+                  1fc900ac              CbkErrCtrlCallBack
+                  1fc8c7ac              KpaCommand16
+                  1fc89010              KpaCommand09
+                  1fc901b0              CheckTimeMarkInInt
+                  1fc8d3d0              KpaCommand2B
+                  1fc8dfdc              KpaCommand32
+                  1fc8d174              KpaCommand2A
+                  1fc8c9cc              KpaCommand19
+                  1fc884e0              KpaCommand02
+                  1fc892cc              KpaCommand0A_Erti
+                  1fc8a8a4              CheckFsmuPower
+                  1fc88834              KpaCommand04
+                  1fc8e028              KpaCommand33
+                  1fc8d0fc              KpaCommand27
+                  1fc8eda0              KpaCommandFF
+                  1fc89e9c              KpaCommand0C
+                  1fc8c728              KpaCommand14
+                  1fc8cf94              KpaCommand25
+                  1fc8abd8              KpaCommand0D
+         .text    1fc90330  1200  1200 2**4  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerErtiUnit.o(overhead 8112 bytes)
+                  1fc90330              KpaCommand08
+                  1fc91414              Read733Config
+                  1fc914c0              Read733UpiConfig
+                  1fc909a0              KpaCommand0B
+                  1fc90a48              Reconfig733
+         .text    1fc91530   b80   b80 2**4  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerErtiUnit.o(overhead 8112 bytes)
+                  1fc91530              IrqHandler02
+         .text    1fc920b0   f40   f40 2**4  elf32-littlemips D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o(overhead 8112 bytes)
+                  1fc92268              GetPeriodicMkoMsgLock
+                  1fc922c0              AddPeriodicMkoMsg
+                  1fc92ca8              DoPeriodicMkoMsg
+                  1fc92600              DelPeriodicMkoMsg
+                  1fc92ae0              GetPeriodicMkoMsgCount
+                  1fc92d1c              ProcessPeriodicMkoMsg
+                  1fc92b24              AbonentToAbonentMkoMsg
+                  1fc92af4              ClrPeriodicMkoMsgList
+                  1fc92284              SetPeriodicMkoMsgLock
+                  1fc92c90              InitPeriodicMkoMsg
+                  1fc92a90              PeriodicMkoMsgDataCmp
+                  1fc92800              ReadPeriodicMkoMsgData
+                  1fc928fc              FindPeriodicMkoMsg
+                  1fc920b0              KpaCommand60
+         .text    1fc92ff0   a80   a80 2**4  elf32-littlemips D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o(overhead 8112 bytes)
+                  1fc9381c              InitProhibitedMkoMsg
+                  1fc937a8              ProhibitedMkoMsgDataCmp
+                  1fc92ff0              KpaCommand61
+                  1fc9363c              FindProhibitedMkoMsg
+                  1fc932ec              DelProhibitedMkoMsg
+                  1fc9382c              IsProhibitedMkoMsg
+                  1fc93110              AddProhibitedMkoMsg
+                  1fc9380c              ClrProhibitedMkoMsgList
+                  1fc93928              CheckProhibitedMkoMsg
+                  1fc937f8              GetProhibitedMkoMsgCount
+                  1fc93540              ReadProhibitedMkoMsgData
+         .text    1fc93a70  45a0  45a0 2**4  elf32-littlemips D:/Roman/TPO/Source/PacketMkoMsgUnit.o(overhead 18476 bytes)
+                  1fc96164              AddPacketMko_CntPiPo_IntToList
+                  1fc979a8              RunPacketMko_CntQue_PreparePacket1
+                  1fc94948              RunPacketMkoSingleMsg
+                  1fc96c9c              RunPacketMko_SecQue_IntList
+                  1fc95040              PacketMkoMsgStoreRxData
+                  1fc962b8              RunPacketMko_CntPiPo_IntList
+                  1fc9791c              RunPacketMko_CntQue_CheckList
+                  1fc94280              ReadPacketMkoMsgData
+                  1fc95328              RunPacketMkoSingleMsgResult
+                  1fc955f0              RunPacketMkoMultiMsgResult
+                  1fc94cdc              PacketMkoMsgPrepareBlock
+                  1fc93f38              AddPacketMkoSingleMsg
+                  1fc95804              AddPacketMko_SecPiPo_MsgToInt
+                  1fc96448              RunPacketMko_CntPiPo_CheckList
+                  1fc95a80              RunPacketMko_SecPiPo_CheckList
+                  1fc955cc              RunPacketMkoMultiMsg
+                  1fc958b0              RunPacketMko_SecPiPo_IntList
+                  1fc97244              RunPacketMko_SecQue_PreparePacket2
+                  1fc97cd8              RunPacketMko_CntQue_PreparePacket2
+                  1fc96204              AddPacketMko_CntPiPo_MsgToInt
+                  1fc93a94              KpaCommand63
+                  1fc95258              XchgSubAddrPacketMkoMsgList
+                  1fc93a70              InitPacketMkoMsg
+                  1fc96b0c              AddPacketMko_SecQue_IntToList
+                  1fc94f28              PacketMkoMsgCheckMessages
+                  1fc97624              AddPacketMko_CntQue_MsgToInt
+                  1fc967dc              RunPacketMko_CntPiPo_PreparePacket2
+                  1fc946e8              PacketMkoMsgDataCmp
+                  1fc9771c              RunPacketMko_CntQue_IntList
+                  1fc95ae4              RunPacketMko_SecPiPo_PreparePacket1
+                  1fc94848              ClrPacketMkoMsgList
+                  1fc94738              DelPacketMkoMsgByIndex
+                  1fc9517c              XchgAddrPacketMkoMsgList
+                  1fc940a4              AddPacketMkoMultiMsg
+                  1fc95e24              RunPacketMko_SecPiPo_PreparePacket2
+                  1fc94570              FindPacketMkoMsg
+                  1fc94ec0              PacketMkoMsgCheckPacket
+                  1fc964ac              RunPacketMko_CntPiPo_PreparePacket1
+                  1fc94834              GetPacketMkoMsgCount
+                  1fc96e88              RunPacketMko_SecQue_CheckList
+                  1fc97584              AddPacketMko_CntQue_IntToList
+                  1fc96f04              RunPacketMko_SecQue_PreparePacket1
+                  1fc9437c              DelPacketMkoMsgByMsg
+                  1fc95774              AddPacketMko_SecPiPo_IntToList
+                  1fc96ba8              AddPacketMko_SecQue_MsgToInt
+         .text    1fc98010   c20   c20 2**4  elf32-littlemips D:/Roman/TPO/Source/MkoMirrorUnit.o(overhead 8112 bytes)
+                  1fc98294              MkoMirrorDoXchg
+                  1fc98010              KpaCommand64
+                  1fc98af0              MkoMirrorSendDebugInfo
+         .text    1fc98c30  20c0  20c0 2**4  elf32-littlemips D:/Roman/TPO/Source/MkoStressTestUnit.o(overhead 15248 bytes)
+                  1fc98c50              KpaCommand65
+                  1fc99bc8              MkoStressPreparePacket2
+                  1fc9aba4              MkoStressSendStatistic
+                  1fc98c30              InitMkoStressTest
+                  1fc99b34              MkoStressPreparePacket1
+                  1fc99084              MkoStressSendTest
+                  1fc9a60c              MkoStressCheckRxPacket2
+                  1fc9aacc              MkoStressSaveStateC
+                  1fc99c5c              MkoStressCheckTxPacket1
+                  1fc99854              MkoStressPrepareSet1
+                  1fc9a224              MkoStressCheckRxPacket1
+                  1fc99358              MkoStressRecvTest
+                  1fc9a9f4              MkoStressSaveStateB
+                  1fc999c4              MkoStressPrepareSet2
+                  1fc9962c              MkoStressSendF4Test
+                  1fc99f40              MkoStressCheckTxPacket2
+         .text    1fc9acf0  74f0  74f0 2**4  elf32-littlemips D:/Roman/TPO/Source/BaloiUnit_v11.o(overhead 31640 bytes)
+                  1fc9ce8c              Irq13Msg0x8756
+                  1fca13e0              BaloiPeriodicTask
+                  1fc9d5f0              Irq13Msg0xC918
+                  1fc9c514              Irq13SendMsgBn
+                  1fc9e37c              Control_AFAR_Fail
+                  1fca2150              Control_BUFAR
+                  1fc9db84              Irq13Msg0xDB3A
+                  1fc9eb30              Irq13Error
+                  1fc9ebe4              Irq13CalcSum
+                  1fc9e408              Irq13Msg0xDE3F
+                  1fc9f6cc              Irq13ReplyTypeRedefined
+                  1fc9d2c0              Irq13Msg0xC312
+                  1fc9fd10              Irq13LoadTableData
+                  1fc9e888              Otkluchenie_AT_Fail
+                  1fc9e4b4              Irq13InfoMsg0x33D2
+                  1fc9c7e4              Irq13SendMsgAn
+                  1fc9e80c              Oper_0962
+                  1fc9f9bc              Irq13ChangeDebugReadList
+                  1fca190c              Irq13PackSetup
+                  1fc9d694              Irq13Msg0xD435
+                  1fc9cab4              Irq13MsgHandler
+                  1fc9fae0              Irq13DoDebugReadBn
+                  1fca1128              Control_LPH
+                  1fca12d8              ReadExtMsgData
+                  1fc9de80              Vkluchenie_AFAR
+                  1fc9e504              Irq13Msg0xDD3C
+                  1fc9d980              Control_ZTM
+                  1fc9e53c              Otkluchenie_AT
+                  1fc9e8c0              Otkluchenie_BUM_AFAR
+                  1fca1d14              Irq13PackRun
+                  1fc9f5ac              Irq13ChangeDisabledCrcList
+                  1fc9f3c4              Irq13ReplyIsDisabled
+                  1fc9f2a4              Irq13ChangeDisabledMsgList
+                  1fc9dc6c              Control_AFAR
+                  1fc9acf0              Irq13InitSys
+                  1fc9d6e8              Irq13Msg0xD839
+                  1fc9f240              Irq13MsgIsDisabled
+                  1fc9d22c              Irq13Msg0x8455
+                  1fc9f548              Irq13CrcIsDisabled
+                  1fc9fbf8              Irq13DoDebugReadAn
+                  1fc9c358              Irq13MsgToFifo
+                  1fca126c              K_BRTK_A
+                  1fc9c2f8              Irq13SendMsgBnOverFifo
+                  1fc9ea10              Irq13Msg0x9C4D
+                  1fc9f958              Irq13DebugReadIsEnabled
+                  1fc9d334              Irq13Msg0xC514
+                  1fc9f750              Irq13ChangeReplyTypeList
+                  1fc9eae8              Irq13InfoMsg0x5382
+                  1fc9d86c              Vkluchenie_BPA_AT
+                  1fc9ec20              Irq13MkoXchgBn
+                  1fc9d6a8              Irq13Msg0xD736
+                  1fc9e2b4              Otkl_kanalov_AFAR
+                  1fc9eb9c              Irq13SingleEventMsg
+                  1fc9d25c              Irq13Msg0xCF1E
+                  1fc9e4fc              Irq13Msg0x9647
+                  1fc9bec4              Irq13IdleTask
+                  1fc9b748              Irq13Handler
+                  1fca16ec              Irq13PackReset
+                  1fc9d3a8              Irq13Msg0xA021
+                  1fca0fd0              Vkluchenie_LPH
+                  1fc9ef30              Irq13MkoXchgAn
+                  1fc9d4d4              Irq13Msg0xB474
+                  1fc9cf58              Irq13Msg0xB171
+                  1fc9add4              Irq13InitData
+                  1fc9eac8              Sbros_Priznakov
+                  1fc9c218              Irq13SendUserMsg
+                  1fc9d0a0              Irq13Msg0xB272
+                  1fca0f40              MsgProc0xDB3AExt
+                  1fc9db40              Irq13Msg0x9041
+                  1fca1fe0              Irq13PackReadInfo
+                  1fc9b0fc              KpaCommand62
+                  1fc9d644              Irq13Msg0xA524
+                  1fc9c4e4              Irq13AddToMsg
+                  1fc9f8ac              Irq13ChangeCurrentTxRns
+                  1fc9d1e4              Send_KPI_Kvit
+                  1fc9db00              Irq13Msg0xA322
+                  1fc9d680              Irq13Msg0xD233
+                  1fc9e3c0              Irq13InfoMsg0x35D4
+                  1fc9c4a8              Irq13InitMsg
+                  1fc9f428              Irq13ChangeDisabledReplyList
+                  1fc9d4c4              Irq13Msg0xBE71
+                  1fc9ea34              Irq13Msg0x9xxx
+         .text    1fca21e0   1f0   1f0 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]taskLib.o(overhead 4056 bytes)
+                  1fca2290              taskAllDelete
+                  1fca2210              taskInipTime
+                  1fca2200              taskCreate
+                  1fca21e0              __errno
+                  1fca2310              taskReStart
+                  1fca22e0              taskPeriod
+                  1fca2350              taskDelayTime
+                  1fca2330              VecStRead
+                  1fca22c0              taskTimerMin
+                  1fca2390              VecStCreate
+                  1fca21f0              taskTimerCorr
+                  1fca22d0              taskInitDelay
+                  1fca2250              taskIdListGet
+                  1fca2240              taskDelay
+                  1fca22a0              taskVerify
+                  1fca2260              taskVsListGet
+                  1fca2230              taskResume
+                  1fca2360              taskIdVerify
+                  1fca2300              taskIdSelf
+                  1fca2380              taskDelayFixTime
+                  1fca23c0              taskTimerZero
+                  1fca2280              taskDelete
+                  1fca23b0              taskAllInfoGet
+                  1fca2270              taskExit
+                  1fca2220              taskSuspend
+                  1fca2370              taskIniFixTime
+                  1fca22b0              taskReVerify
+                  1fca2340              VecStModify
+                  1fca22f0              taskPeriodPlus
+                  1fca23a0              taskInfoGet
+                  1fca2320              taskAllDelAbs
+         .text    1fca23d0    30    30 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]timeLib.o(overhead 4056 bytes)
+                  1fca23d0              timeSet
+                  1fca23f0              timeRead
+                  1fca23e0              timeReadmics
+         .text    1fca2400    50    50 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]semLib.o(overhead 4056 bytes)
+                  1fca2430              semDelete
+                  1fca2410              semLock
+                  1fca2420              semUnlock
+                  1fca2400              semCreate
+                  1fca2440              semStateGet
+         .text    1fca2450    80    80 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]mkoLib.o(overhead 4056 bytes)
+                  1fca2450              mkoWait
+                  1fca24b0              mkoNumPackMsgWait
+                  1fca24a0              mkoNumPackStop
+                  1fca2480              mkoBcInit
+                  1fca2490              mkoPackIniStart
+                  1fca2470              mkoOFF
+                  1fca24c0              mkoNumPackWait
+                  1fca2460              mkoSendPri
+         .text    1fca24d0    20    20 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]errLib.o(overhead 4056 bytes)
+                  1fca24d0              ErrCodGet
+                  1fca24e0              ErrMKIGet
+         .text    1fca24f0    60    60 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]testLib.o(overhead 4056 bytes)
+                  1fca2540              taskErrExit
+                  1fca2510              testMDIGet
+                  1fca24f0              testStart
+                  1fca2500              ErrVMDIget
+                  1fca2530              timeMarktst
+                  1fca2520              testErrGet
+         .text    1fca2550   1d0   1d0 2**4  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]addLib.o(overhead 4056 bytes)
+                  1fca2680              synchRecIncVM
+                  1fca2590              WdReset
+                  1fca2600              sprIQClear
+                  1fca26f0              tlmSendOut
+                  1fca2630              synchRecInfArrVM
+                  1fca26d0              numVMGet
+                  1fca2610              sprIMaskVec
+                  1fca26c0              cfgSysGet
+                  1fca26b0              synchMasterChVM
+                  1fca2650              synchReadVM
+                  1fca2710              tlmByteOut
+                  1fca2670              synchRecEnable
+                  1fca2660              synchInf
+                  1fca2640              synchWriteVM
+                  1fca25e0              sprIGetMask
+                  1fca26e0              flashCorr
+                  1fca25d0              sprIUnMask
+                  1fca2700              tlmReadyOut
+                  1fca2560              cacheDflush
+                  1fca2550              cacheFlush
+                  1fca2690              synchPowerOff
+                  1fca26a0              synchPowerOn
+                  1fca25c0              sprIMask
+                  1fca25b0              sprIGetVecMask
+                  1fca2570              mkoSetChan
+                  1fca2620              synchRecInfVM
+                  1fca2580              mkoGetChan
+                  1fca25a0              WdSet
+                  1fca25f0              sprIGetF
+         .text    1fca2720    50    50 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]rand.o(overhead 4056 bytes)
+                  1fca2730              rand
+                  1fca2720              srand
+         .text    1fca2770   110   110 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcmp.o(overhead 4056 bytes)
+                  1fca2770              memcmp
+         .text    1fca2880   480   480 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcpy.o(overhead 4056 bytes)
+                  1fca2880              memcpy
+         .text    1fca2d00    90    90 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memmove.o(overhead 4056 bytes)
+                  1fca2d00              memmove
+         .text    1fca2d90   260   260 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memset.o(overhead 4056 bytes)
+                  1fca2d90              memset
+         .text    1fca2ff0    e0    e0 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]strlen.o(overhead 4056 bytes)
+                  1fca2ff0              strlen
+ from *(.gnu.warning)
+
+.fini    (no attached output section)
+ from *(.fini)
+
+.rodata           1fca30d0   760     0 2**4 load alloc contents 
+ from *(.rodata)
+         .rodata  1fca30d0    40    40 2**4  elf32-littlemips D:/Roman/TPO/Source/MkoXchgUnit.o(overhead 17204 bytes)
+         .rodata  1fca3110   700   700 2**4  elf32-littlemips D:/Roman/TPO/Source/CrcUnit.o(overhead 4056 bytes)
+                  1fca3510              Crc16Table
+                  1fca3710              Crc8Table
+                  1fca3110              Crc32Table
+         .rodata  1fca3810    20    20 2**4  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerUnit.o(overhead 25892 bytes)
+
+.rodata1 (no attached output section)
+ from *(.rodata1)
+
+.reginfo          1fca3830    18     0 2**2 load alloc contents 
+ from *(.reginfo)
+         .reginfo 1fca3830    18    18 2**2  elf32-littlemips D:/Roman/TPO/Source/MainUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/DataUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/FuncUnit.o(overhead 14684 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerUnit.o(overhead 14228 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoXchgUnit.o(overhead 17204 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/CrcUnit.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerUnit.o(overhead 25892 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/DebugUnit.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerKoiUnit.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerErtiUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerKoiUnit.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerErtiUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/PacketMkoMsgUnit.o(overhead 18476 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoMirrorUnit.o(overhead 8112 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoStressTestUnit.o(overhead 15248 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/BkoiUnit.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/BkoiTableUnit.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips D:/Roman/TPO/Source/BaloiUnit_v11.o(overhead 31640 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]taskLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]timeLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]semLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]mkoLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]errLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]testLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/Target/BOS/CBK/LIB/libBOS.a]addLib.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]rand.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcmp.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcpy.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memmove.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memset.o(overhead 4056 bytes)
+         .reginfo 1fca3848    18     0 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]strlen.o(overhead 4056 bytes)
+                  1fca3860 1fca3860 _etext =.
+                  1fca3860 1fca3860 PROVIDE (etext, .)
+                  1fca3860 1fca3860 . =.
+
+.data             00080004   e9c     0 2**4 load alloc contents 
+                  00080004 00000000 _fdata =.
+ from *(.data)
+         *fill*   00080004     c 0000
+         .data    00080010   e80   e80 2**4  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+                  00080e78              Control_NumList1C
+                  00080774              Control_AddrList1D
+                  00080e54              Control_NumList13
+                  0008084c              Control_NumList03
+                  000805f4              Control_AddrList07
+                  000800f4              Control_AddrList02
+                  00080d04              Control_NumList07
+                  000807d8              Control_NumList01
+                  00080e44              Control_NumList0F
+                  00080e2c              Control_NumList09
+                  00080d90              Control_NumList08
+                  00080734              Control_AddrList0D
+                  00080684              Control_AddrList08
+                  00080864              Control_NumList04
+                  00080768              Control_AddrList1A
+                  00080e70              Control_NumList1A
+                  00080780              Control_NumList00
+                  00080754              Control_AddrList15
+                  0008074c              Control_AddrList13
+                  00080e84              Control_NumList1F
+                  000809d0              Control_NumList06
+                  00080e30              Control_NumList0A
+                  00080e60              Control_NumList16
+                  0008073c              Control_AddrList0F
+                  00080740              Control_AddrList10
+                  00080054              Control_AddrList00
+                  0008012c              Control_AddrList03
+                  00080e80              Control_NumList1E
+                  00080730              Control_AddrList0C
+                  00080760              Control_AddrList18
+                  00080744              Control_AddrList11
+                  00080e68              Control_NumList18
+                  00080e50              Control_NumList12
+                  00080e48              Control_NumList10
+                  0008022c              Control_AddrList05
+                  00080e7c              Control_NumList1D
+                  00080e34              Control_NumList0B
+                  00080738              Control_AddrList0E
+                  00080818              Control_NumList02
+                  00080e58              Control_NumList14
+                  00080e6c              Control_NumList19
+                  00080770              Control_AddrList1C
+                  0008077c              Control_AddrList1F
+                  00080758              Control_AddrList16
+                  00080728              Control_AddrList0A
+                  00080e4c              Control_NumList11
+                  000802bc              Control_AddrList06
+                  00080e40              Control_NumList0E
+                  00080944              Control_NumList05
+                  00080e74              Control_NumList1B
+                  000800b0              Control_AddrList01
+                  0008072c              Control_AddrList0B
+                  0008075c              Control_AddrList17
+                  00080e5c              Control_NumList15
+                  00080010              Control_BitMap
+                  00080748              Control_AddrList12
+                  00080e3c              Control_NumList0D
+                  00080724              Control_AddrList09
+                  00080148              Control_AddrList04
+                  0008076c              Control_AddrList1B
+                  00080e64              Control_NumList17
+                  00080764              Control_AddrList19
+                  00080e38              Control_NumList0C
+                  00080750              Control_AddrList14
+                  00080778              Control_AddrList1E
+         .data    00080e90    10    10 2**4  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]rand.o(overhead 4056 bytes)
+constructors:
+
+.data1   (no attached output section)
+ from *(.data1)
+                  00080ea0 00088ea0 _gp =(.+00008000)
+
+.lit8    (no attached output section)
+ from *(.lit8)
+
+.lit4    (no attached output section)
+ from *(.lit4)
+
+.ctors   (no attached output section)
+ from *(.ctors)
+
+.dtors   (no attached output section)
+ from *(.dtors)
+
+.got     (no attached output section)
+ from *(.got.plt)
+ from *(.got)
+
+.dynamic (no attached output section)
+ from *(.dynamic)
+
+.sdata   (no attached output section)
+ from *(.sdata)
+                  00080ea0 00080ea0 _edata =.
+                  00080ea0 00080ea0 PROVIDE (edata, .)
+                  00080ea0 00080ea0 __bss_start =.
+                  00080ea0 00080ea0 _fbss =.
+
+.sbss             00080ea0   3dc     0 2**3 alloc 
+ from *(.sbss)
+ from *(.scommon)
+         .scommon 00080ea0   1b0   1b0 2**3  elf32-littlemips D:/Roman/TPO/Source/DataUnit.o(overhead 8112 bytes)
+                  00080ea0              CbkConfig
+                  00080ea4              AsnStatusPrevTime
+                  00080ea8              CbkErrCtrlCallBackType
+                  00080eac              TestTaskIn
+                  00080eb0              MainTaskPdoCount
+                  00080eb4              PostMdiDataSize
+                  00080eb8              AsnStatusBeginTime
+                  00080ec0              AsnPeriodicTaskTime
+                  00080ec8              MkoMsgPtrX
+                  00080ecc              ExtTaskCount
+                  00080ed0              AsnIrqCount
+                  00080ed4              DebugPackRes
+                  00080ed8              AsnMkoFailCount
+                  00080edc              FlashDataAddr
+                  00080ee0              BehWaitForFirstIrq
+                  00080ee4              AsnTaskDeltaTimeTimer
+                  00080ee8              MkoPackResA
+                  00080eec              BehControlEnabled
+                  00080ef0              KPADetected
+                  00080ef4              AsnPostDeltaTime
+                  00080ef8              AsnWaitForFirstIrq
+                  00080efc              MainTaskIn
+                  00080f00              FlashDataIndex
+                  00080f08              MkoPackX
+                  00080f10              AsnControlStopTime
+                  00080f18              BehEnabledZone
+                  00080f20              AsnExcIrqCount
+                  00080f24              BehPostDeltaTime
+                  00080f28              AsnTimeIrqPrev
+                  00080f30              AsnTaskDeltaTimeInterval
+                  00080f34              AsnTaskDeltaTimeFlag
+                  00080f38              BehExcFhvIrqCount
+                  00080f3c              BehIrqCount
+                  00080f40              CallBackCount
+                  00080f44              BehIrqAlreadySet
+                  00080f48              BehControlStopTime
+                  00080f50              IrqTime
+                  00080f58              MkoMsgResX
+                  00080f60              AsnIrqAlreadySet
+                  00080f64              MkoPackResC
+                  00080f68              AsnEnabledZone
+                  00080f70              ErrorTaskIn
+                  00080f74              BehFhvPeriod
+                  00080f78              MkoPackC
+                  00080f80              AsnControlEnabled
+                  00080f88              MkoPackB
+                  00080f90              BehMissFinikIrqCount
+                  00080f94              AsnTaskOut
+                  00080f98              BehExcIrqCount
+                  00080f9c              MainTaskCmdFail
+                  00080fa0              AsnTimerFailCount
+                  00080fa4              BehMissFhvIrqCount
+                  00080fa8              AsnMissIrqCount
+                  00080fac              MkoPackResB
+                  00080fb0              BehFhvIrqCount
+                  00080fb4              AsnTimeListSize
+                  00080fb8              PostParam
+                  00080fbc              BehPreDeltaTime
+                  00080fc0              AsnTaskDeltaTimeId
+                  00080fc4              BehFinikFlag
+                  00080fc8              ErrorTaskOut
+                  00080fcc              AsnTaskIn
+                  00080fd0              PostMkiDataSize
+                  00080fd8              MainTaskTime0
+                  00080fe0              B732PupsListSize
+                  00080fe8              AsnSecondIrqTime
+                  00080ff0              AsnPreDeltaTime
+                  00080ff4              BehMissIrqCount
+                  00080ff8              BehFinikPeriod
+                  00080ffc              BehExcFinikIrqCount
+                  00081000              IrqTaskIn
+                  00081004              BehMkoFailCount
+                  00081008              IrqTaskOut
+                  0008100c              BehFhvFlag
+                  00081010              AsnStartTimer
+                  00081018              MainTaskTime1
+                  00081020              MkoPackA
+                  00081028              TestTaskOut
+                  0008102c              AsnParamFailCount
+                  00081030              BehStartTimer
+                  00081034              MkoPackResX
+                  00081038              DebugFlag
+                  0008103c              BehFinikIrqCount
+                  00081040              PassBeginTime
+                  00081048              BehFhvTmpCount
+                  0008104c              BehFinikTmpCount
+         .scommon 00081050    14    14 2**3  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerUnit.o(overhead 14228 bytes)
+                  00081050              Irq10PackRes
+                  00081058              Irq10Pack
+                  00081060              Irq10Result
+         .scommon 00081064     c     c 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoXchgUnit.o(overhead 17204 bytes)
+                  00081064              XchgBTrack
+                  00081068              RES_STD_DBG
+                  0008106c              CNT_DBG
+         .scommon 00081070     4     4 2**2  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+                  00081070              Control_ChangedCount
+         .scommon 00081074     8     8 2**2  elf32-littlemips D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o(overhead 8112 bytes)
+                  00081074              PeriodicMkoMsgLock
+                  00081078              PeriodicMkoMsgCount
+         .scommon 0008107c     4     4 2**2  elf32-littlemips D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o(overhead 8112 bytes)
+                  0008107c              ProhibitedMkoMsgCount
+         .scommon 00081080    3c    3c 2**3  elf32-littlemips D:/Roman/TPO/Source/PacketMkoMsgUnit.o(overhead 18476 bytes)
+                  00081080              PacketMkoIntQueueCount
+                  00081084              PacketMkoMsgCount
+                  00081088              PacketMkoIntCount
+                  0008108c              TrackPack
+                  00081090              RunPacketBeginTime
+                  00081098              PacketMkoIntCntCount
+                  0008109c              TrackPackCount
+                  000810a0              LastResult
+                  000810a8              RunPacketCurrTime
+                  000810b0              PacketRdDataInfo
+                  000810b8              GRES_DBG
+         .scommon 000810bc    40    40 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoMirrorUnit.o(overhead 8112 bytes)
+                  000810bc              MkoMirrorBadWords
+                  000810c0              MkoMirrorWrLen
+                  000810c4              MkoMirrorXchgTotal
+                  000810c8              MkoMirrorRdLen
+                  000810cc              MkoMirrorAddr
+                  000810d0              MkoMirrorRdChan
+                  000810d4              MkoMirrorXchgWithError
+                  000810d8              MkoMirrorInterval
+                  000810dc              MkoMirrorAbWrError
+                  000810e0              MkoMirrorWrChan
+                  000810e4              MkoMirrorLine
+                  000810e8              MkoMirrorDebug
+                  000810ec              MkoMirrorAbRdError
+                  000810f0              MkoMirrorCycles
+                  000810f4              MkoMirrorBadBits
+                  000810f8              MkoMirrorXchgMask
+         .scommon 000810fc    34    34 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoStressTestUnit.o(overhead 15248 bytes)
+                  000810fc              MkoStressMsgCount
+                  00081100              MkoStressErrorCount
+                  00081104              MkoStressLinkErrorCount
+                  00081108              MkoStressTermErrorCount
+                  0008110c              MkoStressNoOsErrorCount
+                  00081110              MkoStressShowLastPackResult
+                  00081114              MkoStressMsgErrorCount
+                  00081118              MkoStressAbErrorCount
+                  0008111c              MkoStressBusyErrorCount
+                  00081120              MkoStressLastOS
+                  00081124              MkoStressMsgResCount
+                  00081128              MkoStressDataErrorCount
+                  0008112c              MkoStressPackResCount
+         .scommon 00081130   14c   14c 2**3  elf32-littlemips D:/Roman/TPO/Source/BaloiUnit_v11.o(overhead 31640 bytes)
+                  00081130              Pause_BUM
+                  00081138              Pause_OTKL_AFAR
+                  0008113c              BUFAR_Sbros
+                  00081140              RedefinedTxRnsValue
+                  00081142              Irq13RxIndex
+                  00081144              Irq13BrtkMode2Enabled
+                  00081148              Pause_Proverki_TM_AFAR
+                  0008114c              Otriz_Kvit
+                  00081150              Irq13PrevTxMsgLen
+                  00081154              Control_Tm_AFAR
+                  00081158              Pause_MkoTx
+                  0008115c              Control_BUM
+                  00081160              RedefinedTxRns
+                  00081164              LPH
+                  00081168              Irq13SingleEvent
+                  0008116c              Baloi_DebugReadListCount
+                  00081170              SAA_Ustanovlena
+                  00081174              Baloi_MkoPackSem
+                  00081178              BUFAR
+                  0008117c              LPH_Vkluchena
+                  00081180              Otkl_AT
+                  00081184              KPI_Etalon_Len
+                  00081188              KPI_Kvit
+                  0008118c              Irq13LastMsg
+                  00081190              Code_DB
+                  00081194              Control_ZTM_BUFAR
+                  00081198              Komplekt_APD_MT
+                  0008119c              Irq13WaitReplyFlag
+                  000811a0              Baloi_Send_Bau_OK_Time
+                  000811a8              Baloi_DisabledCrcListCount
+                  000811ac              Otkl_BPA_AT
+                  000811b0              Pause_MFS
+                  000811b8              Irq13LastRns
+                  000811bc              Nomer_Shetverti
+                  000811c0              Irq13CmdFifoHead
+                  000811c4              Komplekt_ALPS
+                  000811c8              Baloi_ReplyTypeListCount
+                  000811cc              Irq13PrevTxIndex
+                  000811d0              AFAR_AT_M
+                  000811d4              Baloi_DisabledMsgListCount
+                  000811d8              Index_AFAR
+                  000811dc              Komplekt_MFS
+                  000811e0              Rejim_3_Rasch
+                  000811e4              Irq13TxIndex
+                  000811e8              Pause_Rasch_3
+                  000811ec              Ctrl_Ispravnosti
+                  000811f0              Irq13TxMsgLen
+                  000811f4              Irq13CmdFifoTail
+                  000811f8              Baloi_Read_OK_Time
+                  00081200              Irq13BaloiFail
+                  00081208              Irq13WaitReplyTimer
+                  00081210              Baloi_DisabledReplyListCount
+                  00081214              Baloi_MkoPackRes
+                  00081218              DN_Vvedena
+                  0008121c              Pause_LPH
+                  00081220              Baloi_Read_OK
+                  00081224              Pause_AFAR
+                  00081228              Pause_PRD
+                  0008122c              Irq13CmdFifoEnabled
+                  00081230              Irq13LastSum
+                  00081234              Otkl_AFAR
+                  00081238              Rejim_BRTK
+                  00081240              Pause_AOS
+                  00081248              Komplekt_AOS
+                  00081250              Irq13TimeSEV
+                  00081258              Baloi_MkoPack
+                  00081260              Chislo_Proverok_TM_AFAR
+                  00081268              Ctrl_Ispravnosti_Time
+                  00081270              Irq13SendNackEnabled
+                  00081274              Ctrl_Ispravnosti_Enabled
+                  00081278              Baloi_Send_Bau_OK
+
+.bss              00081280 d0920     0 2**4 alloc 
+ from *(.dynbss)
+ from *(.bss)
+ from *(COMMON)
+         COMMON   00081280  1000  1000 2**4  elf32-littlemips D:/Roman/TPO/Source/MainUnit.o(overhead 8112 bytes)
+                  00081280              FailVmDiag
+         COMMON   00082280 56a40 56a40 2**4  elf32-littlemips D:/Roman/TPO/Source/DataUnit.o(overhead 8112 bytes)
+                  00082280              ReConfigBuffer
+                  00082290              MkoMsgResC
+                  000823a0              FlashDataBuffer
+                  000c23a0              MkoMsgPtrC
+                  000c2430              DebugMki
+                  000c3430              SubsDataBuffer
+                  000c3c30              MkoMsgResB
+                  000c3d40              KpaCommand
+                  000c3d50              LastError
+                  000c3e50              PostMdiDataBuf
+                  000c5450              AsnTimeList
+                  000c7070              VmStateData
+                  000c70d0              PostMkiDataBuf
+                  000c7130              MkoBufX
+                  000c7170              SubsAddrBuffer
+                  000c71b0              B732PupsList
+                  000d3500              MkoMsgPtrB
+                  000d3590              MkoBufStub
+                  000d35d0              MkoMsgB
+                  000d38f0              MkoMsgResA
+                  000d3a00              MkoMsgX
+                  000d3a20              MkoMsgC
+                  000d3d40              MkoBufC
+                  000d4580              FlashJob
+                  000d6090              SpoConfig
+                  000d6190              CmdHandlerTable
+                  000d6590              MkoBufB
+                  000d6dd0              OpoVersionString
+                  000d6e10              CbkDataImit
+                  000d7650              MdiBuffer
+                  000d7850              MkoBufA
+                  000d8090              FlashSectorCSumTable
+                  000d80d0              MkoMsgPtrA
+                  000d8160              MkiBuffer
+                  000d8960              MkoMsgA
+                  000d8c80              IrqHandlerTable
+         COMMON   000d8cc0   b90   b90 2**4  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerUnit.o(overhead 14228 bytes)
+                  000d8cc0              Irq10PackMsgRes
+                  000d8d50              Irq10Data
+                  000d91d0              Irq10PackMsgBuf
+                  000d9650              Irq10PackMsgList
+                  000d96a0              Irq10PackMsg
+         COMMON   000d9850  1d20  1d20 2**4  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+                  000d9850              Control_NumList
+                  000d98d0              Control_ChangedList
+                  000da8d0              Control_AddrList
+                  000da950              Control_StateList
+                  000db150              Control_DeviceList
+                  000db170              Control_DataAvail
+         COMMON   000db570  5400  5400 2**4  elf32-littlemips D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o(overhead 8112 bytes)
+                  000db570              PeriodicMkoMsgList
+         COMMON   000e0970  8200  8200 2**4  elf32-littlemips D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o(overhead 8112 bytes)
+                  000e0970              ProhibitedMkoMsgList
+         COMMON   000e8b70 1c410 1c410 2**4  elf32-littlemips D:/Roman/TPO/Source/PacketMkoMsgUnit.o(overhead 18476 bytes)
+                  000e8b70              PacketMkoMsgList
+                  000fab70              PacketMkoIntQueue1List
+                  000fbc70              PacketMkoIntQueue0List
+                  000fcd70              PacketMkoMsgResultBuf
+                  000fed80              PacketMkoIntList
+                  000ffe80              PacketMkoMsgResultList
+                  00101e80              PacketMkoIntCntList
+         COMMON   00104f80 30410 30410 2**4  elf32-littlemips D:/Roman/TPO/Source/MkoStressTestUnit.o(overhead 15248 bytes)
+                  00104f80              MkoStressLastPackResult
+                  00105390              MkoStressPackResList
+                  00115390              MkoStressMsgResList
+         COMMON   00135390 1c810 1c810 2**4  elf32-littlemips D:/Roman/TPO/Source/BaloiUnit_v11.o(overhead 31640 bytes)
+                  00135390              Baloi_PackList
+                  00145b90              Irq13TxBuffer
+                  00146390              Baloi_DisabledReplyList
+                  00146590              Baloi_DisabledMsgList
+                  00146790              KPI_Etalon
+                  00146e10              Baloi_MkoPackMsg
+                  00147110              Baloi_PackMkoLine
+                  00147130              Baloi_PackSendCount
+                  001471b0              Baloi_MkoPackMsgRes
+                  001472b0              Baloi_DisabledCrcList
+                  001474b0              Baloi_PackErrSendCount
+                  00147530              Baloi_MkoPackMsgList
+                  001475b0              Baloi_ReplyTypeList
+                  001479b0              Vkl_AFAR_PRD
+                  00147e10              Tm_AFAR_BUM
+                  00147e30              Irq13PrevTxBuffer
+                  00148630              Vkl_PRD_0
+                  00148710              Irq13DevState
+                  00148750              Baloi_DebugReadList
+                  00148950              Vkl_AFAR_BUM
+                  00148970              Tm_AFAR_PRD
+                  00148a10              Irq13CmdFifo
+                  00150a50              Irq13UserMsgData
+                  00151250              Baloi_PackPrepPause
+                  00151290              Baloi_PackMkoChan
+                  001512b0              Data_OTKL_AFAR
+                  001512c0              Baloi_PackOkSendCount
+                  00151340              Baloi_PackMsgCount
+                  00151360              Irq13RxBuffer
+                  00151b60              Baloi_PackInterval
+                  00151ba0 00151ba0 _end =.
+                  00151ba0 00151ba0 PROVIDE (end, .)
+
+.stab             00000000 2c610     0 2**2 contents 
+ from *(.stab)
+         .stab    00000000   de0   de0 2**2  elf32-littlemips D:/Roman/TPO/Source/MainUnit.o(overhead 8112 bytes)
+         .stab    00000de0  1014  1014 2**2  elf32-littlemips D:/Roman/TPO/Source/DataUnit.o(overhead 8112 bytes)
+         .stab    00001df4  2b5c  2b5c 2**2  elf32-littlemips D:/Roman/TPO/Source/FuncUnit.o(overhead 14684 bytes)
+         .stab    00004950  21c0  21c0 2**2  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerUnit.o(overhead 14228 bytes)
+         .stab    00006b10  2eb0  2eb0 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoXchgUnit.o(overhead 17204 bytes)
+         .stab    000099c0  1470  1470 2**2  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+         .stab    0000ae30   594   594 2**2  elf32-littlemips D:/Roman/TPO/Source/CrcUnit.o(overhead 4056 bytes)
+         .stab    0000b3c4  966c  966c 2**2  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerUnit.o(overhead 25892 bytes)
+         .stab    00014a30   108   108 2**2  elf32-littlemips D:/Roman/TPO/Source/DebugUnit.o(overhead 4056 bytes)
+         .stab    00014b38   528   528 2**2  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerKoiUnit.o(overhead 4056 bytes)
+         .stab    00015060  16f8  16f8 2**2  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerErtiUnit.o(overhead 8112 bytes)
+         .stab    00016758   528   528 2**2  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerKoiUnit.o(overhead 4056 bytes)
+         .stab    00016c80   fb4   fb4 2**2  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerErtiUnit.o(overhead 8112 bytes)
+         .stab    00017c34  14e8  14e8 2**2  elf32-littlemips D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o(overhead 8112 bytes)
+         .stab    0001911c  1014  1014 2**2  elf32-littlemips D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o(overhead 8112 bytes)
+         .stab    0001a130  50d0  50d0 2**2  elf32-littlemips D:/Roman/TPO/Source/PacketMkoMsgUnit.o(overhead 18476 bytes)
+         .stab    0001f200  126c  126c 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoMirrorUnit.o(overhead 8112 bytes)
+         .stab    0002046c  2364  2364 2**2  elf32-littlemips D:/Roman/TPO/Source/MkoStressTestUnit.o(overhead 15248 bytes)
+         .stab    000227d0   528   528 2**2  elf32-littlemips D:/Roman/TPO/Source/BkoiUnit.o(overhead 4056 bytes)
+         .stab    00022cf8   528   528 2**2  elf32-littlemips D:/Roman/TPO/Source/BkoiTableUnit.o(overhead 4056 bytes)
+         .stab    00023220  7fec  7fec 2**2  elf32-littlemips D:/Roman/TPO/Source/BaloiUnit_v11.o(overhead 31640 bytes)
+         .stab    0002b20c   21c   21c 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]rand.o(overhead 4056 bytes)
+         .stab    0002b428   30c   30c 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcmp.o(overhead 4056 bytes)
+         .stab    0002b734   558   558 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcpy.o(overhead 4056 bytes)
+         .stab    0002bc8c   270   270 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memmove.o(overhead 4056 bytes)
+         .stab    0002befc   4ec   4ec 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memset.o(overhead 4056 bytes)
+         .stab    0002c3e8   228   228 2**2  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]strlen.o(overhead 4056 bytes)
+
+.stabstr          00000000 39ab4     0 2**0 contents 
+ from *(.stabstr)
+         .stabstr 00000000  271d  271d 2**0  elf32-littlemips D:/Roman/TPO/Source/MainUnit.o(overhead 8112 bytes)
+         .stabstr 0000271d  2ff5  2ff5 2**0  elf32-littlemips D:/Roman/TPO/Source/DataUnit.o(overhead 8112 bytes)
+         .stabstr 00005712  2e46  2e46 2**0  elf32-littlemips D:/Roman/TPO/Source/FuncUnit.o(overhead 14684 bytes)
+         .stabstr 00008558  2c9e  2c9e 2**0  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerUnit.o(overhead 14228 bytes)
+         .stabstr 0000b1f6  2deb  2deb 2**0  elf32-littlemips D:/Roman/TPO/Source/MkoXchgUnit.o(overhead 17204 bytes)
+         .stabstr 0000dfe1  315e  315e 2**0  elf32-littlemips D:/Roman/TPO/Source/ControlUnit.o(overhead 12168 bytes)
+         .stabstr 0001113f   5a0   5a0 2**0  elf32-littlemips D:/Roman/TPO/Source/CrcUnit.o(overhead 4056 bytes)
+         .stabstr 000116df  4bf1  4bf1 2**0  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerUnit.o(overhead 25892 bytes)
+         .stabstr 000162d0   2b9   2b9 2**0  elf32-littlemips D:/Roman/TPO/Source/DebugUnit.o(overhead 4056 bytes)
+         .stabstr 00016589  24ea  24ea 2**0  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerKoiUnit.o(overhead 4056 bytes)
+         .stabstr 00018a73  2942  2942 2**0  elf32-littlemips D:/Roman/TPO/Source/CmdHandlerErtiUnit.o(overhead 8112 bytes)
+         .stabstr 0001b3b5  24ea  24ea 2**0  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerKoiUnit.o(overhead 4056 bytes)
+         .stabstr 0001d89f  2650  2650 2**0  elf32-littlemips D:/Roman/TPO/Source/IrqHandlerErtiUnit.o(overhead 8112 bytes)
+         .stabstr 0001feef  2b99  2b99 2**0  elf32-littlemips D:/Roman/TPO/Source/PeriodicMkoMsgUnit.o(overhead 8112 bytes)
+         .stabstr 00022a88  2a3a  2a3a 2**0  elf32-littlemips D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.o(overhead 8112 bytes)
+         .stabstr 000254c2  3f86  3f86 2**0  elf32-littlemips D:/Roman/TPO/Source/PacketMkoMsgUnit.o(overhead 18476 bytes)
+         .stabstr 00029448  28ac  28ac 2**0  elf32-littlemips D:/Roman/TPO/Source/MkoMirrorUnit.o(overhead 8112 bytes)
+         .stabstr 0002bcf4  2f1c  2f1c 2**0  elf32-littlemips D:/Roman/TPO/Source/MkoStressTestUnit.o(overhead 15248 bytes)
+         .stabstr 0002ec10  24d8  24d8 2**0  elf32-littlemips D:/Roman/TPO/Source/BkoiUnit.o(overhead 4056 bytes)
+         .stabstr 000310e8  24e2  24e2 2**0  elf32-littlemips D:/Roman/TPO/Source/BkoiTableUnit.o(overhead 4056 bytes)
+         .stabstr 000335ca  4b7d  4b7d 2**0  elf32-littlemips D:/Roman/TPO/Source/BaloiUnit_v11.o(overhead 31640 bytes)
+         .stabstr 00038147   889   889 2**0  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]rand.o(overhead 4056 bytes)
+         .stabstr 000389d0   34d   34d 2**0  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcmp.o(overhead 4056 bytes)
+         .stabstr 00038d1d   39b   39b 2**0  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memcpy.o(overhead 4056 bytes)
+         .stabstr 000390b8   35a   35a 2**0  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memmove.o(overhead 4056 bytes)
+         .stabstr 00039412   366   366 2**0  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]memset.o(overhead 4056 bytes)
+         .stabstr 00039778   33c   33c 2**0  elf32-littlemips [S:/TSRP/CDS/LIB/libR3.a]strlen.o(overhead 4056 bytes)
+
+.debug   (no attached output section)
+ from *(.debug)
+
+.debug_srcinfo0 (no attached output section)
+ from *(.debug_srcinfo)
+
+.debug_aranges0 (no attached output section)
+ from *(.debug_aranges)
+
+.debug_pubnames (no attached output section)
+ from *(.debug_pubnames)
+
+.debug_sfnames0 (no attached output section)
+ from *(.debug_sfnames)
+
+.line    (no attached output section)
+ from *(.line)
+
+.gptab.sdata (no attached output section)
+ from *(.gptab.data)
+ from *(.gptab.sdata)
+
+.gptab.sbss (no attached output section)
+ from *(.gptab.bss)
+ from *(.gptab.sbss)
+OUTPUT(MainProject.e elf32-littlemips)

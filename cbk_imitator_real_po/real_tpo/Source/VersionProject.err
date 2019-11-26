@@ -1,0 +1,7 @@
+
+D:\Roman\TPO\Source>echo off 
+CBK :       SubMicPath = S:    [S: = D:\SubMic]
+ldmips -o VersionProject.e -Map VersionProject.map -EL -N  D:/Roman/TPO/Source/VersionUnit.o  S:/Target/BOS/CBK/LIB/libBOS.a  S:/TSRP/CDS/LIB/libR3.a  -Ttext 0x1fc80000 -Tdata 0x00080004 -e 0x1FC80000 +0   
+ldmips: cannot open +0: No such file or directory
+make: *** [VersionProject.e] Error 0x1
+make.exe: *** [build] Error 0x2

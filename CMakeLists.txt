@@ -1,7 +1,110 @@
 project(Stubs)
 cmake_minimum_required(VERSION 2.8)
 
-enable_language(C)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+
+enable_language(CXX)
+
+add_definitions(-DUNICODE -D_UNICODE -DWIN32 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS)
+add_definitions(${Qt5Core_DEFINITIONS})
+add_definitions(${Qt5Gui_DEFINITIONS})
+add_definitions(${Qt5Widgets_DEFINITIONS})
+add_definitions(${Qt5Network_DEFINITIONS})
+
+find_package(Qt5Core)
+find_package(Qt5Gui)
+find_package(Qt5Widgets)
+find_package(Qt5Network)
+find_package(Qt5Script)
+find_package(Qt5ScriptTools)
+find_package(Qt5PrintSupport)
+find_package(libmongocxx REQUIRED)
+
+add_definitions(-DLOKI_CLASS_LEVEL_THREADING -DWINDOWS -D_WINDOWS)
+add_definitions(-DWIN32_LEAN_AND_MEAN)
+
+include_directories($ENV{VISA_HOME}/include)
+include_directories($ENV{MONGO_HOME}/include)
+include_directories($ENV{MONGO_HOME}/include)
+#include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
+include_directories($ENV{LOKI_HOME}/include)
+include_directories($ENV{OMNIBUS_HOME}/include)
+include_directories($ENV{SM_HOME}/SM/target/BOS/BOS_h)
+include_directories($ENV{SM_HOME}/SM/target/BRPO/BRPO_h)
+include_directories($ENV{SM_HOME}/SM/target/OPO/OPO_h)
+include_directories($ENV{SM_HOME}/SM/target/target_h)
+include_directories (${PROJECT_SOURCE_DIR}/cbk_imitator_real_po/real_tpo/Source)
+
+include_directories(${Qt5Core_INCLUDES})
+include_directories(${Qt5Script_INCLUDES})
+include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Qt5Gui_INCLUDES})
+include_directories(${Qt5Core_INCLUDES})
+include_directories(${Qt5Widgets_INCLUDES})
+include_directories(${Qt5Network_INCLUDES})
+include_directories(${Qt5PrintSupport_INCLUDES})
+include_directories(${Qt5ScriptTools_INCLUDES})
+include_directories(core/lexlib)
+include_directories(core/src)
+include_directories(core/Qt4)
+include_directories(core/qsci)	
+include_directories(core/lexers)
+include_directories(core/include)
+include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
+
+add_definitions(${Qt5PrintSupport_DEFINITIONS})
+add_definitions(-DQSCINTILLA_MAKE_DLL)
+add_definitions(-DQT)
+add_definitions(-DSCI_LEXER)
+add_definitions(-DNOMINMAX)
+
+include_directories("../lib/socket_rpc/include")
+include_directories("../vendor/libgit2/include")
+include_directories("../lib/frame_converter")
+include_directories("../lib/my_git")
+include_directories("../lib/common_functions")
+include_directories("../lib/db_ctrl")
+#include_directories("../lib/mongo_ctrl")
+include_directories("../vendor/QScintilla/core/Qt4")
+
+
+include_directories(${QT_QTSCRIPTTOOLS_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/../lib/mongo_ctrl_v3)
+include_directories(${PROJECT_SOURCE_DIR}/../ServerSide/MBK07)
+include_directories(${PROJECT_SOURCE_DIR}/../ServerSide/src/Devices/PUOP/OmniBus/omnibus_lib)
+include_directories("OMNIBUSBOX")
+include_directories("UNMDS32")
+include_directories("UNMFSK24")
+include_directories("buses_imitator")
+include_directories("LKA-05_imitator")
+include_directories("RM_MBK07_imitator")
+include_directories("LKAModules")
+include_directories("UNFOI")
+include_directories("UNOLS")
+include_directories("KPRD_imitator")
+include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
+
+include_directories("BECH_imitator")
+include_directories("buses_imitator")
+include_directories("cbk_imitator_real_po/real_tpo/MY_BOS")
+
+include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
+	
+set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${Qt5Gui_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
+	
+if(WIN32)
+	set(MY_WIN_FLAG WIN32)
+	set(CMAKE_CXX_FLAGS "/EHa /Zc:wchar_t")
+	set(ADDITIONAL_LIBS ws2_32)
+else()
+	set(ADDITIONAL_LIBS pthread)
+endif()
+
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{OMNIBUS_HOME}/lib $ENV{MONGO_HOME}/lib)
 
 SET (TMP1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) 
 SET (TMP2 ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
@@ -11,6 +114,12 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1})
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2}/stubs)
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3}/stubs)
 
+add_subdirectory(buses_imitator)
+add_subdirectory(AG7972)
+add_subdirectory(ASN_imitator)
+add_subdirectory(SORENSEN)
+add_subdirectory(N6705)
+add_subdirectory(IBEP_imitator)
 add_subdirectory(HPE1472)
 add_subdirectory(OMNIBUSBOX)
 add_subdirectory(UNADS128)
@@ -39,6 +148,69 @@ add_subdirectory(SCHWARZ_stub)
 add_subdirectory(TEST1003)
 add_subdirectory(UNMVI102)
 
+
+#add_subdirectory(bkupi_imitator)
+#add_subdirectory(tpo_imitator)
+#add_subdirectory(spobu_imitator)
+#add_subdirectory(cbk_imitator)
+add_subdirectory(cbk_imitator_real_po)
+add_subdirectory(mbk04_imitator)
+add_subdirectory(LKAModules)
+
+add_subdirectory(LKA-05_imitator)
+add_subdirectory(MBK-07_imitator)
+add_subdirectory(BECH_imitator)
+add_subdirectory(MBK-02_imitator)
+add_subdirectory(KPRD_imitator)
+add_subdirectory(BOOP_imitator)
+add_subdirectory(R732_imitator)
+add_subdirectory(R733_imitator)
+add_subdirectory(RM_MBK07_imitator)
+add_subdirectory(MKI_imitator)
+
+
+
+#set(SOURCES "cbk_imitator/main.cpp")
+file(GLOB_RECURSE SOURCES *.cpp *.c)
+file(GLOB_RECURSE HEADERS *.h)
+#file(GLOB_RECURSE REMOVE_SOURCES "*main.cpp")
+file(GLOB_RECURSE REMOVE_SOURCES "tor_bk_t_new.cpp" "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp" "cbk_imitator/*.cpp" "spobu_imitator/*.cpp" "tpo_imitator/*.cpp" "*BUSES.cpp" "cbk_imitator_real_po/real_tpo/DebugUnit.c" "cbk_imitator_real_po/real_tpo/ProtoUnit1.c" "cbk_imitator_real_po/real_tpo/ProtoUnit2.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Erti.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Koi.c" "DllMain.cpp" "cbk_imitator_real_po/*.cpp" "cbk_imitator_real_po/*.c" "kpiu_server_plugin.cpp")
+file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h" "cbk_imitator/*.h" "spobu_imitator/*.h" "tpo_imitator/*.h" "*BUSES.h" "cbk_imitator_real_po/*.h" "kpiu_server_plugin.h")#Выделить заголовочные файлы МКО в отдельную папку
+#list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
+list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
+list(REMOVE_ITEM HEADERS ${REMOVE_HEADERS})
+list(APPEND SOURCES ${PROJECT_SOURCE_DIR}/main.cpp)
+#file(GLOB to_remove main.cpp)
+#list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
+#list(REMOVE_ITEM SOURCES ${PROJECT_SOURCE_DIR}/cbk_imitator/main.cpp)
+
+add_executable(KPIU WIN32 ${SOURCES} ${HEADERS} icon.rc)
+
+ADD_CUSTOM_COMMAND(TARGET Stubs
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/kpiu_server.h ${PROJECT_SOURCE_DIR} kpiu
+)
+
+#QT5_ADD_RESOURCES(KPIU_SERVER_RESOURCES kpiu_plugin.qrc)
+set(KPIU_SERVER_plugin_SOURCES KPIU_server_plugin.h  KPIU_server_plugin.cpp ${PROJECT_SOURCE_DIR}/kpiu_rpc.h ${PROJECT_SOURCE_DIR}/kpiu_rpc.cpp)
+
+add_library(kpiu_server_plugin SHARED ${KPIU_SERVER_plugin_SOURCES} ${KPIU_SERVER_RESOURCES} )
+target_link_libraries(kpiu_server_plugin ${Qt5Core_LIBRARIES}  ${Qt5Widgets_LIBRARIES} common_functions db_ctrl mongo_controller_v3 socket_rpc)
+
+target_link_libraries(KPIU ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+                                      ${Boost_LIBRARIES} ${Qt5Script_LIBRARIES} ${ADDITIONAL_LIBS} BTICARD BTI1553 socket_rpc 
+									   mongo_controller_v3 ${LIBMONGOCXX_LIBRARIES} qscintilla db_ctrl git2 my_git common_functions unfoi_32 frame_converter
+									   $ENV{VISA_LIBS} ) 
+
+if(WIN32)
+	qt5_use_modules(KPIU Core Widgets Network Gui)
+	# SET_TARGET_PROPERTIES(MBK-02_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+endif()
+
+qt5_use_modules(kpiu_server_plugin Core Widgets)
+
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1}) 
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3})
+
+QT5_ADD_RESOURCES(kpiu_server_plugin common_functions.qrc) #что делает?

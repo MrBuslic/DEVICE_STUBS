@@ -1,58 +1,35 @@
-extern "C"
-{
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
 #include <unmds32.h>
+#if defined(__cplusplus) || defined(__cplusplus__)
 }
+#endif
+#include <socket_rpc.h>
 #include <windows.h>
-/*
-// Объявляем функцию DllMain
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-      DWORD fdwReason, LPVOID lpvReserved)
-{
+#include "mds32_rpc.h"
+#include "rpc_ports.h"
+#include "unmds32_h.h"
 
-switch (fdwReason)      // Дерево разбора уведомлений
-{
-  case DLL_PROCESS_ATTACH: // Подключение DLL
-    MessageBox(NULL,"Подключение Заглушки UNMDS32 для Мезонина МДС-32","Использование заглушек!", MB_ICONINFORMATION);
+int mds_count = 0;
 
-    if (lpvReserved)  // Определение способа загрузки
-      MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    else
-      MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-    return 1; // успешная инициализация
+#if defined(__cplusplus) || defined(__cplusplus__)
+extern "C" {
+#endif
 
-  case DLL_PROCESS_DETACH: // Отключение DLL
-    // Здесь – освобождаем память, закрываем
-    // файлы и т.д.
-    break;
-
-  case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
-    // Здесь – если надо переходим на
-    // многопоточный режим работы с
-    // использованием средств синхронизации
-    // таких как критическая секция, мутанты,
-    // семафоры и т.д.
-    break;
-
-  case DLL_THREAD_DETACH:
-      //Уведомление о завершении потока
-    // Здесь – если надо освобождаем все ресурсы, 
-    // вязанные с завершившимся потоком. Какой именно
-    // поток завершился можно узнать просмотром списка
-    // потоков средствами TOOLHELP32
-    MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
-    break;
-
-  }
-return TRUE;    // Код возврата игнорируется
-}
-*/
-//--------------------- Initialize --------------------------------------------
+	//--------------------- Initialize --------------------------------------------
 #ifdef UNMDS32_OLD_INIT	
 ViStatus _VI_FUNC unmds32_init (ViSession arg0, ViUInt16 arg1, ViBoolean arg2,
                               ViBoolean arg3, ViSession *arg4){ return 0; }
 #else
 ViStatus _VI_FUNC unmds32_init (ViRsrc rsrcName, ViBoolean IDquery,
-                                 ViBoolean doReset, ViSession *mezvi){ return 0; }
+                                 ViBoolean doReset, ViSession *mezvi)
+{ 
+	Srpc_buffer_class::Instance();
+	mds_count++;
+	*mezvi = mds_count;
+	return 0; 
+}
 ViStatus _VI_FUNC unmds32_connect (ViSession mezvi, ViSession vi, ViUInt16 m_num, ViBoolean IDquery,
                                  ViBoolean doReset){ return 0; }
 #endif
@@ -90,7 +67,11 @@ ViStatus _VI_FUNC unmds32_sample_period (ViSession mvi, ViReal64 periodS){ retur
 ViStatus _VI_FUNC unmds32_sample_period_q (ViSession arg0, ViReal64 *arg1){ return 0; }
 
 //---------------------- Set input trigger ------------------------------
-ViStatus _VI_FUNC unmds32_input_trigger (ViSession mvi, ViBoolean state){ return 0; }
+ViStatus _VI_FUNC unmds32_input_trigger (ViSession mvi, ViBoolean state){
+	return Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_input_trigger(state);
+}
+
+
 ViStatus _VI_FUNC unmds32_input_trigger_group (ViSession mvi, ViBoolean state, ViUInt16 group){ return 0; }
 
 //---------------------- Query input trigger ------------------------------
@@ -114,7 +95,9 @@ ViStatus _VI_FUNC unmds32_sample_width_q (ViSession mvi,ViPUInt16 n,ViPUInt16 nB
 ViStatus _VI_FUNC unmds32_config_trigger (ViSession arg0, ViUInt16 arg1){ return 0; }
 
 //---------------------
-ViStatus _VI_FUNC unmds32_start (ViSession mvi){ return 0; }
+ViStatus _VI_FUNC unmds32_start (ViSession mvi){ 
+	return Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_start();
+}
 
 //---------------------
 ViStatus _VI_FUNC unmds32_state (ViSession arg0, ViBoolean *arg1){ return 0; }
@@ -126,8 +109,19 @@ ViStatus _VI_FUNC unmds32_stop (ViSession mvi){ return 0; }
 ViStatus _VI_FUNC unmds32_numReadyData (ViSession arg0, ViUInt32 *arg1){ return 0; }
 
 //--------------------- Read one sample --------------------------
-ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,
-		ViPUInt32 firstTime,ViPUInt32 lastTime){ return 0; }
+ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,ViPUInt32 firstTime,ViPUInt32 lastTime){
+	uint tmp_buf;
+	uint _firstTime;
+	uint _lastTime;
+	Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
+	*buf = tmp_buf;
+	*lastTime = _lastTime;
+	*firstTime = _firstTime;
+	
+	return 0;
+}
+
+
 //--------------------- Read data in block mode -----------------------------       
 ViStatus _VI_FUNC unmds32_read_block (ViSession mvi, ViUInt32 firstSample,
 					ViUInt32 numSamples,ViPUInt32 buf){ return 0; }
@@ -152,4 +146,6 @@ ViStatus _VI_FUNC unmds32_revision_query (ViSession mvi, ViChar _VI_FAR driverVe
 //-----------------------------                                    
 ViStatus _VI_FUNC unmds32_close (ViSession mvi){ return 0; }
 
-
+#if defined(__cplusplus) || defined(__cplusplus__)
+}
+#endif

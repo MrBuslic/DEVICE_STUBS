@@ -1,10 +1,53 @@
 #include <unis4.h>
+#include <socket_rpc.h>
+#include <windows.h>
+#include "is4_rpc.h"
+#include "rpc_ports.h"
+
+#ifndef SINGLETON_DEF
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#endif
+
+int is4_count = 0;
+
+class rpc_buffer_class
+{
+public:
+	QList<RPC_is4_SLOT_Thread*> is4_slot_thr;
+	QList<RPC_is4_SIGNAL_Thread*> is4_signal_thr;
+	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+private:
+	rpc_buffer_class()
+	{
+			for (int i = 0; i < 1; i++)
+		{
+			RPC_is4_SLOT_Thread* slot_thr = new RPC_is4_SLOT_Thread;
+			slot_thr->set_connection_params("127.0.0.1",  IS4_SLOT+ i);
+			slot_thr->start();
+			//if (!slot_thr.wait_connected(3))
+			//	return false;
+			RPC_is4_SIGNAL_Thread* signal_thr = new RPC_is4_SIGNAL_Thread;
+			signal_thr->set_connection_params("127.0.0.1", IS4_SIGNAL + i);
+			signal_thr->start();
+			//if (!signal_thr.wait_connected(3))
+			//	return false;
+			is4_slot_thr.push_back(slot_thr);
+			is4_signal_thr.push_back(signal_thr);
+		}
+	}
+};
+
+SINGLETON_DEF(rpc_buffer_class);
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
 #endif
 //	Функция установки текущего исполняемого процесса
-ViStatus _VI_FUNC unis4_SetTypeProcess (ViSession vi, ViInt32 ExeProcess){ return 0; }
+ViStatus _VI_FUNC unis4_SetTypeProcess (ViSession vi, ViInt32 ExeProcess)
+{ 
+	Srpc_buffer_class::Instance().is4_slot_thr[vi - 1]->get_is4_obj()->unis4_SetTypeProcess(ExeProcess);
+	return 0; 
+}
 //	Функция запроса текущего исполняемого процесса
 ViStatus _VI_FUNC unis4_SetTypeProcess_Q (ViSession vi, ViPInt32 ExeProcess){ return 0; }
 //	Функция установки разрешения или запрета завершения процессов по прерыванию
@@ -17,13 +60,22 @@ ViStatus _VI_FUNC unis4_InterruptEndProcess_Q (ViSession vi, ViPInt32 ModeEndMea
 //	ФУНКЦИИ УСТАНОВКИ ПАРАМЕТРОВ, ОБЩИХ ДЛЯ ВСЕХ ПРОЦЕССОВ ИЗМЕРЕНИЯ
 //======================================================================
 //	Функция установки диапазона установленного измерения 
-ViStatus _VI_FUNC unis4_RangeMeas (ViSession vi, ViInt32 Range){ return 0; }
+ViStatus _VI_FUNC unis4_RangeMeas (ViSession vi, ViInt32 Range)
+{
+
+
+	return 0; 
+}
 //	Функция запроса диапазона установленного измерения
 ViStatus _VI_FUNC unis4_RangeMeas_Q (ViSession vi, ViPInt32 Range){ return 0; }
 //	Функция установки времени интегрирования
 //	Коды времени интегрирования
 //#define IS4_TimeAper16ms	4//код времени интегрирования 16,67 мс (для питающей сети с частотой 60 Гц)
-ViStatus _VI_FUNC unis4_Aper (ViSession vi, ViInt32 NumbAper){ return 0; }
+ViStatus _VI_FUNC unis4_Aper (ViSession vi, ViInt32 NumbAper)
+{ 
+	
+	return 0; 
+}
 //	Функция запроса номера времени интегрирования
 ViStatus _VI_FUNC unis4_Aper_Q (ViSession vi, ViPInt32 NumbAper){ return 0; }
 //	Функция установки количества измерений в одном запуске
@@ -32,7 +84,12 @@ ViStatus _VI_FUNC unis4_NumbMeasOneStart (ViSession vi, ViInt32 NumbMeas){ retur
 //	Функция запроса количества измерений в одном запуске
 ViStatus _VI_FUNC unis4_NumbMeasOneStart_Q (ViSession vi, ViPInt32 NumbMeas){ return 0; }
 //	Функция установки разрешения автокалибровки ноля при измерении
-ViStatus _VI_FUNC unis4_AutoClbrNull (ViSession vi, ViInt32 AutoClbrNull){ return 0; }
+ViStatus _VI_FUNC unis4_AutoClbrNull (ViSession vi, ViInt32 AutoClbrNull)
+{
+
+
+	return 0; 
+}
 //	Функция запроса разрешения автокалибровки ноля при измерении
 ViStatus _VI_FUNC unis4_AutoClbrNull_Q (ViSession vi, ViPInt32 AutoClbrNull){ return 0; }
 
@@ -72,7 +129,12 @@ ViStatus _VI_FUNC unis4_CurrLimit_Q (ViSession vi, ViPReal64 CurrLimit){ return 
 
 ViStatus _VI_FUNC unis4_VoltT_FVoltDC (ViSession vi,
 						ViInt32 RangeV, ViReal64 VoltT,
-						ViReal64 TimGrow, ViReal64 TimDiscon){ return 0; }
+						ViReal64 TimGrow, ViReal64 TimDiscon)
+{
+
+
+	return 0; 
+}
 //	Функция запроса диапазона измерения, испытательного напряжения,
 //	времени нарастания, времени снятия
 ViStatus _VI_FUNC unis4_VoltT_FVoltDC_Q (ViSession vi,
@@ -144,7 +206,15 @@ ViStatus _VI_FUNC unis4_StartProcess (ViSession vi){ return 0; }
 //	Функция остановки процесса измерения или формирования
 ViStatus _VI_FUNC unis4_StopProcess (ViSession vi){ return 0; }
 //	Функция запроса данных измерения
-ViStatus _VI_FUNC unis4_ResultMeas (ViSession vi, ViReal64 ResultMeas[], ViPInt32 NumbResult){ return 0; }
+ViStatus _VI_FUNC unis4_ResultMeas (ViSession vi, ViReal64 ResultMeas[], ViPInt32 NumbResult)
+{ 
+	double resmeas;
+	uint numres;
+ 	Srpc_buffer_class::Instance().is4_slot_thr[vi - 1]->get_is4_obj()->unis4_ResultMeas(resmeas, numres);
+	*NumbResult = numres;
+	*ResultMeas = resmeas;
+	return 0; 
+}
 //	Функция запроса частоты напряжения переменного тока
 ViStatus _VI_FUNC unis4_ResultMeasFreq (ViSession vi, ViPReal64 ResultMeasFreq){ return 0; }
 //	Функция запроса текущего состояния процесса в инструменте
@@ -154,20 +224,39 @@ ViStatus _VI_FUNC unis4_StatusProcess (ViSession vi, ViPUInt16 StatusMeas){ retu
 //	константы общего состояния инструмента
 ViStatus _VI_FUNC unis4_status_Q (ViSession vi, ViPInt32 StatusDev){ return 0; }
 //	Функция запуска конфигурации парам.установленного процесса
-ViStatus _VI_FUNC unis4_StartConfig (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unis4_StartConfig (ViSession vi)
+{
+
+	return 0;
+}
 //	Функция калибровки аппаратуры
-ViStatus _VI_FUNC unis4_StartCalibr (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unis4_StartCalibr (ViSession vi)
+{ 
+
+
+	return 0;
+}
 
 //********************************************************************************************
 //	ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ УПРАВЛЕНИЯ ПРОЦЕССАМИ
 //	ИЗМЕРЕНИЯ ИЛИ ФОРМИРОВАНИЯ
 //======================================================================
 //	Запуск процесса включения напряжения
-ViStatus _VI_FUNC unis4_IncludeVolt (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unis4_IncludeVolt (ViSession vi)
+{
+
+
+	return 0; 
+}
 //	Запуск процесса включения источника тока
 ViStatus _VI_FUNC unis4_IncludeCurr (ViSession vi){ return 0; }
 //	Запуск процесса чтения АЦП
-ViStatus _VI_FUNC unis4_StartACP (ViSession vi){ return 0; }
+ViStatus _VI_FUNC unis4_StartACP (ViSession vi)
+{ 
+	Srpc_buffer_class::Instance().is4_slot_thr[vi - 1]->get_is4_obj()->unis4_StartACP();
+
+	return 0;
+}
 //********************************************************************************************
 //********************************************************************************************
 //********************************************************************************************
@@ -199,7 +288,13 @@ ViStatus _VI_FUNC unis4_testOK_off2 (ViSession vi, ViPInt16 test_result,
 /*======================================================================*/
 /*  Инициализация														*/
 ViStatus _VI_FUNC unis4_init (ViRsrc rsrcName,
-						ViBoolean id_query,ViBoolean reset,ViPSession vi){ return 0; }
+						ViBoolean id_query,ViBoolean reset,ViPSession vi)
+{ 
+	Srpc_buffer_class::Instance();
+	is4_count++;
+	*vi = is4_count;
+	return 0;
+}
 /*----------------------------------------------------------------------*/
 /*  Закрытие сеанса инструмента											*/
 ViStatus _VI_FUNC unis4_close (ViSession vi){ return 0; }

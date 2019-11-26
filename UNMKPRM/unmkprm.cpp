@@ -1,4 +1,9 @@
+#include <socket_rpc.h>
 #include <unmkprm.h>
+#include <windows.h>
+#include "mkprm_rpc.h"
+#include "rpc_ports.h"
+#include "unmkprm_h.h"
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
@@ -36,11 +41,19 @@ ViStatus _VI_FUNC unmkprm_mode_cycle (
 
 ViStatus _VI_FUNC unmkprm_start (
 							ViSession mvi
-							){ return 0; }
+							)
+{ 
+	Srpc_buffer_class::Instance().mkprm_slot_thr.get_mkprm_obj()->unmkprm_start();
+	return 0; 
+}
 
 ViStatus _VI_FUNC unmkprm_stop (
 							ViSession mvi
-							){ return 0; }
+							)
+{
+	Srpc_buffer_class::Instance().mkprm_slot_thr.get_mkprm_obj()->unmkprm_stop();
+	return 0; 
+}
 
 ViStatus _VI_FUNC unmkprm_inp_type (
 							ViSession mvi, 
@@ -99,7 +112,22 @@ ViStatus _VI_FUNC unmkprm_read_str_packet (
 							ViInt8 _VI_FAR data[], 
 							ViInt8 _VI_FAR mask[], 
 							ViPInt32 nreadstr
-							){ return 0; }
+							)
+{
+	QVariantList string_data;
+	int tmp_begin = 0;
+	int tmp_string_size;
+	Srpc_buffer_class::Instance().mkprm_slot_thr.get_mkprm_obj()->unmkprm_get_strings(needStr, string_data);
+	for (int i = 0; i < string_data.size(); i++)
+	{
+		QByteArray& tmp_string = string_data[i].toByteArray();
+		tmp_string_size = tmp_string.size();
+		std::copy(tmp_string.data(), tmp_string.data() + tmp_string_size, data + tmp_begin);
+		tmp_begin += tmp_string_size;
+	}
+	*nreadstr = string_data.size();
+	return 0; 
+}
 
 ViStatus _VI_FUNC unmkprm_state_q (
 							ViSession mvi, 

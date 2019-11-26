@@ -1,40 +1,5 @@
 #include "foi_rpc.h"
 
-void RPC_foi_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("foi slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("foi slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("foi slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_foi_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("foi signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("foi signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("foi signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_foi_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_foi_SLOT_Object>(new RPC_foi_SLOT_Object(addr, port));
@@ -64,18 +29,10 @@ void RPC_foi_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
 
 void RPC_foi_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_foi_SIGNAL_Object::foi_interrupt)) {
-		SRPCSignalClass::Instance().toLog("foi_interrupt connected");
-		emit connect_signal("foi_interrupt(int, short, double, double)", true);
-	}
 }
 
 void RPC_foi_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_foi_SIGNAL_Object::foi_interrupt)) {
-		SRPCSignalClass::Instance().toLog("foi_interrupt disconnected");
-		//emit connect_signal("foi_interrupt(int, short, double, double)", false);
-	}
 }
 
 void RPC_foi_SIGNAL_Object::read_data()
@@ -106,30 +63,11 @@ void RPC_foi_SIGNAL_Object::read_data()
 		{
 			QString op_name;
 			tmp_stream >> op_name;
+			int call_number;
+			tmp_stream >> call_number;
 
 			SRPCSignalClass::Instance().toLog("foi new signal " + op_name);
 
-			if (op_name == "foi_interrupt(int, short, double, double)")
-			{
-				int _n;
-				tmp_stream >> _n;
-				short _chan;
-				tmp_stream >> _chan;
-				double _u;
-				tmp_stream >> _u;
-				double _t;
-				tmp_stream >> _t;
-				emit foi_interrupt(_n, _chan, _u, _t);
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("foi signal finished " + op_name);
-			}
 		}
 	}
 }
@@ -138,41 +76,43 @@ void RPC_foi_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_foi_SLOT_Object::auto_scroll_clicked(int _state)
+int RPC_foi_SLOT_Object::unfoi_map_channels_setup(int _n, int _chan)
 {
+	if(!connected) return 1;
 	QVariantList tmp_list;
-	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog("foi dynamic_call auto_scroll_clicked");
-	dynamic_call("auto_scroll_clicked(int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("foi dynamic_call finished auto_scroll_clicked");
-}
-void RPC_foi_SLOT_Object::log_timer_ontimer()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("foi dynamic_call log_timer_ontimer");
-	dynamic_call("log_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("foi dynamic_call finished log_timer_ontimer");
+	QString tmp_ret_params;
+	tmp_list << QVariant(_n);
+	tmp_list << QVariant(_chan);
+	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call unfoi_map_channels_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("unfoi_map_channels_setup(int, int)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call finished unfoi_map_channels_setup %1").arg(tmp_ret_params));
+	return res.toInt();
 }
 int RPC_foi_SLOT_Object::unfoi_chan_setup(int _n, short _chan, double _u, double _t)
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
+	QString tmp_ret_params;
 	tmp_list << QVariant(_n);
 	tmp_list << QVariant(_chan);
 	tmp_list << QVariant(_u);
 	tmp_list << QVariant(_t);
-	SRPCSignalClass::Instance().toLog("foi dynamic_call unfoi_chan_setup");
+	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call unfoi_chan_setup %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unfoi_chan_setup(int, short, double, double)", tmp_list);
-	SRPCSignalClass::Instance().toLog("foi dynamic_call finished unfoi_chan_setup");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call finished unfoi_chan_setup %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 int RPC_foi_SLOT_Object::unfoi_run()
 {
 	if(!connected) return 1;
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog("foi dynamic_call unfoi_run");
+	QString tmp_ret_params;
+	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call unfoi_run %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("unfoi_run()", tmp_list);
-	SRPCSignalClass::Instance().toLog("foi dynamic_call finished unfoi_run");
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("foi dynamic_call finished unfoi_run %1").arg(tmp_ret_params));
 	return res.toInt();
 }
 

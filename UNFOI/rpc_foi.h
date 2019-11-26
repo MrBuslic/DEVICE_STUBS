@@ -16,38 +16,30 @@
 #include <qlayout.h>
 #include <loki/Singleton.h>
 
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#include "../buses_imitator/interrupt_bus_rpc.h"
 
+#ifndef SINGLETON_DEF
+#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
+#endif
 class RpcFoiWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcFoiWidget();
+	RpcFoiWidget(QWidget* parent = 0);
 public slots:
-
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
-
+	int unfoi_map_channels_setup(int _n, int _chan);
 	int unfoi_chan_setup(int _n, short _chan, double _u, double _t);
 	int unfoi_run();
 private:
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
-	QStringList log_buffer;
-	QMutex log_mutex;
-
 	int n;
+	double u, t;
 	short chan;
-	double u;
-	double t;
-signals:
-	void foi_interrupt(int _n, short _chan, double _u, double _t);
+	LogWidget* log_widget;
+
+	QMap<int, int> map_channels;//словарь исправности каналов
+
+	RPC_interrupt_bus_SLOT_Thread interrupt_slot_thr;
+	RPC_interrupt_bus_SIGNAL_Thread interrupt_signal_thr;
 };
 
 #endif //RPC_FOI_H

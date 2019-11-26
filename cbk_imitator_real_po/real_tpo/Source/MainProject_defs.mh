@@ -1,0 +1,14 @@
+MAKEDIR=D:/SUBMIC/TSRP/CDS/MAKE
+PROJECTDIR=D:/Roman/TPO/Source
+MainProject_Prep=0
+
+MainProject_Added_CppFlags=-D__MACHINE__=__CBK__ -D_TOPSEG_OFF_ -D_NOK_2_MOD_
+MainProject_Added_CFlags=-D__MACHINE__=__CBK__ -D_TOPSEG_OFF_ -D_NOK_2_MOD_ -O2
+MainProject_Added_AsFlags=
+MainProject_Added_LdFlags=
+
+MainProject_Include=$(SubMicPath)/Target/BOS/BOS_h; $(SubMicPath)/Target/OPO/OPO_h; $(SubMicPath)/TSRP/CDS/INCLUDE; $(SubMicPath)/Target/Target_h; $(SubMicPath)/Target/BRPO/BRPO_h;
+MainProject_Lib=$(SubMicPath)/Target/BOS/CBK/LIB/libBOS.a; $(SubMicPath)/TSRP/CDS/LIB/libR3.a
+
+MainProject_Prf=D:/Roman/TPO/Source/MainUnit.c D:/Roman/TPO/Source/DataUnit.c D:/Roman/TPO/Source/FuncUnit.c D:/Roman/TPO/Source/IrqHandlerUnit.c D:/Roman/TPO/Source/MkoXchgUnit.c D:/Roman/TPO/Source/ControlUnit.c D:/Roman/TPO/Source/CrcUnit.c D:/Roman/TPO/Source/CmdHandlerUnit.c D:/Roman/TPO/Source/DebugUnit.c D:/Roman/TPO/Source/CmdHandlerKoiUnit.c D:/Roman/TPO/Source/CmdHandlerErtiUnit.c D:/Roman/TPO/Source/IrqHandlerKoiUnit.c D:/Roman/TPO/Source/IrqHandlerErtiUnit.c D:/Roman/TPO/Source/PeriodicMkoMsgUnit.c D:/Roman/TPO/Source/ProhibitedMkoMsgUnit.c D:/Roman/TPO/Source/PacketMkoMsgUnit.c D:/Roman/TPO/Source/MkoMirrorUnit.c D:/Roman/TPO/Source/MkoStressTestUnit.c D:/Roman/TPO/Source/BkoiUnit.c D:/Roman/TPO/Source/BkoiTableUnit.c D:/Roman/TPO/Source/BaloiUnit_v11.c 
+MainProject_Dep=D:/Roman/TPO/Source/VersionProject.e 

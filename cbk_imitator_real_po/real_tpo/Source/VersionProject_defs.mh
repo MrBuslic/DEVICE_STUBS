@@ -1,0 +1,14 @@
+MAKEDIR=D:/SUBMIC/TSRP/CDS/MAKE
+PROJECTDIR=D:/Roman/TPO/Source
+VersionProject_Prep=0
+
+VersionProject_Added_CppFlags=-D__MACHINE__=__CBK__ -D_TOPSEG_OFF_ -D_NOK_2_MOD_
+VersionProject_Added_CFlags=-D__MACHINE__=__CBK__ -D_TOPSEG_OFF_ -D_NOK_2_MOD_ -O2
+VersionProject_Added_AsFlags=
+VersionProject_Added_LdFlags=
+
+VersionProject_Include=$(SubMicPath)/Target/BOS/BOS_h; $(SubMicPath)/Target/OPO/OPO_h; $(SubMicPath)/TSRP/CDS/INCLUDE; $(SubMicPath)/Target/Target_h; $(SubMicPath)/Target/BRPO/BRPO_h;
+VersionProject_Lib=$(SubMicPath)/Target/BOS/CBK/LIB/libBOS.a; $(SubMicPath)/TSRP/CDS/LIB/libR3.a
+
+VersionProject_Prf=D:/Roman/TPO/Source/VersionUnit.c 
+VersionProject_Dep=

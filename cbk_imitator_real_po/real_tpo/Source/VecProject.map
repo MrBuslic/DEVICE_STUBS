@@ -1,0 +1,1022 @@
+**FILES**
+
+  D:/Roman/TPO/Source/VecUnit.o
+00000000 00000000 2** 4d .text
+00000000 000002d0 2** 4d .data
+00000000 00000000 2** 4d .bss
+00000000 00000018 2** 2d .reginfo
+00000000 0000054c 2** 2d .stab
+00000000 00002548 2** 0d .stabstr
+
+  D:/Roman/TPO/Source/MainProject.e
+ symbols only
+
+**GLOBAL SYMBOLS**
+
+offset    section    offset   symbol
+00000290  .sbss      00081130 Pause_BUM
+00000000  .sbss      00080ea0 CbkConfig
+00022580  .text      1fca2680 synchRecIncVM
+00000298  .sbss      00081138 Pause_OTKL_AFAR
+00000004  .sbss      00080ea4 AsnStatusPrevTime
+0000025c  .sbss      000810fc MkoStressMsgCount
+0000a7f0  .text      1fc8a8f0 CheckFsvuPower
+000080e8  .text      1fc881e8 ControlOkNumberToDevice
+00022190  .text      1fca2290 taskAllDelete
+00000e74  .data      00080e78 Control_NumList1C
+0001cd8c  .text      1fc9ce8c Irq13Msg0x8756
+000001e0  .sbss      00081080 PacketMkoIntQueueCount
+00000770  .data      00080774 Control_AddrList1D
+0000e370  .text      1fc8e470 KpaCommand37
+00022490  .text      1fca2590 WdReset
+00022110  .text      1fca2210 taskInipTime
+00007130  .text      1fc87230 CheckMkoXchg
+000212e0  .text      1fca13e0 BaloiPeriodicTask
+00012168  .text      1fc92268 GetPeriodicMkoMsgLock
+00022500  .text      1fca2600 sprIQClear
+0001d4f0  .text      1fc9d5f0 Irq13Msg0xC918
+000b4110  .bss       00135390 Baloi_PackList
+0000029c  .sbss      0008113c BUFAR_Sbros
+00000000  .bss       00081280 FailVmDiag
+0000000c  .sbss      00080eac TestTaskIn
+00000008  .sbss      00080ea8 CbkErrCtrlCallBackType
+00001000  .bss       00082280 ReConfigBuffer
+0001c414  .text      1fc9c514 Irq13SendMsgBn
+00000e50  .data      00080e54 Control_NumList13
+0001e27c  .text      1fc9e37c Control_AFAR_Fail
+00000010  .sbss      00080eb0 MainTaskPdoCount
+00022050  .text      1fca2150 Control_BUFAR
+00000014  .sbss      00080eb4 PostMdiDataSize
+0001da84  .text      1fc9db84 Irq13Msg0xDB3A
+00000018  .sbss      00080eb8 AsnStatusBeginTime
+00000020  .sbss      00080ec0 AsnPeriodicTaskTime
+0001eae4  .text      1fc9ebe4 Irq13CalcSum
+0001ea30  .text      1fc9eb30 Irq13Error
+00000848  .data      0008084c Control_NumList03
+0001371c  .text      1fc9381c InitProhibitedMkoMsg
+000002a0  .sbss      00081140 RedefinedTxRnsValue
+000002a2  .sbss      00081142 Irq13RxIndex
+000029c0  .text      1fc82ac0 HandleIrqBA
+00007bc4  .text      1fc87cc4 ControlCheckDevice
+0001e308  .text      1fc9e408 Irq13Msg0xDE3F
+00016064  .text      1fc96164 AddPacketMko_CntPiPo_IntToList
+000002a4  .sbss      00081144 Irq13BrtkMode2Enabled
+00000cd8  .text      1fc80dd8 MainTaskRun
+00000000  .data      1fdfdd00 _fdata
+00000ab8  .text      1fc80bb8 InitMkoMsgC
+000178a8  .text      1fc979a8 RunPacketMko_CntQue_PreparePacket1
+00018b50  .text      1fc98c50 KpaCommand65
+00019ac8  .text      1fc99bc8 MkoStressPreparePacket2
+1fc80000  *ABS*      1fc80000 SpoVersionCode
+000585d0  .bss       000d9850 Control_NumList
+000002a8  .sbss      00081148 Pause_Proverki_TM_AFAR
+00022350  .text      1fca2450 mkoWait
+000002ac  .sbss      0008114c Otriz_Kvit
+00000028  .sbss      00080ec8 MkoMsgPtrX
+0000c670  .text      1fc8c770 KpaCommand15
+00001010  .bss       00082290 MkoMsgResC
+00022100  .text      1fca2200 taskCreate
+00008298  .text      1fc88398 CSumLong
+000005f0  .data      000805f4 Control_AddrList07
+0000002c  .sbss      00080ecc ExtTaskCount
+00010230  .text      1fc90330 KpaCommand08
+000023bc  .text      1fc824bc MainTaskCheckCbkConfig
+000000f0  .data      000800f4 Control_AddrList02
+000041dc  .text      1fc842dc IrqHandler07
+00000030  .sbss      00080ed0 AsnIrqCount
+00014848  .text      1fc94948 RunPacketMkoSingleMsg
+00004504  .text      1fc84604 IrqHandler0B
+0001f5cc  .text      1fc9f6cc Irq13ReplyTypeRedefined
+000225f0  .text      1fca26f0 tlmSendOut
+00000d00  .data      00080d04 Control_NumList07
+0000021c  .sbss      000810bc MkoMirrorBadWords
+000c4910  .bss       00145b90 Irq13TxBuffer
+00002ce8  .text      1fc82de8 IrqHandler00
+00001120  .bss       000823a0 FlashDataBuffer
+00016b9c  .text      1fc96c9c RunPacketMko_SecQue_IntList
+000001b0  .sbss      00081050 Irq10PackRes
+00022c00  .text      1fca2d00 memmove
+0001aaa4  .text      1fc9aba4 MkoStressSendStatistic
+00014f40  .text      1fc95040 PacketMkoMsgStoreRxData
+000002b0  .sbss      00081150 Irq13PrevTxMsgLen
+000002b4  .sbss      00081154 Control_Tm_AFAR
+00000034  .sbss      00080ed4 DebugPackRes
+00022440  .text      1fca2540 taskErrExit
+00000038  .sbss      00080ed8 AsnMkoFailCount
+0000c54c  .text      1fc8c64c KpaCommand11
+000001c4  .sbss      00081064 XchgBTrack
+000220e0  .text      1fca21e0 __errno
+000136a8  .text      1fc937a8 ProhibitedMkoMsgDataCmp
+00012ef0  .text      1fc92ff0 KpaCommand61
+0000ceb8  .text      1fc8cfb8 KpaCommand26
+000678f0  .bss       000e8b70 PacketMkoMsgList
+000002b8  .sbss      00081158 Pause_MkoTx
+0001d1c0  .text      1fc9d2c0 Irq13Msg0xC312
+0001fc10  .text      1fc9fd10 Irq13LoadTableData
+000007d4  .data      000807d8 Control_NumList01
+000161b8  .text      1fc962b8 RunPacketMko_CntPiPo_IntList
+0000003c  .sbss      00080edc FlashDataAddr
+000001e4  .sbss      00081084 PacketMkoMsgCount
+000222d0  .text      1fca23d0 timeSet
+00000040  .sbss      00080ee0 BehWaitForFirstIrq
+000001d4  .sbss      00081074 PeriodicMkoMsgLock
+0001781c  .text      1fc9791c RunPacketMko_CntQue_CheckList
+000c5110  .bss       00146390 Baloi_DisabledReplyList
+00004a28  .text      1fc84b28 MkoXchgBn
+0000c1d4  .text      1fc8c2d4 BUPE_Chan1_Enable
+0000a834  .text      1fc8a934 CheckFsmuOK
+00022210  .text      1fca2310 taskReStart
+000002bc  .sbss      0008115c Control_BUM
+00014180  .text      1fc94280 ReadPacketMkoMsgData
+0001e788  .text      1fc9e888 Otkluchenie_AT_Fail
+1fdfdd18  *ABS*      1fdfdd18 _etext
+000053b0  .text      1fc854b0 MkoXchgBnMini
+000002c0  .sbss      00081160 RedefinedTxRns
+00000044  .sbss      00080ee4 AsnTaskDeltaTimeTimer
+000002c4  .sbss      00081164 LPH
+0000d5bc  .text      1fc8d6bc KpaCommand2D
+0000d904  .text      1fc8da04 KpaCommand31
+000001e8  .sbss      00081088 PacketMkoIntCount
+00041120  .bss       000c23a0 MkoMsgPtrC
+00000260  .sbss      00081100 MkoStressErrorCount
+0001e3b4  .text      1fc9e4b4 Irq13InfoMsg0x33D2
+00000e40  .data      00080e44 Control_NumList0F
+00015228  .text      1fc95328 RunPacketMkoSingleMsgResult
+000154f0  .text      1fc955f0 RunPacketMkoMultiMsgResult
+0000ea74  .text      1fc8eb74 KpaCommandFD
+0001c6e4  .text      1fc9c7e4 Irq13SendMsgAn
+1fe05fd0  *ABS*      1fe05fd0 _gp
+00000220  .sbss      000810c0 MkoMirrorWrLen
+000223b0  .text      1fca24b0 mkoNumPackMsgWait
+00011430  .text      1fc91530 IrqHandler02
+00022530  .text      1fca2630 synchRecInfArrVM
+00000048  .sbss      00080ee8 MkoPackResA
+000002c8  .sbss      00081168 Irq13SingleEvent
+000c5310  .bss       00146590 Baloi_DisabledMsgList
+0000c848  .text      1fc8c948 KpaCommand18
+0000004c  .sbss      00080eec BehControlEnabled
+0001e70c  .text      1fc9e80c Oper_0962
+0000831c  .text      1fc8841c CalcCrc32Done
+0001f8bc  .text      1fc9f9bc Irq13ChangeDebugReadList
+00000050  .sbss      00080ef0 KPADetected
+00009dec  .text      1fc89eec KpaCommand0CBase
+00014bdc  .text      1fc94cdc PacketMkoMsgPrepareBlock
+000002cc  .sbss      0008116c Baloi_DebugReadListCount
+000798f0  .bss       000fab70 PacketMkoIntQueue1List
+0000cedc  .text      1fc8cfdc CbkChanPowerOn
+00000054  .sbss      00080ef4 AsnPostDeltaTime
+00013e38  .text      1fc93f38 AddPacketMkoSingleMsg
+0002180c  .text      1fca190c Irq13PackSetup
+000121c0  .text      1fc922c0 AddPeriodicMkoMsg
+000001ec  .sbss      0008108c TrackPack
+0001d594  .text      1fc9d694 Irq13Msg0xD435
+00015704  .text      1fc95804 AddPacketMko_SecPiPo_MsgToInt
+0001c9b4  .text      1fc9cab4 Irq13MsgHandler
+00022780  .text      1fca2880 memcpy
+00058650  .bss       000d98d0 Control_ChangedList
+0001f9e0  .text      1fc9fae0 Irq13DoDebugReadBn
+0000d444  .text      1fc8d544 KpaCommand2C
+00000e28  .data      00080e2c Control_NumList09
+0001353c  .text      1fc9363c FindProhibitedMkoMsg
+00000058  .sbss      00080ef8 AsnWaitForFirstIrq
+000225d0  .text      1fca26d0 numVMGet
+00012ba8  .text      1fc92ca8 DoPeriodicMkoMsg
+00000600  .text      1fc80700 OpoToSpoHookProc
+0000836c  .text      1fc8846c KpaCommand01
+00011314  .text      1fc91414 Read733Config
+000002d0  .sbss      00081170 SAA_Ustanovlena
+000002d4  .sbss      00081174 Baloi_MkoPackSem
+00010130  .text      1fc90230 CheckVmDeSynch
+00012500  .text      1fc92600 DelPeriodicMkoMsg
+000c5510  .bss       00146790 KPI_Etalon
+0000cdf0  .text      1fc8cef0 KpaCommand21
+00021028  .text      1fca1128 Control_LPH
+000411b0  .bss       000c2430 DebugMki
+00003dc8  .text      1fc83ec8 IrqHandler06
+000221e0  .text      1fca22e0 taskPeriod
+000223a0  .text      1fca24a0 mkoNumPackStop
+00000d8c  .data      00080d90 Control_NumList08
+00000224  .sbss      000810c4 MkoMirrorXchgTotal
+000211d8  .text      1fca12d8 ReadExtMsgData
+000082bc  .text      1fc883bc CalcCrc32Init
+00000730  .data      00080734 Control_AddrList0D
+000131ec  .text      1fc932ec DelProhibitedMkoMsg
+00016348  .text      1fc96448 RunPacketMko_CntPiPo_CheckList
+00015980  .text      1fc95a80 RunPacketMko_SecPiPo_CheckList
+00000580  .text      1fc80680 AsnPeriodicTask
+00022510  .text      1fca2610 sprIMaskVec
+00000680  .data      00080684 Control_AddrList08
+0001dd80  .text      1fc9de80 Vkluchenie_AFAR
+0000ce4c  .text      1fc8cf4c KpaCommand23
+0001e404  .text      1fc9e504 Irq13Msg0xDD3C
+000421b0  .bss       000c3430 SubsDataBuffer
+00007128  .text      1fc87228 MkoXchgStub
+00000228  .sbss      000810c8 MkoMirrorRdLen
+000154cc  .text      1fc955cc RunPacketMkoMultiMsg
+000081e8  .text      1fc882e8 CalcCrc16
+0001d880  .text      1fc9d980 Control_ZTM
+00000860  .data      00080864 Control_NumList04
+00000764  .data      00080768 Control_AddrList1A
+0000005c  .sbss      00080efc MainTaskIn
+000c5b90  .bss       00146e10 Baloi_MkoPackMsg
+00000e6c  .data      00080e70 Control_NumList1A
+000429b0  .bss       000c3c30 MkoMsgResB
+0000022c  .sbss      000810cc MkoMirrorAddr
+00059650  .bss       000da8d0 Control_AddrList
+00042ac0  .bss       000c3d40 KpaCommand
+00042ad0  .bss       000c3d50 LastError
+00022250  .text      1fca2350 taskDelayTime
+00000060  .sbss      00080f00 FlashDataIndex
+00018b30  .text      1fc98c30 InitMkoStressTest
+00018194  .text      1fc98294 MkoMirrorDoXchg
+00000068  .sbss      00080f08 MkoPackX
+00022230  .text      1fca2330 VecStRead
+000022b8  .text      1fc823b8 SendCbkConfigToKPA
+000225c0  .text      1fca26c0 cfgSysGet
+00000070  .sbss      00080f10 AsnControlStopTime
+000002d8  .sbss      00081178 BUFAR
+0007a9f0  .bss       000fbc70 PacketMkoIntQueue0List
+000002dc  .sbss      0008117c LPH_Vkluchena
+0001e43c  .text      1fc9e53c Otkluchenie_AT
+000221c0  .text      1fca22c0 taskTimerMin
+00022290  .text      1fca2390 VecStCreate
+0000077c  .data      00080780 Control_NumList00
+0000d04c  .text      1fc8d14c KpaCommand29
+00017f10  .text      1fc98010 KpaCommand64
+00000080  .sbss      00080f20 AsnExcIrqCount
+00000078  .sbss      00080f18 BehEnabledZone
+00000084  .sbss      00080f24 BehPostDeltaTime
+00000e8c  .text      1fc80f8c CheckAsnDeltaTime
+000045c0  .text      1fc846c0 SendIrqMessageToKPA
+0001e7c0  .text      1fc9e8c0 Otkluchenie_BUM_AFAR
+00022380  .text      1fca2480 mkoBcInit
+0000ebf8  .text      1fc8ecf8 KpaCommandFE
+000001c8  .sbss      00081068 RES_STD_DBG
+00000000  *ABS*      00000000 _DYNAMIC_LINK
+00000088  .sbss      00080f28 AsnTimeIrqPrev
+00000090  .sbss      00080f30 AsnTaskDeltaTimeInterval
+00000750  .data      00080754 Control_AddrList15
+000c5e90  .bss       00147110 Baloi_PackMkoLine
+0001372c  .text      1fc9382c IsProhibitedMkoMsg
+000129e0  .text      1fc92ae0 GetPeriodicMkoMsgCount
+00000230  .sbss      000810d0 MkoMirrorRdChan
+00000094  .sbss      00080f34 AsnTaskDeltaTimeFlag
+00004f14  .text      1fc85014 MkoXchgBnStd
+00019a34  .text      1fc99b34 MkoStressPreparePacket1
+00042bd0  .bss       000c3e50 PostMdiDataBuf
+0000d09c  .text      1fc8d19c CbkChanPowerOff
+000220f0  .text      1fca21f0 taskTimerCorr
+0000276c  .text      1fc8286c MainTaskDoReplyImit
+0000c5e4  .text      1fc8c6e4 KpaCommand13
+00057a40  .bss       000d8cc0 Irq10PackMsgRes
+00000750  .text      1fc80850 DataInit
+00021c14  .text      1fca1d14 Irq13PackRun
+000c5eb0  .bss       00147130 Baloi_PackSendCount
+00000748  .data      0008074c Control_AddrList13
+00000098  .sbss      00080f38 BehExcFhvIrqCount
+0001f4ac  .text      1fc9f5ac Irq13ChangeDisabledCrcList
+0000ce70  .text      1fc8cf70 KpaCommand24
+00000e80  .data      00080e84 Control_NumList1F
+0000bbb4  .text      1fc8bcb4 KpaCommand0F
+00008c40  .text      1fc88d40 KpaCommand07
+000001b8  .sbss      00081058 Irq10Pack
+000225b0  .text      1fca26b0 synchMasterChVM
+0000009c  .sbss      00080f3c BehIrqCount
+00012c1c  .text      1fc92d1c ProcessPeriodicMkoMsg
+0001f2c4  .text      1fc9f3c4 Irq13ReplyIsDisabled
+00018f84  .text      1fc99084 MkoStressSendTest
+000000a0  .sbss      00080f40 CallBackCount
+00001b3c  .text      1fc81c3c DetectMkoLine
+000001dc  .sbss      0008107c ProhibitedMkoMsgCount
+00022550  .text      1fca2650 synchReadVM
+00022610  .text      1fca2710 tlmByteOut
+000000a4  .sbss      00080f44 BehIrqAlreadySet
+0000c6e8  .text      1fc8c7e8 KpaCommand17
+00000264  .sbss      00081104 MkoStressLinkErrorCount
+000002e0  .sbss      00081180 Otkl_AT
+000002e4  .sbss      00081184 KPI_Etalon_Len
+000001f0  .sbss      00081090 RunPacketBeginTime
+0001f1a4  .text      1fc9f2a4 Irq13ChangeDisabledMsgList
+000c5f30  .bss       001471b0 Baloi_MkoPackMsgRes
+000000a8  .sbss      00080f48 BehControlStopTime
+0000807c  .text      1fc8817c ControlResetDeviceState
+00022410  .text      1fca2510 testMDIGet
+000000b0  .sbss      00080f50 IrqTime
+0000e2d0  .text      1fc8e3d0 KpaCommand36
+000c6030  .bss       001472b0 Baloi_DisabledCrcList
+000009cc  .data      000809d0 Control_NumList06
+000221d0  .text      1fca22d0 taskInitDelay
+000441d0  .bss       000c5450 AsnTimeList
+00083d00  .bss       00104f80 MkoStressLastPackResult
+00022570  .text      1fca2670 synchRecEnable
+000037f0  .text      1fc838f0 IrqHandler05
+00022560  .text      1fca2660 synchInf
+000002e8  .sbss      00081188 KPI_Kvit
+000000b8  .sbss      00080f58 MkoMsgResX
+000002ec  .sbss      0008118c Irq13LastMsg
+000000c0  .sbss      00080f60 AsnIrqAlreadySet
+000157b0  .text      1fc958b0 RunPacketMko_SecPiPo_IntList
+0000b6a0  .text      1fc8b7a0 KpaCommand0E
+00057ad0  .bss       000d8d50 Irq10Data
+00022330  .text      1fca2430 semDelete
+00004528  .text      1fc84628 IrqHandler0C
+00017144  .text      1fc97244 RunPacketMko_SecQue_PreparePacket2
+000002f0  .sbss      00081190 Code_DB
+00022150  .text      1fca2250 taskIdListGet
+00001cf0  .text      1fc81df0 DeltaTimeMSec
+000001c0  .sbss      00081060 Irq10Result
+00000e2c  .data      00080e30 Control_NumList0A
+0001db6c  .text      1fc9dc6c Control_AFAR
+0001abf0  .text      1fc9acf0 Irq13InitSys
+00017bd8  .text      1fc97cd8 RunPacketMko_CntQue_PreparePacket2
+00012a24  .text      1fc92b24 AbonentToAbonentMkoMsg
+0001d5e8  .text      1fc9d6e8 Irq13Msg0xD839
+00000e5c  .data      00080e60 Control_NumList16
+0000e9a4  .text      1fc8eaa4 KpaCommandFB
+0001f140  .text      1fc9f240 Irq13MsgIsDisabled
+0000e5f8  .text      1fc8e6f8 KpaCommand3A
+000189f0  .text      1fc98af0 MkoMirrorSendDebugInfo
+00022140  .text      1fca2240 taskDelay
+0001d12c  .text      1fc9d22c Irq13Msg0x8455
+00000738  .data      0008073c Control_AddrList0F
+1fc80004  *ABS*      1fc80004 SpoVersionStr
+0000e8b8  .text      1fc8e9b8 KpaCommand40
+0001f448  .text      1fc9f548 Irq13CrcIsDisabled
+00003468  .text      1fc83568 IrqHandler04
+000000c4  .sbss      00080f64 MkoPackResC
+00000440  .rodata    1fca3510 Crc16Table
+0000073c  .data      00080740 Control_AddrList10
+00008190  .text      1fc88290 CalcCrc32
+0001a50c  .text      1fc9a60c MkoStressCheckRxPacket2
+0001faf8  .text      1fc9fbf8 Irq13DoDebugReadAn
+000069d4  .text      1fc86ad4 MkoXchgBnBlock
+000000c8  .sbss      00080f68 AsnEnabledZone
+00004630  .text      1fc84730 MkoXchgAn
+0001c258  .text      1fc9c358 Irq13MsgToFifo
+00022540  .text      1fca2640 synchWriteVM
+000224e0  .text      1fca25e0 sprIGetMask
+000002f4  .sbss      00081194 Control_ZTM_BUFAR
+0000167c  .text      1fc8177c MainTaskIdle
+00057f50  .bss       000d91d0 Irq10PackMsgBuf
+0002116c  .text      1fca126c K_BRTK_A
+00045df0  .bss       000c7070 VmStateData
+0001c1f8  .text      1fc9c2f8 Irq13SendMsgBnOverFifo
+000c6230  .bss       001474b0 Baloi_PackErrSendCount
+00000130  .text      1fc80230 ErrorTask
+00016104  .text      1fc96204 AddPacketMko_CntPiPo_MsgToInt
+000596d0  .bss       000da950 Control_StateList
+00000050  .data      00080054 Control_AddrList00
+0001e910  .text      1fc9ea10 Irq13Msg0x9C4D
+0007baf0  .bss       000fcd70 PacketMkoMsgResultBuf
+00000234  .sbss      000810d4 MkoMirrorXchgWithError
+0000aa2c  .text      1fc8ab2c CheckGenOK
+00000000  .data      00000000 TabVec
+0000bf60  .text      1fc8c060 KpaCommand10
+000221a0  .text      1fca22a0 taskVerify
+00000be0  .text      1fc80ce0 MainTaskInit
+0001f858  .text      1fc9f958 Irq13DebugReadIsEnabled
+0001d234  .text      1fc9d334 Irq13Msg0xC514
+000000d0  .sbss      00080f70 ErrorTaskIn
+00013994  .text      1fc93a94 KpaCommand63
+00045e50  .bss       000c70d0 PostMkiDataBuf
+000026fc  .text      1fc827fc MakeShbkBuffer
+00000128  .data      0008012c Control_AddrList03
+00004200  .text      1fc84300 IrqHandler08
+0001f650  .text      1fc9f750 Irq13ChangeReplyTypeList
+000002f8  .sbss      00081198 Komplekt_APD_MT
+00007218  .text      1fc87318 DECODE_XCHG_ERROR
+000002fc  .sbss      0008119c Irq13WaitReplyFlag
+0001e9e8  .text      1fc9eae8 Irq13InfoMsg0x5382
+0001d76c  .text      1fc9d86c Vkluchenie_BPA_AT
+000225e0  .text      1fca26e0 flashCorr
+00009938  .text      1fc89a38 KpaCommand0A_Koi
+00000e7c  .data      00080e80 Control_NumList1E
+000c62b0  .bss       00147530 Baloi_MkoPackMsgList
+00005568  .text      1fc85668 MkoXchgBnExt
+000002c0  .data      000002c0 sysDescSPO
+0000e9cc  .text      1fc8eacc KpaCommandFC
+000000d4  .sbss      00080f74 BehFhvPeriod
+0000774c  .text      1fc8784c Output
+0000e8f8  .text      1fc8e9f8 KpaCommand41
+000000d8  .sbss      00080f78 MkoPackC
+0001eb20  .text      1fc9ec20 Irq13MkoXchgBn
+0000072c  .data      00080730 Control_AddrList0C
+00008330  .text      1fc88430 KpaCommandUnknown
+0000075c  .data      00080760 Control_AddrList18
+000000e0  .sbss      00080f80 AsnControlEnabled
+00003270  .text      1fc83370 IrqHandler01
+00000300  .sbss      000811a0 Baloi_Send_Bau_OK_Time
+00045eb0  .bss       000c7130 MkoBufX
+00015158  .text      1fc95258 XchgSubAddrPacketMkoMsgList
+00013970  .text      1fc93a70 InitPacketMkoMsg
+00000740  .data      00080744 Control_AddrList11
+000001d0  .sbss      00081070 Control_ChangedCount
+00016a0c  .text      1fc96b0c AddPacketMko_SecQue_IntToList
+000224d0  .text      1fca25d0 sprIUnMask
+00000308  .sbss      000811a8 Baloi_DisabledCrcListCount
+0001a9cc  .text      1fc9aacc MkoStressSaveStateC
+00000000  .text      1fdfdd00 _ftext
+0001d5a8  .text      1fc9d6a8 Irq13Msg0xD736
+00045ef0  .bss       000c7170 SubsAddrBuffer
+000001f8  .sbss      00081098 PacketMkoIntCntCount
+0001e1b4  .text      1fc9e2b4 Otkl_kanalov_AFAR
+000113c0  .text      1fc914c0 Read733UpiConfig
+00000e64  .data      00080e68 Control_NumList18
+00022600  .text      1fca2700 tlmReadyOut
+0005f6f0  .bss       000e0970 ProhibitedMkoMsgList
+00007318  .text      1fc87418 ReplyToKpaNoData
+0001ea9c  .text      1fc9eb9c Irq13SingleEventMsg
+000c6330  .bss       001475b0 Baloi_ReplyTypeList
+00022630  .text      1fca2730 rand
+00045f30  .bss       000c71b0 B732PupsList
+0000030c  .sbss      000811ac Otkl_BPA_AT
+0001d15c  .text      1fc9d25c Irq13Msg0xCF1E
+00000310  .sbss      000811b0 Pause_MFS
+000000e8  .sbss      00080f88 MkoPackB
+0001e3fc  .text      1fc9e4fc Irq13Msg0x9647
+0001bdc4  .text      1fc9bec4 Irq13IdleTask
+00000268  .sbss      00081108 MkoStressTermErrorCount
+00052280  .bss       000d3500 MkoMsgPtrB
+0000e088  .text      1fc8e188 KpaCommand35
+000000f0  .sbss      00080f90 BehMissFinikIrqCount
+0000d80c  .text      1fc8d90c KpaCommand2E
+000000f4  .sbss      00080f94 AsnTaskOut
+00052310  .bss       000d3590 MkoBufStub
+000021ec  .text      1fc822ec SendNextPassMsgToKPA
+0000026c  .sbss      0008110c MkoStressNoOsErrorCount
+000223f0  .text      1fca24f0 testStart
+00000e4c  .data      00080e50 Control_NumList12
+000084b4  .text      1fc885b4 KpaCommand03
+0007db00  .bss       000fed80 PacketMkoIntList
+000c6730  .bss       001479b0 Vkl_AFAR_PRD
+0000cdc0  .text      1fc8cec0 KpaCommand20
+0000a938  .text      1fc8aa38 CheckFsvuOK
+00000318  .sbss      000811b8 Irq13LastRns
+00000430  .text      1fc80530 TestTask
+0001b648  .text      1fc9b748 Irq13Handler
+00013010  .text      1fc93110 AddProhibitedMkoMsg
+00014e28  .text      1fc94f28 PacketMkoMsgCheckMessages
+00017524  .text      1fc97624 AddPacketMko_CntQue_MsgToInt
+0000031c  .sbss      000811bc Nomer_Shetverti
+000001fc  .sbss      0008109c TrackPackCount
+000166dc  .text      1fc967dc RunPacketMko_CntPiPo_PreparePacket2
+0000a540  .text      1fc8a640 DisableMBK07x
+000010c0  .text      1fc811c0 AsnControlProc
+000215ec  .text      1fca16ec Irq13PackReset
+000129f4  .text      1fc92af4 ClrPeriodicMkoMsgList
+00000e44  .data      00080e48 Control_NumList10
+00000320  .sbss      000811c0 Irq13CmdFifoHead
+00002080  .text      1fc82180 SendMdiDataToKPA
+0001d2a8  .text      1fc9d3a8 Irq13Msg0xA021
+0000ce24  .text      1fc8cf24 KpaCommand22
+00022400  .text      1fca2500 ErrVMDIget
+00000228  .data      0008022c Control_AddrList05
+00000e78  .data      00080e7c Control_NumList1D
+00008958  .text      1fc88a58 KpaCommand05
+0007ec00  .bss       000ffe80 PacketMkoMsgResultList
+0000dfa8  .text      1fc8e0a8 KpaCommand34
+000000f8  .sbss      00080f98 BehExcIrqCount
+00020ed0  .text      1fca0fd0 Vkluchenie_LPH
+0001ee30  .text      1fc9ef30 Irq13MkoXchgAn
+000000fc  .sbss      00080f9c MainTaskCmdFail
+00022670  .text      1fca2770 memcmp
+00000270  .sbss      00081110 MkoStressShowLastPackResult
+000222f0  .text      1fca23f0 timeRead
+00000100  .sbss      00080fa0 AsnTimerFailCount
+00059ed0  .bss       000db150 Control_DeviceList
+00000e30  .data      00080e34 Control_NumList0B
+00000200  .sbss      000810a0 LastResult
+00052350  .bss       000d35d0 MkoMsgB
+000145e8  .text      1fc946e8 PacketMkoMsgDataCmp
+00000274  .sbss      00081114 MkoStressMsgErrorCount
+00000324  .sbss      000811c4 Komplekt_ALPS
+00000328  .sbss      000811c8 Baloi_ReplyTypeListCount
+000108a0  .text      1fc909a0 KpaCommand0B
+00000104  .sbss      00080fa4 BehMissFhvIrqCount
+00019b5c  .text      1fc99c5c MkoStressCheckTxPacket1
+00000734  .data      00080738 Control_AddrList0E
+00022160  .text      1fca2260 taskVsListGet
+0001761c  .text      1fc9771c RunPacketMko_CntQue_IntList
+0000010c  .sbss      00080fac MkoPackResB
+00000108  .sbss      00080fa8 AsnMissIrqCount
+000c6b90  .bss       00147e10 Tm_AFAR_BUM
+00022130  .text      1fca2230 taskResume
+00000110  .sbss      00080fb0 BehFhvIrqCount
+00022260  .text      1fca2360 taskIdVerify
+00022200  .text      1fca2300 taskIdSelf
+000159e4  .text      1fc95ae4 RunPacketMko_SecPiPo_PreparePacket1
+00000118  .sbss      00080fb8 PostParam
+00000114  .sbss      00080fb4 AsnTimeListSize
+00000814  .data      00080818 Control_NumList02
+0000d024  .text      1fc8d124 KpaCommand28
+00000640  .rodata    1fca3710 Crc8Table
+00014748  .text      1fc94848 ClrPacketMkoMsgList
+0000011c  .sbss      00080fbc BehPreDeltaTime
+0000d8e0  .text      1fc8d9e0 KpaCommand30
+0000032c  .sbss      000811cc Irq13PrevTxIndex
+0000137c  .text      1fc8147c BehControlProc
+000c6bb0  .bss       00147e30 Irq13PrevTxBuffer
+000583d0  .bss       000d9650 Irq10PackMsgList
+0001d3d4  .text      1fc9d4d4 Irq13Msg0xB474
+00052670  .bss       000d38f0 MkoMsgResA
+1fdfdfd0  *ABS*      1fdfdfd0 __bss_start
+00014638  .text      1fc94738 DelPacketMkoMsgByIndex
+00022460  .text      1fca2560 cacheDflush
+00022c90  .text      1fca2d90 memset
+0005a2f0  .bss       000db570 PeriodicMkoMsgList
+00000e54  .data      00080e58 Control_NumList14
+00001d98  .text      1fc81e98 SendStartMsgToKPA
+000c73b0  .bss       00148630 Vkl_PRD_0
+00000e68  .data      00080e6c Control_NumList19
+00000330  .sbss      000811d0 AFAR_AT_M
+00000334  .sbss      000811d4 Baloi_DisabledMsgListCount
+0000e5b8  .text      1fc8e6b8 KpaCommand39
+000222e0  .text      1fca23e0 timeReadmics
+0000076c  .data      00080770 Control_AddrList1C
+00019754  .text      1fc99854 MkoStressPrepareSet1
+00022620  .text      1fca2720 srand
+00000120  .sbss      00080fc0 AsnTaskDeltaTimeId
+00052780  .bss       000d3a00 MkoMsgX
+000c7490  .bss       00148710 Irq13DevState
+00000124  .sbss      00080fc4 BehFinikFlag
+00022280  .text      1fca2380 taskDelayFixTime
+00001684  .text      1fc81784 SetDefaultConfig
+0001ce58  .text      1fc9cf58 Irq13Msg0xB171
+000082c4  .text      1fc883c4 CalcCrc32Block
+00008b50  .text      1fc88c50 KpaCommand06
+00000338  .sbss      000811d8 Index_AFAR
+00022450  .text      1fca2550 cacheFlush
+0001507c  .text      1fc9517c XchgAddrPacketMkoMsgList
+000527a0  .bss       000d3a20 MkoMsgC
+00000778  .data      0008077c Control_AddrList1F
+00013fa4  .text      1fc940a4 AddPacketMkoMultiMsg
+00022390  .text      1fca2490 mkoPackIniStart
+000222c0  .text      1fca23c0 taskTimerZero
+0000033c  .sbss      000811dc Komplekt_MFS
+0000824c  .text      1fc8834c CalcCrc8
+00000754  .data      00080758 Control_AddrList16
+000c74d0  .bss       00148750 Baloi_DebugReadList
+0001a124  .text      1fc9a224 MkoStressCheckRxPacket1
+00052ac0  .bss       000d3d40 MkoBufC
+00015d24  .text      1fc95e24 RunPacketMko_SecPiPo_PreparePacket2
+0001acd4  .text      1fc9add4 Irq13InitData
+0000251c  .text      1fc8261c MainTaskDoShbkImit
+00022590  .text      1fca2690 synchPowerOff
+00012184  .text      1fc92284 SetPeriodicMkoMsgLock
+00000128  .sbss      00080fc8 ErrorTaskOut
+00054e10  .bss       000d6090 SpoConfig
+00053300  .bss       000d4580 FlashJob
+0000012c  .sbss      00080fcc AsnTaskIn
+00054f10  .bss       000d6190 CmdHandlerTable
+0000e3e8  .text      1fc8e4e8 KpaCommand38
+00080c00  .bss       00101e80 PacketMkoIntCntList
+00000130  .sbss      00080fd0 PostMkiDataSize
+00010948  .text      1fc90a48 Reconfig733
+00055310  .bss       000d6590 MkoBufB
+00000138  .sbss      00080fd8 MainTaskTime0
+00000724  .data      00080728 Control_AddrList0A
+00000340  .sbss      000811e0 Rejim_3_Rasch
+00000e48  .data      00080e4c Control_NumList11
+00006f68  .text      1fc87068 MkoXchgXn
+00012b90  .text      1fc92c90 InitPeriodicMkoMsg
+00000344  .sbss      000811e4 Irq13TxIndex
+00000348  .sbss      000811e8 Pause_Rasch_3
+00000208  .sbss      000810a8 RunPacketCurrTime
+000002b8  .data      000802bc Control_AddrList06
+000c76d0  .bss       00148950 Vkl_AFAR_BUM
+00000140  .sbss      00080fe0 B732PupsListSize
+000225a0  .text      1fca26a0 synchPowerOn
+0001e9c8  .text      1fc9eac8 Sbros_Priznakov
+0001370c  .text      1fc9380c ClrProhibitedMkoMsgList
+00000238  .sbss      000810d8 MkoMirrorInterval
+00022310  .text      1fca2410 semLock
+0000438c  .text      1fc8448c IrqHandler0A
+000c76f0  .bss       00148970 Tm_AFAR_PRD
+00022370  .text      1fca2470 mkoOFF
+00022180  .text      1fca2280 taskDelete
+0000323c  .text      1fc8333c IrqHandler00TaskDeltaTime
+0000c390  .text      1fc8c490 BUPE_Chan2_Enable
+0000d928  .text      1fc8da28 Get_OK_OKK_Data
+0000d854  .text      1fc8d954 KpaCommand2F
+00058420  .bss       000d96a0 Irq10PackMsg
+00001d34  .text      1fc81e34 SleepMSec
+00012990  .text      1fc92a90 PeriodicMkoMsgDataCmp
+00019258  .text      1fc99358 MkoStressRecvTest
+0001a8f4  .text      1fc9a9f4 MkoStressSaveStateB
+0001c118  .text      1fc9c218 Irq13SendUserMsg
+00000998  .text      1fc80a98 InitMkoMsgA
+00007b68  .text      1fc87c68 ControlCheckList
+00014470  .text      1fc94570 FindPacketMkoMsg
+00022320  .text      1fca2420 semUnlock
+00000278  .sbss      00081118 MkoStressAbErrorCount
+00000e3c  .data      00080e40 Control_NumList0E
+000c7790  .bss       00148a10 Irq13CmdFifo
+0000ffac  .text      1fc900ac CbkErrCtrlCallBack
+00055b50  .bss       000d6dd0 OpoVersionString
+000198c4  .text      1fc999c4 MkoStressPrepareSet2
+00014dc0  .text      1fc94ec0 PacketMkoMsgCheckPacket
+000cf7d0  .bss       00150a50 Irq13UserMsgData
+00000210  .sbss      000810b0 PacketRdDataInfo
+0001cfa0  .text      1fc9d0a0 Irq13Msg0xB272
+00003444  .text      1fc83544 IrqHandler03
+0000c6ac  .text      1fc8c7ac KpaCommand16
+000163ac  .text      1fc964ac RunPacketMko_CntPiPo_PreparePacket1
+00013828  .text      1fc93928 CheckProhibitedMkoMsg
+0000034c  .sbss      000811ec Ctrl_Ispravnosti
+000cffd0  .bss       00151250 Baloi_PackPrepPause
+00002264  .text      1fc82364 SendCbkReConfigMsgToKPA
+00008f10  .text      1fc89010 KpaCommand09
+000074f8  .text      1fc875f8 ReplyToKpaWithDataX
+00000350  .sbss      000811f0 Irq13TxMsgLen
+0000454c  .text      1fc8464c IrqHandler0D
+000222b0  .text      1fca23b0 taskAllInfoGet
+00001c00  .text      1fc81d00 MainTaskGetMkiData
+00000354  .sbss      000811f4 Irq13CmdFifoTail
+00001c68  .text      1fc81d68 MainTaskGetMdiData
+00004578  .text      1fc84678 IrqHandler0E
+00020e40  .text      1fca0f40 MsgProc0xDB3AExt
+000223c0  .text      1fca24c0 mkoNumPackWait
+0000023c  .sbss      000810dc MkoMirrorAbWrError
+00055b90  .bss       000d6e10 CbkDataImit
+0001da40  .text      1fc9db40 Irq13Msg0x9041
+00022170  .text      1fca2270 taskExit
+000224c0  .text      1fca25c0 sprIMask
+000224b0  .text      1fca25b0 sprIGetVecMask
+00004248  .text      1fc84348 Irq10PackInit
+00012700  .text      1fc92800 ReadPeriodicMkoMsgData
+00000358  .sbss      000811f8 Baloi_Read_OK_Time
+00001744  .text      1fc81844 HandlerTableInit
+00000240  .sbss      000810e0 MkoMirrorWrChan
+00021ee0  .text      1fca1fe0 Irq13PackReadInfo
+00000244  .sbss      000810e4 MkoMirrorLine
+00000148  .sbss      00080fe8 AsnSecondIrqTime
+00022430  .text      1fca2530 timeMarktst
+00000150  .sbss      00080ff0 AsnPreDeltaTime
+00022120  .text      1fca2220 taskSuspend
+00000360  .sbss      00081200 Irq13BaloiFail
+0001affc  .text      1fc9b0fc KpaCommand62
+000d0010  .bss       00151290 Baloi_PackMkoChan
+00022300  .text      1fca2400 semCreate
+00001f14  .text      1fc82014 SendMkiDataToKPA
+00022470  .text      1fca2570 mkoSetChan
+00000940  .data      00080944 Control_NumList05
+00022270  .text      1fca2370 taskIniFixTime
+000d0030  .bss       001512b0 Data_OTKL_AFAR
+00014734  .text      1fc94834 GetPacketMkoMsgCount
+000563d0  .bss       000d7650 MdiBuffer
+000100b0  .text      1fc901b0 CheckTimeMarkInInt
+00000e70  .data      00080e74 Control_NumList1B
+000221b0  .text      1fca22b0 taskReVerify
+00001dec  .text      1fc81eec SendVmStateToKPA
+00000154  .sbss      00080ff4 BehMissIrqCount
+00022520  .text      1fca2620 synchRecInfVM
+000076a0  .text      1fc877a0 Input
+00022420  .text      1fca2520 testErrGet
+0000d2d0  .text      1fc8d3d0 KpaCommand2B
+000000ac  .data      000800b0 Control_AddrList01
+0000dedc  .text      1fc8dfdc KpaCommand32
+00000248  .sbss      000810e8 MkoMirrorDebug
+000565d0  .bss       000d7850 MkoBufA
+00000368  .sbss      00081208 Irq13WaitReplyTimer
+0000027c  .sbss      0008111c MkoStressBusyErrorCount
+00000370  .sbss      00081210 Baloi_DisabledReplyListCount
+000d0040  .bss       001512c0 Baloi_PackOkSendCount
+1fdfdfd0  *ABS*      1fdfdfd0 _edata
+00000374  .sbss      00081214 Baloi_MkoPackRes
+00000158  .sbss      00080ff8 BehFinikPeriod
+00022240  .text      1fca2340 VecStModify
+0000162c  .text      1fc8172c MainTaskRunCheck
+00000728  .data      0008072c Control_AddrList0B
+0000d074  .text      1fc8d174 KpaCommand2A
+00000758  .data      0008075c Control_AddrList17
+1fdfdfd0  *ABS*      1fdfdfd0 _end
+0000c8cc  .text      1fc8c9cc KpaCommand19
+00022480  .text      1fca2580 mkoGetChan
+0000015c  .sbss      00080ffc BehExcFinikIrqCount
+00016d88  .text      1fc96e88 RunPacketMko_SecQue_CheckList
+0001d544  .text      1fc9d644 Irq13Msg0xA524
+00000e58  .data      00080e5c Control_NumList15
+00000160  .sbss      00081000 IrqTaskIn
+000224a0  .text      1fca25a0 WdSet
+00000b48  .text      1fc80c48 InitMkoMsgX
+00000040  .rodata    1fca3110 Crc32Table
+00000378  .sbss      00081218 DN_Vvedena
+0001c3e4  .text      1fc9c4e4 Irq13AddToMsg
+00000164  .sbss      00081004 BehMkoFailCount
+000136f8  .text      1fc937f8 GetProhibitedMkoMsgCount
+00000168  .sbss      00081008 IrqTaskOut
+00000000  .text      1fc80100 MainTask
+0000037c  .sbss      0008121c Pause_LPH
+0000000c  .data      00080010 Control_BitMap
+0000016c  .sbss      0008100c BehFhvFlag
+00022360  .text      1fca2460 mkoSendPri
+0001f7ac  .text      1fc9f8ac Irq13ChangeCurrentTxRns
+00017484  .text      1fc97584 AddPacketMko_CntQue_IntToList
+00084110  .bss       00105390 MkoStressPackResList
+00000170  .sbss      00081010 AsnStartTimer
+000d00c0  .bss       00151340 Baloi_PackMsgCount
+00000380  .text      1fc80480 IrqTask
+00016e04  .text      1fc96f04 RunPacketMko_SecQue_PreparePacket1
+00000380  .sbss      00081220 Baloi_Read_OK
+0000024c  .sbss      000810ec MkoMirrorAbRdError
+00007800  .text      1fc87900 ControlInitTables
+000083e0  .text      1fc884e0 KpaCommand02
+00000744  .data      00080748 Control_AddrList12
+000001cc  .sbss      0008106c CNT_DBG
+00000384  .sbss      00081224 Pause_AFAR
+000091cc  .text      1fc892cc KpaCommand0A_Erti
+00000250  .sbss      000810f0 MkoMirrorCycles
+00002990  .text      1fc82a90 BitCount
+00000388  .sbss      00081228 Pause_PRD
+000127fc  .text      1fc928fc FindPeriodicMkoMsg
+00000218  .sbss      000810b8 GRES_DBG
+0000a7a4  .text      1fc8a8a4 CheckFsmuPower
+0001427c  .text      1fc9437c DelPacketMkoMsgByMsg
+0001952c  .text      1fc9962c MkoStressSendF4Test
+00000178  .sbss      00081018 MainTaskTime1
+0001d0e4  .text      1fc9d1e4 Send_KPI_Kvit
+00000180  .sbss      00081020 MkoPackA
+00000e38  .data      00080e3c Control_NumList0D
+00000720  .data      00080724 Control_AddrList09
+00022340  .text      1fca2440 semStateGet
+000001d8  .sbss      00081078 PeriodicMkoMsgCount
+00008734  .text      1fc88834 KpaCommand04
+00000144  .data      00080148 Control_AddrList04
+0000df28  .text      1fc8e028 KpaCommand33
+00015674  .text      1fc95774 AddPacketMko_SecPiPo_IntToList
+00000280  .sbss      00081120 MkoStressLastOS
+000d00e0  .bss       00151360 Irq13RxBuffer
+0001da00  .text      1fc9db00 Irq13Msg0xA322
+00000768  .data      0008076c Control_AddrList1B
+00000188  .sbss      00081028 TestTaskOut
+0000018c  .sbss      0008102c AsnParamFailCount
+00000284  .sbss      00081124 MkoStressMsgResCount
+0001d580  .text      1fc9d680 Irq13Msg0xD233
+00022ef0  .text      1fca2ff0 strlen
+0000038c  .sbss      0008122c Irq13CmdFifoEnabled
+000223d0  .text      1fca24d0 ErrCodGet
+000224f0  .text      1fca25f0 sprIGetF
+00056e10  .bss       000d8090 FlashSectorCSumTable
+000221f0  .text      1fca22f0 taskPeriodPlus
+00016aa8  .text      1fc96ba8 AddPacketMko_SecQue_MsgToInt
+00056e50  .bss       000d80d0 MkoMsgPtrA
+00000390  .sbss      00081230 Irq13LastSum
+00000288  .sbss      00081128 MkoStressDataErrorCount
+00000394  .sbss      00081234 Otkl_AFAR
+00019e40  .text      1fc99f40 MkoStressCheckTxPacket2
+00059ef0  .bss       000db170 Control_DataAvail
+0000028c  .sbss      0008112c MkoStressPackResCount
+00000190  .sbss      00081030 BehStartTimer
+00000398  .sbss      00081238 Rejim_BRTK
+00000194  .sbss      00081034 MkoPackResX
+00000198  .sbss      00081038 DebugFlag
+0001e2c0  .text      1fc9e3c0 Irq13InfoMsg0x35D4
+000222a0  .text      1fca23a0 taskInfoGet
+0001c3a8  .text      1fc9c4a8 Irq13InitMsg
+0000019c  .sbss      0008103c BehFinikIrqCount
+0000459c  .text      1fc8469c IrqHandler0F
+0000cffc  .text      1fc8d0fc KpaCommand27
+00000e60  .data      00080e64 Control_NumList17
+00004224  .text      1fc84324 IrqHandler09
+0000eca0  .text      1fc8eda0 KpaCommandFF
+000003a0  .sbss      00081240 Pause_AOS
+00094110  .bss       00115390 MkoStressMsgResList
+000003a8  .sbss      00081248 Komplekt_AOS
+0001f328  .text      1fc9f428 Irq13ChangeDisabledReplyList
+00056ee0  .bss       000d8160 MkiBuffer
+000003b0  .sbss      00081250 Irq13TimeSEV
+00000254  .sbss      000810f4 MkoMirrorBadBits
+000003b8  .sbss      00081258 Baloi_MkoPack
+000d08e0  .bss       00151b60 Baloi_PackInterval
+00000a28  .text      1fc80b28 InitMkoMsgB
+000223e0  .text      1fca24e0 ErrMKIGet
+0001d3c4  .text      1fc9d4c4 Irq13Msg0xBE71
+1fdfdfd0  *ABS*      1fdfdfd0 _fbss
+000003c0  .sbss      00081260 Chislo_Proverok_TM_AFAR
+00000760  .data      00080764 Control_AddrList19
+00007350  .text      1fc87450 ReplyToKpaWithData
+00000e34  .data      00080e38 Control_NumList0C
+00009d9c  .text      1fc89e9c KpaCommand0C
+000003c8  .sbss      00081268 Ctrl_Ispravnosti_Time
+0000c628  .text      1fc8c728 KpaCommand14
+000003d0  .sbss      00081270 Irq13SendNackEnabled
+0000074c  .data      00080750 Control_AddrList14
+00013440  .text      1fc93540 ReadProhibitedMkoMsgData
+00000258  .sbss      000810f8 MkoMirrorXchgMask
+00011fb0  .text      1fc920b0 KpaCommand60
+000003d4  .sbss      00081274 Ctrl_Ispravnosti_Enabled
+0000ce94  .text      1fc8cf94 KpaCommand25
+000001a0  .sbss      00081040 PassBeginTime
+0000aad8  .text      1fc8abd8 KpaCommand0D
+0001e934  .text      1fc9ea34 Irq13Msg0x9xxx
+000576e0  .bss       000d8960 MkoMsgA
+00000774  .data      00080778 Control_AddrList1E
+000001a8  .sbss      00081048 BehFhvTmpCount
+00022220  .text      1fca2320 taskAllDelAbs
+000001ac  .sbss      0008104c BehFinikTmpCount
+00057a00  .bss       000d8c80 IrqHandlerTable
+000003d8  .sbss      00081278 Baloi_Send_Bau_OK
+**MEMORY CONFIGURATION**
+
+name		origin   length   r_size   c_size    is    attributes
+*default*       00000000 ffffffff 00000000 00002548 ()
+
+
+**LINK EDITOR MEMORY MAP**
+
+output   input     virtual
+section  section   address    tsize
+
+
+*ABS*             00000000     0     0 2**0 
+LOAD D:/Roman/TPO/Source/VecUnit.o
+LOAD D:/Roman/TPO/Source/MainProject.e
+LOAD S:/Target/Bos/CBK/Lib/libBOS.a
+LOAD S:/TSRP/CDS/LIB/libR3.a
+address
+address
+                  00000000 00000000 _DYNAMIC_LINK =00000000
+                  00000000 00400094 . =(00400000+SIZEOF_HEADERS)
+
+.interp  (no attached output section)
+ from *(.interp)
+
+.hash    (no attached output section)
+ from *(.hash)
+
+.dynsym  (no attached output section)
+ from *(.dynsym)
+
+.dynstr  (no attached output section)
+ from *(.dynstr)
+
+.rel.text (no attached output section)
+ from *(.rel.text)
+
+.rela.text (no attached output section)
+ from *(.rela.text)
+
+.rel.data (no attached output section)
+ from *(.rel.data)
+
+.rela.data (no attached output section)
+ from *(.rela.data)
+
+.rel.rodata (no attached output section)
+ from *(.rel.rodata)
+
+.rela.rodata (no attached output section)
+ from *(.rela.rodata)
+
+.rel.got (no attached output section)
+ from *(.rel.got)
+
+.rela.got (no attached output section)
+ from *(.rela.got)
+
+.rel.ctors (no attached output section)
+ from *(.rel.ctors)
+
+.rela.ctors (no attached output section)
+ from *(.rela.ctors)
+
+.rel.dtors (no attached output section)
+ from *(.rel.dtors)
+
+.rela.dtors (no attached output section)
+ from *(.rela.dtors)
+
+.rel.init (no attached output section)
+ from *(.rel.init)
+
+.rela.init (no attached output section)
+ from *(.rela.init)
+
+.rel.fini (no attached output section)
+ from *(.rel.fini)
+
+.rela.fini (no attached output section)
+ from *(.rela.fini)
+
+.rel.bss (no attached output section)
+ from *(.rel.bss)
+
+.rela.bss (no attached output section)
+ from *(.rela.bss)
+
+.rel.plt (no attached output section)
+ from *(.rel.plt)
+
+.rela.plt (no attached output section)
+ from *(.rela.plt)
+
+.init    (no attached output section)
+ from *(.init)
+
+.plt     (no attached output section)
+ from *(.plt)
+
+.text             1fdfdd00     0     0 2**4 load alloc contents 
+                  1fdfdd00 00000000 _ftext =.
+ from *(.text)
+ from *(.gnu.warning)
+
+.fini    (no attached output section)
+ from *(.fini)
+
+.rodata  (no attached output section)
+ from *(.rodata)
+
+.rodata1 (no attached output section)
+ from *(.rodata1)
+
+.reginfo          1fdfdd00    18     0 2**2 load alloc contents 
+ from *(.reginfo)
+         .reginfo 1fdfdd00    18    18 2**2  elf32-littlemips D:/Roman/TPO/Source/VecUnit.o(overhead 4056 bytes)
+                  1fdfdd18 1fdfdd18 _etext =.
+                  1fdfdd18 1fdfdd18 PROVIDE (etext, .)
+                  1fdfdd18 1fdfdd18 . =.
+
+.data             1fdfdd00   2d0     0 2**4 load alloc contents 
+                  1fdfdd00 00000000 _fdata =.
+ from *(.data)
+         .data    1fdfdd00   2d0   2d0 2**4  elf32-littlemips D:/Roman/TPO/Source/VecUnit.o(overhead 4056 bytes)
+                  1fdfdd00              TabVec
+                  1fdfdfc0              sysDescSPO
+constructors:
+
+.data1   (no attached output section)
+ from *(.data1)
+                  1fdfdfd0 1fe05fd0 _gp =(.+00008000)
+
+.lit8    (no attached output section)
+ from *(.lit8)
+
+.lit4    (no attached output section)
+ from *(.lit4)
+
+.ctors   (no attached output section)
+ from *(.ctors)
+
+.dtors   (no attached output section)
+ from *(.dtors)
+
+.got     (no attached output section)
+ from *(.got.plt)
+ from *(.got)
+
+.dynamic (no attached output section)
+ from *(.dynamic)
+
+.sdata   (no attached output section)
+ from *(.sdata)
+                  1fdfdfd0 1fdfdfd0 _edata =.
+                  1fdfdfd0 1fdfdfd0 PROVIDE (edata, .)
+                  1fdfdfd0 1fdfdfd0 __bss_start =.
+                  1fdfdfd0 1fdfdfd0 _fbss =.
+
+.sbss    (no attached output section)
+ from *(.sbss)
+ from *(.scommon)
+
+.bss              1fdfdfd0     0     0 2**4 alloc 
+ from *(.dynbss)
+ from *(.bss)
+ from *(COMMON)
+                  1fdfdfd0 1fdfdfd0 _end =.
+                  1fdfdfd0 1fdfdfd0 PROVIDE (end, .)
+
+.stab             00000000   54c     0 2**2 contents 
+ from *(.stab)
+         .stab    00000000   54c   54c 2**2  elf32-littlemips D:/Roman/TPO/Source/VecUnit.o(overhead 4056 bytes)
+
+.stabstr          00000000  2548     0 2**0 contents 
+ from *(.stabstr)
+         .stabstr 00000000  2548  2548 2**0  elf32-littlemips D:/Roman/TPO/Source/VecUnit.o(overhead 4056 bytes)
+
+.debug   (no attached output section)
+ from *(.debug)
+
+.debug_srcinfo0 (no attached output section)
+ from *(.debug_srcinfo)
+
+.debug_aranges0 (no attached output section)
+ from *(.debug_aranges)
+
+.debug_pubnames (no attached output section)
+ from *(.debug_pubnames)
+
+.debug_sfnames0 (no attached output section)
+ from *(.debug_sfnames)
+
+.line    (no attached output section)
+ from *(.line)
+
+.gptab.sdata (no attached output section)
+ from *(.gptab.data)
+ from *(.gptab.sdata)
+
+.gptab.sbss (no attached output section)
+ from *(.gptab.bss)
+ from *(.gptab.sbss)
+OUTPUT(VecProject.e elf32-littlemips)
