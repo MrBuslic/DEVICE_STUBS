@@ -83,6 +83,8 @@ include_directories("LKAModules")
 include_directories("UNFOI")
 include_directories("UNOLS")
 include_directories("KPRD_imitator")
+include_directories("UNVVK4")
+include_directories("UNIS4")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 
 include_directories("BECH_imitator")

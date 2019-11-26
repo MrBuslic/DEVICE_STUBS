@@ -42,6 +42,17 @@ union MDS1_CHANNELS
 };
 
 
+#include "rpc_vvk4.h"
+#include "vvk4_rpc.h"
+
+struct pyro_chan_state
+{
+	pyro_chan_state(QList<int> _chans, int _state) : chan_num(_chans), state(_state)	{}//to do передать параметр _chans в форме pair
+	QList<int> chan_num;
+	int state;
+};
+
+
 class KPIUServer : public QWidget
 {
 	Q_OBJECT
@@ -70,17 +81,24 @@ public slots:
 
 	//power_bus_setup
 	void USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
+
+	//pyro
+	void PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
 	QString getXML();
 	
+
 	void mfsk_1_impulse(QVariantList channels);
 
 	void mds_1_get_sample(uint& buf, bool& flag);
 	void mds_2_get_sample(uint& buf, bool& flag);
+	void get_resistance(uint NProcess, int& resistance);
+	int get_connection_state(QVariantList& _chans);
 private:
 
 	MDS1_CHANNELS mds1_chans;
 	MDS2_CHANNELS mds2_chans;
 
+	QMap<QString, pyro_chan_state> pyro_state;
 	RpcOmnibusWidget* omnibus_widget;
 	InterruptWidget* interrupt_widget;
 	KPIWidget* kpi_widget;
@@ -90,6 +108,8 @@ private:
 	RpcFoiWidget* foi_widget;
 	RpcOlsWidget* ols_widget;
 	KPRD_imitator* kprd_widget;
+
+	RPC_vvk4_SLOT_Thread* vvk4_slot_thr;
 
 signals:
 	void string_msg(QString _msg);

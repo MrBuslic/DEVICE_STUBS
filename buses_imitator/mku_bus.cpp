@@ -12,8 +12,8 @@ MKUWidget::MKUWidget(QWidget *parent)
 	v_lay->addWidget(log_widget);
 
 	for (int i = 0; i <= 8; i++) ku_map_channels[i] = 3;
-	for (int i = 0; i <= 20; i++) mshm_map_channels[i] = 3;
-	for (int i = 0; i <= 20; i++) pshm_map_channels[i] = 3;
+	for (int i = 0; i <= 12; i++) mshm_map_channels[i] = 3;
+	for (int i = 0; i <= 12; i++) pshm_map_channels[i] = 3;
 	
 	QString ip_str = "127.0.0.1";
 	int slot_port = MKU_SLOT;

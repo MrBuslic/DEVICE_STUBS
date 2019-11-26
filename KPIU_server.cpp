@@ -4,6 +4,9 @@
 #include "kpiu_socket_rpc.h"
 #include "mds32_rpc.h"
 #include "mfsk24_rpc.h"
+#include "vvk4_rpc.h"
+#include "is4_rpc.h"
+
 
 KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 {
@@ -89,6 +92,8 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/BECH_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/ASN_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/LKA-05_imitator");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/UNVVK4");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/UNIS4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/common");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comapp1");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/MBK07");
@@ -156,6 +161,68 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	mds1_chans.chans = 0xFFFFFFFF;
 	mds2_chans.chans = 0xFFFFFFFF;
 
+	vvk4_slot_thr = new RPC_vvk4_SLOT_Thread;
+	vvk4_slot_thr->set_connection_params("127.0.0.1", VVK_SLOT);
+	vvk4_slot_thr->start();
+
+	RPC_vvk4_SIGNAL_Thread* vvk4_signal_thr = new RPC_vvk4_SIGNAL_Thread;
+	vvk4_signal_thr->set_connection_params("127.0.0.1", VVK_SIGNAL);
+	vvk4_signal_thr->start();
+
+	if (!vvk4_slot_thr->wait_connected(3) || !vvk4_signal_thr->wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с vvk4");
+		this->deleteLater();
+		return;
+	}
+	//connect(mfsk1_signal_thr->get_obj().get(), SIGNAL(vvk4_get_channels_list(QVariantList& ei_list, QVariantList& sum_list)), this, SLOT(get_commut_chanels_list(QVariantList& ei_list, QVariantList& sum_list)), Qt::DirectConnection);
+
+	RPC_is4_SLOT_Thread* is4_slot_thr = new RPC_is4_SLOT_Thread;
+	is4_slot_thr->set_connection_params("127.0.0.1", IS4_SLOT);
+	is4_slot_thr->start();
+	RPC_is4_SIGNAL_Thread* is4_signal_thr = new RPC_is4_SIGNAL_Thread;
+	is4_signal_thr->set_connection_params("127.0.0.1", IS4_SIGNAL);
+	is4_signal_thr->start();
+
+	if (!is4_slot_thr->wait_connected(3) || !is4_signal_thr->wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с vvk4");
+		this->deleteLater();
+		return;
+	}
+	connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint NProcess, QVariant& value)), this, SLOT(get_resistance(uint NProcess, int& resistance)), Qt::DirectConnection);
+
+	pyro_state.insert("ПП1_О",  pyro_chan_state(QList<int>() << 111 << 112, 0));
+	pyro_state.insert("ПП1_Р",  pyro_chan_state(QList<int>() << 113 << 114, 0));
+	pyro_state.insert("ПП2_О",  pyro_chan_state(QList<int>() << 115 << 116, 0));
+	pyro_state.insert("ПП2_Р",  pyro_chan_state(QList<int>() << 117 << 118, 0));
+	pyro_state.insert("ПП3_О",  pyro_chan_state(QList<int>() << 119 << 120, 0));
+	pyro_state.insert("ПП3_Р",  pyro_chan_state(QList<int>() << 121 << 122, 0));
+	pyro_state.insert("ПП4_О",  pyro_chan_state(QList<int>() << 123 << 124, 0));
+	pyro_state.insert("ПП4_Р",  pyro_chan_state(QList<int>() << 125 << 126, 0));
+
+	pyro_state.insert("ПП5_О",  pyro_chan_state(QList<int>() << 161 << 162, 0));
+	pyro_state.insert("ПП5_Р",  pyro_chan_state(QList<int>() << 163 << 164, 0));
+	pyro_state.insert("ПП6_О",  pyro_chan_state(QList<int>() << 165 << 166, 0));
+	pyro_state.insert("ПП6_Р",  pyro_chan_state(QList<int>() << 167 << 168, 0));
+
+	pyro_state.insert("ПП7_О",  pyro_chan_state(QList<int>() << 169 << 170, 0));
+	pyro_state.insert("ПП7_Р",  pyro_chan_state(QList<int>() << 171 << 172, 0));
+	pyro_state.insert("ПП8_О",  pyro_chan_state(QList<int>() << 173 << 174, 0));
+	pyro_state.insert("ПП8_Р",  pyro_chan_state(QList<int>() << 175 << 176, 0));
+	pyro_state.insert("ПП9_О",  pyro_chan_state(QList<int>() << 177 << 178, 0));
+	pyro_state.insert("ПП9_Р",  pyro_chan_state(QList<int>() << 179 << 180, 0));
+	pyro_state.insert("ПП10_О",  pyro_chan_state(QList<int>() << 181 << 182, 0));
+	pyro_state.insert("ПП10_Р",  pyro_chan_state(QList<int>() << 183 << 184, 0));
+
+	pyro_state.insert("ПП11_О",  pyro_chan_state(QList<int>() << 185 << 186, 0));
+	pyro_state.insert("ПП11_Р",  pyro_chan_state(QList<int>() << 187 << 188, 0));
+	pyro_state.insert("ПП12_О",  pyro_chan_state(QList<int>() << 189 << 190, 0));
+	pyro_state.insert("ПП12_Р",  pyro_chan_state(QList<int>() << 191 << 192, 0));
+	pyro_state.insert("ПП13_О",  pyro_chan_state(QList<int>() << 193 << 194, 0));
+	pyro_state.insert("ПП13_Р",  pyro_chan_state(QList<int>() << 195 << 196, 0));
+	pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
+	pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
 }
 //mku_bus_setup
 int KPIUServer::KU_NASTROYKA_CELOSTNOSTI_KANALOV(int ku_n, int line)
@@ -223,6 +290,19 @@ int KPIUServer::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 void KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 {
 	power_widget->set_bus_state(bus, state);
+}
+
+//pyro
+void KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
+{
+	QMap<QString, pyro_chan_state>::iterator itr = pyro_state.find(_name);
+
+	if (itr == pyro_state.end())
+	{
+		SRPCSignalClass::Instance().toLog(QString("Соединение %1 не найдено!").arg(_name));
+		return;
+	}
+	itr->state = _state;
 }
 
 QString KPIUServer::getXML()
@@ -326,4 +406,40 @@ void KPIUServer::mds_2_get_sample(uint& buf, bool& flag)
 	mds2_chans.chans_732 = ((~tmp_buf.toUInt()) & 0x1F);
 
 	buf = mds2_chans.chans;
+}
+
+void KPIUServer::get_resistance(uint NProcess, int& resistance)
+{
+	QVariantList ei_chanels_list;
+	QVariantList sum_chanels_list;
+	int connection_state;
+	QVariantList channels;
+	vvk4_slot_thr->get_vvk4_obj()->get_commut_chanels_list(ei_chanels_list, sum_chanels_list);
+	channels = ei_chanels_list + sum_chanels_list;
+	// вставить функцию опроса ВВК
+	connection_state = get_connection_state(channels);
+	switch (connection_state)
+	{
+	case 1:
+		resistance = 10;
+	case 2:
+		resistance = 0.8;
+	case 3:
+		resistance = 13000000;
+	}
+}
+	//get_commut_chanels_list(ei_list, sum_list);
+
+int KPIUServer::get_connection_state(QVariantList& _chans)
+{
+	QList<pyro_chan_state> connections = pyro_state.values();
+	QList<pyro_chan_state>::iterator it = connections.begin();
+	for (; it != connections.end(); it++)
+	{
+		if (((it->chan_num[0] == _chans[0]) && (it->chan_num[1] == _chans[1])) || ((it->chan_num[1] == _chans[0]) && (it->chan_num[0] == _chans[1])))
+			//((it->chan_num[0] == _chans[0]) || (it->chan_num[1] == _chans[0]) || (it->chan_num[0] == _chans[1]) || (it->chan_num[1] == _chans[1]))//todo убрать
+			return it->state;
+	}
+	SRPCSignalClass::Instance().toLog(QString("Не найдено соединения каналов пиропатронов %1 %2").arg(_chans[0].toString()).arg(_chans[1].toString()));
+	return 0; //возвращать -1?
 }
