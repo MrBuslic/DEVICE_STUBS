@@ -25,6 +25,7 @@ ViStatus _VI_FUNC unmds32_init (ViSession arg0, ViUInt16 arg1, ViBoolean arg2,
 ViStatus _VI_FUNC unmds32_init (ViRsrc rsrcName, ViBoolean IDquery,
                                  ViBoolean doReset, ViSession *mezvi)
 { 
+	Srpc_buffer_class::Instance();
 	mds_count++;
 	*mezvi = mds_count;
 	return 0; 

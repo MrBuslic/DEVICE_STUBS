@@ -145,6 +145,7 @@ public:
 private:
 	QMap<VCHM_CHANEL, bool> working;
 	QMap<VCHM_CHANEL, bool> proc_working;
+
 };
 
 #endif // R732_MODULES_H

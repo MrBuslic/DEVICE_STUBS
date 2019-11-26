@@ -18,10 +18,10 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 {
 	for (int i = 0; i < 3; i++)
 	{
-		mvku_modules << LKA05_MV_MODULE(2, i);
-		mvmk_modules << LKA05_MV_MODULE(3, i);
+		mvku_modules << LKA_MV_MODULE(2, i);
+		mvmk_modules << LKA_MV_MODULE(3, i);
 	}
-		mpvn_modules << LKA05_MV_MODULE(5, 0);
+		mpvn_modules << LKA_MV_MODULE(5, 0);
 	widg = new QWidget(this);
 	this->setFixedSize(572, 200);
 	setWindowTitle("ЛКА-05");
@@ -170,6 +170,7 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 	adr = 4;
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(signal_thr.get_obj().get(), SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mbk04_signal_thr.get_obj().get() ,SIGNAL(new_tm(int)), this, SLOT(new_tm(int)));// сигнал от Васи
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
@@ -179,11 +180,11 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 
 	for (int i = 0; i < 3; i++)
 	{
-		mvku_modules[i].switch_cur_dev(LKA05_CURRENT_DEV::OFF);
-		mvmk_modules[i].switch_cur_dev(LKA05_CURRENT_DEV::OFF);
+		mvku_modules[i].switch_cur_dev(LKA_CURRENT_DEV::OFF);
+		mvmk_modules[i].switch_cur_dev(LKA_CURRENT_DEV::OFF);
 	}
-	mu_module.switch_cur_dev(LKA05_CURRENT_DEV::OFF);
-	mpvn_modules[0].switch_cur_dev(LKA05_CURRENT_DEV::OFF);
+	mu_module.switch_cur_dev(LKA_CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(LKA_CURRENT_DEV::OFF);
 	paint_buttons();
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
@@ -214,11 +215,11 @@ void LKA05_widg::imit_off()
 	flag_on = false;
 	for (int i = 0; i < 3; i++)
 	{
-		mvku_modules[i].switch_cur_dev(LKA05_CURRENT_DEV::OFF);
-		mvmk_modules[i].switch_cur_dev(LKA05_CURRENT_DEV::OFF);
+		mvku_modules[i].switch_cur_dev(LKA_CURRENT_DEV::OFF);
+		mvmk_modules[i].switch_cur_dev(LKA_CURRENT_DEV::OFF);
 	}
-	mu_module.switch_cur_dev(LKA05_CURRENT_DEV::OFF);
-	mpvn_modules[0].switch_cur_dev(LKA05_CURRENT_DEV::OFF);
+	mu_module.switch_cur_dev(LKA_CURRENT_DEV::OFF);
+	mpvn_modules[0].switch_cur_dev(LKA_CURRENT_DEV::OFF);
 	paint_buttons(); //	update_graphics();
 //	inter_tmr->stop();
 }
@@ -241,12 +242,14 @@ void LKA05_widg::omni_connect()
 	AbOn_tmr->stop();
 	for (int i = 0; i < 3; i++)
 	{
-		mvku_modules[i].switch_cur_dev(LKA05_CURRENT_DEV::MAIN);
-		mvmk_modules[i].switch_cur_dev(LKA05_CURRENT_DEV::MAIN);
+		mvku_modules[i].switch_cur_dev(LKA_CURRENT_DEV::MAIN);
+		mvmk_modules[i].switch_cur_dev(LKA_CURRENT_DEV::MAIN);
 	}
-	mu_module.switch_cur_dev(LKA05_CURRENT_DEV::MAIN);
-	mpvn_modules[0].switch_cur_dev(LKA05_CURRENT_DEV::MAIN);
+	mu_module.switch_cur_dev(LKA_CURRENT_DEV::MAIN);
+	mpvn_modules[0].switch_cur_dev(LKA_CURRENT_DEV::MAIN);
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	//slot_thr.get_omnibus_obj()->switch_ab_os(MKO, adr, -1, 1);
+	new_tm(0xFFFF);
 	paint_buttons();
 	set_new_tm();
 	flag_on = true;
@@ -293,11 +296,11 @@ void LKA05_widg::new_ku_732(int ku_n, int length, double u, int line)
 
 	switch (ku_n)
 	{
-	case 3: mu_module.switch_cur_dev(LKA05_CURRENT_DEV(LKA05_CURRENT_DEV::MAIN));
+	case 3: mu_module.switch_cur_dev(LKA_CURRENT_DEV(LKA_CURRENT_DEV::MAIN));
 		paint_buttons();
 		set_new_tm();
 		break;
-	case 4: mu_module.switch_cur_dev(LKA05_CURRENT_DEV(LKA05_CURRENT_DEV::RESERVE));
+	case 4: mu_module.switch_cur_dev(LKA_CURRENT_DEV(LKA_CURRENT_DEV::RESERVE));
 		paint_buttons();
 		set_new_tm(); 
 		break;
@@ -332,7 +335,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					continue;
 				case 2:
 					if (switch_dev)
-						mvku_modules[nim].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
+						mvku_modules[nim].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
 					if (bus_reset)
 					{
 						mvku_modules[nim].set_ku_p(-1);
@@ -345,15 +348,15 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 						switch (nim)
 						{
 						case 0:
-							mvmk_modules[nim].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
+							mvmk_modules[nim].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
 							break;
 						case 1:
-							mvmk_modules[nim].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
-							mvmk_modules[nim+1].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
+							mvmk_modules[nim].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
+							mvmk_modules[nim+1].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
 							break;
 						case 2:
-							mvmk_modules[nim-1].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
-							mvmk_modules[nim].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
+							mvmk_modules[nim-1].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
+							mvmk_modules[nim].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
 							break;
 						}
 					}
@@ -367,7 +370,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					break;
 				case 5:
 					if (switch_dev)
-						mpvn_modules[nim].switch_cur_dev(LKA05_CURRENT_DEV(switch_dev));
+						mpvn_modules[nim].switch_cur_dev(LKA_CURRENT_DEV(switch_dev));
 						break;
 				};
 			}
@@ -395,7 +398,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					QMessageBox::critical(0, "Больше 11", "Ошибка СД");
 					break;
 				}
-				LKA05_MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
+				LKA_MV_DEV& param_pshm = mvmk_modules[pshm / 4].get_settings();
 				for (int mshm = 0; mshm <= 11; mshm++)
 				{
 					num_vertic = (itr->toInt()&(1<<mshm));
@@ -403,7 +406,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					{
 						if (max_p <= 4)
 						{
-							LKA05_MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
+							LKA_MV_DEV& param_mshm = mvmk_modules[mshm / 4].get_settings();
 							mvmk_modules[pshm / 4].set_ku_p(pshm % 4);
 							mvmk_modules[mshm / 4].set_ku_m(mshm % 4);
 							mku_slot_thr.get_mku_bus_obj()->make_mk(mshm, pshm, param_mshm.length_kom, param_pshm.length_kom, param_mshm.u_kom, param_pshm.u_kom, std::abs(param_pshm.dt_kom - param_mshm.dt_kom), 3, 3);
@@ -435,7 +438,7 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 					{
 						if (max_ku <= 4)
 						{
-							LKA05_MV_DEV& param_ku = mvku_modules[nim].get_settings();
+							LKA_MV_DEV& param_ku = mvku_modules[nim].get_settings();
 							mvku_modules[nim].set_ku_p(num_ku);
 							int full_num_ku = num_ku + nim * 8;
 							if ((full_num_ku >= 16) && (full_num_ku <= 18)) //Команды в МБК04 не заведены на внешнюю шину и выдаются напрямую
@@ -487,15 +490,15 @@ void LKA05_widg::paint_buttons()
 	}*/
 	switch (mu_module.get_current_dev())
 	{
-	case LKA05_CURRENT_DEV::OFF:
+	case LKA_CURRENT_DEV::OFF:
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case LKA05_CURRENT_DEV::MAIN:
+	case LKA_CURRENT_DEV::MAIN:
 		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case LKA05_CURRENT_DEV::RESERVE:
+	case LKA_CURRENT_DEV::RESERVE:
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
@@ -504,15 +507,15 @@ void LKA05_widg::paint_buttons()
 	{
 		switch (mvku_modules[i].get_current_dev())
 		{
-		case LKA05_CURRENT_DEV::OFF: 
+		case LKA_CURRENT_DEV::OFF: 
 			main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
-		case LKA05_CURRENT_DEV::MAIN:
+		case LKA_CURRENT_DEV::MAIN:
 			main_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 			reserve_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
-		case LKA05_CURRENT_DEV::RESERVE:
+		case LKA_CURRENT_DEV::RESERVE:
 			main_MVKU[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			reserve_MVKU[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 			break;
@@ -521,15 +524,15 @@ void LKA05_widg::paint_buttons()
 
 		switch (mvmk_modules[i].get_current_dev())
 		{
-		case LKA05_CURRENT_DEV::OFF:
+		case LKA_CURRENT_DEV::OFF:
 			main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
-		case LKA05_CURRENT_DEV::MAIN:
+		case LKA_CURRENT_DEV::MAIN:
 			main_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 			reserve_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
-		case LKA05_CURRENT_DEV::RESERVE:
+		case LKA_CURRENT_DEV::RESERVE:
 			main_MVMK[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			reserve_MVMK[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 			break;
@@ -541,15 +544,15 @@ void LKA05_widg::paint_buttons()
 //	{
 		switch (mpvn_modules[0].get_current_dev())
 		{
-		case LKA05_CURRENT_DEV::OFF:
+		case LKA_CURRENT_DEV::OFF:
 			main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 			reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
-		case LKA05_CURRENT_DEV::MAIN:
+		case LKA_CURRENT_DEV::MAIN:
 			main_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 			reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 			break;
-		case LKA05_CURRENT_DEV::RESERVE:
+		case LKA_CURRENT_DEV::RESERVE:
 			main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 			reserve_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 			break;
@@ -594,64 +597,6 @@ void LKA05_widg::new_data_mv(int saddr)
 		}
 	}
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, saddr, new_words);
-}
-
-unsigned short LKA05_MV_MODULE::get_data_mvku()
-{
-	unsigned short _word = (0 << 12) + (nim << 8);
-	if (!get_working())
-		_word += 0x1000;
-	if (ku_p!= -1)
-		_word += 1 << ku_p;
-	return _word;
-}
-unsigned short LKA05_MV_MODULE::get_data_mvmk()
-{
-	unsigned short _word = (0 << 12) + (nim << 8);
-	if (!get_working())
-		_word += 0x1000;
-	if (ku_p != -1)
-		_word += 1 << (ku_p+4);
-	if (ku_m != -1)
-		_word += 1 << ku_m;
-	return _word;
-}
-
-LKA05_MU_MODULE::LKA05_MU_MODULE() : current_dev(LKA05_CURRENT_DEV::MAIN)
-{
-	working.insert(LKA05_CURRENT_DEV::MAIN, true);
-	working.insert(LKA05_CURRENT_DEV::RESERVE, true);
-
-	ab_working.insert(LKA05_CURRENT_DEV::MAIN, true);
-	ab_working.insert(LKA05_CURRENT_DEV::RESERVE, true);
-
-}
-
-LKA05_MV_MODULE::LKA05_MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(LKA05_CURRENT_DEV::MAIN)
-{
-	devices.insert(LKA05_CURRENT_DEV::MAIN, LKA05_MV_DEV());
-	devices.insert(LKA05_CURRENT_DEV::RESERVE, LKA05_MV_DEV());
-}
-
-unsigned short LKA05_MU_MODULE::get_tm()
-{
-	unsigned short _word = 0x1000;
-	if (!get_working())
-		_word += 4;
-	_word += 0x20 << int(current_dev);
-	return _word;
-}
-
-unsigned short LKA05_MV_MODULE::get_tm()
-{
-	unsigned short _word = (com << 12) + (nim << 8);
-	if (!get_working())
-		_word += 2 << int(current_dev);
-	if (current_dev == LKA05_CURRENT_DEV::OFF)
-		_word += 0xC0;
-	else
-		_word += 0x20 << int(current_dev);
-	return _word;
 }
 
 void LKA05_widg::new_tm(int tm)

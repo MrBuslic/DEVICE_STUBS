@@ -538,7 +538,10 @@ void MBK07_widg::set_new_tm()
 
 	if (current_lit != 0)
 		s_word += 0x100 << current_lit - 1;
-	s_word += 0x80 << STAB(current_stab) - 1;
+
+	if (current_stab != OFF_STAB)
+		s_word += (0x20 << (3-STAB(current_stab)));
+
 	if (current_PSP != PSP_OFF)
 		s_word += PSP(current_PSP) - 1;
 	switch (current_antenna)

@@ -147,6 +147,22 @@ void RPC_r733_SLOT_Object::new_frame_04(QString mode, QVariant frame_data)
 	dynamic_call("new_frame_04(QString, QVariant)", tmp_list);
 	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_frame_04");
 }
+void RPC_r733_SLOT_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mshm);
+	tmp_list << QVariant(pshm);
+	tmp_list << QVariant(length_m);
+	tmp_list << QVariant(length_p);
+	tmp_list << QVariant(u_m);
+	tmp_list << QVariant(u_p);
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(line_m);
+	tmp_list << QVariant(line_p);
+	SRPCSignalClass::Instance().toLog(QString("r733 dynamic_call new_mk %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_mk(int, int, int, int, double, double, int, int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("r733 dynamic_call finished new_mk");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

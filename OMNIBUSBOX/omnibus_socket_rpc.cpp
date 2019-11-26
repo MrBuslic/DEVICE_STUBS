@@ -76,10 +76,11 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("omnibus_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &omnibus_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["switch_ab_os(int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab_os;
+		operators_map["switch_ab_os(int, int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab_os;
 		operators_map["switch_ab(int, int, bool)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab;
 		operators_map["set_new_data(int, int, int, QVariantList)"] = &omnibus_Socket_RPC_SLOT_Object::set_new_data;
 		operators_map["send_msg(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg;
+		operators_map["send_msg_mpko(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg_mpko;
 		operators_map["unomnibus_map_channels_setup(int, int)"] = &omnibus_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup;
 		operators_map["get_dt()"] = &omnibus_Socket_RPC_SLOT_Object::get_dt;
 		///////////////////////////////////////////////////////////////////////
@@ -120,6 +121,7 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+		disconnect(app, SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message_mpko(QVariant, int, int, int, QVariantList, int)));
 		disconnect(app, SIGNAL(message_to_log(QString)), this, SLOT(message_to_log(QString)));
 	}
 	void omnibus_Socket_RPC_SIGNAL_Object::set_app(RpcOmnibusWidget* _app)
@@ -127,6 +129,8 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		app = _app;
 		connect(app, SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)), Qt::DirectConnection);
 		data_map.insert("new_message(QVariant, int, int, int, QVariantList, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message_mpko(QVariant, int, int, int, QVariantList, int)), Qt::DirectConnection);
+		data_map.insert("new_message_mpko(QVariant, int, int, int, QVariantList, int)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(message_to_log(QString)), this, SLOT(message_to_log(QString)), Qt::DirectConnection);
 		data_map.insert("message_to_log(QString)", std::shared_ptr<SignalData>(new SignalData()));
 
@@ -291,6 +295,39 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_message finished").arg(objectName()));
 	}
+	void omnibus_Socket_RPC_SIGNAL_Object::new_message_mpko(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+	{
+		auto& descriptor = *data_map["new_message_mpko(QVariant, int, int, int, QVariantList, int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_message_mpko(QVariant, int, int, int, QVariantList, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_message_mpko  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << dt;
+		SRPCSignalClass::Instance().toLog(QString("new_message_mpko  call_number %2 dt =  %1").arg(RPCSignalClass::QVariantToString(dt)).arg(call_number));
+		tmp_stream << mko;
+		SRPCSignalClass::Instance().toLog(QString("new_message_mpko  call_number %2 mko =  %1").arg(RPCSignalClass::QVariantToString(mko)).arg(call_number));
+		tmp_stream << line;
+		SRPCSignalClass::Instance().toLog(QString("new_message_mpko  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
+		tmp_stream << cwd;
+		SRPCSignalClass::Instance().toLog(QString("new_message_mpko  call_number %2 cwd =  %1").arg(RPCSignalClass::QVariantToString(cwd)).arg(call_number));
+		tmp_stream << words;
+		SRPCSignalClass::Instance().toLog(QString("new_message_mpko  call_number %2 words =  %1").arg(RPCSignalClass::QVariantToString(words)).arg(call_number));
+		tmp_stream << os;
+		SRPCSignalClass::Instance().toLog(QString("new_message_mpko  call_number %2 os =  %1").arg(RPCSignalClass::QVariantToString(os)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_message_mpko sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_message_mpko finished").arg(objectName()));
+	}
 	void omnibus_Socket_RPC_SIGNAL_Object::message_to_log(QString _msg)
 	{
 		auto& descriptor = *data_map["message_to_log(QString)"].get();
@@ -334,7 +371,8 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int mko = _values.at(0).value<int>();
 			int addr = _values.at(1).value<int>();
 			int _os = _values.at(2).value<int>();
-			app->switch_ab_os(mko, addr, _os);
+			int _s_addr = _values.at(3).value<int>();
+			app->switch_ab_os(mko, addr, _os, _s_addr);
 			return 0;
 		}
 		catch(const std::exception &)
@@ -398,6 +436,33 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			QVariantList words = _values.at(3).value<QVariantList>();
 			int os = _values.at(4).value<int>();
 			app->send_msg(mko, line, cwd, words, os);
+			_values[3] = words;
+			SRPCSignalClass::Instance().toLog(QString("%1 words = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[3])));
+			_values[4] = os;
+			SRPCSignalClass::Instance().toLog(QString("%1 os = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[4])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant omnibus_Socket_RPC_SLOT_Object::send_msg_mpko(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int mko = _values.at(0).value<int>();
+			int line = _values.at(1).value<int>();
+			int cwd = _values.at(2).value<int>();
+			QVariantList words = _values.at(3).value<QVariantList>();
+			int os = _values.at(4).value<int>();
+			app->send_msg_mpko(mko, line, cwd, words, os);
 			_values[3] = words;
 			SRPCSignalClass::Instance().toLog(QString("%1 words = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[3])));
 			_values[4] = os;

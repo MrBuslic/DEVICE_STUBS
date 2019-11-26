@@ -14,6 +14,7 @@ public slots:
 	void auto_scroll_clicked(int _state);
 	void get_power(double volt);
 	void new_frame_04(QString mode, QVariant frame_data);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	////////////////////////////////////
 };
 

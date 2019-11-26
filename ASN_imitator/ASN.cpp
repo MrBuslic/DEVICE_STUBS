@@ -13,7 +13,7 @@ union MKOWord
 	};
 };
 
-ASN_widg::ASN_widg(QWidget *parent) : QWidget(parent), sett(QCoreApplication::applicationDirPath() + "/ans.ini", QSettings::IniFormat), a(true)
+ASN_widg::ASN_widg(QWidget *parent) : QWidget(parent), sett(QCoreApplication::applicationDirPath() + "/asn.ini", QSettings::IniFormat), a(true)
 {
 	//io = new QPushButton(QString("Включить"));
 	first_half = new QPushButton(QString("Первый комплект"));
@@ -52,9 +52,12 @@ ASN_widg::ASN_widg(QWidget *parent) : QWidget(parent), sett(QCoreApplication::ap
 	connect(n_hrg, SIGNAL(clicked()), this, SLOT(n_hrg_Clicked()));
 	connect(zacep, SIGNAL(clicked()), this, SLOT(zacep_Clicked()));
 	
-	test = false;
+	test = true;
 	OG = false;
 	flag_on = false;
+	radio = false;
+	dost = false;
+	nav_SYS = NAV_SYS_GG;
 
 	text = new QTextEdit();
 	text->setReadOnly(true);
@@ -132,7 +135,7 @@ ASN_widg::ASN_widg(QWidget *parent) : QWidget(parent), sett(QCoreApplication::ap
 	main->addLayout(hBoxLayout);
 	main->addWidget(text);
 
-	setFixedSize(500, 450);
+	setFixedSize(500, 350);
 	setLayout(main);
 	setWindowTitle(name);
 
@@ -221,7 +224,10 @@ void ASN_widg::n_hrg_Clicked()
 		text->setTextColor(QColor("red"));
 		text->append(QString("Отказ от прогрева ОГ"));
 		text->setTextColor(QColor("black"));
+		OG = true;
 		set_new_tm(8);
+		nw_Clicked();
+		jm_gg_Clicked();
 	}
 	else
 	{
@@ -241,6 +247,9 @@ void ASN_widg::zacep_Clicked()
 {
 	text->append(QString("Зацепился"));
 	prer->start(1000);
+	radio = true;
+	dost = true;
+	set_new_tm(8);
 }
 void ASN_widg::io_Clicked()
 {
@@ -281,10 +290,13 @@ void ASN_widg::io_Clicked()
 
 		update_time();
 		n_hrg->setEnabled(true);
+		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+		set_new_tm(8);
 	}
 	else
 	{
 		text->append(QString("Питание отключено"));
+		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 		EnableButton();
 		prer->stop();
 		heat_og_tmr->stop();
@@ -328,12 +340,12 @@ void ASN_widg::get_power(double _volt)
 {
 
 	volt = _volt;
-	if (volt >= 27.0)
+	if ((volt >= 27.0) && (!flag_on))
 	{
 		flag_on = true;
 		io_Clicked();
 	}
-	else if (volt < 1)
+	else if ((volt < 1) && (flag_on))
 	{
 		flag_on = false;
 		io_Clicked();
@@ -401,33 +413,23 @@ void ASN_widg::set_new_tm(int subadr)
 	if (subadr == 8)
 	{
 		// 1 слово
-		_word = 0;
-		if (test) _word += 0x8000;
-		if (OG) _word += 0x4000;
-		switch (nav_SYS)
-		{
-		case NAV_SYS_GL:
-			_word += 0;
-			break;
-		case NAV_SYS_GPS:
-			_word += 10;
-			break;
-		case NAV_SYS_GG:
-			_word += 8;
-			break;
-		case NAV_SYS_OFF:
-			_word += 18;
-			break;
-		default:
-			break;
-		}
+		_word = 4;
+		_word += 0xC0;
+		if (test) _word += 1;
+		if (OG) _word += 2;
+		if (dost) _word += 8;
+		if (radio) _word += 0x10;
+
+		_word += (_mode << 8);
+		_word += (nav_SYS << 11);
+		_word += (sys_mode << 13);
 		tmp_list.push_back(_word);
 
 		text->append(QString::number(_word));
-		slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
+		slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, subadr, tmp_list);
 	}
 	tmp_list.clear();
-	if (subadr == 2)
+	if (subadr == 9)
 	{
 		if(OG)
 			priznak_dost = true;
@@ -536,7 +538,7 @@ void ASN_widg::set_new_tm(int subadr)
 		count += 2;
 
 
-		//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
+		slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, subadr, tmp_list);
 	}
 
 }
@@ -564,15 +566,36 @@ void ASN_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	text->append(QString::number(tmp_cwd.adr));
 	if ((mko == MKO) && (tmp_cwd.adr == adr))
 	{
-		QString _msg = QString(QString("%1 принял сигнал на подадресе %2 c КС %3")).arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
-		text->append(_msg);
+		if (tmp_cwd.subadr == 1)
+		{
+			int tmp_word = words[0].toInt();
+			QString _msg = QString(QString("%1 принята команда 0x%2")).arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_word, 4, 16, QChar('0'));
+			text->append(_msg);
 
-		int tmp_word = words[0].toInt();
+			if (tmp_word == 0x3)
+				nav_SYS = NAV_SYS_GL;
+			if (tmp_word == 0xC)
+				nav_SYS = NAV_SYS_GPS;
+			if (tmp_word == 0x30)
+				nav_SYS = NAV_SYS_GG;
 
-		set_new_tm(tmp_cwd.subadr);
+			if (tmp_word == 0xAA)
+				_mode = MAIN_WORK;
+
+			if (tmp_word == 0xCC)
+				_mode = TEST_MODE;
+
+			if (tmp_word == 0xF5FA)
+				_mode = VECTOR_MODE;
+
+			set_new_tm(8);
+		}
+
+		//int tmp_word = words[0].toInt();
+
+		//set_new_tm(tmp_cwd.subadr);
 	}
 }
 
@@ -580,6 +603,8 @@ void ASN_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 {
 	if (volt != 0)
 	{
+		if ((pshm != 1) || (mshm > 2))
+			return;
 		QString _msg = QString("%1 принял МК МШ%2 ПШ%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mshm).arg(pshm);
 		text->append(_msg);
 		int tmp_mshm = mshm;
@@ -656,7 +681,7 @@ void ASN_widg::load_fact()
 void ASN_widg::set_new_tm_2()
 {
 	interrupt_slot_thr.get_interrupt_bus_obj()->make_interrupt(0, 3, 5, 4.5);
-	set_new_tm(2);
+	set_new_tm(9);
 }
 
 unsigned short ASN_widg::sokr_time(QDateTime t, bool a)

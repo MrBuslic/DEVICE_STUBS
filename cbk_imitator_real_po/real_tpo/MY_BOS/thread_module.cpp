@@ -16,9 +16,6 @@ TPOThread::TPOThread() : QThread()
 
 void TPOThread::run()
 {
-	MkoImitObject& mko_imit(SMkoImitObject::Instance());
-	mko_imit.create_slot_thread();
-	QObject::connect(&mko_imit, SIGNAL(signal_send_msg_mko(int, int, int, QVariantList&, int&)), mko_imit.get_mko_slot_thread()->get_omnibus_obj().get(), SLOT(send_msg(int, int, int, QVariantList&, int&)), Qt::DirectConnection);
 	MainTask(0);
 }
 

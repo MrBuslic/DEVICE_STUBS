@@ -28,6 +28,7 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+	void new_message_mpko(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void message_to_log(QString _msg);
 
 	void send_signal_slot(QByteArray* _arr);
@@ -99,6 +100,7 @@ public:
 	QVariant switch_ab(QVariantList& _values);
 	QVariant set_new_data(QVariantList& _values);
 	QVariant send_msg(QVariantList& _values);
+	QVariant send_msg_mpko(QVariantList& _values);
 	QVariant unomnibus_map_channels_setup(QVariantList& _values);
 	QVariant get_dt(QVariantList& _values);
 public slots:

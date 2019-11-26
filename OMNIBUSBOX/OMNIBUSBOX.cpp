@@ -63,23 +63,33 @@ RpcOmnibusWidget::RpcOmnibusWidget(QWidget* parent) : QWidget(parent)
 RpcAbonent::RpcAbonent(int addr)
 {
 	on = false;
-	os = addr << 11;
-	for (int i = 1; i < 30; i++)
+	line = 3;
+	unsigned short tmp_os = addr << 11;
+	os.insert(0, tmp_os);
+	last_os = tmp_os;
+	os.insert(31, tmp_os);
+	for (int i = 1; i < 31; i++)
 	{
 		QList<unsigned short> tmp_words;
 		for (int j = 0; j < 32; j++)
 		{
 			tmp_words << 0;
 		}
-
+		os.insert(i, tmp_os);
 		words.insert(i, tmp_words);
 	}
 }
 
-void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os)
+void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os, int _s_addr)
 {
-	abonents[mko][addr].os = _os;
-	QString _msg = QString("Абонент с адресом %1 на МКО %2 с ответным словом %3").arg(addr).arg(mko).arg(_os);
+	if (_s_addr == -1)
+		for (int i = 0; i < 32; i++)
+		{
+			abonents[mko][addr].os[i] = _os;
+		}
+	else
+		abonents[mko][addr].os[_s_addr] = _os;
+	QString _msg = QString("Абоненту с адресом %1 на МКО %2 установлено ОС %3 на подадрес %4").arg(addr).arg(mko).arg(_os).arg(_s_addr);
 	emit message_to_log(_msg);
 }
 
@@ -113,14 +123,78 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 		emit message_to_log(_msg);
 		return;
 	}
+	if (abonents[mko][tmp_cwd.adr].on && (work_line & abonents[mko][tmp_cwd.adr].line))
+	{
+		if ((tmp_cwd.subadr ==0) || (tmp_cwd.subadr == 31))
+		{
+			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+
+			switch (tmp_cwd.count)
+			{
+			case TRANSMIT_BW:
+				os = abonents[mko][tmp_cwd.adr].last_os;
+				break;
+			case BLOCK_TRANSMITTER:
+				abonents[mko][tmp_cwd.adr].line ^= work_line;
+				break;
+			case DEBLOCK_TRANSMITTER:
+				abonents[mko][tmp_cwd.adr].line += 2 - 2*line;
+				break;
+			}
+		}
+		else
+		{
+			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+			if (tmp_cwd.tr && (os != -1))
+			{
+				words.clear();
+				int tmp_word_count = tmp_cwd.count;
+				if (tmp_cwd.count == 0)
+					tmp_word_count = 32;
+				words.reserve(tmp_word_count);
+				for (int i = 0; i < tmp_word_count; i++)
+					words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
+			}
+		}
+	}
+	else
+	{
+		os = -1;
+	}
+
+	if (os != -1)
+		abonents[mko][tmp_cwd.adr].last_os = os;
+
+	QString _msg = QString("Обмен на МКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(cwd, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
+	emit message_to_log(_msg);
+	emit new_message(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
+}
+
+
+void RpcOmnibusWidget::send_msg_mpko(int mko, int line, int cwd, QVariantList& words, int& os)
+{
+	MkoWord tmp_cwd;
+	tmp_cwd.cw = cwd;
+	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
+	tmp_cwd.adr = 4;
+	qDebug() << QString("mpko %1 %2 %3").arg(tmp_cwd.adr).arg(tmp_cwd.subadr).arg(tmp_cwd.count);
+	if (!(map_channels[mko] & work_line))
+	{
+		QString _msg = QString("МКО %1 канал %2 не работает").arg(mko).arg(line);
+		emit message_to_log(_msg);
+		return;
+	}
 	if (abonents[mko][tmp_cwd.adr].on)
 	{
-		os = abonents[mko][tmp_cwd.adr].os;
-		if (tmp_cwd.tr)
+		os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+		if (tmp_cwd.tr && (os != -1))
 		{
 			words.clear();
-			words.reserve(tmp_cwd.count);
-			for (int i = 0; i < tmp_cwd.count; i++)
+			int tmp_word_count = tmp_cwd.count;
+			if (tmp_cwd.count == 0)
+				tmp_word_count = 32;
+			words.reserve(tmp_word_count);
+			for (int i = 0; i < tmp_word_count; i++)
 				words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
 		}
 	}
@@ -128,9 +202,9 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 	{
 		os = -1;
 	}
-	QString _msg = QString("Обмен на МКО %1 КС 0x%2").arg(mko).arg(cwd, 4, 16, QChar('0'));
+	QString _msg = QString("Обмен на МПКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(tmp_cwd.cw, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
 	emit message_to_log(_msg);
-	emit new_message(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
+	emit new_message_mpko(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, tmp_cwd.cw, words, os);
 }
 
 

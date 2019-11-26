@@ -347,6 +347,7 @@ void MainTaskIdle (void)
 {
 // фоновые процедуры
 // ...
+	taskDelay(20);
 }
 //================================================================================
 
@@ -651,6 +652,7 @@ while (1)
   timeRead(&CurrTime);
   DeltaTime = DeltaTimeMSec(&BeginTime, &CurrTime);
   if (DeltaTime > ATime) break;
+  taskDelay(1);
   }
 }
 //================================================================================

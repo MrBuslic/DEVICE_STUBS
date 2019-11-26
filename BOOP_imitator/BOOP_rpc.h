@@ -10,9 +10,6 @@ public:
 	RPC_BOOP_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("BOOP_slot_obj");}
 	////////////////////////////////////
 public slots:
-	void new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word);
-	void new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
-	void move_boop();
 	////////////////////////////////////
 };
 

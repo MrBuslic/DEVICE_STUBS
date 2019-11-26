@@ -12,10 +12,14 @@
 enum PowerState{ON, OFF, CRASH};
 enum POState{SPOBU, TPO, VACANT, UNDEFINED};
 
+#define SPO_START_TIME 30000
+
 struct VM_State
 {
 	int VMPowerState[4];
 	int VMPOState[4];
+	long long StartTime[4];
+	bool running[4];
 };
 
 struct Work_State
@@ -55,7 +59,14 @@ private:
 	void set_str_combo();
 	void closeEvent(QCloseEvent *event);
 
+	QMap<QTimer*, int> on_timers;
+	QMap<int, QTimer*> on_timers_;
+
+	void opo_loaded(int n_vm);
+
 private slots:
+	void on_timeout();
+
 	void set_VM_ON(int n_vm);
 	void VM_ON_clicked();
 	void set_VM_OFF(int n_vm);
@@ -64,8 +75,8 @@ private slots:
 	void VM_CRASH_clicked();
 	void change_PO_VM(int index);
 	
-	void slot_vm_is_on(int n_vm);
-	void slot_vm_is_off(int n_vm);
+	//void slot_vm_is_on(int n_vm);
+	//void slot_vm_is_off(int n_vm);
 	void run_PO(int PO);
 	void shutdown_PO(int PO);
 

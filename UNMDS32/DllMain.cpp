@@ -7,7 +7,7 @@
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	DWORD fdwReason, LPVOID lpvReserved)
 {
-	Srpc_buffer_class::Instance();
+
 	switch (fdwReason)      // Дерево разбора уведомлений
 	{
 	case DLL_PROCESS_ATTACH: // Подключение DLL
