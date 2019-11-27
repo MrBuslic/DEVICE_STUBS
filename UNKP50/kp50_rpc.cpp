@@ -1,40 +1,5 @@
 #include "kp50_rpc.h"
 
-void RPC_kp50_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("kp50 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("kp50 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("kp50 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_kp50_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("kp50 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("kp50 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("kp50 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_kp50_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_kp50_SLOT_Object>(new RPC_kp50_SLOT_Object(addr, port));
@@ -111,21 +76,6 @@ void RPC_kp50_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_kp50_SLOT_Object::auto_scroll_clicked(int _state)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(_state);
-	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call auto_scroll_clicked %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("auto_scroll_clicked(int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("kp50 dynamic_call finished auto_scroll_clicked");
-}
-void RPC_kp50_SLOT_Object::log_timer_ontimer()
-{
-	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("kp50 dynamic_call log_timer_ontimer %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("log_timer_ontimer()", tmp_list);
-	SRPCSignalClass::Instance().toLog("kp50 dynamic_call finished log_timer_ontimer");
-}
 void RPC_kp50_SLOT_Object::set_u_in(double _u)
 {
 	QVariantList tmp_list;

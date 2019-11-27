@@ -1,40 +1,5 @@
 #include "MBK02_rpc.h"
 
-void RPC_MBK02_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("MBK02 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("MBK02 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("MBK02 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_MBK02_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("MBK02 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("MBK02 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("MBK02 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_MBK02_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_MBK02_SLOT_Object>(new RPC_MBK02_SLOT_Object(addr, port));
@@ -78,6 +43,11 @@ void RPC_MBK02_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		SRPCSignalClass::Instance().toLog("set_new_power_tm connected");
 		emit connect_signal("set_new_power_tm(int, QVariantList)", true);
 	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::emit_update_graphics)) {
+		SRPCSignalClass::Instance().toLog("emit_update_graphics connected");
+		emit connect_signal("emit_update_graphics()", true);
+	}
 }
 
 void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -95,6 +65,11 @@ void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_power_tm)) {
 		SRPCSignalClass::Instance().toLog("set_new_power_tm disconnected");
 		//emit connect_signal("set_new_power_tm(int, QVariantList)", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::emit_update_graphics)) {
+		SRPCSignalClass::Instance().toLog("emit_update_graphics disconnected");
+		//emit connect_signal("emit_update_graphics()", false);
 	}
 }
 
@@ -185,6 +160,19 @@ void RPC_MBK02_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("MBK02 signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
+			if (op_name == "emit_update_graphics()")
+			{
+				emit emit_update_graphics();
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("MBK02 signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 		}
 	}
 }
@@ -255,6 +243,13 @@ void RPC_MBK02_SLOT_Object::get_power(double volt)
 	SRPCSignalClass::Instance().toLog(QString("MBK02 dynamic_call get_power %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("get_power(double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("MBK02 dynamic_call finished get_power");
+}
+void RPC_MBK02_SLOT_Object::update_graphics()
+{
+	QVariantList tmp_list;
+	SRPCSignalClass::Instance().toLog(QString("MBK02 dynamic_call update_graphics %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("update_graphics()", tmp_list);
+	SRPCSignalClass::Instance().toLog("MBK02 dynamic_call finished update_graphics");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

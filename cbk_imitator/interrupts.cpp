@@ -1,6 +1,6 @@
-#include "interrupts.h"
 #include <QMessageBox>
 #include <QMutex>
+#include "interrupts.h"
 
 Interrupt_Object::Interrupt_Object() : QObject()
 {

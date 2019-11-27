@@ -29,14 +29,14 @@ endif()
 
 QT5_ADD_RESOURCES(RESOURCES mfsk24.qrc)
 
-set(UNMFSK24_SOURCES unmfsk24.cpp mfsk24_rpc.h mfsk24_rpc.cpp)                                            
+set(UNMFSK24_SOURCES unmfsk24.cpp mfsk24_rpc.h mfsk24_rpc.cpp DllMain.cpp)                                            
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unmfsk24_32 SHARED ${UNMFSK24_HEADERS} ${UNMFSK24_SOURCES} export.def)
 target_link_libraries(unmfsk24_32 socket_rpc)                                                        
 
 set(RPC_MFSK24_SOURCES rpc_mfsk24.h rpc_mfsk24.cpp mfsk24_main.cpp mfsk24_socket_rpc.h mfsk24_socket_rpc.cpp)
-add_executable(rpc_mfsk24 WIN32 ${RPC_MFSK24_SOURCES} ${RESOURCES})
+add_executable(rpc_mfsk24 WIN32 ${RPC_MFSK24_SOURCES} ${RESOURCES} icon.rc)
 set_target_properties(rpc_mfsk24 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_mfsk24 ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_mfsk24 Core Widgets Gui Network)

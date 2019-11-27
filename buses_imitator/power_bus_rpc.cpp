@@ -1,40 +1,5 @@
 #include "power_bus_rpc.h"
 
-void RPC_power_bus_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("power_bus slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("power_bus slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("power_bus slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_power_bus_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("power_bus signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("power_bus signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("power_bus signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_power_bus_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_power_bus_SLOT_Object>(new RPC_power_bus_SLOT_Object(addr, port));

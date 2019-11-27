@@ -60,7 +60,7 @@ RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), auto_scroll(true), measu
 
 	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka05");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku");
 		this->deleteLater();
 		return;
 	}

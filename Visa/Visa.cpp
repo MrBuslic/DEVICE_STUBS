@@ -33,7 +33,7 @@ void mezanin_list_add(QString desc, int type, int model, int slot, int commapp)
 {
 	mezanin_struct mez;
 	strcpy(mez.desc, desc.toLocal8Bit().data());
-	mez.type = VI_INTF_VXI;
+	mez.type = type;
 	mez.model = model; 
 	mez.slot = slot;
 	mez.commapp = commapp;
@@ -54,6 +54,8 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 	{
 		QString commapp = QCoreApplication::applicationName();
 		QString mez = "";
+		mezanin_list.clear();
+		mezanin_list_poiner = 0;
 		if(commapp == "comapp1")
 		{
 			mezanin_list_poiner = 0;
@@ -104,6 +106,14 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 		{
 			mezanin_list_add("VXI::105::INSTR", VI_INTF_VXI, 0x010D, 6, 1);		// ÕÃ
 			mez = "iksa_server";
+		}
+
+		if (commapp == "mbk02")
+		{
+			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0x0171, 1, 1);		//  œ100-30
+			mezanin_list_add("VXI::80::INSTR", VI_INTF_VXI, 0x0168, 2, 2);		// ŒÀ—
+			mezanin_list_add("VXI::81::INSTR", VI_INTF_VXI, 0x0168, 3, 2);		// ŒÀ—
+			mezanin_list_add("VXI::77::INSTR", VI_INTF_VXI, 0x010D, 4, 1);		// ÕÃ
 		}
 
 		/*		/// –¿¡Œ“¿ — XML
@@ -161,7 +171,7 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		case VI_ATTR_INTF_TYPE:
 		{
 			int* tmp_res = (int*)attrValue;
-			*tmp_res = VI_INTF_VXI;
+			*tmp_res = mezanin_list.at(mezanin_list_poiner).type;
 			break;
 		}
 		case VI_ATTR_MODEL_CODE:

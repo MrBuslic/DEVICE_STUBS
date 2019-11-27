@@ -1,40 +1,5 @@
 #include "BOOP_rpc.h"
 
-void RPC_BOOP_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("BOOP slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("BOOP slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("BOOP slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_BOOP_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("BOOP signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("BOOP signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("BOOP signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_BOOP_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_BOOP_SLOT_Object>(new RPC_BOOP_SLOT_Object(addr, port));
@@ -111,35 +76,6 @@ void RPC_BOOP_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_BOOP_SLOT_Object::new_message(QVariant dt, int MKO, int line, int command_word, QVariantList words, int respond_word)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(dt);
-	tmp_list << QVariant(MKO);
-	tmp_list << QVariant(line);
-	tmp_list << QVariant(command_word);
-	tmp_list << QVariant(words);
-	tmp_list << QVariant(respond_word);
-	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call new_message %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("BOOP dynamic_call finished new_message");
-}
-void RPC_BOOP_SLOT_Object::new_matrix_command(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
-{
-	QVariantList tmp_list;
-	tmp_list << QVariant(mshm);
-	tmp_list << QVariant(pshm);
-	tmp_list << QVariant(length_m);
-	tmp_list << QVariant(length_p);
-	tmp_list << QVariant(u_m);
-	tmp_list << QVariant(u_p);
-	tmp_list << QVariant(dt);
-	tmp_list << QVariant(line_m);
-	tmp_list << QVariant(line_p);
-	SRPCSignalClass::Instance().toLog(QString("BOOP dynamic_call new_matrix_command %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("new_matrix_command(int, int, int, int, double, double, int, int, int)", tmp_list);
-	SRPCSignalClass::Instance().toLog("BOOP dynamic_call finished new_matrix_command");
-}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

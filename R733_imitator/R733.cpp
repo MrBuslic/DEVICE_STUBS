@@ -15,17 +15,17 @@ union MKOWord
 	};
 };
 
-R733_widg::R733_widg()
+R733_widg::R733_widg() : LKA06_MODULE(6)
 {
-	mpvn_modules << MV_MODULE(5, 0);
-	mvku_modules << MV_MODULE(2, 0);
-//	upi_modules << UPI_MODULE();
-	vchm_chanels_init << 0 << 0 << 0 << 0;
-	upi_state_channels << 0 << 0 << 0 << 0;
-	mode_names.insert(REGIME::PI15, "ПИ15");
-	mode_names.insert(REGIME::PI8, "ПИ8");
-	mode_names.insert(REGIME::VTF, "ВТФ");
-	mode_names.insert(REGIME::RBK, "РБК");
+	PUPS = 0x1;
+
+	tm_data.tm_data = 0;
+
+	mode_names.insert(int(REGIME::ERR), "Ошибка");
+	mode_names.insert(int(REGIME::PI15), "ПИ15");
+	mode_names.insert(int(REGIME::PI8), "ПИ8");
+	mode_names.insert(int(REGIME::VTF), "ВТФ");
+	mode_names.insert(int(REGIME::RBK), "РБК");
 
 	channel_names.insert(NUM_CHANNEL::CHANNEL_1, "first channel");
 	channel_names.insert(NUM_CHANNEL::CHANNEL_2, "two channel");
@@ -125,34 +125,6 @@ R733_widg::R733_widg()
 	//v_l->addLayout(h_layout_UPI);
 	v_l->addLayout(block_glayout);
 
-	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	omni_slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), OMNIBUS_SLOT);
-	omni_slot_thr.start(); // вот тут падает
-
-
-	omni_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-	omni_signal_thr.start(); // вот тут падает
-
-	if (!omni_slot_thr.wait_connected(3) || !omni_signal_thr.wait_connected(3))
-	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
-		//this->deleteLater();
-		//return;
-	}
-
-	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
-	mku_slot_thr.start(); 
-
-	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
-	mku_signal_thr.start();
-
-	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
-	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
-		//this->deleteLater();
-		//return;
-	}
-
 	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
 	power_slot_thr.start();
 
@@ -193,44 +165,26 @@ R733_widg::R733_widg()
 	adr = 6;
 //	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	flag_on = false;
-	QVariantList words;
-	words << 0x011;
-	for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-	{
-		int state_upi = itr->toInt() /*& 0x1) >> 1*/;
-		upi_state_channels.clear();
-		upi_state_channels << (state_upi & 0x1);
-		upi_state_channels << ((state_upi & 0x4) >> 2);
-		upi_state_channels << ((state_upi & 0x10) >> 4);
-		upi_state_channels << ((state_upi & 0x40) >> 6);
-		upi_module.set_working_channels(vchm_chanels_init, false);
-		//for (int j = 0; j <= 7; j++)
-		//{
-		//	int state_upi = (itr->toInt() & 0x1) >> j;
-		//	//for (int i = 0; i <= 7; i++)
-		//	//{
-		//		upi_modules[j].switch_num_chan(STATE_UPI(state_upi));
-		//	//}
-		//}
-	}
 
-	AbOn_tmr = new QTimer(this);
-	AbOn_tmr->setSingleShot(true);
-	connect(AbOn_tmr, &QTimer::timeout, this, &R733_widg::omni_connect);
-
+	
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k2(double)), this, SLOT(get_power(double)));
+
+	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
+
 	//	connect(mbk02_signal_thr.get_obj().get(), SIGNAL(set_new_tm(int, int)), this, SLOT(set_new_mbk02_tm(int, int)));
 	//		regime_upi = REGIME::PI8;
 	//			QString _msg = QString("Режим работы модуля УПИ: %1").arg(mode_names[regime_upi]);
 	//			msg_to_log(_msg);
-	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
-	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
+
 	//upi_modules[0].switch_num_chan(NUM_CHANNEL::CHANNEL_1);
 	paint_buttons();
-		QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
-		restoreGeometry(settings.value("733_geometry").toByteArray());
-		//set_new_tm();
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("733_geometry").toByteArray());
+
+	set_rsk();
+	//set_new_tm();
 }
 
 void R733_widg::get_power(double _volt)
@@ -241,17 +195,6 @@ void R733_widg::get_power(double _volt)
 	else if (volt < 1)
 			imit_off();
 
-}
-
-void R733_widg::omni_connect()
-{
-	AbOn_tmr->stop();
-	mu_module.switch_cur_dev(CURRENT_DEV::MAIN);
-	mvku_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
-	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::MAIN);
-	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
-	paint_buttons();
-	set_new_tm();
 }
 
 void R733_widg::set_power_back()
@@ -274,13 +217,15 @@ void R733_widg::imit_on()
 {
 	if (flag_on)
 		return;
-	connect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
-	AbOn_tmr->start(1000); 
-	upi_state_channels.clear();
-	upi_state_channels << 1 << 1 << 1 << 1 ;
+
+	mu_dev_to_set = LKA_CURRENT_DEV::MAIN;
+	lka_imit_on();
 	change_power();
 	paint_buttons();
+	PUPS = 1;
+	tm_data.PP = 1;
+	tm_data.VP_O = 1;
+	set_tm_state();
 	flag_on = true;
 }
 
@@ -288,19 +233,18 @@ void R733_widg::imit_off()
 {
 	if (!flag_on)
 		return;
-	disconnect(omni_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	omni_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	power = 0;
 	flag_on = false;
-	mu_module.switch_cur_dev(CURRENT_DEV::OFF);
-	mvku_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	mpvn_modules[0].switch_cur_dev(CURRENT_DEV::OFF);
-	upi_state_channels.clear();
-	upi_state_channels << 0 << 0 << 0 << 0;
+	lka_imit_off();
 	set_power_back();
-//	set_new_tm();
+	tm_data.PP = 0;
+	tm_data.VP_O = 0;
+	tm_data.VP_R = 0;
+	set_tm_state();
 	paint_buttons();
 }
+
 
 
 void UPI_MODULE::set_working_channels(QList<int> chanels_state, bool can_on)
@@ -311,9 +255,9 @@ void UPI_MODULE::set_working_channels(QList<int> chanels_state, bool can_on)
 	for (int i = 0; i < 4; i++)
 	{
 		if (!chanels_state[i])
-			working[STATE_UPI(i)] = chanels_state[i];
+			working[UPI_CHANEL(i)] = chanels_state[i];
 		else if (can_on)
-			working[STATE_UPI(i)] = chanels_state[i];
+			working[UPI_CHANEL(i)] = chanels_state[i];
 	}
 }
 
@@ -323,105 +267,29 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.subadr >= 17) && (tmp_cwd.subadr <= 29))
+	{
+		mko_counter++;
+		set_new_tm();
+	}
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		if (tmp_cwd.subadr == 17)
 		{
-			bool need_mvku_renew = false;
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
-			{
-				int vchm_flag = (itr->toInt() & 0x8000) >> 15;
-				switch (vchm_flag)
-				{
-				case 0:
-				{
-					int bus_reset = (itr->toInt() & 0x3);
-					int switch_dev = (itr->toInt() & 0xC0) >> 6;
-					int com = (itr->toInt() & 0x7000) >> 12;
-					switch (com)
-					{
-					case 1:
-						continue;
-					case 2:
-						if (switch_dev)
-							mvku_modules[0].switch_cur_dev(CURRENT_DEV(switch_dev));
-						if (bus_reset)
-						{
-							mvku_modules[0].set_ku_p(-1);
-							need_mvku_renew = true;
-						}
-						break;
-					case 3:
-						continue;
-					case 5:
-						if (switch_dev)
-							mpvn_modules[0].switch_cur_dev(CURRENT_DEV(switch_dev));
-						break;
-					};
-					break;
-				}
-				case 1:
-				{
-					int vchm_chanels_on = (itr->toInt() & 0x1000) >> 12;
-					switch (vchm_chanels_on)
-					{
-					case 0:
-					{
-						int chanels = (itr->toInt() & 0xF);
-						if (!vchm_is_init)
-						{
-							vchm_chanels_init.clear();
-							vchm_chanels_init << (chanels & 0x1);
-							vchm_chanels_init << ((chanels & 0x2) >> 1);
-							vchm_chanels_init << ((chanels & 0x4) >> 2);
-							vchm_chanels_init << ((chanels & 0x8) >> 3);
-							vchm_module.set_working_chanels(vchm_chanels_init, false);
-							if (vchm_chanels_init.contains(1))
-							{
-								vchm_on_timer.start(48000);
-								vchm_is_init = true;
-							}
-						}
-						break;
-					}
-					case 1:
-					{
-						int pshk = (itr->toInt() & 0x800) >> 11;
-						int nk = (itr->toInt() & 0x600) >> 9;
-						int comand = (itr->toInt() & 0x3C) >> 2;
-						switch (comand)
-						{
-						case 0xC:
-							//команда подключения процессора 
-							break;
-						case 0x7:
-						{
-							QList<int> tmp_chans;
-							if (pshk)
-								tmp_chans << 0 << 0 << 0 << 0;
-							else
-								for (int i = 0; i < 4; i++)
-									if (i == nk)
-										tmp_chans << 0;
-									else
-										tmp_chans << vchm_module.get_working(i);
-							vchm_module.set_working_chanels(tmp_chans, false);
-							vchm_on_timer.start(48000);
-							vchm_is_init = true;
-						}
-						}
-						break;
-					}
-					}
-					break;
-				}
-				};
-			}
-			paint_buttons();
-			set_new_tm();
+			new_message_mu(words);
+
 			if (need_mvku_renew)
 				new_data_mv();
 
+		}
+		if (tmp_cwd.subadr == 19)
+		{
+
+			if (words.at(0).toInt() == 0x0D00)
+			{
+				PUPS = 0;
+				set_new_tm();
+			}
 		}
 		//if (tmp_cwd.subadr == 17)
 		//{
@@ -441,7 +309,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//			continue;
 		//		case 2:
 		//			if (switch_dev)
-		//				mvku_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+		//				mvku_modules[nim].switch_cur_dev(R733_CURRENT_DEV(switch_dev));
 		//			if (bus_reset)
 		//			{
 		//				mvku_modules[nim].set_ku_p(-1);
@@ -452,7 +320,7 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//			continue;
 		//		case 5:
 		//			if (switch_dev)
-		//				mpvn_modules[nim].switch_cur_dev(CURRENT_DEV(switch_dev));
+		//				mpvn_modules[nim].switch_cur_dev(R733_CURRENT_DEV(switch_dev));
 		//			break;
 		//		};
 		//	}
@@ -515,24 +383,19 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					ku = (itr->toInt()&(1 << num_ku));
 					if (ku != 0 && nim == 0)
 					{
-						MV_DEV& param_ku = mvku_modules[nim].get_settings();
+						LKA_MV_DEV& param_ku = mvku_modules[nim].get_settings();
 						mvku_modules[nim].set_ku_p(num_ku);
 						int full_num_ku = num_ku + nim * 8;
+
+						upi_module.set_working(UPI_MODULE::UPI_CHANEL(num_ku / 2), (num_ku % 2 == 0));
+
 						//mku_slot_thr.get_mku_bus_obj()->make_ku_732(full_num_ku, param_ku.length_kom, param_ku.u_kom, 3);
 					}
+
 				}
-				int state_upi = itr->toInt() /*& 0x1) >> 1*/;
-				upi_state_channels.clear();
-				upi_state_channels << (state_upi & 0x1);
-				upi_state_channels << ((state_upi & 0x4) >> 2);
-				upi_state_channels << ((state_upi & 0x10) >> 4);
-				upi_state_channels << ((state_upi & 0x40) >> 6);
-				upi_module.set_working_channels(vchm_chanels_init, false);
-				/*for (int i = 0; i <= 7; i++) 
-				{
-					upi_modules[i].switch_num_chan(STATE_UPI());
-				}*/
 			}
+			set_rsk();
+			paint_buttons();
 			new_data_mv();
 		}
 		//		if (tmp_cwd.subadr == 30)
@@ -550,176 +413,182 @@ void R733_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		//new_data(mko,addr, subadr, words);
 		if (tmp_cwd.subadr == 2)
 		{
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			int rrr_1 = words.at(0).toInt() & 0xFF;
+			int rrr_2 = ((words.at(0).toInt() & 0xFF00) >> 8);
+
+			if (rrr_1 == rrr_2)
 			{
+				rrr = rrr_1;
 
-				for (int i = 0; i <= 7; i++)
+				switch (rrr)
 				{
-					rrr = itr->toInt() & (0x0101 << i);
-
-					switch (rrr)
-					{
-					case 257:
-						regime_upi = PI15;
-						break;
-					case 514:
-						regime_upi = PI8;
-						break;
-					case 1028:
-						regime_upi = VTF;
-						break;
-					case 8224:
-						regime_upi = RBK;
-						break;
-					default:
-						break;
-					}
+				case (1 << (int)REGIME::PI15):
+					regime_upi = REGIME::PI15;
+					break;
+				case (1 << (int)REGIME::PI8):
+					regime_upi = REGIME::PI8;
+					break;
+				case (1 << (int)REGIME::VTF):
+					regime_upi = REGIME::VTF;
+					break;
+				case (1 << (int)REGIME::RBK):
+					regime_upi = REGIME::RBK;
+					break;
+				default:
+					regime_upi = REGIME::ERR;
+					break;
 				}
+
+				regime = mode_names[int(regime_upi)];
+				QString _msg = QString("%1").arg(mode_names[int(regime_upi)]);
+				//msg_to_log(_msg);
+				regime_mod_upi->setText(_msg);
+				set_rrr_rsh();
+
 			}
-			regime = mode_names[regime_upi];
-			QString _msg = QString("%1").arg(mode_names[regime_upi]);
-			//msg_to_log(_msg);
-			regime_mod_upi->setText(_msg);
+			else
+			{
+				msg = QString("Подадрес 2. Регистр РРР: СД несимметрично");
+				msg_to_log(msg);
+			}
 		}
 
 		if (tmp_cwd.subadr == 3)
 		{
 			rkm_channels.clear();
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+
+			int rkm_1 = words.at(0).toInt() & 0xFF;
+			int rkm_2 = ((words.at(0).toInt() & 0xFF00) >> 8);
+			if (rkm_1 == rkm_2)
 			{
-				int rkm_1 = itr->toInt() & 0xFF;
-				int rkm_2 = ((itr->toInt() & 0xFF00) >> 8);
-				rkm = rkm_1 & rkm_2;
+				rkm = rkm_1;
 				rkm_channels << (rkm & 0x1);
 				rkm_channels << ((rkm & 0x2) >> 1);
 				rkm_channels << ((rkm & 0x4) >> 2);
 				rkm_channels << ((rkm & 0x8) >> 3);
-				if (rrr == 8224) // блокировка разрешана, если включенно РБК в РРР
+				rkm_channels << ((rkm & 0x10) >> 4);
+				rkm_channels << ((rkm & 0x20) >> 5);
+				rkm_channels << ((rkm & 0x40) >> 6);
+				rkm_channels << ((rkm & 0x80) >> 7);
+				//upi_module.set_working_channels(rkm_channels);
+
+				int j_major = 1;
+				int j_gsch = 1;
+				for (int i = 0; i <= 7; i++)
 				{
-					rkm_channels << ((rkm & 0x10) >> 4);
-					rkm_channels << ((rkm & 0x20) >> 5);
-					rkm_channels << ((rkm & 0x40) >> 6);
-					rkm_channels << ((rkm & 0x80) >> 7);
-					//upi_module.set_working_channels(rkm_channels);
-				}
-				else  
-				{
-					rkm_channels << 0;
-					rkm_channels << 0;
-					rkm_channels << 0;
-					rkm_channels << 0;
+					if ((0 <= i) && (i < 3))
+					{
+						msg = QString("Контроль %2 каналa мажоритарa: %1").arg(rkm_channels[i]).arg(j_major);
+						j_major++;
+					}
+					else if ((3 < i) && (i <= 7))
+					{
+						msg = QString("Блокировка %2 канала ГСЧ: %1").arg(rkm_channels[i]).arg(j_gsch);
+						j_gsch++;
+					}
+					else
+						msg = "";
+					msg_to_log(msg);
 				}
 			}
-			int j_major = 1;
-			int j_gsch = 1;
-			for (int i = 0; i <= 7; i++)
+			else
 			{
-				if ((0 <= i) && (i < 3))
-				{
-					msg = QString("Контроль %2 каналa мажоритарa: %1").arg(rkm_channels[i]).arg(j_major);
-					j_major++;
-				}
-				else if ((3 < i) && (i <= 7))
-				{
-					msg = QString("Блокировка %2 канала ГСЧ: %1").arg(rkm_channels[i]).arg(j_gsch);
-					j_gsch++;
-				}
-				else
-					msg = "";
+				msg = QString("Подадрес 3. Регистр РКМ: СД несимметрично");
 				msg_to_log(msg);
 			}
 		}
 		if (tmp_cwd.subadr == 4)
 		{
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+			channels_upi.clear();
+			int rpk_1 = words.at(0).toInt() & 0xFF;
+			int rpk_2 = words.at(0).toInt() >> 8;
+			if (rpk_1 == rpk_2)
 			{
-				channels_upi.clear();
-				rpk_1 = itr->toInt() & 0xFF;
-				rpk_2 = itr->toInt() >> 8;
-				if (rpk_1 == rpk_2)
+				rpk = rpk_1;
+				for (int i = 0; i <= 3; i++)
 				{
-					for (int i = 0; i <= 3; i++)
+					int pos = 2 * i;
+					int tmp_rpk = (rpk >> (pos)) & 0x3;
+					//if ((pos == 6) && (rpk == 3))
+					//	channels_upi << 10101; //канал под номером 4 не может работать с МБК07
+					switch (tmp_rpk)
 					{
-						int pos = 2 * i;
-						rpk = (itr->toInt() >> (pos)) & 0x3;
-						if ((pos == 6) && (rpk == 3))
-							channels_upi << 10101; //канал под номером 4 не может работать с МБК07
-						switch (rpk)
-						{
-						case 0:
-							channels_upi << 1;
-							break;
-						case 1:
-							channels_upi << 2;
-							break;
-						case 2:
-							channels_upi << 3;
-							break;
-						case 3:
-							channels_upi << 4;
-							break;
-						default:
-							break;
-						}
-					}
-
-					for (int j = 0; j <= 3; j++)
-					{
-						QList<QString> number_channel;
-						number_channel << "Рабочий канал модуля УПИ" << "Контрольный канал модуля УПИ" << "Номер канала ФСЧ" << "Номер канала МБК07";
-						msg = QString("%2: %1").arg(channels_upi[j]).arg(number_channel[j]);
-						msg_to_log(msg);
+					case 0:
+						channels_upi << 1;
+						break;
+					case 1:
+						channels_upi << 2;
+						break;
+					case 2:
+						channels_upi << 3;
+						break;
+					case 3:
+						channels_upi << 4;
+						break;
+					default:
+						break;
 					}
 				}
-				else
+
+				for (int j = 0; j <= 3; j++)
 				{
-					msg = QString("Подадрес 4. Регистр РПК: СД несимметрично");
+					QList<QString> number_channel;
+					number_channel << "Рабочий канал модуля УПИ" << "Контрольный канал модуля УПИ" << "Номер канала ФСЧ" << "Номер канала МБК07";
+					msg = QString("%2: %1").arg(channels_upi[j]).arg(number_channel[j]);
 					msg_to_log(msg);
 				}
+
+				upi_module.set_work_channel(UPI_MODULE::UPI_CHANEL(channels_upi[0]));
+				upi_module.set_control_channel(UPI_MODULE::UPI_CHANEL(channels_upi[1]));
+
+				set_rsk();
+			}
+			else
+			{
+				msg = QString("Подадрес 4. Регистр РПК: СД несимметрично");
+				msg_to_log(msg);
 			}
 		}
 		if (tmp_cwd.subadr == 5)
 		{
 			rbk_channels.clear();
-			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
+
+			int rbk_1 = words.at(0).toInt() & 0xFF;
+			int rbk_2 = words.at(0).toInt() >> 8;
+			if (rbk_1 == rbk_2)
 			{
-				int rbk_1 = itr->toInt() & 0xFF;
-				int rbk_2 = ((itr->toInt() & 0xFF00) >> 8);
-				rbk = rbk_1 & rbk_2;
-				if (rrr == 8224)
-				{
-					rbk_channels << (rbk & 0x1);
-					rbk_channels << ((rbk & 0x2) >> 1);
-					rbk_channels << ((rbk & 0x4) >> 2);
-					rbk_channels << ((rbk & 0x8) >> 3);
-				}
-				else
-				{
-					rbk_channels << 0;
-					rbk_channels << 0;
-					rbk_channels << 0;
-					rbk_channels << 0;
-				}
+
+				rbk = rbk_1;
+				rbk_channels << (rbk & 0x1);
+				rbk_channels << ((rbk & 0x2) >> 1);
+				rbk_channels << ((rbk & 0x4) >> 2);
+				rbk_channels << ((rbk & 0x8) >> 3);
 				rbk_channels << ((rbk & 0x10) >> 4);
 				rbk_channels << ((rbk & 0x20) >> 5);
 				rbk_channels << ((rbk & 0x40) >> 6);
 				rbk_channels << ((rbk & 0x80) >> 7);
 				//upi_module.set_working_channels(rkm_channels);
+				int j_major = 1;
+				int j_gsch = 1;
+				for (int i = 0; i <= 7; i++)
+				{
+					if ((0 <= i) && (i < 4))
+					{
+						msg = QString("Блокировка %2 информационного каналa и канала ФСЧ модуля УПИ: %1").arg(rbk_channels[i]).arg(j_major);
+						j_major++;
+					}
+					else /*if ((3 < i) && (i <= 7))*/
+					{
+						msg = QString("Блокировка 'Сбой' %2 выхода на МБК07: %1").arg(rbk_channels[i]).arg(j_gsch);
+						j_gsch++;
+					}
+					msg_to_log(msg);
+				}
+
 			}
-			int j_major = 1;
-			int j_gsch = 1;
-			for (int i = 0; i <= 7; i++)
+			else
 			{
-				if ((0 <= i) && (i < 4))
-				{
-					msg = QString("Блокировка %2 информационного каналa и канала ФСЧ модуля УПИ: %1").arg(rbk_channels[i]).arg(j_major);
-					j_major++;
-				}
-				else /*if ((3 < i) && (i <= 7))*/
-				{
-					msg = QString("Блокировка 'Сбой' %2 выхода на МБК07: %1").arg(rbk_channels[i]).arg(j_gsch);
-					j_gsch++;
-				}
+				msg = QString("Подадрес 5. Регистр РБК: СД несимметрично");
 				msg_to_log(msg);
 			}
 		}
@@ -746,9 +615,20 @@ void R733_widg::set_new_tm()
 	tm_words << mu_module.get_tm();
 	tm_words << mvku_modules[0].get_tm();
 	tm_words << mpvn_modules[0].get_tm();
-	//tm_words << get_mko_counter_word();
+	tm_words << get_mko_counter_word();
+	tm_words << get_pups_words_list();
+	tm_words << get_vchm_word();
+	unsigned short word_11 = 0xC080;
+	word_11 += (PUPS & 0x1F);
+	tm_words << word_11;
+	tm_words << 0xC000;
+	tm_words << 0xC200;
+	tm_words << 0xC400;
+	tm_words << 0xC600;
+
 	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
 }
+
 
 void R733_widg::paint_buttons()
 {
@@ -764,30 +644,30 @@ void R733_widg::paint_buttons()
 	}*/
 	switch (mu_module.get_current_dev())
 	{
-	case OFF:
+	case LKA_CURRENT_DEV::OFF:
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case MAIN:
+	case LKA_CURRENT_DEV::MAIN:
 		MU1->setStyleSheet("background-color: rgb(142, 198, 156);");
 		MU2->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case RESERVE:
+	case LKA_CURRENT_DEV::RESERVE:
 		MU1->setStyleSheet("background-color: rgb(204, 204, 204);");
 		MU2->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
 	};
 	switch (mvku_modules[0].get_current_dev())
 	{
-	case OFF:
+	case LKA_CURRENT_DEV::OFF:
 		main_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case MAIN:
+	case LKA_CURRENT_DEV::MAIN:
 		main_MVKU->setStyleSheet("background-color: rgb(142, 198, 156);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case RESERVE:
+	case LKA_CURRENT_DEV::RESERVE:
 		main_MVKU->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MVKU->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
@@ -796,22 +676,22 @@ void R733_widg::paint_buttons()
 
 	switch (mpvn_modules[0].get_current_dev())
 	{
-	case OFF:
+	case LKA_CURRENT_DEV::OFF:
 		main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case MAIN:
+	case LKA_CURRENT_DEV::MAIN:
 		main_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 		reserve_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		break;
-	case RESERVE:
+	case LKA_CURRENT_DEV::RESERVE:
 		main_MPVN->setStyleSheet("background-color: rgb(204, 204, 204);");
 		reserve_MPVN->setStyleSheet("background-color: rgb(142, 198, 156);");
 		break;
 	};
 	for (int i = 0; i < 4; i++)
 	{
-		if (vchm_module.get_working(i))
+		if (get_working(i))
 			VCH_list[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 		else
 			VCH_list[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -827,52 +707,6 @@ void R733_widg::paint_buttons()
 	//	if (upi_module)
 }
 
-MU_MODULE::MU_MODULE() : current_dev(MAIN)
-{
-	working.insert(MAIN, true);
-	working.insert(RESERVE, true);
-
-	ab_working.insert(MAIN, true);
-	ab_working.insert(RESERVE, true);
-
-}
-
-MV_MODULE::MV_MODULE(int _com, int _nim) : com(_com), nim(_nim), current_dev(MAIN)
-{
-	devices.insert(MAIN, MV_DEV());
-	devices.insert(RESERVE, MV_DEV());
-}
-
-unsigned short MU_MODULE::get_tm()
-{
-	unsigned short _word = 0x1000;
-	if (!get_working())
-		_word += 4;
-	_word += 0x20 << current_dev;
-	return _word;
-}
-
-unsigned short MV_MODULE::get_tm()
-{
-	unsigned short _word = (com << 12) + (nim << 8);
-	if (!get_working())
-		_word += 2 << current_dev;
-	if (current_dev == OFF)
-		_word += 0xC0;
-	else
-		_word += 0x20 << current_dev;
-	return _word;
-}
-
-unsigned short MV_MODULE::get_data_mvku()
-{
-	unsigned short _word = (0 << 12) + (nim << 8);
-	if (!get_working())
-		_word += 0x1000;
-	if (ku_p != -1)
-		_word += 1 << ku_p;
-	return _word;
-}
 
 
 void R733_widg::msg_to_log(const QString& _msg)
@@ -893,32 +727,12 @@ void R733_widg::auto_scroll_clicked(int _state)
 
 UPI_MODULE::UPI_MODULE()
 {
-	working.insert(VKL, false);
-	working.insert(VIKL, false);
+	working.insert(UPI_0, false);
+	working.insert(UPI_1, false);
+	working.insert(UPI_2, false);
+	working.insert(UPI_3, false);
 }
 
-
-VCHM_MODULE::VCHM_MODULE()
-{
-	working.insert(VCHM0, false);
-	working.insert(VCHM1, false);
-	working.insert(VCHM2, false);
-	working.insert(VCHM3, false);
-}
-
-void VCHM_MODULE::set_working_chanels(QList<int> chanels_state, bool can_on)
-{
-	if (chanels_state.size() < 4)
-		return;
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (!chanels_state[i])
-			working[VCHM_CHANEL(i)] = chanels_state[i];
-		else if (can_on)
-			working[VCHM_CHANEL(i)] = chanels_state[i];
-	}
-}
 
 void R733_widg::new_frame_04(QString mode, QVariant frame_data)
 {
@@ -934,3 +748,71 @@ void R733_widg::closeEvent(QCloseEvent *event)
 	QWidget::closeEvent(event);
 }
 
+void R733_widg::set_tm_state()
+{
+	mku_slot_thr.get_mku_bus_obj()->set_tm("733_TM", (uint)(tm_data.tm_data));
+}
+
+
+void R733_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+{
+	if ((pshm != 0) || (mshm < 5) || (mshm > 6))
+		return;
+	imit_off();
+	imit_on();
+	if (mshm == 5)
+	{
+		tm_data.VP_O = 1;
+		tm_data.VP_R = 0;
+		mu_dev_to_set = LKA_CURRENT_DEV::MAIN;
+	}
+	else if (mshm == 6)
+	{
+		tm_data.VP_O = 0;
+		tm_data.VP_R = 1;
+		mu_dev_to_set = LKA_CURRENT_DEV::RESERVE;
+	}
+	else
+		return;
+
+	paint_buttons();
+	set_new_tm();
+	set_tm_state();
+}
+
+
+void R733_widg::set_rsk()
+{
+	QVariantList words;
+	QList<int> rsk;
+	for (int i = 0; i < 4; i++)
+	{
+		if (upi_module.get_working(i))
+		{
+			rsk << 0;
+		}
+		else
+		{
+			rsk << 0xFF;
+		}
+	}
+	words << (rsk[0] + (rsk[1] << 8));
+	words << (rsk[2] + (rsk[3] << 8));
+	words << (rpk + (rpk << 8));
+	words << (rpk + (rpk << 8));
+
+	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, words);
+}
+
+
+void R733_widg::set_rrr_rsh()
+{
+	QVariantList words;
+
+	for (int i = 0; i < 4; i++)
+	{
+		words << rrr;
+	}
+
+	omni_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 2, words);
+}

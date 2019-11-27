@@ -76,8 +76,6 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("mds32_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &mds32_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &mds32_Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &mds32_Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["unmds32_input_trigger(bool)"] = &mds32_Socket_RPC_SLOT_Object::unmds32_input_trigger;
 		operators_map["unmds32_read_sample(uint&, uint&, uint&)"] = &mds32_Socket_RPC_SLOT_Object::unmds32_read_sample;
 		operators_map["unmds32_start()"] = &mds32_Socket_RPC_SLOT_Object::unmds32_start;
@@ -120,13 +118,13 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(mds32_get_sample(int, uint&, int&)), this, SLOT(mds32_get_sample(int, uint&, int&)));
+		disconnect(app, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds32_get_sample(uint&, bool&)));
 	}
 	void mds32_Socket_RPC_SIGNAL_Object::set_app(RpcMDS32Widget* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(mds32_get_sample(int, uint&, int&)), this, SLOT(mds32_get_sample(int, uint&, int&)), Qt::DirectConnection);
-		data_map.insert("mds32_get_sample(int, uint&, int&)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds32_get_sample(uint&, bool&)), Qt::DirectConnection);
+		data_map.insert("mds32_get_sample(uint&, bool&)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -256,18 +254,16 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void mds32_Socket_RPC_SIGNAL_Object::mds32_get_sample(int channel, uint& buf, int& flag)
+	void mds32_Socket_RPC_SIGNAL_Object::mds32_get_sample(uint& buf, bool& flag)
 	{
-		auto& descriptor = *data_map["mds32_get_sample(int, uint&, int&)"].get();
+		auto& descriptor = *data_map["mds32_get_sample(uint&, bool&)"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("mds32_get_sample(int, uint&, int&)");
+		tmp_stream << QString("mds32_get_sample(uint&, bool&)");
 		tmp_stream << (++call_number);
 		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal mds32_get_sample  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << channel;
-		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 channel =  %1").arg(RPCSignalClass::QVariantToString(channel)).arg(call_number));
 		tmp_stream << buf;
 		SRPCSignalClass::Instance().toLog(QString("mds32_get_sample  call_number %2 buf =  %1").arg(RPCSignalClass::QVariantToString(buf)).arg(call_number));
 		tmp_stream << flag;
@@ -281,8 +277,8 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mds32_get_sample sended").arg(objectName()));
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
-		buf = data_map["mds32_get_sample(int, uint&, int&)"]->signal_data.at(1).toUInt();
-		flag = data_map["mds32_get_sample(int, uint&, int&)"]->signal_data.at(2).toInt();
+		buf = data_map["mds32_get_sample(uint&, bool&)"]->signal_data.at(0).toUInt();
+		flag = data_map["mds32_get_sample(uint&, bool&)"]->signal_data.at(1).toBool();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal mds32_get_sample finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -297,40 +293,6 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant mds32_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int _state = _values.at(0).value<int>();
-			app->auto_scroll_clicked(_state);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant mds32_Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
-	{
-		try
-		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
 	QVariant mds32_Socket_RPC_SLOT_Object::unmds32_input_trigger(QVariantList& _values)
 	{
 		try

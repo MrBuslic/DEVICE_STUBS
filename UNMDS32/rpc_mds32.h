@@ -17,6 +17,7 @@
 #include <memory>
 #include <qlayout.h>
 #include <loki/Singleton.h>
+#include "rpc_loger.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -27,8 +28,6 @@ public:
 	RpcMDS32Widget(int mds_num);
 public slots:
 
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 
 	int unmds32_input_trigger(bool state);
 	int unmds32_read_sample(uint& _buf, uint& _firstTime, uint& _lasteTime);
@@ -37,18 +36,9 @@ public slots:
 	void check_box_clicked();
 	void line_edit_changed(const QString& _text);
 signals:
-	void mds32_get_sample(int channel, uint& buf, int& flag);
+	void mds32_get_sample(uint& buf, bool& flag);
 private:
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
-	QStringList log_buffer;
-	QMutex log_mutex;
+	LogWidget* log_widget;
 
 	bool state;
 	QList<QCheckBox*> checks;

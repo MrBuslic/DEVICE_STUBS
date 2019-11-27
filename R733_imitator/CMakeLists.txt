@@ -26,6 +26,7 @@ include_directories(${Qt5Network_INCLUDES})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("../../lib/socket_rpc/include")
 include_directories("../../lib/common_functions")
+include_directories("../LKAModules")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 include_directories($ENV{MONGO_HOME}/include ${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl ${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl_v3 ${PROJECT_SOURCE_DIR}/../../lib/db_ctrl)
 include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
@@ -42,18 +43,20 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-SET(R733_HEADERS R733.h R733Modules.h)
+SET(R733_HEADERS R733.h)
 SET(R733_SOURCES main.cpp R733.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS}  $ENV{MONGO_HOME}/lib)
 
 SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.h 
 ${PROJECT_SOURCE_DIR}/../mbk04_imitator/mbk04_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp  r733_socket_rpc.h r733_socket_rpc.cpp
-${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.cpp)
+${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.cpp
+	${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h 
+	${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
 
-add_executable(R733_imitator ${MY_WIN_FLAG} ${R733_HEADERS} ${R733_SOURCES} ${RPC_SOURCES})
+add_executable(R733_imitator ${MY_WIN_FLAG} ${R733_HEADERS} ${R733_SOURCES} ${RPC_SOURCES} icon.rc)
 target_link_libraries (R733_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc common_functions mongo_controller_v3 db_ctrl) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc common_functions mongo_controller_v3 db_ctrl LKAModules) 
 
 if(WIN32)
   qt5_use_modules(R733_imitator Core Widgets Network Gui)

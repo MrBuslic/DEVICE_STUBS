@@ -1,5 +1,6 @@
 #ifndef INTERRUPTS_H
 #define INTERRUPTS_H
+
 #include "winsock2.h"
 #include <QString>
 #include "../UNFOI/foi_rpc.h"

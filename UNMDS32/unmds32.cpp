@@ -9,82 +9,9 @@ extern "C" {
 #include <windows.h>
 #include "mds32_rpc.h"
 #include "rpc_ports.h"
+#include "unmds32_h.h"
 
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 int mds_count = 0;
-class rpc_buffer_class
-{
-public:
-	QList<RPC_mds32_SLOT_Thread*> mds32_slot_thr;
-	QList<RPC_mds32_SIGNAL_Thread*> mds32_signal_thr;
-	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
-private:
-	rpc_buffer_class()
-	{
-		for (int i = 0; i < 2; i++)
-		{
-			RPC_mds32_SLOT_Thread* slot_thr = new RPC_mds32_SLOT_Thread;
-			slot_thr->set_connection_params("127.0.0.1", MDS_SLOT +i);
-			slot_thr->start();
-			//if (!slot_thr.wait_connected(3))
-			//	return false;
-			RPC_mds32_SIGNAL_Thread* signal_thr = new RPC_mds32_SIGNAL_Thread;
-			signal_thr->set_connection_params("127.0.0.1", MDS_SIGNAL +i);
-			signal_thr->start();
-			//if (!signal_thr.wait_connected(3))
-			//	return false;
-
-			mds32_slot_thr.push_back(slot_thr);
-			mds32_signal_thr.push_back(signal_thr);
-		}
-	}
-};
-
-SINGLETON_DEF(rpc_buffer_class);
-
-// Объявляем функцию DllMain
-BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
-      DWORD fdwReason, LPVOID lpvReserved)
-{
-	Srpc_buffer_class::Instance();
-	switch (fdwReason)      // Дерево разбора уведомлений
-	{
-	case DLL_PROCESS_ATTACH: // Подключение DLL
-	    //MessageBox(NULL,"Подключение Заглушки UNMDS32 для Мезонина МДС-32","Использование заглушек!", MB_ICONINFORMATION);
-
-		//if (lpvReserved)  // Определение способа загрузки
-		// MessageBox(NULL,"DLL загружена с неявной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-		//else
-		//MessageBox(NULL,"DLL загружена с явной компоновкой","Использование заглушек!", MB_ICONINFORMATION);
-		//return 1; // успешная инициализация
-
-		break;
-
-	case DLL_PROCESS_DETACH: // Отключение DLL
-		// Здесь – освобождаем память, закрываем
-		// файлы и т.д.
-		break;
-
-	case DLL_THREAD_ATTACH: // Уведомление о новом потоке 
-		// Здесь – если надо переходим на
-		// многопоточный режим работы с
-		// использованием средств синхронизации
-		// таких как критическая секция, мутанты,
-		// семафоры и т.д.
-		break;
-
-		case DLL_THREAD_DETACH:
-		//Уведомление о завершении потока
-		// Здесь – если надо освобождаем все ресурсы, 
-		// вязанные с завершившимся потоком. Какой именно
-		// поток завершился можно узнать просмотром списка
-		// потоков средствами TOOLHELP32
-		//MessageBox(NULL,"Использование заглушек!","Завершение потока", MB_ICONINFORMATION);
-		break;
-
-	}
-	return TRUE;    // Код возврата игнорируется
-}
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
@@ -98,6 +25,7 @@ ViStatus _VI_FUNC unmds32_init (ViSession arg0, ViUInt16 arg1, ViBoolean arg2,
 ViStatus _VI_FUNC unmds32_init (ViRsrc rsrcName, ViBoolean IDquery,
                                  ViBoolean doReset, ViSession *mezvi)
 { 
+	Srpc_buffer_class::Instance();
 	mds_count++;
 	*mezvi = mds_count;
 	return 0; 

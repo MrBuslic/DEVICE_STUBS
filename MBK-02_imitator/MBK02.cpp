@@ -69,10 +69,10 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	Chan2_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 	Ant_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
 
-	ant_names.insert(ANTENNA::MHA1MY, "MHA1-Y");
-	ant_names.insert(ANTENNA::MHA1PY, "MHA1+Y");
-	ant_names.insert(ANTENNA::MHA2MY, "MHA2-Y");
-	ant_names.insert(ANTENNA::MHA2PY, "MHA2+Y");
+	ant_names.insert(MBK02_ANTENNA::MHA1MY, "MHA1-Y");
+	ant_names.insert(MBK02_ANTENNA::MHA1PY, "MHA1+Y");
+	ant_names.insert(MBK02_ANTENNA::MHA2MY, "MHA2-Y");
+	ant_names.insert(MBK02_ANTENNA::MHA2PY, "MHA2+Y");
 
 	chanel_start_warm.insert(CHANEL_1, 0);
 	chanel_start_warm.insert(CHANEL_2, 0);
@@ -146,6 +146,8 @@ MBK02_widg::MBK02_widg(QWidget *parent) : flag_on(false)
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 
+	connect(this, &MBK02_widg::emit_update_graphics, this, &MBK02_widg::update_graphics);
+
 	//connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
@@ -197,10 +199,10 @@ void MBK02_widg::break_warm()//дебаг кнопка
 void MBK02_widg::get_power(double _volt)
 {
 	volt = _volt;
-	if (volt >= 20.0)
+/*	if (volt >= 20.0)
 		imit_on();
 	else
-		if (volt < 1) imit_off();
+		*/if (volt < 1) imit_off();
 }
 
 void MBK02_widg::change_power(bool switch_chanel)
@@ -246,8 +248,7 @@ void MBK02_widg::imit_on()
 		return;
 	flag_on = true;
 	msg_to_log("Питание включено");
-	current_chanel = CHANEL_1;
-	current_ant = MHA1MY;
+	current_ant = MBK02_ANTENNA(1 + current_chanel*2 );
 	warm_chanel_tmr->start(standart_tm);
 	t_ant_ch->start(5000);
 	change_power(true);
@@ -276,25 +277,23 @@ void MBK02_widg::new_ku_732(int ku_n, int length, double u, int line)
 	if (volt != 0)
 	{
 		int tmp_ku_n = ku_n;
-		if (current_chanel != tmp_ku_n)
+		imit_off();
+		if (tmp_ku_n == CHANEL_ERR)
 		{
-			switch (tmp_ku_n)
-			{
-			case CHANEL_1:
-				current_ant = MHA1MY;
-				break;
-			case CHANEL_2:
-				current_ant = MHA2MY;
-				break;
-			}
-			set_warm_chanel();
-			current_chanel = CHANEL(tmp_ku_n);
-			if (!t_ant_ch->isActive())
-				t_ant_ch->start(5000);
-			update_graphics();
-			_update_time();
 			update_tm(1);
+			return;
 		}
+
+		current_chanel = CHANEL(tmp_ku_n);
+
+		imit_on();
+		
+		set_warm_chanel();
+		if (!t_ant_ch->isActive())
+			t_ant_ch->start(5000);
+
+		_update_time();
+		update_tm(1);
 	}
 }
 
@@ -522,40 +521,44 @@ void MBK02_widg::lose_cont()
 void MBK02_widg::update_tm(int sadr)
 {
 	int _sadr = sadr;
-	unsigned short word = 0x48;
+	unsigned short word = 0x30;
 	switch (_sadr)
 	{
 	case 1:
+		if (current_chanel == CHANEL_OFF)
+		{
+			emit set_new_tm(1, 0xFFFF);
+			return;
+		}
 		if (signal_con)	word += current_chanel + 1;
 		switch (current_ant)
 		{
-		case MHA1MY: word += 4; break;
-		case MHA1PY:break;
-		case MHA2MY: word += 8; break;
-		case MHA2PY:break;
+			case MHA1MY: word += 4; break;
+			case MHA1PY:break;
+			case MHA2MY: word += 8; break;
+			case MHA2PY:break;
 		}
-		if (ready_chanel)
+
+		switch (current_chanel)
 		{
-			switch (current_chanel)
-			{
-			case CHANEL_1: word = word - 0x32; break;
-			case CHANEL_2: word = word - 0x16; break;
-			}
+			case CHANEL_1: word = word - 0x10; break;
+			case CHANEL_2: word = word - 0x20; break;
 		}
+
 		word += (word << 8);
 		emit set_new_tm(_sadr, word);
 		break;
 	case 4:
 		switch (current_lit)
 		{
-		case 1: word += 0x18; break;
-		case 2: word += 0x20; break;
-		case 3: word += 0x28; break;
-		case 4: word += 0x30; break;
-		case 5: word += 0x38; break;
-		case 6: word += 0x40; break;
-		case 7: word += 0x48; break;
-		case 8: word += 0x50; break;
+		case 1: word = 0x18; break;
+		case 2: word = 0x20; break;
+		case 3: word = 0x28; break;
+		case 4: word = 0x30; break;
+		case 5: word = 0x38; break;
+		case 6: word = 0x40; break;
+		case 7: word = 0x48; break;
+		case 8: word = 0x50; break;
 		}
 		word += (word << 8);
 		emit set_new_tm(_sadr, word);
@@ -635,14 +638,14 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			{
 				switch (first_byte)
 				{
-				case 0x20: current_lit = 1; break;
-				case 0x28: current_lit = 2; break;
-				case 0x30: current_lit = 3; break;
-				case 0x38: current_lit = 4; break;
-				case 0x40: current_lit = 5; break;
-				case 0x48: current_lit = 6; break;
-				case 0x50: current_lit = 7; break;
-				case 0x58: current_lit = 8; break;
+				case 0x18: current_lit = 1; break;
+				case 0x20: current_lit = 2; break;
+				case 0x28: current_lit = 3; break;
+				case 0x30: current_lit = 4; break;
+				case 0x38: current_lit = 5; break;
+				case 0x40: current_lit = 6; break;
+				case 0x48: current_lit = 7; break;
+				case 0x50: current_lit = 8; break;
 				}
 			}
 			update_tm(4);
@@ -669,7 +672,7 @@ void MBK02_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 				update_tm(1);
 			}
 		}
-		update_graphics();
+		emit emit_update_graphics();
 	}
 }
 void MBK02_widg::update_graphics()
@@ -704,7 +707,7 @@ void MBK02_widg::update_graphics()
 	if (current_ant != MHAOFF)
 	{
 		Ant_pbut->setStyleSheet("background-color: rgb(142, 198, 156);");
-		Ant_pbut->setText(ant_names[ANTENNA(current_ant)]);
+		Ant_pbut->setText(ant_names[MBK02_ANTENNA(current_ant)]);
 	}
 	else
 	{

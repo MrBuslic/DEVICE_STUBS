@@ -50,7 +50,10 @@ ViStatus _VI_FUNC unmn3i_setXchgType (ViSession mvi, ViInt32 type){ return 0; }
 
 //--------------------- Query sample width -----------------------------------------
 ViStatus _VI_FUNC unmn3i_sample_width_q (ViSession mvi, ViUInt16 nChans,
-										 ViUInt16 *widthW, ViUInt16 *widthB){ return 0; }
+	ViUInt16 *widthW, ViUInt16 *widthB) {
+	*widthW = 2;
+	return 0;
+}
 
 //---------------------- Set mask interrupt --------------------------------
 ViStatus _VI_FUNC unmn3i_config_events (ViSession mvi, ViBoolean data,

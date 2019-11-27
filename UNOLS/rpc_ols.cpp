@@ -9,30 +9,12 @@
 
 //rpc_buffer_class kprd_list;
 
-RpcOlsWidget::RpcOlsWidget(int ols_num) : QWidget(), auto_scroll(true)
+RpcOlsWidget::RpcOlsWidget(QWidget* parent, int ols_num) : QWidget(parent)
 {
-	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	edit = new QTextEdit(this);
-	_scroll_bar = edit->verticalScrollBar();
-	_doc = new QTextDocument();
-	_cursor = new QTextCursor(_doc);
-	edit->setDocument(_doc);
-	edit->setReadOnly(true);
-	_doc->setMaximumBlockCount(1000);
-	setMinimumSize(490, 300);
-	auto_scroll_box = new QCheckBox(this);
-	auto_scroll_box->setText("Автопрокрутка");
-	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcOlsWidget::auto_scroll_clicked);
-	v_lay->addWidget(edit);
-	v_lay->addWidget(auto_scroll_box);
 
-	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
-	QDir dir("d:/logs");
-	if (!dir.exists())
-		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcOlsWidget::log_timer_ontimer);
-	log_timer.start(200);
+	log_widget = new LogWidget(this, QString("ols_%1").arg(ols_num));
+	QVBoxLayout* v_lay = new QVBoxLayout(this);
+	v_lay->addWidget(log_widget);
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = OLS_SLOT;
@@ -53,36 +35,40 @@ RpcOlsWidget::RpcOlsWidget(int ols_num) : QWidget(), auto_scroll(true)
 
 int RpcOlsWidget::unols_write_data_kf(QVariantList data_buffer, QVariantList mask_buffer)
 {
-	rpc_ols_buffer = data_buffer;
+	log_widget->log_append(QString("Записаны новые данные"));
+	rpc_ols_kf_buffer = data_buffer;
 	rpc_mask_buffer = mask_buffer;
+//	SRPCSignalClass::Instance().toLog(QString("Записываю данные %1 с маской %2").arg(data_buffer).arg(mask_buffer));
 	return 0;
 }
-int RpcOlsWidget::unols_trigger_imm()
+/*
+int RpcOlsWidget::unols_read_data_kr(QVariantList data_buffer)
 {
-	emit new_ols_data(rpc_ols_buffer, rpc_mask_buffer);
-	return 0;
+	rpc_ols_kr_buffer = data_buffer;
 }
-
-void RpcOlsWidget::auto_scroll_clicked(int _state)
+*/
+int RpcOlsWidget::unols_trigger_imm(int devise)//добавить параметр (выдача, приём)
 {
-	auto_scroll = (_state != 0);
-}
-
-
-void RpcOlsWidget::log_timer_ontimer()
-{
-	QStringList tmp_buffer;
+	if (devise == 1)//возможно обойтись без ветвления?
 	{
-		QMutexLocker lock(&log_mutex);
-		tmp_buffer = log_buffer;
-		log_buffer.clear();
+		log_widget->log_append(QString("Запуск чтения"));
+		emit send_data(rpc_ols_kr_buffer);//добавить связь сигнала rpc_ols с КПИУ
 	}
-	if (tmp_buffer.isEmpty())
-		return;
-	QFile log_file(log_filename);
-	QTextStream log_stream(&log_file);
-	log_file.open(QIODevice::Append);
-	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
-		log_stream << *itr << "\n";
-	log_file.close();
+	else if (devise == 2){
+		log_widget->log_append(QString("Запуск выдачи"));
+		emit new_ols_data(rpc_ols_kf_buffer, rpc_mask_buffer);
+	}
+	return 0;
+}
+
+void RpcOlsWidget::unols_read_data_kr(QVariantList& data_buffer)
+{
+	//rpc_ols_kr_buffer << 10;
+	data_buffer = rpc_ols_kr_buffer;
+}
+
+int RpcOlsWidget::unols_mStart()
+{
+
+	return 0;
 }

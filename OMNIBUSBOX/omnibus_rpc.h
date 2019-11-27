@@ -8,18 +8,15 @@ class RPC_omnibus_SLOT_Object : public RPC_SLOT_Object
 	Q_OBJECT
 public:
 	RPC_omnibus_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("omnibus_slot_obj");}
-	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
-	void switch_ab_os(int mko, int addr, int _os);
+	void switch_ab_os(int mko, int addr, int _os, int _s_addr);
 	void switch_ab(int mko, int addr, bool _on);
 	void set_new_data(int mko, int addr, int saddr, QVariantList words);
 	void send_msg(int mko, int line, int cwd, QVariantList& words, int& os);
-	int unomnibus_map_channels_setup(int _n, short _chan);
+	void send_msg_mpko(int mko, int line, int cwd, QVariantList& words, int& os);
+	int unomnibus_map_channels_setup(int _n, int _chan);
 	QVariant get_dt();
-	void message_to_log_slot(QString _msg);
 	////////////////////////////////////
 };
 
@@ -45,7 +42,6 @@ public:
 		this->QObject::setObjectName("omnibus_signal_obj");
 		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection); 
 	}
-	virtual void connect_to_server();
 public slots:
 	void read_data();
 	void send_connect(QString signal_name, bool _connect);
@@ -55,6 +51,7 @@ protected:
 signals:
 	void connect_signal(QString signal_name, bool _connect);
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+	void new_message_mpko(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void message_to_log(QString _msg);
 };
 

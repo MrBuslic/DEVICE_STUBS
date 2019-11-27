@@ -10,7 +10,7 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QMainWindow>
-#include "LKA05Modules.h"
+#include "LKAModules.h"
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../mbk04_imitator/mbk04_rpc.h"
@@ -89,9 +89,9 @@ signals:
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 private:
 	MU_MODULE mu_module;
-	QList<MV_MODULE> mvku_modules;
-	QList<MV_MODULE> mvmk_modules;
-	QList<MV_MODULE> mpvn_modules;
+	QList<LKA_MV_MODULE> mvku_modules;
+	QList<LKA_MV_MODULE> mvmk_modules;
+	QList<LKA_MV_MODULE> mpvn_modules;
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;

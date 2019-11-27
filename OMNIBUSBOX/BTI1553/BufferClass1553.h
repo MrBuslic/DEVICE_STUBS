@@ -15,7 +15,7 @@
 #endif
 //структура командного слова сообщения МКО
 //
-union MkoWord
+union MkoWord1553
 {
 	quint16 cw;				 // командное слово целиком
 	struct
@@ -44,11 +44,11 @@ struct LstAddr
 	QVariantList words;
 };
 
-class rpc_buffer_class : public QObject
+class rpc_buffer_class_1553 : public QObject
 {
 	Q_OBJECT
 public:
-	rpc_buffer_class() { msg_ind = 0;}
+	rpc_buffer_class_1553() { msg_ind = 0;}
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
 	int create_msg_addr(int addr, int saddr, int mko);
@@ -63,6 +63,6 @@ private:
 	int msg_ind;
 };
 
-SINGLETON_DEF(rpc_buffer_class);
+SINGLETON_DEF(rpc_buffer_class_1553);
 
 #endif

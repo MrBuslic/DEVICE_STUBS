@@ -16,8 +16,8 @@ int main(int argc, char **argv)
 #endif
     QApplication app(argc, argv);
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-//	LogWidget log_w;
-//	log_w.show();
+	LogWidget log_w;
+	log_w.show();
 
 	PowerWidget power_widget;
 	power_widget.show();

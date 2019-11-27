@@ -7,7 +7,9 @@
 
 KPIWidget::KPIWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget(this);
+	log_widget = new LogWidget(this, "kpi_bus");
+	QVBoxLayout* v_lay = new QVBoxLayout(this);
+	v_lay->addWidget(log_widget);
 
 
 	QString ip_str = "127.0.0.1";
@@ -25,5 +27,6 @@ KPIWidget::KPIWidget(QWidget *parent)
 
 void KPIWidget::make_KPI(QVariantList KPI_list)
 {
+	log_widget->log_append(QString("Новая КПИ"));
 	emit new_KPI(KPI_list);
 }

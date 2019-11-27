@@ -64,7 +64,7 @@ SET(HELP_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h  ${PROJECT_SO
 SET(RPC_FOI_RESOURCES ${PROJECT_SOURCE_DIR}/../UNFOI/foi_rpc.h ${PROJECT_SOURCE_DIR}/../UNFOI/foi_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(spobu_imitator ${MY_WIN_FLAG} ${SPOBU_HEADERS} ${SPOBU_SOURCES} ${HELP_SOURCES} ${RPC_FOI_RESOURCES})
+add_executable(spobu_imitator ${MY_WIN_FLAG} ${SPOBU_HEADERS} ${SPOBU_SOURCES} ${HELP_SOURCES} ${RPC_FOI_RESOURCES} icon.rc)
 target_link_libraries (spobu_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} git2 my_git common_functions  mongo_controller_v3 db_ctrl socket_rpc unfoi_32) 
 
