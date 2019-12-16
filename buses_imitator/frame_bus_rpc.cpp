@@ -14,62 +14,41 @@ void RPC_frame_bus_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_frame_bus_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_frame_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_04)) {
-		SRPCSignalClass::Instance().toLog("new_frame_04 connected");
-		emit connect_signal("new_frame_04(QString, QVariant)", true);
+		connect_signal("new_frame_04(QString, QVariant)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_733)) {
-		SRPCSignalClass::Instance().toLog("new_frame_733 connected");
-		emit connect_signal("new_frame_733(QString, QVariant)", true);
+		connect_signal("new_frame_733(QString, QVariant)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_07)) {
-		SRPCSignalClass::Instance().toLog("new_frame_07 connected");
-		emit connect_signal("new_frame_07(QString, int, int, int, QString, QVariant)", true);
+		connect_signal("new_frame_07(QString, int, int, int, QString, QVariant)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_rm07)) {
-		SRPCSignalClass::Instance().toLog("new_frame_rm07 connected");
-		emit connect_signal("new_frame_rm07(QString, QVariant)", true);
+		connect_signal("new_frame_rm07(QString, QVariant)", true);
 	}
 }
 
 void RPC_frame_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_04)) {
-		SRPCSignalClass::Instance().toLog("new_frame_04 disconnected");
-		//emit connect_signal("new_frame_04(QString, QVariant)", false);
+		connect_signal("new_frame_04(QString, QVariant)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_733)) {
-		SRPCSignalClass::Instance().toLog("new_frame_733 disconnected");
-		//emit connect_signal("new_frame_733(QString, QVariant)", false);
+		connect_signal("new_frame_733(QString, QVariant)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_07)) {
-		SRPCSignalClass::Instance().toLog("new_frame_07 disconnected");
-		//emit connect_signal("new_frame_07(QString, int, int, int, QString, QVariant)", false);
+		connect_signal("new_frame_07(QString, int, int, int, QString, QVariant)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_rm07)) {
-		SRPCSignalClass::Instance().toLog("new_frame_rm07 disconnected");
-		//emit connect_signal("new_frame_rm07(QString, QVariant)", false);
+		connect_signal("new_frame_rm07(QString, QVariant)", false);
 	}
 }
 

@@ -22,10 +22,9 @@ public:
 public slots:
 	void set_u(int bus, double volt);
 	void get_i(int bus, double& curr);
-
 	void set_i(int bus, QString name, double curr);
-
 	void set_bus_state(int bus, int state);
+
 private slots:
 	void set_on();
 	void set_off();

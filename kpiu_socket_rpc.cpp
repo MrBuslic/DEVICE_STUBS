@@ -87,7 +87,13 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)"] = &kpiu_Socket_RPC_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII;
 		operators_map["OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV;
 		operators_map["USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA;
+		operators_map["PYRO_USTANOVIT_SOSTOYANIE(QString, int)"] = &kpiu_Socket_RPC_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE;
 		operators_map["getXML()"] = &kpiu_Socket_RPC_SLOT_Object::getXML;
+		operators_map["mfsk_1_impulse(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mfsk_1_impulse;
+		operators_map["mds_1_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_1_get_sample;
+		operators_map["mds_2_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_2_get_sample;
+		operators_map["get_resistance(uint, int&)"] = &kpiu_Socket_RPC_SLOT_Object::get_resistance;
+		operators_map["get_connection_state(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::get_connection_state;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -618,6 +624,25 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString name = _values.at(0).value<QString>();
+			int state = _values.at(1).value<int>();
+			app->PYRO_USTANOVIT_SOSTOYANIE(name, state);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 	QVariant kpiu_Socket_RPC_SLOT_Object::getXML(QVariantList& _values)
 	{
 		try
@@ -633,6 +658,116 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return QString();
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::mfsk_1_impulse(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList channels = _values.at(0).value<QVariantList>();
+			app->mfsk_1_impulse(channels);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::mds_1_get_sample(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint buf = _values.at(0).value<uint>();
+			bool flag = _values.at(1).value<bool>();
+			app->mds_1_get_sample(buf, flag);
+			_values[0] = buf;
+			SRPCSignalClass::Instance().toLog(QString("%1 buf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			_values[1] = flag;
+			SRPCSignalClass::Instance().toLog(QString("%1 flag = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::mds_2_get_sample(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint buf = _values.at(0).value<uint>();
+			bool flag = _values.at(1).value<bool>();
+			app->mds_2_get_sample(buf, flag);
+			_values[0] = buf;
+			SRPCSignalClass::Instance().toLog(QString("%1 buf = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			_values[1] = flag;
+			SRPCSignalClass::Instance().toLog(QString("%1 flag = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::get_resistance(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			uint NProcess = _values.at(0).value<uint>();
+			int resistance = _values.at(1).value<int>();
+			app->get_resistance(NProcess, resistance);
+			_values[1] = resistance;
+			SRPCSignalClass::Instance().toLog(QString("%1 resistance = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::get_connection_state(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList _chans = _values.at(0).value<QVariantList>();
+			int res = app->get_connection_state(_chans);
+			_values[0] = _chans;
+			SRPCSignalClass::Instance().toLog(QString("%1 _chans = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			with_return = true;
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

@@ -20,12 +20,12 @@
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
 
-enum AOS_KP
-{
-	AOS_1 = 0,
-	AOS_2 = 1,
-	AOS_OFF = 3
-};
+//enum AOS_KP
+//{
+//	AOS_1 = 0,
+//	AOS_2 = 1,
+//	AOS_OFF = 3
+//};
 
 class AOS_widg : public QWidget
 {
@@ -36,7 +36,7 @@ public:
 	~AOS_widg();
 	
 private:
-	AOS_KP current_KP = AOS_OFF;
+	//AOS_KP current_KP = AOS_OFF;
 
 
 	const int MKO = 1;

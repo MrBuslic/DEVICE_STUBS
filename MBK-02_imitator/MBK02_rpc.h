@@ -41,16 +41,13 @@ public:
 	RPC_MBK02_SIGNAL_Object(QString _addr, int _port) : RPC_SIGNAL_Object(_addr, _port)
 	{
 		this->QObject::setObjectName("MBK02_signal_obj");
-		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection); 
 	}
 public slots:
 	void read_data();
-	void send_connect(QString signal_name, bool _connect);
 protected:
 	void connectNotify(const QMetaMethod & signal);
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
-	void connect_signal(QString signal_name, bool _connect);
 	void msg_to_14R732(QVariantList data);
 	void set_new_tm(int sadr, int word);
 	void set_new_power_tm(int sadr, QVariantList words);

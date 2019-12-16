@@ -37,16 +37,12 @@ public:
 	RPC_mkprm_SIGNAL_Object(QString _addr, int _port) : RPC_SIGNAL_Object(_addr, _port)
 	{
 		this->QObject::setObjectName("mkprm_signal_obj");
-		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection); 
 	}
 public slots:
 	void read_data();
-	void send_connect(QString signal_name, bool _connect);
 protected:
 	void connectNotify(const QMetaMethod & signal);
 	void disconnectNotify(const QMetaMethod & signal);
-signals:
-	void connect_signal(QString signal_name, bool _connect);
 };
 
 class RPC_mkprm_SIGNAL_Thread : public RPC_SIGNAL_Thread

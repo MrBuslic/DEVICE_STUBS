@@ -14,62 +14,41 @@ void RPC_MBK02_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_MBK02_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_MBK02_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::msg_to_14R732)) {
-		SRPCSignalClass::Instance().toLog("msg_to_14R732 connected");
-		emit connect_signal("msg_to_14R732(QVariantList)", true);
+		connect_signal("msg_to_14R732(QVariantList)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_tm)) {
-		SRPCSignalClass::Instance().toLog("set_new_tm connected");
-		emit connect_signal("set_new_tm(int, int)", true);
+		connect_signal("set_new_tm(int, int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_power_tm)) {
-		SRPCSignalClass::Instance().toLog("set_new_power_tm connected");
-		emit connect_signal("set_new_power_tm(int, QVariantList)", true);
+		connect_signal("set_new_power_tm(int, QVariantList)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::emit_update_graphics)) {
-		SRPCSignalClass::Instance().toLog("emit_update_graphics connected");
-		emit connect_signal("emit_update_graphics()", true);
+		connect_signal("emit_update_graphics()", true);
 	}
 }
 
 void RPC_MBK02_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::msg_to_14R732)) {
-		SRPCSignalClass::Instance().toLog("msg_to_14R732 disconnected");
-		//emit connect_signal("msg_to_14R732(QVariantList)", false);
+		connect_signal("msg_to_14R732(QVariantList)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_tm)) {
-		SRPCSignalClass::Instance().toLog("set_new_tm disconnected");
-		//emit connect_signal("set_new_tm(int, int)", false);
+		connect_signal("set_new_tm(int, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::set_new_power_tm)) {
-		SRPCSignalClass::Instance().toLog("set_new_power_tm disconnected");
-		//emit connect_signal("set_new_power_tm(int, QVariantList)", false);
+		connect_signal("set_new_power_tm(int, QVariantList)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_MBK02_SIGNAL_Object::emit_update_graphics)) {
-		SRPCSignalClass::Instance().toLog("emit_update_graphics disconnected");
-		//emit connect_signal("emit_update_graphics()", false);
+		connect_signal("emit_update_graphics()", false);
 	}
 }
 
