@@ -14,52 +14,33 @@ void RPC_omnibus_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_omnibus_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_omnibus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_omnibus_SIGNAL_Object::new_message)) {
-		SRPCSignalClass::Instance().toLog("new_message connected");
-		emit connect_signal("new_message(QVariant, int, int, int, QVariantList, int)", true);
+		connect_signal("new_message(QVariant, int, int, int, QVariantList, int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_omnibus_SIGNAL_Object::new_message_mpko)) {
-		SRPCSignalClass::Instance().toLog("new_message_mpko connected");
-		emit connect_signal("new_message_mpko(QVariant, int, int, int, QVariantList, int)", true);
+		connect_signal("new_message_mpko(QVariant, int, int, int, QVariantList, int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_omnibus_SIGNAL_Object::message_to_log)) {
-		SRPCSignalClass::Instance().toLog("message_to_log connected");
-		emit connect_signal("message_to_log(QString)", true);
+		connect_signal("message_to_log(QString)", true);
 	}
 }
 
 void RPC_omnibus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_omnibus_SIGNAL_Object::new_message)) {
-		SRPCSignalClass::Instance().toLog("new_message disconnected");
-		//emit connect_signal("new_message(QVariant, int, int, int, QVariantList, int)", false);
+		connect_signal("new_message(QVariant, int, int, int, QVariantList, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_omnibus_SIGNAL_Object::new_message_mpko)) {
-		SRPCSignalClass::Instance().toLog("new_message_mpko disconnected");
-		//emit connect_signal("new_message_mpko(QVariant, int, int, int, QVariantList, int)", false);
+		connect_signal("new_message_mpko(QVariant, int, int, int, QVariantList, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_omnibus_SIGNAL_Object::message_to_log)) {
-		SRPCSignalClass::Instance().toLog("message_to_log disconnected");
-		//emit connect_signal("message_to_log(QString)", false);
+		connect_signal("message_to_log(QString)", false);
 	}
 }
 

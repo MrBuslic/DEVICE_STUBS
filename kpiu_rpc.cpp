@@ -1,40 +1,5 @@
 #include "kpiu_rpc.h"
 
-void RPC_kpiu_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("kpiu slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("kpiu slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("kpiu slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_kpiu_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("kpiu signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("kpiu signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("kpiu signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_kpiu_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_kpiu_SLOT_Object>(new RPC_kpiu_SLOT_Object(addr, port));
@@ -49,72 +14,49 @@ void RPC_kpiu_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_kpiu_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_kpiu_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::string_msg)) {
-		SRPCSignalClass::Instance().toLog("string_msg connected");
-		emit connect_signal("string_msg(QString)", true);
+		connect_signal("string_msg(QString)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::int_msg)) {
-		SRPCSignalClass::Instance().toLog("int_msg connected");
-		emit connect_signal("int_msg(int)", true);
+		connect_signal("int_msg(int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::int_return_signal)) {
-		SRPCSignalClass::Instance().toLog("int_return_signal connected");
-		emit connect_signal("int_return_signal(int&)", true);
+		connect_signal("int_return_signal(int&)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toLog)) {
-		SRPCSignalClass::Instance().toLog("toLog connected");
-		emit connect_signal("toLog(QString)", true);
+		connect_signal("toLog(QString)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toProtocol)) {
-		SRPCSignalClass::Instance().toLog("toProtocol connected");
-		emit connect_signal("toProtocol(QString)", true);
+		connect_signal("toProtocol(QString)", true);
 	}
 }
 
 void RPC_kpiu_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::string_msg)) {
-		SRPCSignalClass::Instance().toLog("string_msg disconnected");
-		//emit connect_signal("string_msg(QString)", false);
+		connect_signal("string_msg(QString)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::int_msg)) {
-		SRPCSignalClass::Instance().toLog("int_msg disconnected");
-		//emit connect_signal("int_msg(int)", false);
+		connect_signal("int_msg(int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::int_return_signal)) {
-		SRPCSignalClass::Instance().toLog("int_return_signal disconnected");
-		//emit connect_signal("int_return_signal(int&)", false);
+		connect_signal("int_return_signal(int&)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toLog)) {
-		SRPCSignalClass::Instance().toLog("toLog disconnected");
-		//emit connect_signal("toLog(QString)", false);
+		connect_signal("toLog(QString)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toProtocol)) {
-		SRPCSignalClass::Instance().toLog("toProtocol disconnected");
-		//emit connect_signal("toProtocol(QString)", false);
+		connect_signal("toProtocol(QString)", false);
 	}
 }
 
@@ -373,6 +315,15 @@ void RPC_kpiu_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int stat
 	dynamic_call("USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished USTANOVIT_SOSTOYANIE_SHINI_PITANIYA");
 }
+void RPC_kpiu_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE(QString name, int state)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(name);
+	tmp_list << QVariant(state);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call PYRO_USTANOVIT_SOSTOYANIE %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("PYRO_USTANOVIT_SOSTOYANIE(QString, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished PYRO_USTANOVIT_SOSTOYANIE");
+}
 QString RPC_kpiu_SLOT_Object::getXML()
 {
 	QVariantList tmp_list;
@@ -382,6 +333,68 @@ QString RPC_kpiu_SLOT_Object::getXML()
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished getXML %1").arg(tmp_ret_params));
 	return res.toString();
+}
+void RPC_kpiu_SLOT_Object::mfsk_1_impulse(QVariantList channels)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(channels);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mfsk_1_impulse %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mfsk_1_impulse(QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished mfsk_1_impulse");
+}
+void RPC_kpiu_SLOT_Object::mds_1_get_sample(uint& buf, bool& flag)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(buf);
+	tmp_list << QVariant(flag);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mds_1_get_sample %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mds_1_get_sample(uint&, bool&)", tmp_list);
+	buf = tmp_list.at(0).toUInt();
+	tmp_ret_params += " buf="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	flag = tmp_list.at(1).toBool();
+	tmp_ret_params += " flag="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished mds_1_get_sample %1").arg(tmp_ret_params));
+}
+void RPC_kpiu_SLOT_Object::mds_2_get_sample(uint& buf, bool& flag)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(buf);
+	tmp_list << QVariant(flag);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mds_2_get_sample %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mds_2_get_sample(uint&, bool&)", tmp_list);
+	buf = tmp_list.at(0).toUInt();
+	tmp_ret_params += " buf="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	flag = tmp_list.at(1).toBool();
+	tmp_ret_params += " flag="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished mds_2_get_sample %1").arg(tmp_ret_params));
+}
+void RPC_kpiu_SLOT_Object::get_resistance(uint NProcess, int& resistance)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(NProcess);
+	tmp_list << QVariant(resistance);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call get_resistance %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_resistance(uint, int&)", tmp_list);
+	resistance = tmp_list.at(1).toInt();
+	tmp_ret_params += " resistance="+RPCSignalClass::QVariantToString(tmp_list.at(1));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished get_resistance %1").arg(tmp_ret_params));
+}
+int RPC_kpiu_SLOT_Object::get_connection_state(QVariantList& _chans)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(_chans);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call get_connection_state %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("get_connection_state(QVariantList&)", tmp_list);
+	_chans = tmp_list.at(0).toList();
+	tmp_ret_params += " _chans="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished get_connection_state %1").arg(tmp_ret_params));
+	return res.toInt();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

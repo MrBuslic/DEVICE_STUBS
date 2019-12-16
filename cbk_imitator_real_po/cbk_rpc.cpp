@@ -14,52 +14,33 @@ void RPC_cbk_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_cbk_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_cbk_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_cbk_SIGNAL_Object::vm_is_on)) {
-		SRPCSignalClass::Instance().toLog("vm_is_on connected");
-		emit connect_signal("vm_is_on(int)", true);
+		connect_signal("vm_is_on(int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_cbk_SIGNAL_Object::vm_is_off)) {
-		SRPCSignalClass::Instance().toLog("vm_is_off connected");
-		emit connect_signal("vm_is_off(int)", true);
+		connect_signal("vm_is_off(int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_cbk_SIGNAL_Object::vm_change_po)) {
-		SRPCSignalClass::Instance().toLog("vm_change_po connected");
-		emit connect_signal("vm_change_po(int)", true);
+		connect_signal("vm_change_po(int)", true);
 	}
 }
 
 void RPC_cbk_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_cbk_SIGNAL_Object::vm_is_on)) {
-		SRPCSignalClass::Instance().toLog("vm_is_on disconnected");
-		//emit connect_signal("vm_is_on(int)", false);
+		connect_signal("vm_is_on(int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_cbk_SIGNAL_Object::vm_is_off)) {
-		SRPCSignalClass::Instance().toLog("vm_is_off disconnected");
-		//emit connect_signal("vm_is_off(int)", false);
+		connect_signal("vm_is_off(int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_cbk_SIGNAL_Object::vm_change_po)) {
-		SRPCSignalClass::Instance().toLog("vm_change_po disconnected");
-		//emit connect_signal("vm_change_po(int)", false);
+		connect_signal("vm_change_po(int)", false);
 	}
 }
 

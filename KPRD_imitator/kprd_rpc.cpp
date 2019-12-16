@@ -14,42 +14,25 @@ void RPC_kprd_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_kprd_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_kprd_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::test)) {
-		SRPCSignalClass::Instance().toLog("test connected");
-		emit connect_signal("test(QVariantList, QVariantList)", true);
+		connect_signal("test(QVariantList, QVariantList)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::sendKPI)) {
-		SRPCSignalClass::Instance().toLog("sendKPI connected");
-		emit connect_signal("sendKPI(QVariantList)", true);
+		connect_signal("sendKPI(QVariantList)", true);
 	}
 }
 
 void RPC_kprd_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::test)) {
-		SRPCSignalClass::Instance().toLog("test disconnected");
-		//emit connect_signal("test(QVariantList, QVariantList)", false);
+		connect_signal("test(QVariantList, QVariantList)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_kprd_SIGNAL_Object::sendKPI)) {
-		SRPCSignalClass::Instance().toLog("sendKPI disconnected");
-		//emit connect_signal("sendKPI(QVariantList)", false);
+		connect_signal("sendKPI(QVariantList)", false);
 	}
 }
 
