@@ -28,7 +28,7 @@ enum CHANEL
 	CHANEL_OFF = 3
 };
 
-enum ANTENNA
+enum MBK02_ANTENNA
 {
 	MHA1PY = 0,
 	MHA1MY = 1,
@@ -59,7 +59,7 @@ private:
 
 	int current_lit;
 	CHANEL current_chanel = CHANEL_OFF;
-	ANTENNA current_ant = MHAOFF;
+	MBK02_ANTENNA current_ant = MHAOFF;
 
 	const int MKO = 1;
 	const int adr = 2;

@@ -63,9 +63,9 @@ public:
 	
 private:
 	QWidget* widg;
-	/// -- Главное окно;
+	/// -- Р“Р»Р°РІРЅРѕРµ РѕРєРЅРѕ;
 	QMainWindow* main_widg;
-	//Хранимые текущие
+	//РҐСЂР°РЅРёРјС‹Рµ С‚РµРєСѓС‰РёРµ
 
 	OG current_OG = OG_ERR;
 	FINIK current_FINIK = FINIK_ERR;
@@ -99,18 +99,18 @@ private:
 	bool ready_og;
 	bool flag_on;
 
-	void update_graphics();//обновление графики
-	void set_new_tm();//составление ОК-ов
-	void omni_connect();//почключение к omnibus спустя n-ое количество времени
-	void update_time();//Расчет времени прогрева ОГ в зависимости от времени включения и окончания прогрева
-	void set_warm_og();//сохранение окончания прогревания и обьявление о прогретости/непрогретости
-	void imit_off();//включение имитатора
-	void imit_on();//выключение имитатора
-	void change_power(bool switch_og);//изменение мощности
-	void set_change_power();//передает в change_power параметр false, означающий, что функция вызвана таймером
-	void set_power_back();//возврат силы тока в зависимости от мощности
+	void update_graphics();//РѕР±РЅРѕРІР»РµРЅРёРµ РіСЂР°С„РёРєРё
+	void set_new_tm();//СЃРѕСЃС‚Р°РІР»РµРЅРёРµ РћРљ-РѕРІ
+	void omni_connect();//РїРѕС‡РєР»СЋС‡РµРЅРёРµ Рє omnibus СЃРїСѓСЃС‚СЏ n-РѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РІСЂРµРјРµРЅРё
+	void update_time();//Р Р°СЃС‡РµС‚ РІСЂРµРјРµРЅРё РїСЂРѕРіСЂРµРІР° РћР“ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РІСЂРµРјРµРЅРё РІРєР»СЋС‡РµРЅРёСЏ Рё РѕРєРѕРЅС‡Р°РЅРёСЏ РїСЂРѕРіСЂРµРІР°
+	void set_warm_og();//СЃРѕС…СЂР°РЅРµРЅРёРµ РѕРєРѕРЅС‡Р°РЅРёСЏ РїСЂРѕРіСЂРµРІР°РЅРёСЏ Рё РѕР±СЊСЏРІР»РµРЅРёРµ Рѕ РїСЂРѕРіСЂРµС‚РѕСЃС‚Рё/РЅРµРїСЂРѕРіСЂРµС‚РѕСЃС‚Рё
+	void imit_off();//РІРєР»СЋС‡РµРЅРёРµ РёРјРёС‚Р°С‚РѕСЂР°
+	void imit_on();//РІС‹РєР»СЋС‡РµРЅРёРµ РёРјРёС‚Р°С‚РѕСЂР°
+	void change_power(bool switch_og);//РёР·РјРµРЅРµРЅРёРµ РјРѕС‰РЅРѕСЃС‚Рё
+	void set_change_power();//РїРµСЂРµРґР°РµС‚ РІ change_power РїР°СЂР°РјРµС‚СЂ false, РѕР·РЅР°С‡Р°СЋС‰РёР№, С‡С‚Рѕ С„СѓРЅРєС†РёСЏ РІС‹Р·РІР°РЅР° С‚Р°Р№РјРµСЂРѕРј
+	void set_power_back();//РІРѕР·РІСЂР°С‚ СЃРёР»С‹ С‚РѕРєР° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РјРѕС‰РЅРѕСЃС‚Рё
 protected:
-	
+	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
@@ -139,21 +139,21 @@ private:
 	QSettings LKA_sett;
 
 	QMap<int, QString> mode_names;
-	QMap<OG, qint64> OG_start_warm;//Мап старта прогрева
-	QMap<OG, qint64> OG_finish_warm;//Мап окончания прогрева
+	QMap<OG, qint64> OG_start_warm;//РњР°Рї СЃС‚Р°СЂС‚Р° РїСЂРѕРіСЂРµРІР°
+	QMap<OG, qint64> OG_finish_warm;//РњР°Рї РѕРєРѕРЅС‡Р°РЅРёСЏ РїСЂРѕРіСЂРµРІР°
 
-	int standart_tm = 120000;//стандартное время прогрева
-	int tm_towarm;//текущее время прогрева, с растчетом прогретости
-	int cooling_cof = 4;//коэфициент охлаждения (во сколько раз ОГ быстрее нагревается чем охлаждается)
-	int power_vt = 0;//мощность
-	int warm_er = 500;//погрешность нагрева
+	int standart_tm = 120000;//СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РІСЂРµРјСЏ РїСЂРѕРіСЂРµРІР°
+	int tm_towarm;//С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ РїСЂРѕРіСЂРµРІР°, СЃ СЂР°СЃС‚С‡РµС‚РѕРј РїСЂРѕРіСЂРµС‚РѕСЃС‚Рё
+	int cooling_cof = 4;//РєРѕСЌС„РёС†РёРµРЅС‚ РѕС…Р»Р°Р¶РґРµРЅРёСЏ (РІРѕ СЃРєРѕР»СЊРєРѕ СЂР°Р· РћР“ Р±С‹СЃС‚СЂРµРµ РЅР°РіСЂРµРІР°РµС‚СЃСЏ С‡РµРј РѕС…Р»Р°Р¶РґР°РµС‚СЃСЏ)
+	int power_vt = 0;//РјРѕС‰РЅРѕСЃС‚СЊ
+	int warm_er = 500;//РїРѕРіСЂРµС€РЅРѕСЃС‚СЊ РЅР°РіСЂРµРІР°
 	int n;
 	short chan;
 	double u;
 	double t;
-	QString name = "БЭЧ";//Имя устройства
-	int bus  = 2;//номер шины для шины питания(power_bus)
-	int volt;//Принятое напряжение
+	QString name = "Р‘Р­Р§";//РРјСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР°
+	int bus  = 2;//РЅРѕРјРµСЂ С€РёРЅС‹ РґР»СЏ С€РёРЅС‹ РїРёС‚Р°РЅРёСЏ(power_bus)
+	int volt;//РџСЂРёРЅСЏС‚РѕРµ РЅР°РїСЂСЏР¶РµРЅРёРµ
 
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
@@ -167,8 +167,7 @@ private:
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
-protected:
-	void closeEvent(QCloseEvent *event);
+
 };
 
 #endif // BECH_H

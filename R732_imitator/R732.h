@@ -8,21 +8,37 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include <QMainWindow>
-#include "R732Modules.h"
+#include "LKAModules.h"
 #include "instruments.h"
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
+
 #include "../MBK-02_imitator/MBK02_rpc.h"
 
-class R732_widg : public QWidget
+union TM_732
+{
+	quint16 tm_data;
+	struct
+	{
+		quint16 PP : 1,
+			GO : 1,
+			VP_O : 1,
+			VP_R : 1,
+			GR : 1,
+			res : 11;
+	};
+};
+
+class R732_widg : public LKA06_MODULE
 {
     Q_OBJECT
 public:
 	R732_widg();
 	~R732_widg();
 private:
+	TM_732 tm_data;
 	QPushButton *MU1;
 	QPushButton *MU2;
 	QPushButton *main_MPVN;
@@ -40,25 +56,13 @@ private:
 	QPushButton* proc_vchm3;
 	QList<QPushButton*> proc_vchm_btns_lst;
 
-	MU_MODULE mu_module;
-	QList<MV_MODULE> mpvn_modules;
-	QList<MV_MODULE> mvku_modules;
-	VCHM_MODULE vchm_module;
-
-	RPC_omnibus_SLOT_Thread omni_slot_thr;
-	RPC_omnibus_SIGNAL_Thread omni_signal_thr;
 
 	RPC_MBK02_SLOT_Thread mbk02_slot_thr;
 	RPC_MBK02_SIGNAL_Thread mbk02_signal_thr;
 
-	RPC_mku_bus_SLOT_Thread mku_slot_thr;
-	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
-
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
-	int MKO;
-	int adr;
 	int num_ku;
 
 	int bus;
@@ -67,22 +71,20 @@ private:
 	bool power_on;
 	bool ready_to_work_hard;
 	QString name;
+	int kpi_counter;
 
 	unsigned short mko_counter;
 
 	void paint_buttons();
 	void new_data_mv();
 	void set_new_tm();
-	QVariantList get_mko_counter_word();
-	QTimer vchm_on_timer;
-	QTimer mu_on_timer;
-	QList<int> vchm_chanels_init;
-	bool vchm_is_init;
+	void set_new_kpi();
 
 	void imit_on();
 	void imit_off();
 	void set_power_back();
-	void restart_vchm_proc(int chanel);
+
+	void set_tm_state();
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
@@ -91,9 +93,7 @@ public slots:
 	void get_power(double volt);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void new_kpi(QVariantList kpi);
-private slots:
-	void set_vchm_on();
-	void set_mu_on();
+
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 };

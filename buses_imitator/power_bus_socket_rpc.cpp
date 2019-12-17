@@ -80,7 +80,6 @@ int power_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["get_i(int, double&)"] = &power_bus_Socket_RPC_SLOT_Object::get_i;
 		operators_map["set_i(int, QString, double)"] = &power_bus_Socket_RPC_SLOT_Object::set_i;
 		operators_map["set_bus_state(int, int)"] = &power_bus_Socket_RPC_SLOT_Object::set_bus_state;
-		operators_map["set_bus_state(int, int)"] = &Socket_RPC_SLOT_Object::set_bus_state;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();

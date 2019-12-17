@@ -30,7 +30,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNMN8I_SOURCES unmn8i.cpp unmn8i_h.h mn8i_rpc.h mn8i_rpc.cpp)
+set(UNMN8I_SOURCES unmn8i.cpp unmn8i_h.h mn8i_rpc.h mn8i_rpc.cpp DllMain.cpp)
 
 include_directories($ENV{VISA_HOME}include)
 
@@ -42,7 +42,7 @@ set(RPC_MN8I_SOURCES rpc_mn8i.h rpc_mn8i.cpp
 	../buses_imitator/mku_bus_rpc.h ../buses_imitator/mku_bus_rpc.cpp
 	mn8i_main.cpp mn8i_socket_rpc.h mn8i_socket_rpc.cpp)
 
-add_executable(rpc_mn8i WIN32 ${RPC_MN8I_SOURCES})
+add_executable(rpc_mn8i WIN32 ${RPC_MN8I_SOURCES} icon.rc)
 set_target_properties(rpc_mn8i PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_mn8i ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(rpc_mn8i Core Widgets Gui Network)

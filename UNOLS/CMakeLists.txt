@@ -27,7 +27,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNOLS_SOURCES unols.cpp unols_h.h ols_rpc.h ols_rpc.cpp)
+set(UNOLS_SOURCES unols.cpp unols_h.h ols_rpc.h ols_rpc.cpp DllMain.cpp)
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unols_32 SHARED ${UNOLS_HEADERS} ${UNOLS_SOURCES} export.def)

@@ -1,40 +1,5 @@
 #include "mfsk24_rpc.h"
 
-void RPC_mfsk24_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("mfsk24 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("mfsk24 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("mfsk24 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_mfsk24_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("mfsk24 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("mfsk24 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("mfsk24 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_mfsk24_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_mfsk24_SLOT_Object>(new RPC_mfsk24_SLOT_Object(addr, port));
@@ -49,52 +14,33 @@ void RPC_mfsk24_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_mfsk24_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_mfsk24_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_)) {
-		SRPCSignalClass::Instance().toLog("mfsk24_ connected");
-		emit connect_signal("mfsk24_()", true);
+		connect_signal("mfsk24_()", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_state_change)) {
-		SRPCSignalClass::Instance().toLog("mfsk24_state_change connected");
-		emit connect_signal("mfsk24_state_change(int, int)", true);
+		connect_signal("mfsk24_state_change(int, int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_impulse_change)) {
-		SRPCSignalClass::Instance().toLog("mfsk24_impulse_change connected");
-		emit connect_signal("mfsk24_impulse_change(QVariantList)", true);
+		connect_signal("mfsk24_impulse_change(QVariantList)", true);
 	}
 }
 
 void RPC_mfsk24_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_)) {
-		SRPCSignalClass::Instance().toLog("mfsk24_ disconnected");
-		//emit connect_signal("mfsk24_()", false);
+		connect_signal("mfsk24_()", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_state_change)) {
-		SRPCSignalClass::Instance().toLog("mfsk24_state_change disconnected");
-		//emit connect_signal("mfsk24_state_change(int, int)", false);
+		connect_signal("mfsk24_state_change(int, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mfsk24_SIGNAL_Object::mfsk24_impulse_change)) {
-		SRPCSignalClass::Instance().toLog("mfsk24_impulse_change disconnected");
-		//emit connect_signal("mfsk24_impulse_change(QVariantList)", false);
+		connect_signal("mfsk24_impulse_change(QVariantList)", false);
 	}
 }
 

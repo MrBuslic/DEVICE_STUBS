@@ -99,6 +99,7 @@ extern "C" {
 		sprIQClear(
 		UINT numChan    /* номер канала */
 		){
+		SInterImitObject::Instance().clear_irq_channel(numChan);
 			return 0;
 		}
 
@@ -114,17 +115,8 @@ extern "C" {
 		cfgSysGet(
 		cfgSYS_t * cfgCBK /* указатель на область для записи конфигурации ЦБК @}@*/
 		){
-		cfgCBK->vm = 7;
-		cfgCBK->rs = 8;
-		cfgCBK->er = 0;
-		cfgCBK->of = 8;
-		cfgCBK->m0 = 1;
-		cfgCBK->b0 = 0;
-		cfgCBK->m1 = 1;
-		cfgCBK->b1 = 0;
-		cfgCBK->no = 0;
-		cfgCBK->dv = 1;
-		cfgCBK->rg = CFGSYS_rgWork;
+
+		*cfgCBK = STimeThread::Instance().cbk_conf;
 
 		return 0;
 		}
@@ -185,7 +177,7 @@ extern "C" {
 		sprIGetF(
 		UINT numChan    /* номер канала */
 		){
-			return 0;
+		return SInterImitObject::Instance().get_irq_channel(numChan);
 		}
 
 

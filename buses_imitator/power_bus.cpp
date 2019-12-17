@@ -9,9 +9,7 @@
 
 PowerWidget::PowerWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget();
-	log_w->show();
-	setFixedSize(250, 80);
+	log_widget = new LogWidget(this, "power_bus");
 	for (int i = 1; i <= 3; i++) power_bus_state_map[i] = 1;
 
 	QString ip_str = "127.0.0.1";
@@ -27,10 +25,14 @@ PowerWidget::PowerWidget(QWidget *parent)
 	rpc_signal_srv->start();
 
 	on_btn = new QPushButton("Вкл", this);
+	on_btn->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	off_btn = new QPushButton("Откл", this);
+	off_btn->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	QVBoxLayout* lay = new QVBoxLayout(this);
+	lay->addStretch(10);
 	lay->addWidget(on_btn);
 	lay->addWidget(off_btn);
+	lay->addWidget(log_widget);
 	connect(on_btn, &QPushButton::clicked, this, &PowerWidget::set_on);
 	connect(off_btn, &QPushButton::clicked, this, &PowerWidget::set_off);
 
@@ -51,14 +53,17 @@ void PowerWidget::set_u(int bus, double volt) //
 	case NK:
 		nk_volt = volt;
 		emit u_on_nk(volt);
+		log_widget->log_append(QString("UНК - %1В").arg(nk_volt));
 		break;
 	case K1:
 		k1_volt = volt;
 		emit u_on_k1(volt);
+		log_widget->log_append(QString("UК1 - %1В").arg(k1_volt));
 		break;
 	case K2:
 		k2_volt = volt;
 		emit u_on_k2(volt);
+		log_widget->log_append(QString("UК2 - %1В").arg(k2_volt));
 		break;
 	}
 }
@@ -81,6 +86,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		}
 		curr = tmp_curr;
 		nk_curr = tmp_curr;
+		log_widget->log_append(QString("IНК - %1А").arg(nk_curr));
 		break;
 	case K1:
 		for (QMap<QString, double>::iterator itr = k1_curr_map.begin(); itr != k1_curr_map.end(); itr++)
@@ -89,6 +95,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		}
 		curr = tmp_curr;
 		k1_curr = tmp_curr;
+		log_widget->log_append(QString("IК1 - %1А").arg(k1_curr));
 		break;
 	case K2:
 		for (QMap<QString, double>::iterator itr = k2_curr_map.begin(); itr != k2_curr_map.end(); itr++)
@@ -97,6 +104,7 @@ void PowerWidget::get_i(int bus, double& curr)
 		}
 		curr = tmp_curr;
 		k2_curr = tmp_curr;
+		log_widget->log_append(QString("IК2 - %1А").arg(k2_curr));
 		break;
 	}
 }
@@ -120,6 +128,7 @@ void PowerWidget::set_i(int bus, QString name, double curr)
 void PowerWidget::set_bus_state(int bus, int state)
 {
 	power_bus_state_map[bus] = state;
+	log_widget->log_append(QString("Присваиваю каналу шины %1 значение %2").arg(bus).arg(state));
 }
 
 void PowerWidget::set_on()

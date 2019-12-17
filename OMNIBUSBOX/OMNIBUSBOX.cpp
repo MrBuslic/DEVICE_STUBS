@@ -23,32 +23,13 @@ union MkoWord
 	};
 };
 
-RpcOmnibusWidget::RpcOmnibusWidget() : QWidget(), auto_scroll(true)
+RpcOmnibusWidget::RpcOmnibusWidget(QWidget* parent) : QWidget(parent)
 {
-	for (int i = 1; i <= 2; i++) map_channels[i] = 3;//инициализация мап исправных каналов
+	for (int i = 0; i <= 2; i++) map_channels[i] = 3;//инициализация мап исправных каналов
+
+	log_widget = new LogWidget(this, "omnibusbox");
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	edit = new QTextEdit(this);
-	_scroll_bar = edit->verticalScrollBar();
-	_doc = new QTextDocument();
-	_cursor = new QTextCursor(_doc);
-	edit->setDocument(_doc);
-	edit->setReadOnly(true);
-	_doc->setMaximumBlockCount(1000);
-	setMinimumSize(490, 300);
-	auto_scroll_box = new QCheckBox(this);
-	auto_scroll_box->setText("Автопрокрутка");
-	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcOmnibusWidget::auto_scroll_clicked);
-	v_lay->addWidget(edit);
-	v_lay->addWidget(auto_scroll_box);
-
-	log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
-	QDir dir("d:/logs");
-	if (!dir.exists())
-		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcOmnibusWidget::log_timer_ontimer);
-	log_timer.start(200);
-
+	v_lay->addWidget(log_widget);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -76,40 +57,39 @@ RpcOmnibusWidget::RpcOmnibusWidget() : QWidget(), auto_scroll(true)
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
-	connect(this, &RpcOmnibusWidget::message_to_log, this, &RpcOmnibusWidget::message_to_log_slot, Qt::BlockingQueuedConnection);
+	connect(this, &RpcOmnibusWidget::message_to_log, log_widget, &LogWidget::log_append, Qt::DirectConnection);
 }
 
 RpcAbonent::RpcAbonent(int addr)
 {
 	on = false;
-	os = addr << 11;
-	for (int i = 1; i < 30; i++)
+	line = 3;
+	unsigned short tmp_os = addr << 11;
+	os.insert(0, tmp_os);
+	last_os = tmp_os;
+	os.insert(31, tmp_os);
+	for (int i = 1; i < 31; i++)
 	{
 		QList<unsigned short> tmp_words;
 		for (int j = 0; j < 32; j++)
 		{
 			tmp_words << 0;
 		}
-
+		os.insert(i, tmp_os);
 		words.insert(i, tmp_words);
 	}
 }
 
-void RpcOmnibusWidget::message_to_log_slot(QString _msg)
+void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os, int _s_addr)
 {
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
-}
-
-void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os)
-{
-	abonents[mko][addr].os = _os;
-	QString _msg = QString("%1 абонент с адресом %2 на МКО %3 с ответным словом %4").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(addr).arg(mko).arg(_os);
+	if (_s_addr == -1)
+		for (int i = 0; i < 32; i++)
+		{
+			abonents[mko][addr].os[i] = _os;
+		}
+	else
+		abonents[mko][addr].os[_s_addr] = _os;
+	QString _msg = QString("Абоненту с адресом %1 на МКО %2 установлено ОС %3 на подадрес %4").arg(addr).arg(mko).arg(_os).arg(_s_addr);
 	emit message_to_log(_msg);
 }
 
@@ -117,7 +97,7 @@ void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os)
 void RpcOmnibusWidget::switch_ab(int mko, int addr, bool _on)
 {
 	abonents[mko][addr].on = _on;
-	QString _msg = QString("%1 абонент с адресом %2 на МКО %3 %4").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(addr).arg(mko).arg(_on ? "включен" : "выключен");
+	QString _msg = QString("Абонент с адресом %1 на МКО %2 %3").arg(addr).arg(mko).arg(_on ? "включен" : "выключен");
 	emit message_to_log(_msg);
 }
 
@@ -127,7 +107,7 @@ void RpcOmnibusWidget::set_new_data(int mko, int addr, int saddr, QVariantList w
 	{
 		abonents[mko][addr].words[saddr][i] = words[i].toInt();
 	}
-	QString _msg = QString("%1 абоненту с адресом %2 на МКО %3 заданы новые данные в подадрес %4").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(addr).arg(mko).arg(saddr);
+	QString _msg = QString("Абоненту с адресом %1 на МКО %2 заданы новые данные в подадрес %4").arg(addr).arg(mko).arg(saddr);
 	emit message_to_log(_msg);
 }
 
@@ -139,18 +119,82 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 
 	if (!(map_channels[mko] & work_line))
 	{
-		QString _msg = QString("%1 МКО %2 канал %3 не работает").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mko).arg(line);
+		QString _msg = QString("МКО %1 канал %2 не работает").arg(mko).arg(line);
+		emit message_to_log(_msg);
+		return;
+	}
+	if (abonents[mko][tmp_cwd.adr].on && (work_line & abonents[mko][tmp_cwd.adr].line))
+	{
+		if ((tmp_cwd.subadr ==0) || (tmp_cwd.subadr == 31))
+		{
+			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+
+			switch (tmp_cwd.count)
+			{
+			case TRANSMIT_BW:
+				os = abonents[mko][tmp_cwd.adr].last_os;
+				break;
+			case BLOCK_TRANSMITTER:
+				abonents[mko][tmp_cwd.adr].line ^= work_line;
+				break;
+			case DEBLOCK_TRANSMITTER:
+				abonents[mko][tmp_cwd.adr].line += 2 - 2*line;
+				break;
+			}
+		}
+		else
+		{
+			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+			if (tmp_cwd.tr && (os != -1))
+			{
+				words.clear();
+				int tmp_word_count = tmp_cwd.count;
+				if (tmp_cwd.count == 0)
+					tmp_word_count = 32;
+				words.reserve(tmp_word_count);
+				for (int i = 0; i < tmp_word_count; i++)
+					words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
+			}
+		}
+	}
+	else
+	{
+		os = -1;
+	}
+
+	if (os != -1)
+		abonents[mko][tmp_cwd.adr].last_os = os;
+
+	QString _msg = QString("Обмен на МКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(cwd, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
+	emit message_to_log(_msg);
+	emit new_message(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
+}
+
+
+void RpcOmnibusWidget::send_msg_mpko(int mko, int line, int cwd, QVariantList& words, int& os)
+{
+	MkoWord tmp_cwd;
+	tmp_cwd.cw = cwd;
+	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
+	tmp_cwd.adr = 4;
+	qDebug() << QString("mpko %1 %2 %3").arg(tmp_cwd.adr).arg(tmp_cwd.subadr).arg(tmp_cwd.count);
+	if (!(map_channels[mko] & work_line))
+	{
+		QString _msg = QString("МКО %1 канал %2 не работает").arg(mko).arg(line);
 		emit message_to_log(_msg);
 		return;
 	}
 	if (abonents[mko][tmp_cwd.adr].on)
 	{
-		os = abonents[mko][tmp_cwd.adr].os;
-		if (tmp_cwd.tr)
+		os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+		if (tmp_cwd.tr && (os != -1))
 		{
 			words.clear();
-			words.reserve(tmp_cwd.count);
-			for (int i = 0; i < tmp_cwd.count; i++)
+			int tmp_word_count = tmp_cwd.count;
+			if (tmp_cwd.count == 0)
+				tmp_word_count = 32;
+			words.reserve(tmp_word_count);
+			for (int i = 0; i < tmp_word_count; i++)
 				words << abonents[mko][tmp_cwd.adr].words[tmp_cwd.subadr][i];
 		}
 	}
@@ -158,9 +202,9 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 	{
 		os = -1;
 	}
-	QString _msg = QString("%1 обмен на МКО %2 КС 0x%3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(mko).arg(cwd, 4, 16, QChar('0'));
+	QString _msg = QString("Обмен на МПКО %1 КС 0x%2 ОС 0x%3").arg(mko).arg(tmp_cwd.cw, 4, 16, QChar('0')).arg(os, 4, 16, QChar('0'));
 	emit message_to_log(_msg);
-	emit new_message(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, cwd, words, os);
+	emit new_message_mpko(QDateTime::currentMSecsSinceEpoch() * 1000, mko, line, tmp_cwd.cw, words, os);
 }
 
 
@@ -169,32 +213,9 @@ QVariant RpcOmnibusWidget::get_dt()
 	return QDateTime::currentMSecsSinceEpoch()*1000;
 }
 
-void RpcOmnibusWidget::auto_scroll_clicked(int _state)
-{
-	auto_scroll = (_state != 0);
-}
-
-
-void RpcOmnibusWidget::log_timer_ontimer()
-{
-	QStringList tmp_buffer;
-	{
-		QMutexLocker lock(&log_mutex);
-		tmp_buffer = log_buffer;
-		log_buffer.clear();
-	}
-	if (tmp_buffer.isEmpty())
-		return;
-	QFile log_file(log_filename);
-	QTextStream log_stream(&log_file);
-	log_file.open(QIODevice::Append);
-	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
-		log_stream << *itr << "\n";
-	log_file.close();
-}
-
-int RpcOmnibusWidget::unomnibus_map_channels_setup(int _n, short _chan)
+int RpcOmnibusWidget::unomnibus_map_channels_setup(int _n, int _chan)
 {
 	map_channels[_n] = _chan;
+	emit message_to_log(QString("Установлено состояние МКО%1 в %2").arg(_n).arg(_chan));
 	return 0;
 }

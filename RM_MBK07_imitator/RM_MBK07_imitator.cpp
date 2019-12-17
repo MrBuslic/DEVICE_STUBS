@@ -9,16 +9,16 @@ RM_MBK07_imitator::RM_MBK07_imitator()
 	IM = "";
 	FM = "";
 	p20 = new QPushButton("П20", widg);
-	p20->setFixedWidth(150);
-	p20->setFixedHeight(100);
+	p20->setFixedWidth(90);
+	p20->setFixedHeight(90);
 	p20->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
 	p21 = new QPushButton("П21", widg);
-	p21->setFixedWidth(150);
-	p21->setFixedHeight(100);
+	p21->setFixedWidth(90);
+	p21->setFixedHeight(90);
 	p21->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
 	p12 = new QPushButton("П12", widg);
-	p12->setFixedWidth(150);
-	p12->setFixedHeight(100);
+	p12->setFixedWidth(90);
+	p12->setFixedHeight(90);
 	p12->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
 
 	bloks_label = new QLabel("Блоки", widg);

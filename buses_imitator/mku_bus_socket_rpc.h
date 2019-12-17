@@ -29,6 +29,7 @@ signals:
 public slots:
 	void new_ku(int ku_n, int length, double u, int line);
 	void new_ku_732(int ku_n, int length, double u, int line);
+	void new_ku_cbk(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 
 	void send_signal_slot(QByteArray* _arr);
@@ -98,10 +99,13 @@ public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant make_ku(QVariantList& _values);
 	QVariant make_ku_732(QVariantList& _values);
+	QVariant make_ku_cbk(QVariantList& _values);
 	QVariant make_mk(QVariantList& _values);
 	QVariant ku_map_channels_setup(QVariantList& _values);
 	QVariant mshm_map_channels_setup(QVariantList& _values);
 	QVariant pshm_map_channels_setup(QVariantList& _values);
+	QVariant get_tm(QVariantList& _values);
+	QVariant set_tm(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

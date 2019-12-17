@@ -22,11 +22,11 @@ int main(int argc, char **argv)
 	RpcOlsWidget* ols_widget;
 	if (argc < 2)
 	{
-		ols_widget = new RpcOlsWidget(0);
+		ols_widget = new RpcOlsWidget(0, 0);
 	}
 	else
 	{
-		ols_widget = new RpcOlsWidget(QString(argv[1]).toInt());
+		ols_widget = new RpcOlsWidget(0, QString(argv[1]).toInt());
 	}
 	ols_widget->show();
 	return app.exec();

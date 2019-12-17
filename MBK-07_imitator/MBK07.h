@@ -41,14 +41,14 @@ enum STAB
 	OFF_STAB = 4
 
 };
-enum ANTENNA
+enum MBK07_ANTENNA
 {
 	OHA = 0,
 	MHAPY = 1,
 	MHAMY = 2,
 	ANT_OFF = 3
 };
-enum full_mode
+enum class full_mode
 {
 	ERR = 0,
 	PI15 = 1,
@@ -93,12 +93,12 @@ private:
 	//Хранимые текущие
 
 	int current_lit = 0;
-	full_mode current_mode = ERR;
+	full_mode current_mode = full_mode::ERR;
 	PSP current_PSP = PSP_OFF;
 	FSMU_numbB current_FSMU = FSMU_OFF;
 	FSVU_numbB current_FSVU = FSVU_OFF;
 	STAB current_stab = OFF_STAB;
-	ANTENNA current_antenna = ANT_OFF;
+	MBK07_ANTENNA current_antenna = ANT_OFF;
 
 	bool IM = false;
 	bool pi8_fast = false;

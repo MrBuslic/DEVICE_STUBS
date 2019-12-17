@@ -78,13 +78,13 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		///////////////////////////////////////////////////////////////////////
 		operators_map["make_ku(int, int, double, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_ku;
 		operators_map["make_ku_732(int, int, double, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_ku_732;
+		operators_map["make_ku_cbk(int, int, double, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_ku_cbk;
 		operators_map["make_mk(int, int, int, int, double, double, int, int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_mk;
-		operators_map["ku_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::ku_map_channels_setup;
-		operators_map["mshm_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
-		operators_map["pshm_map_channels_setup(int, short)"] = &mku_bus_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
-		operators_map["ku_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::ku_map_channels_setup;
-		operators_map["mshm_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::mshm_map_channels_setup;
-		operators_map["pshm_map_channels_setup(int, short)"] = &Socket_RPC_SLOT_Object::pshm_map_channels_setup;
+		operators_map["ku_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::ku_map_channels_setup;
+		operators_map["mshm_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
+		operators_map["pshm_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
+		operators_map["get_tm(QString, QVariant&)"] = &mku_bus_Socket_RPC_SLOT_Object::get_tm;
+		operators_map["set_tm(QString, QVariant)"] = &mku_bus_Socket_RPC_SLOT_Object::set_tm;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -124,6 +124,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return;
 		disconnect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
 		disconnect(app, SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
+		disconnect(app, SIGNAL(new_ku_cbk(int, int, double, int)), this, SLOT(new_ku_cbk(int, int, double, int)));
 		disconnect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 	}
 	void mku_bus_Socket_RPC_SIGNAL_Object::set_app(MKUWidget* _app)
@@ -133,6 +134,8 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		data_map.insert("new_ku(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)), Qt::DirectConnection);
 		data_map.insert("new_ku_732(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_ku_cbk(int, int, double, int)), this, SLOT(new_ku_cbk(int, int, double, int)), Qt::DirectConnection);
+		data_map.insert("new_ku_cbk(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)), Qt::DirectConnection);
 		data_map.insert("new_mk(int, int, int, int, double, double, int, int, int)", std::shared_ptr<SignalData>(new SignalData()));
 
@@ -322,6 +325,35 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku_732 finished").arg(objectName()));
 	}
+	void mku_bus_Socket_RPC_SIGNAL_Object::new_ku_cbk(int ku_n, int length, double u, int line)
+	{
+		auto& descriptor = *data_map["new_ku_cbk(int, int, double, int)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_ku_cbk(int, int, double, int)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_ku_cbk  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << ku_n;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_cbk  call_number %2 ku_n =  %1").arg(RPCSignalClass::QVariantToString(ku_n)).arg(call_number));
+		tmp_stream << length;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_cbk  call_number %2 length =  %1").arg(RPCSignalClass::QVariantToString(length)).arg(call_number));
+		tmp_stream << u;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_cbk  call_number %2 u =  %1").arg(RPCSignalClass::QVariantToString(u)).arg(call_number));
+		tmp_stream << line;
+		SRPCSignalClass::Instance().toLog(QString("new_ku_cbk  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku_cbk sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku_cbk finished").arg(objectName()));
+	}
 	void mku_bus_Socket_RPC_SIGNAL_Object::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 	{
 		auto& descriptor = *data_map["new_mk(int, int, int, int, double, double, int, int, int)"].get();
@@ -415,6 +447,27 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 0;
 		}
 	}
+	QVariant mku_bus_Socket_RPC_SLOT_Object::make_ku_cbk(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int ku_n = _values.at(0).value<int>();
+			int length = _values.at(1).value<int>();
+			double u = _values.at(2).value<double>();
+			int line = _values.at(3).value<int>();
+			app->make_ku_cbk(ku_n, length, u, line);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 	QVariant mku_bus_Socket_RPC_SLOT_Object::make_mk(QVariantList& _values)
 	{
 		try
@@ -447,7 +500,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int ku_n = _values.at(0).value<int>();
-			short line = _values.at(1).value<short>();
+			int line = _values.at(1).value<int>();
 			int res = app->ku_map_channels_setup(ku_n, line);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -467,7 +520,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int mshm = _values.at(0).value<int>();
-			short line_m = _values.at(1).value<short>();
+			int line_m = _values.at(1).value<int>();
 			int res = app->mshm_map_channels_setup(mshm, line_m);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -487,7 +540,7 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int pshm = _values.at(0).value<int>();
-			short line_p = _values.at(1).value<short>();
+			int line_p = _values.at(1).value<int>();
 			int res = app->pshm_map_channels_setup(pshm, line_p);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
@@ -499,6 +552,47 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant mku_bus_Socket_RPC_SLOT_Object::get_tm(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString tm_name = _values.at(0).value<QString>();
+			QVariant tm_val = _values.at(1).value<QVariant>();
+			app->get_tm(tm_name, tm_val);
+			_values[1] = tm_val;
+			SRPCSignalClass::Instance().toLog(QString("%1 tm_val = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant mku_bus_Socket_RPC_SLOT_Object::set_tm(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString tm_name = _values.at(0).value<QString>();
+			QVariant tm_val = _values.at(1).value<QVariant>();
+			app->set_tm(tm_name, tm_val);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////

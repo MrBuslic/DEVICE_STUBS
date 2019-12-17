@@ -8,7 +8,6 @@ class RPC_vvk4_SLOT_Object : public RPC_SLOT_Object
 	Q_OBJECT
 public:
 	RPC_vvk4_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("vvk4_slot_obj");}
-	virtual void connect_to_server();
 	////////////////////////////////////
 public slots:
 	int unvvk4_commut_ListOutput(int _line, QString _masOn, QString _masOff);
@@ -38,17 +37,12 @@ public:
 	RPC_vvk4_SIGNAL_Object(QString _addr, int _port) : RPC_SIGNAL_Object(_addr, _port)
 	{
 		this->QObject::setObjectName("vvk4_signal_obj");
-		connect(this, SIGNAL(connect_signal(QString, bool)), this, SLOT(send_connect(QString, bool)), Qt::BlockingQueuedConnection); 
 	}
-	virtual void connect_to_server();
 public slots:
 	void read_data();
-	void send_connect(QString signal_name, bool _connect);
 protected:
 	void connectNotify(const QMetaMethod & signal);
 	void disconnectNotify(const QMetaMethod & signal);
-signals:
-	void connect_signal(QString signal_name, bool _connect);
 };
 
 class RPC_vvk4_SIGNAL_Thread : public RPC_SIGNAL_Thread

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 2.8)
 
 #enable_language(C)
 
-
 set(CMAKE_AUTOMOC ON)
 include_directories($ENV{LOKI_HOME}/include)	
 
@@ -22,7 +21,7 @@ include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
 include_directories(${Qt5Script_INCLUDES})
 include_directories(${PROJECT_SOURCE_DIR}/../../lib/db_ctrl)
-include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl)
+#include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl)
 include_directories(${PROJECT_SOURCE_DIR}/../../lib/mongo_ctrl_v3)
 
 add_definitions(-DNOMINMAX)
@@ -45,10 +44,11 @@ else()
 	set(ADDITIONAL_LIBS pthread mongoclient)
 endif()
 
-link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{OMNIBUS_HOME}/lib $ENV{MONGO_HOME}/lib)
-set(CARD_SOURCES BTICARD.cpp omnibus_rpc.h omnibus_rpc.cpp BufferClass.h BufferClass.cpp)
 
-set(1553_SOURCES BTI1553.cpp omnibus_rpc.h omnibus_rpc.cpp BufferClass1553.h BufferClass1553.cpp)
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{OMNIBUS_HOME}/lib $ENV{MONGO_HOME}/lib)
+set(CARD_SOURCES BTICARD/BTICARD.cpp omnibus_rpc.h omnibus_rpc.cpp BTICARD/BufferClass.h BTICARD/BufferClass.cpp BTICARD/DllMain.cpp)
+
+set(1553_SOURCES BTI1553/BTI1553.cpp omnibus_rpc.h omnibus_rpc.cpp BTI1553/BufferClass1553.h BTI1553/BufferClass1553.cpp BTI1553/DllMain.cpp)
 
 include_directories($ENV{OMNIBUS_HOME}/include)
 
@@ -57,12 +57,12 @@ include_directories(${OMNIBUSBOX_SOURCE_DIR}/../../lib/socket_rpc/include ../../
 add_library(BTICARD SHARED ${CARD_HEADERS} ${CARD_SOURCES})
 add_library(BTI1553 SHARED ${1553_HEADERS} ${1553_SOURCES})
 
-target_link_libraries(BTICARD socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller mongo_controller_v3 ${Boost_LIBRARIES})
-target_link_libraries(BTI1553 socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller mongo_controller_v3 ${Boost_LIBRARIES})
+target_link_libraries(BTICARD socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller_v3 ${Boost_LIBRARIES})
+target_link_libraries(BTI1553 socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIES} db_ctrl mongo_controller_v3 ${Boost_LIBRARIES})
 
 set(OMNIBUS_SOURCES OMNIBUSBOX.h OMNIBUSBOX.cpp omnibus_socket_rpc.h omnibus_socket_rpc.cpp main.cpp)
 
-add_executable(rpc_omnibus WIN32 ${OMNIBUS_SOURCES})
+add_executable(rpc_omnibus WIN32 ${OMNIBUS_SOURCES} icon.rc)
 set_target_properties(rpc_omnibus PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(rpc_omnibus ${QT_LIBRARIES} socket_rpc common_functions ${ADDITIONAL_LIBS})
 qt5_use_modules(rpc_omnibus Core Widgets Gui Network)

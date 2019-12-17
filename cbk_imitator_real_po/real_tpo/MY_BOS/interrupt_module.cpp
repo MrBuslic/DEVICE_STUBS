@@ -5,7 +5,7 @@
 
 InterImitObject::InterImitObject()
 {
-
+	GotIrqMask = 0;
 }
 
 void InterImitObject::create_slot_thread()
@@ -72,6 +72,7 @@ void InterImitObject::get_new_interrupt(int _n, short _chan, double _u, double _
 	else
 	{
 		int mask = (1 << _n);
+		GotIrqMask |= (1 << _n);
 		if (((~IrqMask) & mask) == mask)
 		{
 			emit need_handle_interrupt(mask);
@@ -86,4 +87,15 @@ void InterImitObject::get_new_interrupt(int _n, short _chan, double _u, double _
 void InterImitObject::set_IrqMask(int tmp_mask)
 {
 	IrqMask = tmp_mask;
+}
+
+void InterImitObject::clear_irq_channel(int _n)
+{
+	if ((GotIrqMask & (1 << _n)) != 0)
+		GotIrqMask ^= (1 << _n);
+}
+
+int InterImitObject::get_irq_channel(int _n)
+{
+	return GotIrqMask & (1 << _n);
 }

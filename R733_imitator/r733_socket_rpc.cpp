@@ -80,6 +80,7 @@ int r733_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["auto_scroll_clicked(int)"] = &r733_Socket_RPC_SLOT_Object::auto_scroll_clicked;
 		operators_map["get_power(double)"] = &r733_Socket_RPC_SLOT_Object::get_power;
 		operators_map["new_frame_04(QString, QVariant)"] = &r733_Socket_RPC_SLOT_Object::new_frame_04;
+		operators_map["new_mk(int, int, int, int, double, double, int, int, int)"] = &r733_Socket_RPC_SLOT_Object::new_mk;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -361,6 +362,32 @@ int r733_Socket_RPC_SIGNAL_Object::call_number = 0;
 			QString mode = _values.at(0).value<QString>();
 			QVariant frame_data = _values.at(1).value<QVariant>();
 			app->new_frame_04(mode, frame_data);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant r733_Socket_RPC_SLOT_Object::new_mk(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int mshm = _values.at(0).value<int>();
+			int pshm = _values.at(1).value<int>();
+			int length_m = _values.at(2).value<int>();
+			int length_p = _values.at(3).value<int>();
+			double u_m = _values.at(4).value<double>();
+			double u_p = _values.at(5).value<double>();
+			int dt = _values.at(6).value<int>();
+			int line_m = _values.at(7).value<int>();
+			int line_p = _values.at(8).value<int>();
+			app->new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 			return 0;
 		}
 		catch(const std::exception &)

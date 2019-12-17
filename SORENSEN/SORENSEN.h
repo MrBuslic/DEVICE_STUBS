@@ -55,6 +55,8 @@ private:
 signals:
 	void update_graphics_signal();
 	void power_out(int n, double _u);
+protected:
+	void closeEvent(QCloseEvent *event);
 };
 
 #endif //SORENSEN_H

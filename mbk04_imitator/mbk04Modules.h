@@ -14,7 +14,7 @@
 #include <QMainWindow>
 #include <QVariant>
 
-enum CURRENT_DEV
+enum class CURRENT_DEV
 {
 	MAIN = 1,
 	RESERVE = 2,

@@ -9,7 +9,9 @@
 
 FrameBusWidget::FrameBusWidget(QWidget *parent)
 {
-	LogWidget* log_w = new LogWidget(this);
+	log_widget = new LogWidget(this, "frame_bus");
+	QVBoxLayout* v_lay = new QVBoxLayout(this);
+	v_lay->addWidget(log_widget);
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = FRAME_SLOT;
@@ -29,6 +31,7 @@ FrameBusWidget::FrameBusWidget(QWidget *parent)
 
 void FrameBusWidget::make_new_frame_04(QString mode, QVariant frame_data)
 {
+	log_widget->log_append(QString("Новый кадр %1").arg(mode));
 	emit new_frame_04(mode, frame_data);
 }
 

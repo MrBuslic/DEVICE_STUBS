@@ -1,40 +1,5 @@
 #include "r732_rpc.h"
 
-void RPC_r732_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("r732 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("r732 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("r732 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_r732_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("r732 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("r732 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("r732 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_r732_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_r732_SLOT_Object>(new RPC_r732_SLOT_Object(addr, port));
@@ -49,32 +14,17 @@ void RPC_r732_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_r732_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_r732_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_r732_SIGNAL_Object::new_ku)) {
-		SRPCSignalClass::Instance().toLog("new_ku connected");
-		emit connect_signal("new_ku(int, int, double, int)", true);
+		connect_signal("new_ku(int, int, double, int)", true);
 	}
 }
 
 void RPC_r732_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_r732_SIGNAL_Object::new_ku)) {
-		SRPCSignalClass::Instance().toLog("new_ku disconnected");
-		//emit connect_signal("new_ku(int, int, double, int)", false);
+		connect_signal("new_ku(int, int, double, int)", false);
 	}
 }
 

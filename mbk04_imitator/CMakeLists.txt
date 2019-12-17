@@ -18,7 +18,6 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 add_definitions(${Qt5Network_DEFINITIONS})
 
 
-
 include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})
 include_directories(${Qt5Widgets_INCLUDES})
@@ -51,7 +50,7 @@ SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/frame_bus_rpc.h ${PROJEC
 SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
 #set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(mbk04_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES}  ${POWER_RPC_SOURCES})
+add_executable(mbk04_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES}  ${POWER_RPC_SOURCES} icon.rc)
 target_link_libraries (mbk04_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc frame_converter ) 
 

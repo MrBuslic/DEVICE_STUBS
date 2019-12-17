@@ -30,7 +30,7 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa")
 endif()
 
-set(UNADS128_SOURCES unads128.cpp unads128_h.h ads128_rpc.h ads128_rpc.cpp)
+set(UNADS128_SOURCES unads128.cpp unads128_h.h ads128_rpc.h ads128_rpc.cpp DllMain.cpp)
 
 include_directories($ENV{VISA_HOME}include)
 

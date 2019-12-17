@@ -76,7 +76,7 @@ int foi_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("foi_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &foi_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["unfoi_map_channels_setup(int, short)"] = &foi_Socket_RPC_SLOT_Object::unfoi_map_channels_setup;
+		operators_map["unfoi_map_channels_setup(int, int)"] = &foi_Socket_RPC_SLOT_Object::unfoi_map_channels_setup;
 		operators_map["unfoi_chan_setup(int, short, double, double)"] = &foi_Socket_RPC_SLOT_Object::unfoi_chan_setup;
 		operators_map["unfoi_run()"] = &foi_Socket_RPC_SLOT_Object::unfoi_run;
 		///////////////////////////////////////////////////////////////////////
@@ -267,7 +267,7 @@ int foi_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int _n = _values.at(0).value<int>();
-			short _chan = _values.at(1).value<short>();
+			int _chan = _values.at(1).value<int>();
 			int res = app->unfoi_map_channels_setup(_n, _chan);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;

@@ -1,40 +1,5 @@
 #include "mbk04_rpc.h"
 
-void RPC_mbk04_SLOT_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("mbk04 slot connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		SRPCSignalClass::Instance().toLog("mbk04 slot connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("mbk04 slot connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
-void RPC_mbk04_SIGNAL_Object::connect_to_server()
-{
-	SRPCSignalClass::Instance().toLog(QString("mbk04 signal connecting %1 %2").arg(addr).arg(port));
-	_sock = std::shared_ptr<QTcpSocket>(new QTcpSocket);
-	_sock->connectToHost(addr,port);
-	if (_sock->waitForConnected(3000))
-	{
-		connected = true;
-		connect(_sock.get(), SIGNAL(readyRead()), this, SLOT(read_data()));
-		SRPCSignalClass::Instance().toLog("mbk04 signal connected");
-	}
-	else
-	{
-		connected = false;
-		SRPCSignalClass::Instance().toLog(QString("mbk04 signal connection failed %1 %2").arg(_sock->error()).arg(_sock->errorString()));
-	}
-}
-
 void RPC_mbk04_SLOT_Thread::run()
 {
 	rpc_obj = std::shared_ptr<RPC_mbk04_SLOT_Object>(new RPC_mbk04_SLOT_Object(addr, port));
@@ -49,42 +14,25 @@ void RPC_mbk04_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_mbk04_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_mbk04_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::new_tm)) {
-		SRPCSignalClass::Instance().toLog("new_tm connected");
-		emit connect_signal("new_tm(int)", true);
+		connect_signal("new_tm(int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::state_changed_signal)) {
-		SRPCSignalClass::Instance().toLog("state_changed_signal connected");
-		emit connect_signal("state_changed_signal()", true);
+		connect_signal("state_changed_signal()", true);
 	}
 }
 
 void RPC_mbk04_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::new_tm)) {
-		SRPCSignalClass::Instance().toLog("new_tm disconnected");
-		//emit connect_signal("new_tm(int)", false);
+		connect_signal("new_tm(int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_mbk04_SIGNAL_Object::state_changed_signal)) {
-		SRPCSignalClass::Instance().toLog("state_changed_signal disconnected");
-		//emit connect_signal("state_changed_signal()", false);
+		connect_signal("state_changed_signal()", false);
 	}
 }
 
