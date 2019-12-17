@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 
 enable_language(CXX)
 
-add_definitions(-DUNICODE -D_UNICODE -DWIN32 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS)
+# add_definitions(-DUNICODE -D_UNICODE -DWIN32 -D_SCL_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS)
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
@@ -21,7 +21,7 @@ find_package(Qt5ScriptTools)
 find_package(Qt5PrintSupport)
 find_package(libmongocxx REQUIRED)
 
-add_definitions(-DLOKI_CLASS_LEVEL_THREADING -DWINDOWS -D_WINDOWS)
+# add_definitions(-DLOKI_CLASS_LEVEL_THREADING -DWINDOWS -D_WINDOWS)
 add_definitions(-DWIN32_LEAN_AND_MEAN)
 
 include_directories($ENV{VISA_HOME}/include)

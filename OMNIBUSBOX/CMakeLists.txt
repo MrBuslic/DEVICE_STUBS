@@ -41,7 +41,8 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS "/EHa /Zc:wchar_t")
 	set(ADDITIONAL_LIBS ws2_32)
 else()
-	set(ADDITIONAL_LIBS pthread mongoclient)
+	# set(ADDITIONAL_LIBS pthread mongoclient)
+	set(ADDITIONAL_LIBS pthread)
 endif()
 
 
@@ -63,7 +64,11 @@ target_link_libraries(BTI1553 socket_rpc ${ADDITIONAL_LIBS} ${Qt5Script_LIBRARIE
 set(OMNIBUS_SOURCES OMNIBUSBOX.h OMNIBUSBOX.cpp omnibus_socket_rpc.h omnibus_socket_rpc.cpp main.cpp)
 
 add_executable(rpc_omnibus WIN32 ${OMNIBUS_SOURCES} icon.rc)
-set_target_properties(rpc_omnibus PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
+
+if(WIN32)
+	set_target_properties(rpc_omnibus PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
+endif()
+
 target_link_libraries(rpc_omnibus ${QT_LIBRARIES} socket_rpc common_functions ${ADDITIONAL_LIBS})
 qt5_use_modules(rpc_omnibus Core Widgets Gui Network)
 
@@ -71,3 +76,15 @@ ADD_CUSTOM_COMMAND(TARGET rpc_omnibus
 	PRE_BUILD
 	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/OMNIBUSBOX.h ${PROJECT_SOURCE_DIR} omnibus
 )
+
+
+#get_cmake_property(_variableNames VARIABLES)
+#list (SORT _variableNames)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
+
+foreach( d ${DirDefs} )
+    message( STATUS "Found Define: " ${d} )
+endforeach()
+message( STATUS "DirDefs: " ${DirDefs} )
