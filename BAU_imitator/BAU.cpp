@@ -443,7 +443,7 @@ void BAU_widg::imit_off()
 	AT_widget.hide();
 	kcbk = false;
 	//msg_to_log("Питание отключено");
-	//omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	update_graphics_BAU();
 }
 

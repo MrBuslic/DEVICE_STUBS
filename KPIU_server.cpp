@@ -93,6 +93,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/BECH_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/ASN_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/LKA-05_imitator");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/BAU_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/UNVVK4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/UNIS4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/common");

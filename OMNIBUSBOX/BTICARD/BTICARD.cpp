@@ -16,7 +16,6 @@
 #include "rpc_ports.h"
 
 #include "BufferClass.h"
-#include "instruments.h"
 #include <QApplication>
 
 #ifdef __cplusplus
