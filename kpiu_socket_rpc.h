@@ -30,8 +30,8 @@ public slots:
 	void string_msg(QString _msg);
 	void int_msg(int _msg);
 	void int_return_signal(int& ret_int);
-	void toLog(QString message);
-	void toProtocol(QString message);
+	void toLogs(QString message);
+	void toProtocols(QString message);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();

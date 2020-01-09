@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QDir>
 #include "vvk4_socket_rpc.h"
+#include "rpc_ports.h"
 
 RpcVvk4Widget::RpcVvk4Widget() : QWidget()
 {
@@ -21,8 +22,8 @@ RpcVvk4Widget::RpcVvk4Widget() : QWidget()
 	g_lay->addRow("Измерительные линии:", meas_chanels_lbl);
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 70001;
-	int signal_port = 70002;
+	int slot_port = VVK_SLOT;
+	int signal_port = VVK_SIGNAL;
 	vvk4_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new vvk4_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);

@@ -76,8 +76,6 @@ int mn8i_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("mn8i_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &mn8i_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
-		operators_map["auto_scroll_clicked(int)"] = &mn8i_Socket_RPC_SLOT_Object::auto_scroll_clicked;
-		operators_map["log_timer_ontimer()"] = &mn8i_Socket_RPC_SLOT_Object::log_timer_ontimer;
 		operators_map["measurement_timer_ontimer()"] = &mn8i_Socket_RPC_SLOT_Object::measurement_timer_ontimer;
 		operators_map["infin_timer_ontimer()"] = &mn8i_Socket_RPC_SLOT_Object::infin_timer_ontimer;
 		operators_map["new_ku(int, int, double, int)"] = &mn8i_Socket_RPC_SLOT_Object::new_ku;
@@ -298,40 +296,6 @@ int mn8i_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	QVariant mn8i_Socket_RPC_SLOT_Object::auto_scroll_clicked(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int _state = _values.at(0).value<int>();
-			app->auto_scroll_clicked(_state);
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
-	QVariant mn8i_Socket_RPC_SLOT_Object::log_timer_ontimer(QVariantList& _values)
-	{
-		try
-		{
-			app->log_timer_ontimer();
-			return 0;
-		}
-		catch(const std::exception &)
-		{
-			return 0;
-		}
-		catch(...)
-		{
-			return 0;
-		}
-	}
 	QVariant mn8i_Socket_RPC_SLOT_Object::measurement_timer_ontimer(QVariantList& _values)
 	{
 		try
