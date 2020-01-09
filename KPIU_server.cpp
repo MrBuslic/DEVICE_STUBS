@@ -75,6 +75,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 1");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mn8i");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_vvk4");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_is4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/RM_MBK07_imitator");
 	QThread::currentThread()->sleep(3);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");
@@ -186,7 +187,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 
 	if (!is4_slot_thr->wait_connected(3) || !is4_signal_thr->wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с vvk4");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с is4");
 		this->deleteLater();
 		return;
 	}
@@ -267,15 +268,17 @@ int KPIUServer::OLS_BISTRIY_START(int devise)
 	return 0;
 }
 
-void KPIUServer::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
+int KPIUServer::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
 {
 	ols_widget->unols_read_data_kr(data_buffer);
+	return 0;
 }
 
 //KPRD_setup
-void KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
+int KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
 {
 	kprd_widget->set_antenna_connection(antenna_name, connected_antenna_name);
+	return 0;
 }
 
 //OMNIBUS_setup
@@ -287,27 +290,29 @@ int KPIUServer::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 }
 
 //power_bus_setup
-void KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
+int KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 {
 	power_widget->set_bus_state(bus, state);
+	return 0;
 }
 
 //pyro
-void KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
+int KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
 {
 	QMap<QString, pyro_chan_state>::iterator itr = pyro_state.find(_name);
 
 	if (itr == pyro_state.end())
 	{
 		SRPCSignalClass::Instance().toLog(QString("Соединение %1 не найдено!").arg(_name));
-		return;
+		return 1;
 	}
 	itr->state = _state;
+	return 0;
 }
 
 QString KPIUServer::getXML()
 {
-	QFile file(QCoreApplication::applicationDirPath() + "/OPERATORI_NASTROYKI_IMITATOROV_SHIN.xml");
+	QFile file(QCoreApplication::applicationDirPath() + "/kpiu_directives.xml");
 
 	if (file.open(QFile::ReadOnly | QFile::Text))
 		return file.readAll();

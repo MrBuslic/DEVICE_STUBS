@@ -4,6 +4,7 @@
 #include <socket_rpc.h>
 #include "vvk4_rpc.h"
 #include "unvvk4_h.h"
+#include "rpc_ports.h"
 
 // Объявляем функцию DllMain
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
@@ -25,14 +26,14 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 
 		if (!slot_thr.isRunning())
 		{
-			slot_thr.set_connection_params("127.0.0.1", 70001);
+			slot_thr.set_connection_params("127.0.0.1", VVK_SLOT);
 			slot_thr.start();
 		}
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		if (!signal_thr.isRunning())
 		{
-			signal_thr.set_connection_params("127.0.0.1", 70002);
+			signal_thr.set_connection_params("127.0.0.1", VVK_SIGNAL);
 			signal_thr.start();
 		}
 		//if (!signal_thr.wait_connected(3))

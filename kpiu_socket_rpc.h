@@ -30,8 +30,8 @@ public slots:
 	void string_msg(QString _msg);
 	void int_msg(int _msg);
 	void int_return_signal(int& ret_int);
-	void toLog(QString message);
-	void toProtocol(QString message);
+	void toLogs(QString message);
+	void toProtocols(QString message);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -109,7 +109,13 @@ public:
 	QVariant ANTENNA_USTANOVKA_KOMMUTACII(QVariantList& _values);
 	QVariant OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
 	QVariant USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(QVariantList& _values);
+	QVariant PYRO_USTANOVIT_SOSTOYANIE(QVariantList& _values);
 	QVariant getXML(QVariantList& _values);
+	QVariant mfsk_1_impulse(QVariantList& _values);
+	QVariant mds_1_get_sample(QVariantList& _values);
+	QVariant mds_2_get_sample(QVariantList& _values);
+	QVariant get_resistance(QVariantList& _values);
+	QVariant get_connection_state(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

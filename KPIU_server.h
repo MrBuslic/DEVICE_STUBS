@@ -71,19 +71,19 @@ public slots:
 	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
 	int OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer);
 	int OLS_BISTRIY_START(int devise);
-	void OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
+	int OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
 
 	//KPRD_setup
-	void ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
+	int ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
 
 	//OMNIBUS_setup
 	int OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
 
 	//power_bus_setup
-	void USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
+	int USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
 
 	//pyro
-	void PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
+	int PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
 	QString getXML();
 	
 
@@ -119,8 +119,8 @@ signals:
 	*	\brief Асинхронный сигнал, передающий клиенту сообщение в журнал
 	*	\param message - текст сообщения
 	*/
-	void toLog(QString message);
-	void toProtocol(QString message);
+	void toLogs(QString message);
+	void toProtocols(QString message);
 
 };
 

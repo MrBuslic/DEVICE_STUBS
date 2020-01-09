@@ -12,21 +12,12 @@
 #include "mn8i_socket_rpc.h"
 #include "rpc_ports.h"
 
-RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), auto_scroll(true), measuring(false), state(false)
+RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), measuring(false), state(false)
 {
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
-	edit = new QTextEdit(this);
-	_scroll_bar = edit->verticalScrollBar();
-	_doc = new QTextDocument();
-	_cursor = new QTextCursor(_doc);
-	edit->setDocument(_doc);
-	edit->setReadOnly(true);
-	_doc->setMaximumBlockCount(1000);
+	log_widget = new LogWidget(this, QString("mn8i_%1").arg(mn8i_num));
+
 	setMinimumSize(490, 300);
-	auto_scroll_box = new QCheckBox(this);
-	auto_scroll_box->setText("Автопрокрутка");
-	auto_scroll_box->setChecked(true);
-	connect(auto_scroll_box, &QCheckBox::stateChanged, this, &RpcMN8IWidget::auto_scroll_clicked);
 
 	  QGridLayout* gr_layout = new QGridLayout;
 	for (int i = 0; i < 2; i++)
@@ -42,16 +33,8 @@ RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), auto_scroll(true), measu
 	} 
 	  
 	v_lay->addLayout(gr_layout);
-	v_lay->addWidget(edit);
-	v_lay->addWidget(auto_scroll_box);
+	v_lay->addWidget(log_widget);
 
-	 log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
-	QDir dir("d:/logs");
-	if (!dir.exists())
-		QDir().mkdir("d:/logs");
-	connect(&log_timer, &QTimer::timeout, this, &RpcMN8IWidget::log_timer_ontimer);
-	log_timer.start(200);
- 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
 	mku_slot_thr.start(); // вот тут падает
 
@@ -83,16 +66,9 @@ RpcMN8IWidget::RpcMN8IWidget(int mn8i_num) : QWidget(), auto_scroll(true), measu
 
 int RpcMN8IWidget::unmn8i_input_trigger(bool state)
 {
-	QString _msg = QString("%1 %2 входные реле").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg((state == true) ? "замыкаю" : "размыкаю");
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
-
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
-	return 0; 
+	QString _msg = QString("%1 входные реле").arg((state == true) ? "замыкаю" : "размыкаю");
+	log_widget->log_append(_msg);
+	return 0;
 }
 
 int RpcMN8IWidget::unmn8i_sample_width_q(uint& frame_width, uint&  width_in_bytes)
@@ -109,14 +85,8 @@ int RpcMN8IWidget::unmn8i_read_sample(uint& _buf, uint& _firstTime, uint& _thisT
 	_firstTime = 0;
 	_thisTime = 0;
 	 
-	QString _msg = QString("%1 Запрос данных").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
-	{
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
-	}
-	_cursor->insertText(_msg + "\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
+	QString _msg = QString("Запрос данных");
+	log_widget->log_append(_msg);
 
 	return 0;
 }
@@ -141,15 +111,15 @@ int RpcMN8IWidget::unmn8i_start()
 {
 	QString _msg;
 	if (samples == 1)
-		_msg = QString("%1 Запускаю процесс однократного измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+		_msg = QString("Запускаю процесс однократного измерения");
 	else
 		if (samples == 0)
-			_msg = QString("%1 Запускаю процесс непрерывного измерения").arg(QTime::currentTime().toString("hh:mm:ss.zzz"));
+			_msg = QString("Запускаю процесс непрерывного измерения");
 		else 
-			_msg = QString("%1 Запускаю процесс измерения %2 семплов").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(samples);
+			_msg = QString("Запускаю процесс измерения %1 семплов").arg(samples);
 	 
-		QMutexLocker lock(&log_mutex);
-		log_buffer << _msg;
+	log_widget->log_append(_msg);
+
 
 	if (samples == 1)
 	{ 
@@ -191,9 +161,7 @@ int RpcMN8IWidget::unmn8i_start()
 		}
 	}
 	 
-	_cursor->insertText(_msg + "\n");
-	if (auto_scroll)
-		_scroll_bar->setValue(_scroll_bar->maximum());
+
 	return 0;
 }
 
@@ -222,35 +190,6 @@ int RpcMN8IWidget::unmn8i_read_packet(bool isHot, uint numSamples, QVariantList&
 	}
 	return 0;
 
-}
-
-void RpcMN8IWidget::auto_scroll_clicked(int _state)
-{
-	auto_scroll = (_state != 0);
-}
-
-
-
-
-
-
-
-void RpcMN8IWidget::log_timer_ontimer()
-{
-	QStringList tmp_buffer;
-	{
-		QMutexLocker lock(&log_mutex);
-		tmp_buffer = log_buffer;
-		log_buffer.clear();
-	}
-	if (tmp_buffer.isEmpty())
-		return;
-	QFile log_file(log_filename);
-	QTextStream log_stream(&log_file);
-	log_file.open(QIODevice::Append);
-	for (QStringList::iterator itr = tmp_buffer.begin(); itr != tmp_buffer.end(); itr++)
-		log_stream << *itr << "\n";
-	log_file.close();
 }
 
 void RpcMN8IWidget::measurement_timer_ontimer()

@@ -19,6 +19,8 @@
 #include <qlayout.h>
 #include <loki/Singleton.h>
 #include "../buses_imitator/mku_bus_rpc.h"
+#include "rpc_loger.h"
+
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -29,8 +31,6 @@ public:
 	RpcMN8IWidget(int mn8i_num);
 public slots:
 
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	void measurement_timer_ontimer();
 	void infin_timer_ontimer();
 
@@ -49,20 +49,11 @@ public slots:
 
 	void button_clicked();
 private:
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QPushButton* push_b; 
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
+	LogWidget* log_widget;
+
 	std::unique_ptr<QTimer> infin_timer;
 	QTime begin_time;
 
-	QStringList log_buffer;
-	QMutex log_mutex;
 	bool state;
 
 	double periodS;
