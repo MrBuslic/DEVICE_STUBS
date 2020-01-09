@@ -14,52 +14,33 @@ void RPC_power_bus_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_power_bus_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_power_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_nk)) {
-		SRPCSignalClass::Instance().toLog("u_on_nk connected");
-		emit connect_signal("u_on_nk(double)", true);
+		connect_signal("u_on_nk(double)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_k1)) {
-		SRPCSignalClass::Instance().toLog("u_on_k1 connected");
-		emit connect_signal("u_on_k1(double)", true);
+		connect_signal("u_on_k1(double)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_k2)) {
-		SRPCSignalClass::Instance().toLog("u_on_k2 connected");
-		emit connect_signal("u_on_k2(double)", true);
+		connect_signal("u_on_k2(double)", true);
 	}
 }
 
 void RPC_power_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_nk)) {
-		SRPCSignalClass::Instance().toLog("u_on_nk disconnected");
-		//emit connect_signal("u_on_nk(double)", false);
+		connect_signal("u_on_nk(double)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_k1)) {
-		SRPCSignalClass::Instance().toLog("u_on_k1 disconnected");
-		//emit connect_signal("u_on_k1(double)", false);
+		connect_signal("u_on_k1(double)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_k2)) {
-		SRPCSignalClass::Instance().toLog("u_on_k2 disconnected");
-		//emit connect_signal("u_on_k2(double)", false);
+		connect_signal("u_on_k2(double)", false);
 	}
 }
 

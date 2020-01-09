@@ -14,42 +14,25 @@ void RPC_lka05_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_lka05_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_lka05_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_ku)) {
-		SRPCSignalClass::Instance().toLog("new_ku connected");
-		emit connect_signal("new_ku(int, int, double, int)", true);
+		connect_signal("new_ku(int, int, double, int)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_mk)) {
-		SRPCSignalClass::Instance().toLog("new_mk connected");
-		emit connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", true);
+		connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", true);
 	}
 }
 
 void RPC_lka05_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_ku)) {
-		SRPCSignalClass::Instance().toLog("new_ku disconnected");
-		//emit connect_signal("new_ku(int, int, double, int)", false);
+		connect_signal("new_ku(int, int, double, int)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_lka05_SIGNAL_Object::new_mk)) {
-		SRPCSignalClass::Instance().toLog("new_mk disconnected");
-		//emit connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", false);
+		connect_signal("new_mk(int, int, int, int, double, double, int, int, int)", false);
 	}
 }
 

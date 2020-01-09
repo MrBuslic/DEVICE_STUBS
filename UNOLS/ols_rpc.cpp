@@ -14,42 +14,25 @@ void RPC_ols_SIGNAL_Thread::run()
 	exec();
 }
 
-void RPC_ols_SIGNAL_Object::send_connect(QString signal_name, bool _connect)
-{
-	QByteArray tmp_arr2;
-	QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-	if (_connect) tmp_stream2 << QString("connect"); else tmp_stream2 << QString("disconnect");
-	tmp_stream2 << signal_name;
-	QByteArray tmp_arr3;
-	QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-	tmp_stream3 << tmp_arr2.size();
-	_sock->write(tmp_arr3 + tmp_arr2);
-	_sock->waitForBytesWritten(3000);
-}
-
 void RPC_ols_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::new_ols_data)) {
-		SRPCSignalClass::Instance().toLog("new_ols_data connected");
-		emit connect_signal("new_ols_data(QVariantList, QVariantList)", true);
+		connect_signal("new_ols_data(QVariantList, QVariantList)", true);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::packet_ready)) {
-		SRPCSignalClass::Instance().toLog("packet_ready connected");
-		emit connect_signal("packet_ready(QVariantList)", true);
+		connect_signal("packet_ready(QVariantList)", true);
 	}
 }
 
 void RPC_ols_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::new_ols_data)) {
-		SRPCSignalClass::Instance().toLog("new_ols_data disconnected");
-		//emit connect_signal("new_ols_data(QVariantList, QVariantList)", false);
+		connect_signal("new_ols_data(QVariantList, QVariantList)", false);
 	}
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::packet_ready)) {
-		SRPCSignalClass::Instance().toLog("packet_ready disconnected");
-		//emit connect_signal("packet_ready(QVariantList)", false);
+		connect_signal("packet_ready(QVariantList)", false);
 	}
 }
 

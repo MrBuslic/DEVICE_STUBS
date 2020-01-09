@@ -647,6 +647,25 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString name = _values.at(0).value<QString>();
+			int state = _values.at(1).value<int>();
+			app->PYRO_USTANOVIT_SOSTOYANIE(name, state);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 	QVariant kpiu_Socket_RPC_SLOT_Object::getXML(QVariantList& _values)
 	{
 		try

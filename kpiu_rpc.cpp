@@ -28,12 +28,12 @@ void RPC_kpiu_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 		connect_signal("int_return_signal(int&)", true);
 	}
 	else
-	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toLogs)) {
-		connect_signal("toLogs(QString)", true);
+	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toLog)) {
+		connect_signal("toLog(QString)", true);
 	}
 	else
-	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toProtocols)) {
-		connect_signal("toProtocols(QString)", true);
+	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toProtocol)) {
+		connect_signal("toProtocol(QString)", true);
 	}
 }
 
@@ -51,12 +51,12 @@ void RPC_kpiu_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 		connect_signal("int_return_signal(int&)", false);
 	}
 	else
-	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toLogs)) {
-		connect_signal("toLogs(QString)", false);
+	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toLog)) {
+		connect_signal("toLog(QString)", false);
 	}
 	else
-	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toProtocols)) {
-		connect_signal("toProtocols(QString)", false);
+	if (signal == QMetaMethod::fromSignal(&RPC_kpiu_SIGNAL_Object::toProtocol)) {
+		connect_signal("toProtocol(QString)", false);
 	}
 }
 
@@ -144,12 +144,12 @@ void RPC_kpiu_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("kpiu signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
-			if (op_name == "toLogs(QString)")
+			if (op_name == "toLog(QString)")
 			{
 				QString message;
 				tmp_stream >> message;
 				SRPCSignalClass::Instance().toLog("kpiu " + op_name +" call_number "+ QString::number(call_number) + " message = "+RPCSignalClass::QVariantToString(message));
-				emit toLogs(message);
+				emit toLog(message);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -160,12 +160,12 @@ void RPC_kpiu_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("kpiu signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
-			if (op_name == "toProtocols(QString)")
+			if (op_name == "toProtocol(QString)")
 			{
 				QString message;
 				tmp_stream >> message;
 				SRPCSignalClass::Instance().toLog("kpiu " + op_name +" call_number "+ QString::number(call_number) + " message = "+RPCSignalClass::QVariantToString(message));
-				emit toProtocols(message);
+				emit toProtocol(message);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -273,9 +273,8 @@ int RPC_kpiu_SLOT_Object::OLS_BISTRIY_START(int devise)
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_BISTRIY_START %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
+void RPC_kpiu_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
 {
-	if(!connected) return 1;
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(data_buffer);
@@ -283,22 +282,16 @@ int RPC_kpiu_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buf
 	dynamic_call("OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList&)", tmp_list);
 	data_buffer = tmp_list.at(0).toList();
 	tmp_ret_params += " data_buffer="+RPCSignalClass::QVariantToString(tmp_list.at(0));
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OLS_CHTENIE_DANNICH_REGISTRACII %1").arg(tmp_ret_params));
-	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
+void RPC_kpiu_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
 {
-	if(!connected) return 1;
 	QVariantList tmp_list;
-	QString tmp_ret_params;
 	tmp_list << QVariant(antenna_name);
 	tmp_list << QVariant(connected_antenna_name);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call ANTENNA_USTANOVKA_KOMMUTACII %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)", tmp_list);
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished ANTENNA_USTANOVKA_KOMMUTACII %1").arg(tmp_ret_params));
-	return res.toInt();
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished ANTENNA_USTANOVKA_KOMMUTACII");
 }
 int RPC_kpiu_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 {
@@ -313,31 +306,23 @@ int RPC_kpiu_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _cha
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV %1").arg(tmp_ret_params));
 	return res.toInt();
 }
-int RPC_kpiu_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
+void RPC_kpiu_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 {
-	if(!connected) return 1;
 	QVariantList tmp_list;
-	QString tmp_ret_params;
 	tmp_list << QVariant(bus);
 	tmp_list << QVariant(state);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call USTANOVIT_SOSTOYANIE_SHINI_PITANIYA %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)", tmp_list);
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished USTANOVIT_SOSTOYANIE_SHINI_PITANIYA %1").arg(tmp_ret_params));
-	return res.toInt();
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished USTANOVIT_SOSTOYANIE_SHINI_PITANIYA");
 }
-int RPC_kpiu_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE(QString name, int state)
+void RPC_kpiu_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE(QString name, int state)
 {
-	if(!connected) return 1;
 	QVariantList tmp_list;
-	QString tmp_ret_params;
 	tmp_list << QVariant(name);
 	tmp_list << QVariant(state);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call PYRO_USTANOVIT_SOSTOYANIE %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("PYRO_USTANOVIT_SOSTOYANIE(QString, int)", tmp_list);
-	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished PYRO_USTANOVIT_SOSTOYANIE %1").arg(tmp_ret_params));
-	return res.toInt();
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished PYRO_USTANOVIT_SOSTOYANIE");
 }
 QString RPC_kpiu_SLOT_Object::getXML()
 {
