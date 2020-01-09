@@ -93,8 +93,8 @@ public slots:
 	void mds_2_get_sample(uint& buf, bool& flag);
 	void get_resistance(uint NProcess, int& resistance);
 	int get_connection_state(QVariantList& _chans);
-private:
 
+private:
 	MDS1_CHANNELS mds1_chans;
 	MDS2_CHANNELS mds2_chans;
 

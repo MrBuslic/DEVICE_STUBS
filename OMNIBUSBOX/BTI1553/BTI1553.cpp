@@ -12,7 +12,6 @@
 
 #include "BufferClass1553.h"
 #include "omnibus_rpc.h"
-#include "instruments.h"
 #include <QApplication>
 #include "rpc_ports.h"
 
