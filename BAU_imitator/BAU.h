@@ -365,6 +365,22 @@ union ZOBWords
 	};
 };
 
+union TM_BAU
+{
+	quint16 tm_data;
+	struct
+	{
+		quint16
+			VBAU_1 : 1,
+			VBAU_2 : 1,
+			VBAU_3 : 1,
+			VPBAU_1 : 1,
+			VPBAU_2 : 1,
+			VPBAU_3 : 1,
+			rez : 9;
+	};
+};
+
 enum FOS_PS
 {
 	FOS_PS_ON = 0, // > -30 Да
@@ -528,6 +544,7 @@ private:
 	void K_CBK();
 	void ZTM_create();
 	void ZTK_create();
+	void set_tm_state();
 	void set_power_back();
 	void change_power();
 
@@ -536,13 +553,14 @@ private:
 
 protected:
 	public slots :
-		void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void get_power(double volt);
 
 private:
-	void msg_to_log(const QString& _msg);
+	//void msg_to_log(const QString& _msg);
 
+	TM_BAU tm_data;
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
 	QTextDocument* _doc;
