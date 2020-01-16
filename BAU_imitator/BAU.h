@@ -138,6 +138,21 @@ enum BUFAR
 	BUFAR_3 = 1,
 };
 
+union Serv_Union
+{
+	unsigned char bits;
+	struct
+	{
+		quint16
+
+			first_bit : 1,
+			second_bit : 1,
+			third_bit : 1,
+			fourth_bit : 1,
+			rez : 12;
+	};
+};
+
 union ZTM_DataWords
 {
 	quint16 data_words[25];
@@ -559,6 +574,8 @@ protected:
 
 private:
 	//void msg_to_log(const QString& _msg);
+
+	quint16 sum_bits(Serv_Union& bits);
 
 	TM_BAU tm_data;
 	QTextEdit* edit;

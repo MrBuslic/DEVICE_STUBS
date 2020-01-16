@@ -91,7 +91,7 @@ public slots:
 
 	void mds_1_get_sample(uint& buf, bool& flag);
 	void mds_2_get_sample(uint& buf, bool& flag);
-	void get_resistance(uint NProcess, int& resistance);
+	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
 
 private:
@@ -99,6 +99,10 @@ private:
 	MDS2_CHANNELS mds2_chans;
 
 	QMap<QString, pyro_chan_state> pyro_state;
+
+	QList<int> bau_chans;
+	int bau_ground = 147;
+
 	RpcOmnibusWidget* omnibus_widget;
 	InterruptWidget* interrupt_widget;
 	KPIWidget* kpi_widget;

@@ -43,9 +43,11 @@ union BOCH_com
 	struct
 	{
 		quint16
-			BOCH_b1 : 1,
+			BOCH_b3 : 1,
 			BOCH_b2 : 1,
-			BOCH_b3 : 1;
+			BOCH_b1 : 1,
+			rez : 13;
+
 	};
 };
 
@@ -69,20 +71,10 @@ union KBAU_DataWords
 	};
 };
 
-union Serv_Union
+quint16 BAU_widg::sum_bits(Serv_Union& bits)
 {
-	unsigned char bits;
-	struct
-	{
-		quint16
-			first_bit : 1,
-			second_bit : 1,
-			third_bit : 1,
-			four_bit : 1;
-	};
-
-	quint16 sum_bits = first_bit + second_bit + third_bit;
-};
+	return bits.first_bit + bits.second_bit + bits.third_bit;
+}
 
 union KBRTK_M_DataWords
 {
@@ -614,6 +606,7 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 				}
 			}
 			update_graphics_BAU();
+			ZTM_create();
 			set_tm_state();
 		}
 	}
@@ -686,7 +679,7 @@ void BAU_widg::K_BRTK_A(QVariantList words)
 
 	if (d_words.rez != 0)
 		ZOB.NKK = 1;
-	if ((tmp_ALPS_dw.sum_bits > 4) && (tmp_MFS_dw.sum_bits > 4) && (tmp_LPch_dw.sum_bits > 4) && (tmp_BUFAR_dw.sum_bits > 4))
+	if ((sum_bits(tmp_ALPS_dw) > 4) && (sum_bits(tmp_MFS_dw) > 4) && (sum_bits(tmp_LPch_dw) > 4) && (sum_bits(tmp_BUFAR_dw) > 4))
 		ZOB.KMT = 1;
 	///АЛПС
 	if (AT_widget.current_ALPS == ALPS_OFF)
@@ -738,11 +731,11 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 	KBRTK_M_DataWords d_words(words);
 
 	BOCH_com BOCH_full;
+	BOCH_full.data_words = 0;
 	BOCH_full.BOCH_b1 = d_words.BOCH_first_com;
 	BOCH_full.BOCH_b2 = d_words.BOCH_second_com;
-	BOCH_full.BOCH_b2 = d_words.BOCH_third_com;
-	BOCH_full.data_words = BOCH_full.BOCH_b1 + BOCH_full.BOCH_b2 + BOCH_full.BOCH_b3;
-
+	BOCH_full.BOCH_b3 = d_words.BOCH_third_com;
+	
 	Serv_Union tmp_UM_dw;
 	Serv_Union tmp_LBV_dw;
 	Serv_Union tmp_PRM_Ant_1_dw;
@@ -767,8 +760,8 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 
 	if (d_words.rez != 0)
 		ZOB.NKK = 1;
-	if ((tmp_UM_dw.sum_bits <= 1) && (tmp_LBV_dw.sum_bits <= 1) && (tmp_PRM_Ant_1_dw.sum_bits <= 1) && (tmp_PRM_Ant_A_dw.sum_bits <= 1) && (tmp_SGTS_Ant_1_dw.sum_bits <= 1)
-		&& (tmp_SGTS_Ant_A_dw.sum_bits <= 1) && (tmp_BOCH_dw.sum_bits <= 1) && (tmp_FOS_dw.sum_bits <= 1) && (tmp_AOS_dw.sum_bits <= 1) && (tmp_UPCH_dw.sum_bits <= 1))
+	if (!((sum_bits(tmp_UM_dw) <= 1) && (sum_bits(tmp_LBV_dw) <= 1) && (sum_bits(tmp_PRM_Ant_1_dw) <= 1) && (sum_bits(tmp_PRM_Ant_A_dw) <= 1) && (sum_bits(tmp_SGTS_Ant_1_dw) <= 1)
+		&& (sum_bits(tmp_SGTS_Ant_A_dw) <= 1) && (sum_bits(tmp_BOCH_dw) <= 1) && (sum_bits(tmp_FOS_dw) <= 1) && (sum_bits(tmp_AOS_dw) <= 1) && (sum_bits(tmp_UPCH_dw) <= 1)))
 		ZOB.KMT = 1;
 
 	///УМ
@@ -1075,7 +1068,7 @@ void BAU_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr))
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		switch (tmp_cwd.subadr)
 		{
@@ -1093,11 +1086,15 @@ void BAU_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 			AT_widget.update_graphics_AT();
 			break;
 		}
+		if (ZOB.zob_word == 0)
+		{
+			ZTK_create();
+			ZTM_create();
+		}
+		//Отправление ЗТК
+		update_graphics_BAU();
 	}
-	if (ZOB.zob_word == 0)
-		ZTK_create();
-	//Отправление ЗТК
-	update_graphics_BAU();
+
 }
 
 void BAU_widg::K_CBK()
@@ -1108,7 +1105,7 @@ void BAU_widg::K_CBK()
 
 void BAU_widg::ZTM_create()
 {
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < 25; i++)
 	{
 		ZTM.data_words[i] = 0;
 	}
@@ -1275,7 +1272,7 @@ void BAU_widg::ZTM_create()
 	ZTM.rez25 = 0;
 
 	QVariantList tmp_list;
-	for (int i = 0; i < 26; i++)
+	for (int i = 0; i < 25; i++)
 		tmp_list.push_back(ZTM.data_words[i]);
 
 	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tmp_list);
@@ -1318,7 +1315,7 @@ void BAU_widg::ZTK_create()
 	ZTK.FOS_att2_D0 = tmp_FOS_att2.first_bit;
 	ZTK.FOS_att2_D1 = tmp_FOS_att2.second_bit;
 	ZTK.FOS_att2_D2 = tmp_FOS_att2.third_bit;
-	ZTK.FOS_att2_D3 = tmp_FOS_att2.four_bit;
+	ZTK.FOS_att2_D3 = tmp_FOS_att2.fourth_bit;
 	ZTK.FOS_att1 = MT_widget.current_FOS_att1;
 	ZTK.FOS_PS = MT_widget.current_PS;
 	ZTK.UPCH_att = MT_widget.current_UPCH_att;
