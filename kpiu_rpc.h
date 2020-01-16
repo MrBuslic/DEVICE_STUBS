@@ -26,7 +26,7 @@ public slots:
 	void mfsk_1_impulse(QVariantList channels);
 	void mds_1_get_sample(uint& buf, bool& flag);
 	void mds_2_get_sample(uint& buf, bool& flag);
-	void get_resistance(uint NProcess, int& resistance);
+	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
 	////////////////////////////////////
 };

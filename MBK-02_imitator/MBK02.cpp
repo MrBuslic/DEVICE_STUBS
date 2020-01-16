@@ -269,6 +269,8 @@ void MBK02_widg::imit_off()
 	current_lit = 0;
 	signal_con = false;
 	current_lit = 0;
+	power = 0;
+	set_power_back();
 	update_graphics();
 }
 

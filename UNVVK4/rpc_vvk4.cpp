@@ -144,13 +144,27 @@ void RpcVvk4Widget::update_view()
 void RpcVvk4Widget::get_commut_chanels_list(QVariantList& ei_list, QVariantList& sum_list)
 {
 	QMutexLocker lock(&comut_mutex);
-	qCopy(ei_chanels_list.begin(), ei_chanels_list.end(), ei_list.begin());
-	qCopy(sum_chanels_list.begin(), sum_chanels_list.end(), sum_list.begin());
+	ei_list.clear();
+	sum_list.clear();
+
+	foreach(auto& chan, ei_chanels_list)
+	{
+		ei_list << chan;
+	}
+
+	foreach(auto& chan, sum_chanels_list)
+	{
+		sum_list << chan;
+	}
+
+	SRPCSignalClass::Instance().toLog("ei_list " + RPCSignalClass::QVariantToString(ei_list));
+	SRPCSignalClass::Instance().toLog("sum_list " + RPCSignalClass::QVariantToString(sum_list));
 }
 
 void RpcVvk4Widget::get_measure_lines(QVariantList& mes_list)
 {
 	QMutexLocker lock(&meas_mutex);
+	mes_list.reserve(measure_line_list.count());
 	qCopy(measure_line_list.begin(), measure_line_list.end(), mes_list.begin());
 }
 

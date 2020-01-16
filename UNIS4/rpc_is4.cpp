@@ -106,7 +106,7 @@ int RpcIS4Widget::unis4_StartACP()
 	{
 		QString _msg;
 		if (_process == 6)//IS4_MeasRes2W
-			_msg = QString("%1 Запускаю процесс измерения сопротивления. Результат: %2Ом").arg(QTime::currentTime().toString("hh:mm:ss.zzz").arg(res_meas));
+			_msg = QString("%1 Запускаю процесс измерения сопротивления. Результат: %2 Ом").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(res_meas);
 		//Пределы: 
 		//3-1кОм 
 		//4-10кОм 

@@ -92,7 +92,7 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["mfsk_1_impulse(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mfsk_1_impulse;
 		operators_map["mds_1_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_1_get_sample;
 		operators_map["mds_2_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_2_get_sample;
-		operators_map["get_resistance(uint, int&)"] = &kpiu_Socket_RPC_SLOT_Object::get_resistance;
+		operators_map["get_resistance(uint, QVariant&)"] = &kpiu_Socket_RPC_SLOT_Object::get_resistance;
 		operators_map["get_connection_state(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::get_connection_state;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -736,7 +736,7 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			uint NProcess = _values.at(0).value<uint>();
-			int resistance = _values.at(1).value<int>();
+			QVariant resistance = _values.at(1).value<QVariant>();
 			app->get_resistance(NProcess, resistance);
 			_values[1] = resistance;
 			SRPCSignalClass::Instance().toLog(QString("%1 resistance = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[1])));

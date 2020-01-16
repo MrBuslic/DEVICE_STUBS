@@ -80,6 +80,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QThread::currentThread()->sleep(3);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/IBEP_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
 	QThread::currentThread()->sleep(2);
@@ -102,7 +103,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
 	QThread::currentThread()->sleep(5);
-	QProcess::startDetached(QApplication::applicationDirPath() + "/client");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
 
 	rpc_slot_srv->set_params(ip_str, KPIU_SERVER_SLOT);
@@ -192,7 +193,8 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 		this->deleteLater();
 		return;
 	}
-	connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint NProcess, QVariant& value)), this, SLOT(get_resistance(uint NProcess, int& resistance)), Qt::DirectConnection);
+
+	connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
 
 	pyro_state.insert("ПП1_О",  pyro_chan_state(QList<int>() << 111 << 112, 0));
 	pyro_state.insert("ПП1_Р",  pyro_chan_state(QList<int>() << 113 << 114, 0));
@@ -225,6 +227,9 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	pyro_state.insert("ПП13_Р",  pyro_chan_state(QList<int>() << 195 << 196, 0));
 	pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
 	pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
+
+	bau_chans.clear();
+	bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
 }
 //mku_bus_setup
 int KPIUServer::KU_NASTROYKA_CELOSTNOSTI_KANALOV(int ku_n, int line)
@@ -414,24 +419,45 @@ void KPIUServer::mds_2_get_sample(uint& buf, bool& flag)
 	buf = mds2_chans.chans;
 }
 
-void KPIUServer::get_resistance(uint NProcess, int& resistance)
+void KPIUServer::get_resistance(uint NProcess, QVariant& resistance)
 {
 	QVariantList ei_chanels_list;
 	QVariantList sum_chanels_list;
 	int connection_state;
 	QVariantList channels;
 	vvk4_slot_thr->get_vvk4_obj()->get_commut_chanels_list(ei_chanels_list, sum_chanels_list);
-	channels = ei_chanels_list + sum_chanels_list;
-	// вставить функцию опроса ВВК
-	connection_state = get_connection_state(channels);
-	switch (connection_state)
+
+	if (sum_chanels_list.contains(bau_ground))
 	{
-	case 1:
-		resistance = 10;
-	case 2:
-		resistance = 0.8;
-	case 3:
 		resistance = 13000000;
+		if (ei_chanels_list.empty())
+			return;
+		int ei_chan = ei_chanels_list.at(0).toInt();
+
+		int bau_ind = bau_chans.indexOf(ei_chan);
+		if (bau_ind == -1)
+			return;
+
+		QVariant bau_tm;
+		mku_widget->get_tm("BAU_TM", bau_tm);
+
+		if ( (bau_tm.toUInt() & (1 << bau_ind)) != 0)
+			resistance = 0.8;
+	}
+	else
+	{
+		channels = ei_chanels_list + sum_chanels_list;
+		// вставить функцию опроса ВВК
+		connection_state = get_connection_state(channels);
+		switch (connection_state)
+		{
+		case 1:
+			resistance = 10;
+		case 2:
+			resistance = 0.8;
+		case 3:
+			resistance = 13000000;
+		}
 	}
 }
 	//get_commut_chanels_list(ei_list, sum_list);

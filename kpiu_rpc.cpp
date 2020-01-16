@@ -385,15 +385,15 @@ void RPC_kpiu_SLOT_Object::mds_2_get_sample(uint& buf, bool& flag)
 	tmp_ret_params += " flag="+RPCSignalClass::QVariantToString(tmp_list.at(1));
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished mds_2_get_sample %1").arg(tmp_ret_params));
 }
-void RPC_kpiu_SLOT_Object::get_resistance(uint NProcess, int& resistance)
+void RPC_kpiu_SLOT_Object::get_resistance(uint NProcess, QVariant& resistance)
 {
 	QVariantList tmp_list;
 	QString tmp_ret_params;
 	tmp_list << QVariant(NProcess);
 	tmp_list << QVariant(resistance);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call get_resistance %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("get_resistance(uint, int&)", tmp_list);
-	resistance = tmp_list.at(1).toInt();
+	dynamic_call("get_resistance(uint, QVariant&)", tmp_list);
+	resistance = tmp_list.at(1);
 	tmp_ret_params += " resistance="+RPCSignalClass::QVariantToString(tmp_list.at(1));
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished get_resistance %1").arg(tmp_ret_params));
 }
