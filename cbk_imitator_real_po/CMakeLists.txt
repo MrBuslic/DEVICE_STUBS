@@ -53,13 +53,13 @@ include_directories("../buses_imitator")
 
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 	
-set(CMAKE_CXX_FLAGS "${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_CXX_FLAGS "${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Network_EXECUTABLE_COMPILE_FLAGS}")
 	
 if(WIN32)
 	set(MY_WIN_FLAG WIN32)
-	set(CMAKE_CXX_FLAGS "/EHa /Zc:wchar_t")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHa /Zc:wchar_t")
 	set(ADDITIONAL_LIBS ws2_32)
 else()
 	set(ADDITIONAL_LIBS pthread)
@@ -117,12 +117,15 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MO
 
 set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(cbk_imitator_real_po ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${TPO_SOURCES} ${TPO_HEADERS} ${BOS_SOURCES} ${BOS_HEADERS} ${OMNIBUSBOX_SOURCES} ${INTERRUPT_SOURCES} ${VIP_SOURCES} ${MKU_SOURCES} icon.rc)
+add_library(imit_bos ${BOS_SOURCES} ${BOS_HEADERS} ${OMNIBUSBOX_SOURCES} ${INTERRUPT_SOURCES} ${VIP_SOURCES} ${MKU_SOURCES})
+
+add_executable(cbk_imitator_real_po ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${TPO_SOURCES} ${TPO_HEADERS} icon.rc)
 target_link_libraries (cbk_imitator_real_po ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
-                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc ) 
+                                      ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc imit_bos) 
 
 if(WIN32)
   qt5_use_modules(cbk_imitator_real_po Core Widgets Network Gui)
+  qt5_use_modules(imit_bos Core Widgets Network Gui)
 endif()
 
 
