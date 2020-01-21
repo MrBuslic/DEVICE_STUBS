@@ -20,12 +20,30 @@
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "../buses_imitator/power_bus_rpc.h"
 
-//enum AOS_KP
-//{
-//	AOS_1 = 0,
-//	AOS_2 = 1,
-//	AOS_OFF = 3
-//};
+enum DEVICE_STATES
+{
+	AOS_KP_OFF = 0, 
+	AOS_KP_1 = 1,
+	AOS_KP_2 = 2,
+	AOS_OKP_ERR = 3
+};
+
+union AOS_modes
+{
+	quint16 _word;
+	struct
+	{
+		quint16 kontr : 2, //AOS_modes
+			cgo : 2, //AOS_modes
+			gpfm2 : 2, //AOS_modes
+			gpfm1 : 2, //AOS_modes
+			sig_96 : 1, //0 - сигнал от УПИ, 1- сигнал от 15Э1827
+			dev_on : 1, //1 - включать устр-ва,1 - игнорировать первые биты
+			res : 4,
+			kontr_mode : 1; // 0 - режим контроля, 1 - рабочий режим
+
+	};
+};
 
 class AOS_widg : public QWidget
 {
@@ -44,22 +62,25 @@ private:
 
 	void update_graphics();//обновление графики
 	void set_new_tm();//составление ОК-ов
-	void omni_connect();//почключение к omnibus спустя n-ое количество времени
-	void update_time();//Расчет времени прогрева ОГ в зависимости от времени включения и окончания прогрева
-	void set_warm_og();//сохранение окончания прогревания и обьявление о прогретости/непрогретости
+
 	void imit_off();//включение имитатора
 	void imit_on();//выключение имитатора
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_ku(int ku, int length_ku, double u_ku, int line_ku);
+	void new_ku_mk(int ku, int length_ku, double u_ku, int line_ku);
 
 private:
 	QString name = "АОС";//Имя устройства
 	int bus  = 2;//номер шины для шины питания(power_bus)
 	int volt;//Принятое напряжение
 
+	DEVICE_STATES kontr_dev;
+	DEVICE_STATES cgo_dev;
+	DEVICE_STATES gpfm2_dev;
+	DEVICE_STATES gpfm1_dev;
+	
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 
