@@ -17,11 +17,11 @@ public slots:
 	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
 	int OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer);
 	int OLS_BISTRIY_START(int devise);
-	void OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
-	void ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
+	int OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
+	int ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
 	int OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
-	void USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
-	void PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
+	int USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
+	int PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
 	QString getXML();
 	void mfsk_1_impulse(QVariantList channels);
 	void mds_1_get_sample(uint& buf, bool& flag);
@@ -61,8 +61,8 @@ signals:
 	void string_msg(QString _msg);
 	void int_msg(int _msg);
 	void int_return_signal(int& ret_int);
-	void toLog(QString message);
-	void toProtocol(QString message);
+	void toLogs(QString message);
+	void toProtocols(QString message);
 };
 
 class RPC_kpiu_SIGNAL_Thread : public RPC_SIGNAL_Thread
