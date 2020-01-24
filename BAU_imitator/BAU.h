@@ -364,19 +364,20 @@ union ZOBWords
 	struct
 	{
 		quint16
-			ZAN : 1,
-			NKK : 1,
-			KMT : 1,
-			KAT : 1,
-			PRK : 1,
-			LPch_ALPS : 1,
-			UM_LBV : 1,
-			AOS_OON : 1,
-			BOCH_OOFF : 1,
-			BOCH_OON : 1,
-			FOS_OON : 1,
+			rez : 4,
 			NZP : 1,
-			rez : 4;
+			FOS_OON : 1,
+			BOCH_OON : 1,
+			BOCH_OOFF : 1,
+			AOS_OON : 1,
+			UM_LBV : 1,
+			LPch_ALPS : 1,
+			PRK : 1,
+			KAT : 1,
+			KMT : 1,
+			NKK : 1,
+			ZAN : 1;
+
 	};
 };
 
