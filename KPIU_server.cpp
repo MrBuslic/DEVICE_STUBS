@@ -21,7 +21,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	frame_widget = new FrameBusWidget(this);
 	power_widget = new PowerWidget(this);
 	ols_widget = new RpcOlsWidget(this, 0);
-	QThread::currentThread()->sleep(2);
+	QThread::currentThread()->msleep(2000);
 	kprd_widget = new KPRD_imitator(this);
 	foi_widget = new RpcFoiWidget(this);
 	QLabel* omnibus_label = new QLabel("OMNIBUS");
@@ -77,16 +77,16 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_vvk4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_is4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/RM_MBK07_imitator");
-	QThread::currentThread()->sleep(3);
+	QThread::currentThread()->msleep(3000);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/IBEP_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
-	QThread::currentThread()->sleep(2);
+	QThread::currentThread()->msleep(2000);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/MBK-02_imitator");
-	QThread::currentThread()->sleep(2);
+	QThread::currentThread()->msleep(2000);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/R732_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/R733_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/BOOP_imitator");
@@ -102,7 +102,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/MBK07");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
-	QThread::currentThread()->sleep(5);
+	QThread::currentThread()->msleep(5000);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
 
