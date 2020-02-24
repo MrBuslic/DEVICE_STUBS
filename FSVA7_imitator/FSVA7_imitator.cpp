@@ -8,59 +8,14 @@ FSVA7_imitator::FSVA7_imitator()
 	setCentralWidget(widg);
 
 	gridlay = new QGridLayout(widg);
-	DELay_label.setText("Задержка между включениями СИБП");
-	DELay_edit = new QTextEdit("0.1", widg);
-	PositivePeak_label.setText("Пульсация напряжения помехи");
-	PositivePeak_edit = new QTextEdit("0", widg);
-	WCO_label.setText("Количество слов на МКО");
-	WCO_edit = new QTextEdit("1", widg);
-	MKO_DATA_label.setText("Слова на МКО");
-	MKO_DATA_edit = new QTextEdit("0xFF", widg);
-	PEAK_label.setText("Напряжение на канале D1");
-	PEAK_edit = new QTextEdit("1", widg);
-	CURS1_VAL_label.setText("Время курсора 1");
-	CURS1_VAL_edit = new QTextEdit("0.0000015", widg);
-	CURS2_VAL_label.setText("Время курсора 1");
-	CURS2_VAL_edit = new QTextEdit("0.0000015", widg);
-	 
-	gridlay->addWidget(&DELay_label, 0, 0/*, 1, 2, Qt::AlignHCenter*/);
-	gridlay->addWidget(DELay_edit, 1, 0);
 
-	gridlay->addWidget(&PositivePeak_label, 2, 0);
-	gridlay->addWidget(PositivePeak_edit, 3, 0);
-
-	gridlay->addWidget(&WCO_label, 4, 0);
-	gridlay->addWidget(WCO_edit, 5, 0);
-
-	gridlay->addWidget(&MKO_DATA_label, 6, 0);
-	gridlay->addWidget(MKO_DATA_edit, 7, 0);
-
-	gridlay->addWidget(&PEAK_label, 0, 1);
-	gridlay->addWidget(PEAK_edit, 1, 1);
-
-	gridlay->addWidget(&CURS1_VAL_label, 2, 1);
-	gridlay->addWidget(CURS1_VAL_edit, 3, 1);
-
-	gridlay->addWidget(&CURS2_VAL_label, 4, 1);
-	gridlay->addWidget(CURS2_VAL_edit, 5, 1);
 
 	//gridlay->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 6, 2);
 
 	
-	connect(DELay_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetDELay);
-	connect(PositivePeak_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetPositivePeak);
-	connect(WCO_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetWCO);
-	connect(MKO_DATA_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetMKO_DATA);
-	connect(PEAK_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetPEAK);
-	connect(CURS1_VAL_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetCURS1_VAL);
-	connect(CURS2_VAL_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetCURS2_VAL);
+/*	connect(DELay_edit, &QTextEdit::textChanged, this, &FSVA7_imitator::SetDELay);
 	SetDELay();
-	SetPositivePeak();
-	SetWCO();
-	SetMKO_DATA();
-	SetPEAK();
-	SetCURS1_VAL();
-	SetCURS2_VAL();
+	*/
 
 	QString ip_str = "127.0.0.1";
 	int slot_port = FSVA7_SLOT;
@@ -137,11 +92,9 @@ void FSVA7_imitator::read_ag()
 			response = "1";
 
 		if (read_data == "MMEM:CAT? 'C:/R_S/Instr/user'\r\n")
-			response = "'data.iq.tar'\n";
+			response = "'data.iq.tar','LIM1','LIM2','LIM3','LIM4','LIM5','LIM6','LIM7'\n";
 		if (read_data == "MMEM:DEL 'C:/R_S/Instr/user'\r\n")
 			response = "";
-		if (read_data == "CALC:MARK:FUNC:POW:RES? ACP\r\n")
-			response = "1";
 		if (read_data == "CALC:MARK:COUN:FREQ?\r\n")
 			response = "1";
 		if (read_data == "CALC:MARK1:COUN:FREQ?\r\n")
@@ -150,27 +103,69 @@ void FSVA7_imitator::read_ag()
 			response = "1";
 		if (read_data == "CALC:MARK:Y?\r\n")
 			response = "1";
-
-
-		if (read_data == "MEASurement1:RESult:ACTual ? DELay\r\n")
-			response = QString::number(GetDELay());//"0.1";
-		if (read_data == "MEASurement1:RES:PPE? PositivePeak\r\n")
-			response = QString::number(GetPositivePeak());// "0";
-		if (read_data == "BUS1:MILS:WCO?\r\n")
-			response = QString::number(GetWCO());//"1";
-		if (read_data == "BUS1:MILS:WORD1:TYPE?\r\n")
-			response = "DATA\n";
-		if (read_data == "BUS1:MILS:WORD1:DATA?\r\n")
-			response = QString::number(GetMKO_DATA());//"15";
-		if (read_data == "MEAS1:RES:ACTual? PEAK\r\n")
-			response = QString::number(GetPEAK());// "1";
-		if (read_data == "CURS1:XDEL:VAL?\r\n")
-			response = QString::number(GetCURS1_VAL());// "0.000015";
-		if (read_data == "CURS2:XDEL:VAL?\r\n")
-			response = QString::number(GetCURS2_VAL());// "0.000015";
+		
+		if (read_data == "CALC:MARK:FUNC:POW:RES? ACP\r\n")
+		{
+			if(SPAN == 250000 && BWID == 210000)
+				response = "1";
+			if (SPAN == 100000000 && BWID == 75000000)
+				response = "1";
+			if (SPAN == 65000 && BWID == 40000)
+				response = "1";
+			if (SPAN == 106000000 && BWID == 60000000)
+				response = "1";
+			if (SPAN == 32000000 && BWID == 31479000)
+				response = "1";
+			if (SPAN == 100000000 && BWID == 45000000)
+				response = "-25";
+			if (SPAN == 65000 && BWID == 24000)
+				response = "-25";
+			if (SPAN == 6120000 && BWID == 3000000)
+				response = "-16";
+			if (SPAN == 106000000 && BWID == 3000000)
+				response = "-19";
+			if (SPAN == 10000 && BWID == 6000)
+				response = "100";
+			if (SPAN == 200000 && BWID == 197000)
+				response = "1";
+			if (SPAN == 70000 && BWID == 60000)
+				response = "-93";
+			if (BWID == 8000)
+				response = "0";
+			if (BWID == 15000000)
+				response = "0";
+			if (BWID == 1500000)
+				response = "0";
+		}
 
 		_ag_sock->write(response.toStdString().c_str());
 	}
+
+	if (read_data.contains("ADEM:SPEC:SPAN:ZOOM"))
+	{
+		// ADEM:SPEC:SPAN:ZOOM 250000 HZ\r\n
+		QString str = read_data.right(read_data.size() - 20);
+		str = str.left(str.size() - 5);
+		setSPAN(str.toInt());
+	}
+	if (read_data.contains("POW:ACH:BWID:ACH"))
+	{
+		// POW:ACH:BWID:ACH 210000 HZ\r\n
+		QString str = read_data.right(read_data.size() - 17);
+		str = str.left(str.size() - 5);
+		setBWID(str.toInt());
+	}
+
+}
+
+void FSVA7_imitator::setSPAN(int span)
+{
+	SPAN = span;
+}
+
+void FSVA7_imitator::setBWID(int bwid)
+{
+	BWID = bwid;
 }
 
 void FSVA7_imitator::closeEvent(QCloseEvent *event)
@@ -183,16 +178,9 @@ void FSVA7_imitator::closeEvent(QCloseEvent *event)
 FSVA7_imitator::~FSVA7_imitator()
 {
 	delete gridlay;
-	delete DELay_edit;
-	delete PositivePeak_edit;
-	delete WCO_edit;
-	delete MKO_DATA_edit;
-	delete PEAK_edit;
-	delete CURS1_VAL_edit;
-	delete CURS2_VAL_edit;
 	delete widg;
 }
-
+/*
 double FSVA7_imitator::GetDELay() const
 {
 	return DELay;
@@ -202,63 +190,4 @@ void FSVA7_imitator::SetDELay()
 {
 	DELay = DELay_edit->toPlainText().toDouble();
 }
-
-double FSVA7_imitator::GetPositivePeak() const
-{
-	return PositivePeak;
-}
-
-void FSVA7_imitator::SetPositivePeak()
-{
-	PositivePeak = PositivePeak_edit->toPlainText().toDouble();
-}
-
-int FSVA7_imitator::GetWCO() const
-{
-	return WCO;
-}
-
-void FSVA7_imitator::SetWCO()
-{
-	WCO = WCO_edit->toPlainText().toInt();
-}
-
-int FSVA7_imitator::GetMKO_DATA() const
-{
-	return MKO_DATA;
-}
-
-void FSVA7_imitator::SetMKO_DATA()
-{
-	MKO_DATA = MKO_DATA_edit->toPlainText().toInt(nullptr,0);
-}
-
-double FSVA7_imitator::GetPEAK() const
-{
-	return PEAK;
-}
-
-void FSVA7_imitator::SetPEAK()
-{
-	PEAK = PEAK_edit->toPlainText().toDouble();
-}
-
-double FSVA7_imitator::GetCURS1_VAL() const
-{
-	return CURS1_VAL;
-}
-
-void FSVA7_imitator::SetCURS1_VAL()
-{
-	CURS1_VAL = CURS1_VAL_edit->toPlainText().toDouble();
-}
-
-double FSVA7_imitator::GetCURS2_VAL() const
-{
-	return CURS2_VAL;
-}
-
-void FSVA7_imitator::SetCURS2_VAL()
-{
-	CURS2_VAL = CURS2_VAL_edit->toPlainText().toDouble();
-}
+*/
