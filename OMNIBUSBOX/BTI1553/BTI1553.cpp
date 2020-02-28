@@ -159,7 +159,14 @@ BTI1553API VOID __stdcall BTI1553_MsgDataWr(LPUSHORT buf,INT count,MSGADDR msgad
 
 	rpc_buffer_class_1553& tmp_buf(Srpc_buffer_class_1553::Instance());
 	MsgAddr& tmp_addr(tmp_buf.msg_addrs[msgaddr]);
-	tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs);
+	if (tmp_addr.f5)
+	{
+		tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data_f5(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs.at(0).toInt());
+	}
+	else
+	{
+		tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs);
+	}
 }
 BTI1553API ULONG __stdcall BTI1553_MsgFieldRd(USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API ULONG __stdcall BTI1553_MsgFieldWr(ULONG fieldval,USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
@@ -194,7 +201,7 @@ BTI1553API LISTADDR __stdcall BTI1553_RTCreateList(ULONG listconfigval,INT count
 BTI1553API MSGADDR __stdcall BTI1553_RTCreateMsg(ULONG configval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval)
 {
 
-	return Srpc_buffer_class_1553::Instance().create_msg_addr(taval, saval, channum);
+	return Srpc_buffer_class_1553::Instance().create_msg_addr(taval, saval, channum, mcflag == MODECODE);
 }
 BTI1553API MSGADDR __stdcall BTI1553_RTGetMsg(BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTReset(INT taval,INT channum,HCORE handleval){ return 0; }

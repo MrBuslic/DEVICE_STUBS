@@ -33,6 +33,7 @@ struct MsgAddr
 	int addr;
 	int saddr;
 	int mko;
+	bool f5;
 };
 
 struct LstAddr
@@ -51,7 +52,7 @@ public:
 	rpc_buffer_class_1553() { msg_ind = 0;}
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
-	int create_msg_addr(int addr, int saddr, int mko);
+	int create_msg_addr(int addr, int saddr, int mko, bool f5);
 	int create_list_addr(int addr, int saddr, int mko, int list_size, int tr);
 	QMap<int, MsgAddr> msg_addrs;
 	QMap<int, LstAddr> lst_addrs;
