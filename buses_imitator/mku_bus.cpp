@@ -62,7 +62,7 @@ void MKUWidget::make_ku_cbk(int ku_n, int length, double u, int line)
 void MKUWidget::make_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
 {
 	line_m &= mshm_map_channels[mshm];
-	line_p &= mshm_map_channels[pshm];
+	line_p &= pshm_map_channels[pshm];
 	log_widget->log_append(QString("МК МШМ%1 %2 ПШМ%3 %4").arg(mshm).arg(get_line(line_m)).arg(pshm).arg(get_line(line_p)));
 	emit new_mk(mshm, pshm, length_m, length_p, u_m, u_p, dt, line_m, line_p);
 }

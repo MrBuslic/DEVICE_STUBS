@@ -111,12 +111,19 @@ void RpcOmnibusWidget::set_new_data(int mko, int addr, int saddr, QVariantList w
 	emit message_to_log(_msg);
 }
 
+void RpcOmnibusWidget::set_new_data_f5(int mko, int addr, int code, int word)
+{
+	abonents[mko][addr].f5[code] = word;
+	QString _msg = QString("Абоненту с адресом %1 на МКО %2 заданы новые данные Ф5 %4").arg(addr).arg(mko).arg(word);
+	emit message_to_log(_msg);
+}
+
 void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words, int& os)
 {
 	MkoWord tmp_cwd;	
 	tmp_cwd.cw = cwd;
 	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
-
+	mko = 1 - mko;
 	if (!(map_channels[mko] & work_line))
 	{
 		QString _msg = QString("МКО %1 канал %2 не работает").arg(mko).arg(line);
@@ -128,6 +135,8 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 		if ((tmp_cwd.subadr ==0) || (tmp_cwd.subadr == 31))
 		{
 			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
+			if (tmp_cwd.tr)
+				words.clear();
 
 			switch (tmp_cwd.count)
 			{
@@ -139,6 +148,9 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 				break;
 			case DEBLOCK_TRANSMITTER:
 				abonents[mko][tmp_cwd.adr].line += 2 - 2*line;
+				break;
+			case SEND_VECTOR_WORD:
+				words << abonents[mko][tmp_cwd.adr].f5[SEND_VECTOR_WORD];
 				break;
 			}
 		}

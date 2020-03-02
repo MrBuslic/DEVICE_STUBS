@@ -21,10 +21,10 @@ AOS_widg::AOS_widg(QWidget *parent)
 	setWindowTitle("АОС");
 
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-	slot_thr.start(); // вот тут падает
+	slot_thr.start(); 
 
 	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-	signal_thr.start(); // вот тут падает
+	signal_thr.start();
 
 	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
 	{
@@ -34,10 +34,10 @@ AOS_widg::AOS_widg(QWidget *parent)
 	}
 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
-	mku_slot_thr.start(); // вот тут падает
+	mku_slot_thr.start();
 
 	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
-	mku_signal_thr.start(); // вот тут падает
+	mku_signal_thr.start();
 
 	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
 	{
@@ -47,10 +47,10 @@ AOS_widg::AOS_widg(QWidget *parent)
 	}
 
 	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
-	power_slot_thr.start(); // вот тут падает
+	power_slot_thr.start(); 
 
 	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
-	power_signal_thr.start(); // вот тут падает
+	power_signal_thr.start();
 
 	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
 	{
@@ -63,11 +63,17 @@ AOS_widg::AOS_widg(QWidget *parent)
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("aos_geometry").toByteArray());
+
+	kontr_dev = AOS_KP_OFF;
+	cgo_dev = AOS_KP_OFF;
+	gpfm2_dev = AOS_KP_OFF;
+	gpfm1_dev = AOS_KP_OFF;
+
 }
 
 
@@ -81,7 +87,7 @@ void AOS_widg::imit_on()
 
 }
 
-void AOS_widg::new_ku(int ku, int length_ku, double u_ku, int line_ku)
+void AOS_widg::new_ku_mk(int ku, int length_ku, double u_ku, int line_ku)
 {
 
 }
@@ -93,7 +99,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr))
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 	
 		update_graphics();

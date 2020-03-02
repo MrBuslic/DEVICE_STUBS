@@ -79,6 +79,7 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["switch_ab_os(int, int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab_os;
 		operators_map["switch_ab(int, int, bool)"] = &omnibus_Socket_RPC_SLOT_Object::switch_ab;
 		operators_map["set_new_data(int, int, int, QVariantList)"] = &omnibus_Socket_RPC_SLOT_Object::set_new_data;
+		operators_map["set_new_data_f5(int, int, int, int)"] = &omnibus_Socket_RPC_SLOT_Object::set_new_data_f5;
 		operators_map["send_msg(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg;
 		operators_map["send_msg_mpko(int, int, int, QVariantList&, int&)"] = &omnibus_Socket_RPC_SLOT_Object::send_msg_mpko;
 		operators_map["unomnibus_map_channels_setup(int, int)"] = &omnibus_Socket_RPC_SLOT_Object::unomnibus_map_channels_setup;
@@ -414,6 +415,27 @@ int omnibus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int saddr = _values.at(2).value<int>();
 			QVariantList words = _values.at(3).value<QVariantList>();
 			app->set_new_data(mko, addr, saddr, words);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant omnibus_Socket_RPC_SLOT_Object::set_new_data_f5(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int mko = _values.at(0).value<int>();
+			int addr = _values.at(1).value<int>();
+			int code = _values.at(2).value<int>();
+			int word = _values.at(3).value<int>();
+			app->set_new_data_f5(mko, addr, code, word);
 			return 0;
 		}
 		catch(const std::exception &)
