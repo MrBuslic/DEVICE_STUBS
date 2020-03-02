@@ -135,7 +135,8 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 		if ((tmp_cwd.subadr ==0) || (tmp_cwd.subadr == 31))
 		{
 			os = abonents[mko][tmp_cwd.adr].os[tmp_cwd.subadr];
-			words.clear();
+			if (tmp_cwd.tr)
+				words.clear();
 
 			switch (tmp_cwd.count)
 			{

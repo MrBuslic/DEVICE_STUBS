@@ -43,11 +43,9 @@ void rpc_buffer_class::new_message(QVariant dt, int mko, int line, int cwd, QVar
 		tmp_rec.swd1 = 0xFF;
 		tmp_rec.error = MSGERR1553_ANYERR | MSGERR1553_NORESP;
 	}
-	int tmp_cnt = tmp_cwd.count;
-	if (tmp_cnt == 0)
-		tmp_cnt = 32;
 
-	tmp_rec.datacount = tmp_cnt;
+	tmp_rec.datacount = words.count();
+
 	for (int i = 0; i < words.count(); i++)
 	{
 		tmp_rec.data[i] = words[i].toInt();
