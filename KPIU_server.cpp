@@ -75,10 +75,12 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 1");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mn8i");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_vvk4");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_is4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/RM_MBK07_imitator");
 	QThread::currentThread()->sleep(3);
 	QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/IBEP_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
 	QThread::currentThread()->sleep(2);
@@ -92,6 +94,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/BECH_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/ASN_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/LKA-05_imitator");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/BAU_imitator");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/UNVVK4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/UNIS4");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/common");
@@ -100,7 +103,7 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 	QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
 	QThread::currentThread()->sleep(5);
-	QProcess::startDetached(QApplication::applicationDirPath() + "/client");
+	QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
 
 	rpc_slot_srv->set_params(ip_str, KPIU_SERVER_SLOT);
@@ -186,11 +189,12 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 
 	if (!is4_slot_thr->wait_connected(3) || !is4_signal_thr->wait_connected(3))
 	{
-		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с vvk4");
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с is4");
 		this->deleteLater();
 		return;
 	}
-	connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint NProcess, QVariant& value)), this, SLOT(get_resistance(uint NProcess, int& resistance)), Qt::DirectConnection);
+
+	connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
 
 	pyro_state.insert("ПП1_О",  pyro_chan_state(QList<int>() << 111 << 112, 0));
 	pyro_state.insert("ПП1_Р",  pyro_chan_state(QList<int>() << 113 << 114, 0));
@@ -223,6 +227,9 @@ KPIUServer::KPIUServer(QWidget* parent) : QWidget(parent)
 	pyro_state.insert("ПП13_Р",  pyro_chan_state(QList<int>() << 195 << 196, 0));
 	pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
 	pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
+
+	bau_chans.clear();
+	bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
 }
 //mku_bus_setup
 int KPIUServer::KU_NASTROYKA_CELOSTNOSTI_KANALOV(int ku_n, int line)
@@ -267,15 +274,17 @@ int KPIUServer::OLS_BISTRIY_START(int devise)
 	return 0;
 }
 
-void KPIUServer::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
+int KPIUServer::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
 {
 	ols_widget->unols_read_data_kr(data_buffer);
+	return 0;
 }
 
 //KPRD_setup
-void KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
+int KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
 {
 	kprd_widget->set_antenna_connection(antenna_name, connected_antenna_name);
+	return 0;
 }
 
 //OMNIBUS_setup
@@ -287,27 +296,29 @@ int KPIUServer::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 }
 
 //power_bus_setup
-void KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
+int KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 {
 	power_widget->set_bus_state(bus, state);
+	return 0;
 }
 
 //pyro
-void KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
+int KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
 {
 	QMap<QString, pyro_chan_state>::iterator itr = pyro_state.find(_name);
 
 	if (itr == pyro_state.end())
 	{
 		SRPCSignalClass::Instance().toLog(QString("Соединение %1 не найдено!").arg(_name));
-		return;
+		return 1;
 	}
 	itr->state = _state;
+	return 0;
 }
 
 QString KPIUServer::getXML()
 {
-	QFile file(QCoreApplication::applicationDirPath() + "/OPERATORI_NASTROYKI_IMITATOROV_SHIN.xml");
+	QFile file(QCoreApplication::applicationDirPath() + "/kpiu_directives.xml");
 
 	if (file.open(QFile::ReadOnly | QFile::Text))
 		return file.readAll();
@@ -408,24 +419,45 @@ void KPIUServer::mds_2_get_sample(uint& buf, bool& flag)
 	buf = mds2_chans.chans;
 }
 
-void KPIUServer::get_resistance(uint NProcess, int& resistance)
+void KPIUServer::get_resistance(uint NProcess, QVariant& resistance)
 {
 	QVariantList ei_chanels_list;
 	QVariantList sum_chanels_list;
 	int connection_state;
 	QVariantList channels;
 	vvk4_slot_thr->get_vvk4_obj()->get_commut_chanels_list(ei_chanels_list, sum_chanels_list);
-	channels = ei_chanels_list + sum_chanels_list;
-	// вставить функцию опроса ВВК
-	connection_state = get_connection_state(channels);
-	switch (connection_state)
+
+	if (sum_chanels_list.contains(bau_ground))
 	{
-	case 1:
-		resistance = 10;
-	case 2:
-		resistance = 0.8;
-	case 3:
 		resistance = 13000000;
+		if (ei_chanels_list.empty())
+			return;
+		int ei_chan = ei_chanels_list.at(0).toInt();
+
+		int bau_ind = bau_chans.indexOf(ei_chan);
+		if (bau_ind == -1)
+			return;
+
+		QVariant bau_tm;
+		mku_widget->get_tm("BAU_TM", bau_tm);
+
+		if ( (bau_tm.toUInt() & (1 << bau_ind)) != 0)
+			resistance = 0.8;
+	}
+	else
+	{
+		channels = ei_chanels_list + sum_chanels_list;
+		// вставить функцию опроса ВВК
+		connection_state = get_connection_state(channels);
+		switch (connection_state)
+		{
+		case 1:
+			resistance = 10;
+		case 2:
+			resistance = 0.8;
+		case 3:
+			resistance = 13000000;
+		}
 	}
 }
 	//get_commut_chanels_list(ei_list, sum_list);

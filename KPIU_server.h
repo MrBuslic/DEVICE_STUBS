@@ -71,19 +71,19 @@ public slots:
 	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
 	int OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer);
 	int OLS_BISTRIY_START(int devise);
-	void OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
+	int OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
 
 	//KPRD_setup
-	void ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
+	int ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
 
 	//OMNIBUS_setup
 	int OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
 
 	//power_bus_setup
-	void USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
+	int USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
 
 	//pyro
-	void PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
+	int PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
 	QString getXML();
 	
 
@@ -91,14 +91,18 @@ public slots:
 
 	void mds_1_get_sample(uint& buf, bool& flag);
 	void mds_2_get_sample(uint& buf, bool& flag);
-	void get_resistance(uint NProcess, int& resistance);
+	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
-private:
 
+private:
 	MDS1_CHANNELS mds1_chans;
 	MDS2_CHANNELS mds2_chans;
 
 	QMap<QString, pyro_chan_state> pyro_state;
+
+	QList<int> bau_chans;
+	int bau_ground = 147;
+
 	RpcOmnibusWidget* omnibus_widget;
 	InterruptWidget* interrupt_widget;
 	KPIWidget* kpi_widget;
@@ -119,8 +123,8 @@ signals:
 	*	\brief Асинхронный сигнал, передающий клиенту сообщение в журнал
 	*	\param message - текст сообщения
 	*/
-	void toLog(QString message);
-	void toProtocol(QString message);
+	void toLogs(QString message);
+	void toProtocols(QString message);
 
 };
 

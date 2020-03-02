@@ -93,8 +93,6 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
-	QVariant auto_scroll_clicked(QVariantList& _values);
-	QVariant log_timer_ontimer(QVariantList& _values);
 	QVariant ads_timer_ontimer(QVariantList& _values);
 	QVariant new_ku(QVariantList& _values);
 	QVariant new_mk(QVariantList& _values);

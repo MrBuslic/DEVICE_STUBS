@@ -165,11 +165,14 @@ add_subdirectory(BECH_imitator)
 add_subdirectory(MBK-02_imitator)
 add_subdirectory(KPRD_imitator)
 add_subdirectory(RTM3002_imitator)
+add_subdirectory(ZVH4_imitator)
+add_subdirectory(FSVA7_imitator)
 add_subdirectory(BOOP_imitator)
 add_subdirectory(R732_imitator)
 add_subdirectory(R733_imitator)
 add_subdirectory(RM_MBK07_imitator)
 add_subdirectory(BAU_imitator)
+add_subdirectory(AOS_imitator)
 add_subdirectory(MKI_imitator)
 
 
@@ -217,4 +220,4 @@ SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TMP1})
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${TMP2})
 SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TMP3})
 
-QT5_ADD_RESOURCES(kpiu_server_plugin common_functions.qrc) #что делает?
+#QT5_ADD_RESOURCES(kpiu_server_plugin common_functions.qrc) #что делает?

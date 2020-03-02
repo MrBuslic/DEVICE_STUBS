@@ -1,4 +1,4 @@
-project(IBEP_imitator)
+project(FSVA7_imitator)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_AUTOMOC ON)
@@ -40,24 +40,18 @@ FILE(GLOB HEADERS *.h *.hpp)
   
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
+SET(RPC_SOURCES  FSVA7_socket_rpc.h FSVA7_socket_rpc.cpp)
 
-SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
-
-add_executable(IBEP_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${POWER_RPC_SOURCES} icon.rc)
-target_link_libraries (IBEP_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+add_executable(FSVA7_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES} )
+target_link_libraries (FSVA7_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
 if(WIN32)
-  qt5_use_modules(IBEP_imitator Core Widgets Network Gui)
- # SET_TARGET_PROPERTIES(IBEP_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+  qt5_use_modules(FSVA7_imitator Core Widgets Network Gui)
+ # SET_TARGET_PROPERTIES(FSVA7_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
 
-
-
-#ADD_CUSTOM_COMMAND(TARGET IBEP_imitator
-#	PRE_BUILD
-#	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/IBEP_imitator.h ${PROJECT_SOURCE_DIR} ibep
-#)
-
-
-
+ADD_CUSTOM_COMMAND(TARGET FSVA7_imitator
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/FSVA7_imitator.h ${PROJECT_SOURCE_DIR} FSVA7
+)

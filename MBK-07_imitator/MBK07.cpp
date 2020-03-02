@@ -227,17 +227,19 @@ void MBK07_widg::change_power()
 {
 	//Надо подправить - может ли работать ФСМУ без ФСВУ?
 	//power = 0.5;
+	power = 0;
+
 	if (current_FSMU != FSMU_OFF)
 	{
-		power = 150;
-		if (current_FSVU != FSVU_OFF)
-			if (FSVU_state[current_FSVU] == true)
-			power = 180;
-			else power = 30;
+		power += 30;
 	}
-	else
+
+	if (current_FSVU != FSVU_OFF)
 	{
-		power = 0;
+		if (FSVU_state[current_FSVU] == true)
+			power += 150;
+		else
+			power += 50;
 	}
 	set_power_back();
 }
@@ -268,7 +270,7 @@ void MBK07_widg::imit_off()
 	current_stab = OFF_STAB;
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-
+	change_power();
 	set_new_tm();
 	update_graphics();
 }
@@ -325,6 +327,7 @@ void MBK07_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 			}
 			update_graphics();
 			set_new_tm();
+			change_power();
 		}
 	}
 }

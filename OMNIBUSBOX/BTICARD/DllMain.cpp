@@ -4,7 +4,6 @@
 #include "omnibus_rpc.h"
 #include "rpc_ports.h"
 #include "BTICARD\BufferClass.h"
-#include "instruments.h"
 
 // Объявляем функцию DllMain
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
@@ -18,22 +17,22 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,
 	QString ipSettingsFile = QString(QCoreApplication::applicationDirPath() + "/" + "ipSettings.ini");
 	QSettings *ipSettings = new QSettings(ipSettingsFile, QSettings::IniFormat, NULL);
 	ipSettings->beginGroup("IP");*/
-	QString ip_str = instr::GetIpFromSettings("rpc_omnibus");//ipSettings->value(QString("rpc_omnibus"), "").toString();
-															 //ipSettings->endGroup();
+	//QString ip_str = instr::GetIpFromSettings("rpc_omnibus");//ipSettings->value(QString("rpc_omnibus"), "").toString();
+	//														 //ipSettings->endGroup();
 
 	switch (fdwReason)      // Дерево разбора уведомлений
 	{
 	case DLL_PROCESS_ATTACH: // Подключение DLL
 		if (!slot_thr.isRunning())
 		{
-			slot_thr.set_connection_params(ip_str, OMNIBUS_SLOT);
+			slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 			slot_thr.start();
 		}
 		//if (!slot_thr.wait_connected(3))
 		//	return false;
 		if (!signal_thr.isRunning())
 		{
-			signal_thr.set_connection_params(ip_str, OMNIBUS_SIGNAL);
+			signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
 			signal_thr.start();
 			signal_thr.wait_connected(3);
 		}

@@ -248,6 +248,7 @@ void BECH_widg::imit_off()
 	current_LKA = LKA_OFF;
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	update_graphics();
+	set_power_back();
 	inter_tmr->stop();
 }
 

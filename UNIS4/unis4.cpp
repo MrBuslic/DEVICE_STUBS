@@ -219,7 +219,7 @@ ViStatus _VI_FUNC unis4_ResultMeas (ViSession vi, ViReal64 ResultMeas[], ViPInt3
 ViStatus _VI_FUNC unis4_ResultMeasFreq (ViSession vi, ViPReal64 ResultMeasFreq){ return 0; }
 //	Функция запроса текущего состояния процесса в инструменте
 //	константы состояния процесса
-ViStatus _VI_FUNC unis4_StatusProcess (ViSession vi, ViPUInt16 StatusMeas){ return 0; }
+ViStatus _VI_FUNC unis4_StatusProcess(ViSession vi, ViPUInt16 StatusMeas) { *StatusMeas = 0; return 0; }
 //	Функция запроса текущего аппаратного состояния инструмента
 //	константы общего состояния инструмента
 ViStatus _VI_FUNC unis4_status_Q (ViSession vi, ViPInt32 StatusDev){ return 0; }

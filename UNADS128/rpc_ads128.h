@@ -19,6 +19,7 @@
 #include <qlayout.h>
 #include <loki/Singleton.h>
 #include "../buses_imitator/mku_bus_rpc.h"
+#include "rpc_loger.h"
 
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
@@ -29,10 +30,7 @@ public:
 	RpcADS128Widget(int _ads_num);
 public slots:
 
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	void ads_timer_ontimer();
-
 
 	void new_ku(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
@@ -43,23 +41,12 @@ public slots:
 	int ads128_analog_q(uint group_, double& lev0, double& lev1);
 private:
 	void add_signal(int ads_chan, double _u);
+	LogWidget* log_widget;
 
-
-	QTextEdit* edit;
-	QScrollBar* _scroll_bar;
-	QTextDocument* _doc;
-	QTextCursor* _cursor;
-	QPushButton* push_b; 
-	QCheckBox* auto_scroll_box;
-	bool auto_scroll;
-	QString log_filename;
-	QTimer log_timer;
 	QTime begin_time;
 
 	std::unique_ptr<QTimer> ads_timer;
 	QMutex ads_mutex;
-	QStringList log_buffer;
-	QMutex log_mutex;
 	bool state;
 	bool timerads;
 

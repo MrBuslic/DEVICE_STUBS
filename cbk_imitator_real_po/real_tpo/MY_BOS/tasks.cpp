@@ -15,7 +15,7 @@ taskCreate(
 	int startArg		/* аргумент, передается задаче при запуске */
 )
 {
-	sysDescSPO.pTabVecSt[numVecSt].taskStart();
+	STasksFactory::Instance().create_task(numVecSt, startArg);
 	return 0;
 }
 
@@ -257,4 +257,35 @@ VecStModify(
 
 #ifdef __cplusplus
 }
+
+void TasksFactory::create_task(USHORT task_ind, int start_arg)
+{
+	QMutexLocker lock(&task_mutex);
+	TASK_STR tmp_str;
+	tmp_str.task_ind = task_ind;
+	tmp_str.start_arg = start_arg;
+	tasks_queue << tmp_str;
+}
+void TasksFactory::run()
+{
+	while (true)
+	{
+		QMutexLocker lock(&task_mutex);
+		if (tasks_queue.empty())
+		{
+			QThread::currentThread()->msleep(50);
+		}
+		else
+		{
+			TASK_STR cur_task = tasks_queue.front();
+			tasks_queue.pop_front();
+
+			sysDescSPO.pTabVecSt[cur_task.task_ind].taskStart();
+
+		}
+	}
+}
+
+
+
 #endif

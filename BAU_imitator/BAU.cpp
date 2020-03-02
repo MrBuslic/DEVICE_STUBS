@@ -43,9 +43,11 @@ union BOCH_com
 	struct
 	{
 		quint16
-			BOCH_b1 : 1,
+			BOCH_b3 : 1,
 			BOCH_b2 : 1,
-			BOCH_b3 : 1;
+			BOCH_b1 : 1,
+			rez : 13;
+
 	};
 };
 
@@ -69,20 +71,10 @@ union KBAU_DataWords
 	};
 };
 
-union Serv_Union
+quint16 BAU_widg::sum_bits(Serv_Union& bits)
 {
-	unsigned char bits;
-	struct
-	{
-		quint16
-			first_bit : 1,
-			second_bit : 1,
-			third_bit : 1,
-			four_bit : 1;
-	};
-
-	quint16 sum_bits = first_bit + second_bit + third_bit;
-};
+	return bits.first_bit + bits.second_bit + bits.third_bit;
+}
 
 union KBRTK_M_DataWords
 {
@@ -443,8 +435,15 @@ void BAU_widg::imit_off()
 	AT_widget.hide();
 	kcbk = false;
 	//msg_to_log("Питание отключено");
-	//omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	tm_data.VBAU_1 = 0;
+	tm_data.VBAU_2 = 0;
+	tm_data.VBAU_3 = 0;
+	tm_data.VPBAU_1 = 0;
+	tm_data.VPBAU_2 = 0;
+	tm_data.VPBAU_3 = 0;
+	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	update_graphics_BAU();
+	set_tm_state();
 }
 
 void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
@@ -465,6 +464,12 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 				current_MT = MT_1;
 				MT_widget.show();
 				AT_widget.show();
+				tm_data.VBAU_1 = 1;
+				tm_data.VBAU_2 = 0;
+				tm_data.VBAU_3 = 0;
+				tm_data.VPBAU_1 = 1;
+				tm_data.VPBAU_2 = 0;
+				tm_data.VPBAU_3 = 0;
 				break;
 			case 1:
 				current_MU = MU_2;
@@ -472,6 +477,12 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 				current_MT = MT_2;
 				MT_widget.show();
 				AT_widget.show();
+				tm_data.VBAU_1 = 0;
+				tm_data.VBAU_2 = 1;
+				tm_data.VBAU_3 = 0;
+				tm_data.VPBAU_1 = 0;
+				tm_data.VPBAU_2 = 1;
+				tm_data.VPBAU_3 = 0;
 				break;
 			case 2:
 				current_MU = MU_3;
@@ -479,9 +490,93 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 				current_MT = MT_3;
 				MT_widget.show();
 				AT_widget.show();
+				tm_data.VBAU_1 = 0;
+				tm_data.VBAU_2 = 0;
+				tm_data.VBAU_3 = 1;
+				tm_data.VPBAU_1 = 0;
+				tm_data.VPBAU_2 = 0;
+				tm_data.VPBAU_3 = 1;
 				break;
-			case 3:
-				if (current_MU = MU_1)
+			//case 3:
+			//	if (current_MU = MU_1)
+			//	{
+			//		current_MU = MU_OFF;
+			//		current_MT = MT_OFF;
+			//		current_MK = MK_OFF;
+			//		MT_widget.current_UM = UM_OFF;
+			//		MT_widget.current_LBV = LBV_OFF;
+			//		MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
+			//		MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
+			//		MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
+			//		MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
+			//		MT_widget.current_BOCH = BOCH_OFF;
+			//		MT_widget.current_FOS = FOS_OFF;
+			//		MT_widget.current_AOS = AOS_OFF;
+			//		MT_widget.current_UPCH = UPCH_OFF;
+			//		AT_widget.current_ALPS = ALPS_OFF;
+			//		AT_widget.current_MFS = MFS_OFF;
+			//		AT_widget.current_LPch = LPch_OFF;
+			//		AT_widget.current_BUFAR = BUFAR_OFF;
+			//		tm_data.VBAU_1 = 0;
+			//		tm_data.VPBAU_1 = 0;
+			//		MT_widget.hide();
+			//		AT_widget.hide();
+			//	}
+			//	break;
+			//case 4:
+			//	if (current_MU = MU_2)
+			//	{
+			//		current_MU = MU_OFF;
+			//		current_MT = MT_OFF;
+			//		current_MK = MK_OFF;
+			//		MT_widget.current_UM = UM_OFF;
+			//		MT_widget.current_LBV = LBV_OFF;
+			//		MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
+			//		MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
+			//		MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
+			//		MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
+			//		MT_widget.current_BOCH = BOCH_OFF;
+			//		MT_widget.current_FOS = FOS_OFF;
+			//		MT_widget.current_AOS = AOS_OFF;
+			//		MT_widget.current_UPCH = UPCH_OFF;
+			//		AT_widget.current_ALPS = ALPS_OFF;
+			//		AT_widget.current_MFS = MFS_OFF;
+			//		AT_widget.current_LPch = LPch_OFF;
+			//		AT_widget.current_BUFAR = BUFAR_OFF;
+			//		tm_data.VBAU_2 = 0;
+			//		tm_data.VPBAU_2 = 0;
+			//		MT_widget.hide();
+			//		AT_widget.hide();
+			//	}
+			//	break;
+			//case 5:
+			//	if (current_MU = MU_3)
+			//	{
+			//		current_MU = MU_OFF;
+			//		current_MT = MT_OFF;
+			//		current_MK = MK_OFF;
+			//		MT_widget.current_UM = UM_OFF;
+			//		MT_widget.current_LBV = LBV_OFF;
+			//		MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
+			//		MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
+			//		MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
+			//		MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
+			//		MT_widget.current_BOCH = BOCH_OFF;
+			//		MT_widget.current_FOS = FOS_OFF;
+			//		MT_widget.current_AOS = AOS_OFF;
+			//		MT_widget.current_UPCH = UPCH_OFF;
+			//		AT_widget.current_ALPS = ALPS_OFF;
+			//		AT_widget.current_MFS = MFS_OFF;
+			//		AT_widget.current_LPch = LPch_OFF;
+			//		AT_widget.current_BUFAR = BUFAR_OFF;
+			//		tm_data.VBAU_3 = 0;
+			//		tm_data.VPBAU_3 = 0;
+			//		MT_widget.hide();
+			//		AT_widget.hide();
+			//	}
+			//	break;
+			default:
+				if ((tmp_mshm >= 3) && (tmp_mshm <= 5))
 				{
 					current_MU = MU_OFF;
 					current_MT = MT_OFF;
@@ -500,61 +595,19 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 					AT_widget.current_MFS = MFS_OFF;
 					AT_widget.current_LPch = LPch_OFF;
 					AT_widget.current_BUFAR = BUFAR_OFF;
+					tm_data.VBAU_1 = 0;
+					tm_data.VBAU_2 = 0;
+					tm_data.VBAU_3 = 0;
+					tm_data.VPBAU_1 = 0;
+					tm_data.VPBAU_2 = 0;
+					tm_data.VPBAU_3 = 0;
 					MT_widget.hide();
 					AT_widget.hide();
 				}
-				break;
-			case 4:
-				if (current_MU = MU_2)
-				{
-					current_MU = MU_OFF;
-					current_MT = MT_OFF;
-					current_MK = MK_OFF;
-					MT_widget.current_UM = UM_OFF;
-					MT_widget.current_LBV = LBV_OFF;
-					MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
-					MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
-					MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
-					MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
-					MT_widget.current_BOCH = BOCH_OFF;
-					MT_widget.current_FOS = FOS_OFF;
-					MT_widget.current_AOS = AOS_OFF;
-					MT_widget.current_UPCH = UPCH_OFF;
-					AT_widget.current_ALPS = ALPS_OFF;
-					AT_widget.current_MFS = MFS_OFF;
-					AT_widget.current_LPch = LPch_OFF;
-					AT_widget.current_BUFAR = BUFAR_OFF;
-					MT_widget.hide();
-					AT_widget.hide();
-				}
-				break;
-			case 5:
-				if (current_MU = MU_3)
-				{
-					current_MU = MU_OFF;
-					current_MT = MT_OFF;
-					current_MK = MK_OFF;
-					MT_widget.current_UM = UM_OFF;
-					MT_widget.current_LBV = LBV_OFF;
-					MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
-					MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
-					MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
-					MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
-					MT_widget.current_BOCH = BOCH_OFF;
-					MT_widget.current_FOS = FOS_OFF;
-					MT_widget.current_AOS = AOS_OFF;
-					MT_widget.current_UPCH = UPCH_OFF;
-					AT_widget.current_ALPS = ALPS_OFF;
-					AT_widget.current_MFS = MFS_OFF;
-					AT_widget.current_LPch = LPch_OFF;
-					AT_widget.current_BUFAR = BUFAR_OFF;
-					MT_widget.hide();
-					AT_widget.hide();
-				}
-				break;
 			}
 			update_graphics_BAU();
-			//set_new_tm();
+			ZTM_create();
+			set_tm_state();
 		}
 	}
 }
@@ -619,11 +672,6 @@ void BAU_widg::K_BRTK_A(QVariantList words)
 	Serv_Union tmp_LPch_dw;
 	Serv_Union tmp_BUFAR_dw;
 
-	//bool ALPS_ok = false;
-	//bool MFS_ok = false;
-	//bool LPch_ok = false;
-	//bool BUFAR_ok = false;
-
 	tmp_ALPS_dw.bits = d_words.ALPS_com;
 	tmp_MFS_dw.bits = d_words.MFS_com;
 	tmp_LPch_dw.bits = d_words.LPch_com;
@@ -631,32 +679,34 @@ void BAU_widg::K_BRTK_A(QVariantList words)
 
 	if (d_words.rez != 0)
 		ZOB.NKK = 1;
-	if ((tmp_ALPS_dw.sum_bits > 4) && (tmp_MFS_dw.sum_bits > 4) && (tmp_LPch_dw.sum_bits > 4) && (tmp_BUFAR_dw.sum_bits > 4))
+	if ((sum_bits(tmp_ALPS_dw) > 4) && (sum_bits(tmp_MFS_dw) > 4) && (sum_bits(tmp_LPch_dw) > 4) && (sum_bits(tmp_BUFAR_dw) > 4))
 		ZOB.KMT = 1;
 	///АЛПС
-	if (AT_widget.current_ALPS == ALPS_OFF)
+
+	if ((AT_widget.current_ALPS != ALPS_OFF) && (ALPS(d_words.ALPS_com) != ALPS_OFF))
+	{
+		if (AT_widget.current_ALPS != ALPS(d_words.ALPS_com))
+			ZOB.KAT = 1;
+	}
+
+	if ((ALPS(d_words.ALPS_com) != ALPS_OFF) && (LPch(d_words.LPch_com) != LPch_OFF))
 	{
 		if (d_words.ALPS_com != d_words.LPch_com)
 			ZOB.LPch_ALPS = 1;
 	}
-	else
-	{
-		if ((AT_widget.current_ALPS != ALPS(d_words.LPch_com)) && (d_words.ALPS_com != 0))
-			ZOB.KAT = 1;
-	}
-	///МФС
-	if (AT_widget.current_MFS != MFS_OFF)
-		if (AT_widget.current_MFS != MFS(d_words.MFS_com) && (d_words.MFS_com != 0))
-			ZOB.KAT = 1;
+
 	///ЛПЧ
-	if (AT_widget.current_LPch == LPch_OFF)
+	if ((AT_widget.current_LPch != LPch_OFF) && (ALPS(d_words.LPch_com) != LPch_OFF))
 	{
-		if (d_words.LPch_com != d_words.ALPS_com)
-			ZOB.LPch_ALPS = 1;
+		if (AT_widget.current_LPch != ALPS(d_words.LPch_com))
+			ZOB.KAT = 1;
 	}
-	else
+
+
+	///МФС
+	if ((AT_widget.current_MFS != MFS_OFF) && (MFS(d_words.MFS_com) != MFS_OFF))
 	{
-		if ((AT_widget.current_LPch != LPch(d_words.LPch_com)) && (d_words.LPch_com != 0))
+		if (AT_widget.current_MFS != MFS(d_words.MFS_com))
 			ZOB.KAT = 1;
 	}
 	///БУФАР
@@ -670,65 +720,6 @@ void BAU_widg::K_BRTK_A(QVariantList words)
 		AT_widget.current_LPch = LPch(d_words.LPch_com);
 		AT_widget.current_BUFAR = BUFAR(d_words.BUFAR_com);
 	}
-	///+-Рабочий код
-	/////АЛПС
-	//if (AT_widget.current_ALPS == ALPS_OFF)
-	//{
-	//	if (d_words.ALPS_com == d_words.LPch_com)
-	//		ALPS_ok = true;
-	//	else
-	//		ZOB.LPch_ALPS = 1;
-	//}
-	//else
-	//{
-	//	if ((AT_widget.current_ALPS == ALPS(d_words.LPch_com)) || (d_words.ALPS_com == 0))
-	//		ALPS_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	/////МФС
-	//if (AT_widget.current_MFS == MFS_OFF)
-	//	MFS_ok = true;
-	//else
-	//{
-	//	if (AT_widget.current_MFS == MFS(d_words.MFS_com) || (d_words.MFS_com == 0))
-	//		MFS_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	/////ЛПЧ
-	//if (AT_widget.current_LPch == LPch_OFF)
-	//{
-	//	if (d_words.LPch_com == d_words.ALPS_com)
-	//		LPch_ok = true;
-	//	else
-	//		ZOB.LPch_ALPS = 1;
-	//}
-	//else
-	//{
-	//	if ((AT_widget.current_LPch == LPch(d_words.LPch_com)) || (d_words.LPch_com == 0))
-	//		LPch_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	/////БУФАР
-	//if (AT_widget.current_BUFAR == BUFAR_OFF)
-	//	BUFAR_ok = true;
-	//else
-	//{
-	//	if ((AT_widget.current_BUFAR == BUFAR(d_words.BUFAR_com)) || (d_words.BUFAR_com == 0))
-	//		BUFAR_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	//if (ZOB.zob_word == 0)
-	//{
-	//	if (ALPS_ok) AT_widget.current_ALPS = ALPS(d_words.ALPS_com);
-	//	if (MFS_ok) AT_widget.current_MFS = MFS(d_words.MFS_com);
-	//	if (LPch_ok) AT_widget.current_LPch = LPch(d_words.LPch_com);
-	//	if (BUFAR_ok) AT_widget.current_BUFAR = BUFAR(d_words.BUFAR_com);
-	//}
-	///+-Рабочий код
 
 	QVariantList tmp_list;
 	tmp_list.push_back(ZOB.zob_word);
@@ -742,11 +733,11 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 	KBRTK_M_DataWords d_words(words);
 
 	BOCH_com BOCH_full;
+	BOCH_full.data_words = 0;
 	BOCH_full.BOCH_b1 = d_words.BOCH_first_com;
 	BOCH_full.BOCH_b2 = d_words.BOCH_second_com;
-	BOCH_full.BOCH_b2 = d_words.BOCH_third_com;
-	BOCH_full.data_words = BOCH_full.BOCH_b1 + BOCH_full.BOCH_b2 + BOCH_full.BOCH_b3;
-
+	BOCH_full.BOCH_b3 = d_words.BOCH_third_com;
+	
 	Serv_Union tmp_UM_dw;
 	Serv_Union tmp_LBV_dw;
 	Serv_Union tmp_PRM_Ant_1_dw;
@@ -757,11 +748,6 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 	Serv_Union tmp_FOS_dw;
 	Serv_Union tmp_AOS_dw;
 	Serv_Union tmp_UPCH_dw;
-
-	//bool UM_ok = false;
-	//bool LBV_ok = false;
-	//bool BOCH_ok = false;
-	//bool FOS_ok = false;
 
 	tmp_UM_dw.bits = d_words.UM_com;
 	tmp_LBV_dw.bits = d_words.LBV_com;
@@ -776,8 +762,8 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 
 	if (d_words.rez != 0)
 		ZOB.NKK = 1;
-	if ((tmp_UM_dw.sum_bits <= 1) && (tmp_LBV_dw.sum_bits <= 1) && (tmp_PRM_Ant_1_dw.sum_bits <= 1) && (tmp_PRM_Ant_A_dw.sum_bits <= 1) && (tmp_SGTS_Ant_1_dw.sum_bits <= 1)
-		&& (tmp_SGTS_Ant_A_dw.sum_bits <= 1) && (tmp_BOCH_dw.sum_bits <= 1) && (tmp_FOS_dw.sum_bits <= 1) && (tmp_AOS_dw.sum_bits <= 1) && (tmp_UPCH_dw.sum_bits <= 1))
+	if (!((sum_bits(tmp_UM_dw) <= 1) && (sum_bits(tmp_LBV_dw) <= 1) && (sum_bits(tmp_PRM_Ant_1_dw) <= 1) && (sum_bits(tmp_PRM_Ant_A_dw) <= 1) && (sum_bits(tmp_SGTS_Ant_1_dw) <= 1)
+		&& (sum_bits(tmp_SGTS_Ant_A_dw) <= 1) && (sum_bits(tmp_BOCH_dw) <= 1) && (sum_bits(tmp_FOS_dw) <= 1) && (sum_bits(tmp_AOS_dw) <= 1) && (sum_bits(tmp_UPCH_dw) <= 1)))
 		ZOB.KMT = 1;
 
 	///УМ
@@ -803,17 +789,17 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 			ZOB.KAT = 1;
 	}
 	///БОЧ
-	if (MT_widget.current_BOCH == BOCH_OFF)
+	if (BOCH(BOCH_full.data_words) == BOCH_OFF)
 	{
-		if ((MT_widget.current_AOS != AOS_OFF) && (MT_widget.current_FOS != FOS_OFF) && (MT_widget.current_LBV != LBV_OFF))
+		if (((AOS(d_words.AOS_com) != AOS_OFF) && (FOS(d_words.FOS_com) != FOS_OFF) && (LBV(d_words.LBV_com) != LBV_OFF)) && (MT_widget.current_BOCH != BOCH_OFF))
 			ZOB.BOCH_OOFF = 1;
 	}
 	else
 	{
-		if (BOCH_full.data_words == 0)
+		if (MT_widget.current_BOCH == BOCH_OFF)
 		{
-			if ((MT_widget.current_AOS == AOS_OFF) || (MT_widget.current_FOS == FOS_OFF) || (MT_widget.current_LBV == LBV_OFF))
-				ZOB.BOCH_OON;
+			if(( (MT_widget.current_AOS != AOS_OFF) && (AOS(d_words.AOS_com) != AOS_OFF)) || ((MT_widget.current_FOS != FOS_OFF) && (FOS(d_words.FOS_com) != FOS_OFF)) || ((MT_widget.current_LBV != LBV_OFF) &&  (LBV(d_words.LBV_com) != LBV_OFF)))
+				ZOB.BOCH_OON = 1;
 		}
 		else
 			if (MT_widget.current_BOCH != BOCH(BOCH_full.data_words))
@@ -831,16 +817,12 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 			ZOB.KAT = 1;
 	}
 	///АОС
-	if (MT_widget.current_BOCH == BOCH_OFF)
+	if (AOS(d_words.AOS_com) != AOS_OFF)
 	{
-		if (BOCH_full.data_words == 0)
+		if ((BOCH_full.data_words == 0))
 			ZOB.AOS_OON = 1;
 	}
-	else
-	{
-		if (BOCH_full.data_words == 0)
-			ZOB.AOS_OON = 1;
-	}
+
 	///Аттенюаторы ФОС 1
 	if ((d_words.FOS_att1 > 0xD) && (d_words.FOS_att1 < 0xF))
 		ZOB.NZP = 1;
@@ -885,137 +867,6 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 		MT_widget.current_PS = FOS_PS(d_words.FOS_PS);
 		MT_widget.current_UPCH_att = d_words.UPCH_att;
 	}
-
-	///+-рабочий код
-	/////УМ
-	//if (MT_widget.current_UM == UM_OFF)
-	//{
-	//	if (d_words.UM_com != d_words.LBV_com)
-	//		ZOB.UM_LBV = 1;
-	//	else
-	//		UM_ok = true;
-	//}
-	//else
-	//{
-	//	if (MT_widget.current_UM == UM(d_words.UM_com) || (d_words.UM_com == 0))
-	//		UM_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	/////ЛБВ
-	//if (MT_widget.current_LBV == LBV_OFF)
-	//{
-	//	if (d_words.LBV_com != d_words.UM_com)
-	//		ZOB.UM_LBV = 1;
-	//	else
-	//		LBV_ok = true;
-	//}
-	//else
-	//{
-	//	if (MT_widget.current_LBV == LBV(d_words.LBV_com) || (d_words.LBV_com == 0))
-	//		LBV_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	/////БОЧ
-	//if (MT_widget.current_BOCH == BOCH_OFF)
-	//{
-	//	if ((MT_widget.current_AOS != AOS_OFF) && (MT_widget.current_FOS != FOS_OFF) && (MT_widget.current_LBV != LBV_OFF))
-	//		ZOB.BOCH_OOFF = 1;
-	//	else
-	//		BOCH_ok = true;
-	//}
-	//else
-	//{
-	//	if (BOCH_full.data_words == 0)
-	//	{
-	//		if ((MT_widget.current_AOS != AOS_OFF) && (MT_widget.current_FOS != FOS_OFF) && (MT_widget.current_LBV != LBV_OFF))
-	//			BOCH_ok = true;
-	//		else
-	//			ZOB.BOCH_OON;
-	//	}
-	//	else
-	//		if (MT_widget.current_BOCH != BOCH(BOCH_full.data_words))
-	//			ZOB.KAT = 1;
-	//}
-	/////ФОС
-	//if (MT_widget.current_FOS == FOS_OFF)
-	//{
-	//	if (MT_widget.current_LBV != LBV_OFF)
-	//		ZOB.FOS_OON = 1;
-	//	else
-	//		FOS_ok = true;
-	//}
-	//else
-	//{
-	//	if (MT_widget.current_FOS == FOS(d_words.FOS_com) || (d_words.FOS_com == 0))
-	//		FOS_ok = true;
-	//	else
-	//		ZOB.KAT = 1;
-	//}
-	/////АОС
-	////ОТЛАДОЧНЫЕ УСЛОВИЯ
-	//if (MT_widget.current_BOCH == BOCH_OFF)
-	//{
-	//	if (BOCH_full.data_words == 0)
-	//		ZOB.AOS_OON = 1;
-	//}
-	//else
-	//{
-	//	if (BOCH_full.data_words == 0)
-	//		ZOB.AOS_OON = 1;
-	//}
-	////ОТЛАДОЧНЫЕ УСЛОВИЯ
-	/////Аттенюаторы ФОС 1
-	//if ((d_words.FOS_att1 > 0xD) && (d_words.FOS_att1 < 0xF))
-	//	ZOB.NZP = 1;
-	/////Аттенюаторы ФОС 2
-	//if ((d_words.FOS_att2 > 0xD) && (d_words.FOS_att2 < 0xF))
-	//	ZOB.NZP = 1;
-	/////Аттенюаторы УПЧ
-	//if ((d_words.UPCH_att > 0xF) && (d_words.UPCH_att < 0x1F))
-	//	ZOB.NZP = 1;
-
-	//if (ZOB.zob_word == 0)
-	//{
-	//	if (UM_ok)
-	//		MT_widget.current_UM = UM(d_words.UM_com);
-	//	if (LBV_ok)
-	//		MT_widget.current_LBV = LBV(d_words.LBV_com);
-	//	if (BOCH_ok)
-	//		MT_widget.current_BOCH = BOCH(BOCH_full.data_words);
-	//	if (FOS_ok)
-	//		MT_widget.current_FOS = FOS(d_words.FOS_com);
-
-	//	MT_widget.current_AOS = AOS(d_words.AOS_com);
-	//	MT_widget.current_UPCH = UPCH(d_words.UPCH_com);
-
-	//	///ПРМ, антена 1
-	//	MT_widget.current_PRM_Ant_1 = PRM(d_words.PRM_ant_one_com);
-	//	///ПРМ, антена А
-	//	MT_widget.current_PRM_Ant_A = PRM(d_words.PRM_ant_A_com);
-	//	/// СТС СГС,антена 1 
-	//	MT_widget.current_SGTS_Ant_1 = SGTS(d_words.SGTS_ant_one_com);
-	//	/// СТС СГС,антена A
-	//	MT_widget.current_SGTS_Ant_A = SGTS(d_words.SGTS_ant_A_com);
-
-	//	///Частота генератора БОЧ
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D0 = d_words.BOCH_ch_D0;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D1 = d_words.BOCH_ch_D1;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D2 = d_words.BOCH_ch_D2;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D3 = d_words.BOCH_ch_D3;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D4 = d_words.BOCH_ch_D4;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D5 = d_words.BOCH_ch_D5;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D6 = d_words.BOCH_ch_D6;
-	//	MT_widget.current_BOCH_ch.BOCH_ch_D7 = d_words.BOCH_ch_D7;
-
-	//	MT_widget.current_FOS_att1 = d_words.FOS_att1;
-	//	MT_widget.current_FOS_att2 = d_words.FOS_att2;
-	//	///Ключ ПС в ФОС
-	//	MT_widget.current_PS = FOS_PS(d_words.FOS_PS);
-	//	MT_widget.current_UPCH_att = d_words.UPCH_att;
-	//}
-	///+-рабочий код
 
 	QVariantList tmp_list;
 	tmp_list.push_back(ZOB.zob_word);
@@ -1215,7 +1066,7 @@ void BAU_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr))
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		switch (tmp_cwd.subadr)
 		{
@@ -1233,11 +1084,15 @@ void BAU_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 			AT_widget.update_graphics_AT();
 			break;
 		}
+		if (ZOB.zob_word == 0)
+		{
+			ZTK_create();
+			ZTM_create();
+		}
+		//Отправление ЗТК
+		update_graphics_BAU();
 	}
-	if (ZOB.zob_word == 0)
-		ZTK_create();
-	//Отправление ЗТК
-	update_graphics_BAU();
+
 }
 
 void BAU_widg::K_CBK()
@@ -1248,28 +1103,28 @@ void BAU_widg::K_CBK()
 
 void BAU_widg::ZTM_create()
 {
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < 25; i++)
 	{
 		ZTM.data_words[i] = 0;
 	}
 	//1
 	ZTM.OK_ALPS = AT_widget.current_ALPS;
 	ZTM.OK_MFS = AT_widget.current_MFS;
-	ZTM.TM_og = 1;
-	ZTM.TM_STS_o = 0;
-	ZTM.TM_STS_k = 0;
-	ZTM.TM_SGS_o = 0;
-	ZTM.TM_SGS_k = 0;
+	ZTM.TM_og = (MT_widget.current_BOCH != BOCH_OFF) ? 1 : 0 ;
+	ZTM.TM_STS_o = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_ALPS != ALPS_OFF)) ? 1 : 0;
+	ZTM.TM_STS_k = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_ALPS != ALPS_OFF)) ? 1 : 0;
+	ZTM.TM_SGS_o = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_ALPS != ALPS_OFF)) ? 1 : 0;
+	ZTM.TM_SGS_k = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_ALPS != ALPS_OFF)) ? 1 : 0;
 	ZTM.OK_LPch = AT_widget.current_LPch;
 	ZTM.TM_LPch_k = 1;
-	ZTM.TM_MFS_OZU = 1;
+	ZTM.TM_MFS_OZU = (AT_widget.current_MFS != MFS_OFF) ? 1 : 0;
 	//2
-	ZTM.TM_MFS_PZU = 1;
-	ZTM.TM_MFS_OB = 1;
-	ZTM.TM_MFS_BS = 1;
-	ZTM.TM_MFS_KS = 1;
-	ZTM.TM_MFS_I = 1;
-	ZTM.TM_MFS_STCH = 1;
+	ZTM.TM_MFS_PZU = (AT_widget.current_MFS != MFS_OFF) ? 1 : 0;
+	ZTM.TM_MFS_OB = (AT_widget.current_MFS != MFS_OFF) ? 1 : 0;
+	ZTM.TM_MFS_BS = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_MFS != MFS_OFF)) ? 1 : 0;
+	ZTM.TM_MFS_KS = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_MFS != MFS_OFF)) ? 1 : 0;
+	ZTM.TM_MFS_I = (AT_widget.current_MFS != MFS_OFF) ? 1 : 0;
+	ZTM.TM_MFS_STCH = ((MT_widget.current_BOCH != BOCH_OFF) && (AT_widget.current_MFS != MFS_OFF)) ? 1 : 0;
 	ZTM.TM_BFS = 1;
 	ZTM.OK_BUFAR = AT_widget.current_BUFAR;
 	ZTM.TM_PRM_ant_1 = MT_widget.current_PRM_Ant_1;
@@ -1279,8 +1134,8 @@ void BAU_widg::ZTM_create()
 	ZTM.TM_SGTS_ant_1 = MT_widget.current_SGTS_Ant_1;
 	ZTM.TM_UPCH = MT_widget.current_UPCH;
 	ZTM.TM_FOS = MT_widget.current_FOS;
-	ZTM.TM_PRM_ant_1_AP1 = 0;
-	ZTM.TM_PRM_ant_a_AP2 = 0;
+	ZTM.TM_PRM_ant_1_AP1 = MT_widget.current_PRM_Ant_1;
+	ZTM.TM_PRM_ant_a_AP2 = MT_widget.current_PRM_Ant_A;
 	ZTM.PNP_APD_MT = 0;
 	ZTM.PNP_APD_AT = 0;
 	ZTM.VNP_APD_MT = 0;
@@ -1415,7 +1270,7 @@ void BAU_widg::ZTM_create()
 	ZTM.rez25 = 0;
 
 	QVariantList tmp_list;
-	for (int i = 0; i < 26; i++)
+	for (int i = 0; i < 25; i++)
 		tmp_list.push_back(ZTM.data_words[i]);
 
 	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tmp_list);
@@ -1423,7 +1278,7 @@ void BAU_widg::ZTM_create()
 
 void BAU_widg::ZTK_create()
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		ZTK.data_words[i] = 0;
 	}
@@ -1447,10 +1302,10 @@ void BAU_widg::ZTK_create()
 	ZTK.AOS = MT_widget.current_AOS;
 	ZTK.ALPS = AT_widget.current_ALPS;
 	ZTK.MFS = AT_widget.current_MFS;
-	ZTK.LPch_first_bit = tmp_LPch.first_bit;
+	ZTK.LPch_first_bit = tmp_LPch.third_bit;
 	//3
 	ZTK.LPch_sec_b = tmp_LPch.second_bit;
-	ZTK.LPch_third_b = tmp_LPch.third_bit;
+	ZTK.LPch_third_b = tmp_LPch.first_bit;
 	ZTK.BUFAR = AT_widget.current_BUFAR;
 	ZTK.UPCH = MT_widget.current_UPCH;
 	ZTK.BOCH_CH = MT_widget.current_BOCH_ch.data_words;
@@ -1458,13 +1313,13 @@ void BAU_widg::ZTK_create()
 	ZTK.FOS_att2_D0 = tmp_FOS_att2.first_bit;
 	ZTK.FOS_att2_D1 = tmp_FOS_att2.second_bit;
 	ZTK.FOS_att2_D2 = tmp_FOS_att2.third_bit;
-	ZTK.FOS_att2_D3 = tmp_FOS_att2.four_bit;
+	ZTK.FOS_att2_D3 = tmp_FOS_att2.fourth_bit;
 	ZTK.FOS_att1 = MT_widget.current_FOS_att1;
 	ZTK.FOS_PS = MT_widget.current_PS;
 	ZTK.UPCH_att = MT_widget.current_UPCH_att;
 
 	QVariantList tmp_list;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		tmp_list.push_back(ZTK.data_words[i]);
 
 	omnibus_slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 18, tmp_list);
@@ -1487,6 +1342,12 @@ void BAU_widg::update_graphics_BAU()
 			MK_pbut[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
 }
+
+void BAU_widg::set_tm_state()
+{
+	mku_slot_thr.get_mku_bus_obj()->set_tm("BAU_TM", (uint)(tm_data.tm_data));
+}
+
 BAU_widg::~BAU_widg()
 {
 	//slot_thr.quit();

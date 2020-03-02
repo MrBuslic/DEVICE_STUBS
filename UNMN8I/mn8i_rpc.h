@@ -10,8 +10,6 @@ public:
 	RPC_mn8i_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("mn8i_slot_obj");}
 	////////////////////////////////////
 public slots:
-	void auto_scroll_clicked(int _state);
-	void log_timer_ontimer();
 	void measurement_timer_ontimer();
 	void infin_timer_ontimer();
 	void new_ku(int ku_n, int length, double u, int line);
