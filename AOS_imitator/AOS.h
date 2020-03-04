@@ -23,9 +23,9 @@
 enum DEVICE_STATES
 {
 	AOS_KP_OFF = 0, 
-	AOS_KP_1 = 1,
+	AOS_KP_1 = 4,
 	AOS_KP_2 = 2,
-	AOS_OKP_ERR = 3
+	AOS_KP_3 = 1
 };
 
 union AOS_modes
@@ -182,6 +182,60 @@ union AOS_shos
 	};
 };
 
+union GSU_kommut
+{
+	quint16 _word;
+	struct
+	{
+		quint16 kommut_data : 12,
+			afs_num : 1,
+			res : 3;
+	};
+};
+
+union AOS_state
+{
+	quint16 _words[7];
+
+	struct
+	{
+		quint16 counter : 15,
+			res_counter : 1;
+
+		quint16 kontr_dev_state : 3,
+			cgo_dev_state : 3,
+			gpfm2_dev_state : 3,
+			gpfm1_dev_state : 3,
+			res_sd2 : 1,
+			restart_watchdog : 1, //1 - перезаупск по сторожевому таймеру, 0 - после включения АОС-МЧ потенциальной командой
+			aos_test_data_ready : 1,
+			kontr_mode : 1;
+
+		quint16 kontr_dev_working : 3,
+			cgo_dev_working : 3,
+			gpfm2_dev_working : 3,
+			gpfm1_dev_working : 3,
+			vmu_bu_working : 1,
+			bu_working : 1,
+			bu_test_data_ready : 1,
+			aos_working : 1;
+
+		quint16 nka_buf_state : 1,
+			gsu_buf_state : 1,
+			shos_buf_state : 1,
+			shps_buf_state : 1,
+			pprch_buf_state : 1;
+
+			//todo dodelat!
+
+
+			quint16 tmp_word1;
+
+		quint16 tmp_word2;
+		quint16 tmp_word3;
+	};
+};
+
 class AOS_widg : public QWidget
 {
     Q_OBJECT
@@ -218,6 +272,24 @@ private:
 	DEVICE_STATES gpfm2_dev;
 	DEVICE_STATES gpfm1_dev;
 	
+	AOS_shos shos;
+
+	QList<GSU_kommut> gsu_kommut;
+
+	QByteArray pprch_main_key_data;
+	int pprch_main_key_num;
+
+	QByteArray pprch_res_key_data;
+	int pprch_main_res_num;
+
+	QByteArray shps_main_key_data;
+	int shps_main_key_ps;
+
+	QByteArray shps_res_key_data;
+	int shps_res_key_ps;
+
+	int n_ka;
+
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 
