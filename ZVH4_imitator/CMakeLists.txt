@@ -40,7 +40,7 @@ FILE(GLOB HEADERS *.h *.hpp)
   
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES  zvh4_socket_rpc.h zvh4_socket_rpc.cpp)
+SET(RPC_SOURCES  ZVH4_socket_rpc.h ZVH4_socket_rpc.cpp)
 
 add_executable(ZVH4_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES} )
 target_link_libraries (ZVH4_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
