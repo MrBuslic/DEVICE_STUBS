@@ -23,9 +23,9 @@
 enum DEVICE_STATES
 {
 	AOS_KP_OFF = 0, 
-	AOS_KP_1 = 1,
+	AOS_KP_1 = 4,
 	AOS_KP_2 = 2,
-	AOS_OKP_ERR = 3
+	AOS_KP_3 = 1
 };
 
 union AOS_modes
@@ -182,6 +182,103 @@ union AOS_shos
 	};
 };
 
+union GSU_kommut
+{
+	quint16 _word;
+	struct
+	{
+		quint16 kommut_data : 12,
+			afs_num : 1,
+			res : 3;
+	};
+};
+
+union AOS_state
+{
+	quint16 _words[7];
+
+	struct
+	{    //Сд1
+		quint16 counter : 15,
+			res_counter : 1;
+		//СД2
+		quint16 kontr_dev_state : 3,
+			cgo_dev_state : 3,
+			gpfm2_dev_state : 3,
+			gpfm1_dev_state : 3,
+			res_sd2 : 1,
+			restart_watchdog : 1, //1 - перезаупск по сторожевому таймеру, 0 - после включения АОС-МЧ потенциальной командой
+			aos_test_data_ready : 1,
+			kontr_mode : 1;
+		// СД3
+		quint16 kontr_dev_working : 3,
+			cgo_dev_working : 3,
+			gpfm2_dev_working : 3,
+			gpfm1_dev_working : 3,
+			vmu_bu_working : 1,
+			bu_working : 1,
+			bu_test_data_ready : 1,
+			aos_working : 1;
+		// СД4
+		quint16 nka_buf_state : 1,
+			gsu_buf_state : 1,
+			shos_buf_state : 1,
+			shps_buf_state : 1,
+			pprch_buf_state : 1,
+			priem_soobsheniy_key_sh_p_s : 1, // 1- данные сообщения "Ключ ШПС" приняты достоверно; 0 - данные сообщения "Ключ ШПС" приняты с ошибкой
+			priem_soobsheniy_key_p_p_r_ch : 1, // 1- данные сообщения "Ключ ППРЧ" приняты достоверно; 0 - данные сообщения "Ключ ППРЧ" приняты с ошибкой
+			rezerv_SD4_1 : 3, // Резерв(значение разрядов - 0) 
+			signal_IK8_UPI_BKUPI : 1, // 1 - сигнал ИК8 присутствует на входе АОС; 0 - отсутствие сигнала ИК8 на входе АОС; 
+			TMI_Signal_15e1827 : 1, // 1 - сигнал 15Э1827 присутствует на входе АОС; 0 - отсутствие сигнала 15Э1827 на входе АОС
+			TMI_peredacha_signala_IK8_v_magistralnom_tracte : 2, // 00 - cигнал АОС ("меандр")
+																 // 01 - сигнал ИК8 от УПИ БКУПИ
+																 // 10 - сигнал 9,6 кБод от 15Э1827
+																 // 11 - резерв
+			rezerv_SD4_2 : 2;// Резерв(значение разрядов - 0) 
+
+
+
+			//todo dodelat!
+
+		// СД5
+		quint16 rezerv_SD5_1 : 5, // резерв (значения разрядов - 0) 
+			sinhronizatsiy_G_T_CH_C_CGO : 1, // 1 - ГТЧ находится в синхронизме; 0 - отсутствие синхронизации ГТЧ
+			signal_OG_v_ustroistve_CGO : 1, // 1- cигнал ОГ присутствует на входе ЦГО; 0 - отсутствие сигнала ОГ на входе ЦГО
+			rezerv_SD5_2 : 1, // резерв ( значение разряда - 1 ) 
+			rezerv_SD5_3 : 2, // резерв ( значение разряда - 0 ) 
+			rabotosposobnost_intef_VMU_BU_AOS : 1, // работоспособность интерфейса ВМУ БУ АОС  (_VMU_ внутренняя гистраль управления)
+			rabotosposobnost_intef_VMU_ustroistva_kontrily : 1, // работоспособность интерфейса ВМУ устройства контроля
+			rabotosposobnost_intef_VMU_ustroistva_CGO : 1, // работоспособность интерфейса ВМУ устройства ЦГО;                          1 - исправно | 0 - не исправно 
+			rabotosposobnost_intef_VMU_PRM_trakta_AFS2 : 1, // работоспособность интерфейса ВМУ ПРМ тракта АФС2 (ГПФМ2)
+			rabotosposobnost_intef_VMU_PRM_trakta_AFS1 : 1, // работоспособность интерфейса ВМУ ПРМ тракта АФС1 (ГПФМ1)
+			rezerv_SD5_4 : 1; // резерв(значения разрядов - 1)
+		//СД6
+		quint16 rezerv_SD6_1 : 4, // Резерв(значение разрядов - 0) 
+			signala_na_vhode_v_priemnik_tracta_AFS2 : 1, // 1 - сигнал ПЧ присутствует на входе ГПФМ2; 0 - отсутствие сигнала ПЧ на входе ГПФМ2
+			sinhronizatsiy_G_T_CH_priemnika_trakta_AFS2 : 1, // 1 - ГТЧ находится в синхронизме; 0 - отсутствие синхронизации ГТЧ
+			signal_OG_v_priemnike_trakta_AFS2 : 1, // 1- сигнал ОГ присутствует на входе ГПФМ2; 0 - отсутствие сигнала ОГ на входе ГПФМ2
+			rezim_raboti_priemnika_trakta_AFS2 : 1, // 1 - приём инф. сигнала (инф. = информационного ????); 0 - контроль
+			rezerv_SD6_2 : 4, // резерв (значения разрядов - 0)
+			signal_P_CH_na_vhode_v_priemnik_trakta_AFS2 : 1, // 1 - сигнал ПЧ присутствует на входе ГПФМ1; 0 - отсутствует сигнал ПЧ на входе ГПФМ1
+			sunhronizatsiy_G_T_CH_priemnika_trakta_AFS1 : 1, // 1 - ГТЧ находится в синхронизме; 0 - отсутсвие синхронизации ГТЧ
+			signal_OG_v_priemnike_trakta_AFS1 : 1, // 1 - сигнал ОГ присутствует на входе ГПФМ1; 0 - отсутствие сигнала ОГ на входе ГПФМ1
+			rezhim_raboti_priemnika_trakta_AFS1 : 1; // 1 - приём инф. сигнала (инф. = информационного ????); 0 - контроль
+
+		// СД7
+		quint16 rezerv_SD7_1 : 4, // Резерв(значение разрядов - 0) 
+			TMI_rabotosposobnost_UK : 1, // 1 - устройство контроля исправно; 0 - устройство контроля не исправно 
+			TMI_sinhronizatsiy_G_T_CH_UK : 1, // 1 - ГТЧ находится в синхронизме; 0 - отсутсвие синхронизации ГТЧ
+			TMI_signal_OG_v_ustroistve_kontroly_UK : 1, // 1 - сигнал ОГ присутствует на входе УК;  0 - отсутсвие сигнала ОГ на входе УК
+			rezerv_SD7_2 : 1, //// Резерв(значение разрядов - 1)
+			rezerv_SD7_3 : 1, //// Резерв(значение разрядов - 0)
+			TMI_rabotosposobnost_ustroistva_CGO : 1, // 1 - устройство ЦГО исправно; 0 - устройство ЦГО не исправно
+			rezerv_SD7_4 : 3, //  резерв (значения разрядов - 0) 
+			TMI_rabotosposobnost_priemnika_trakta_AFS2 : 1, // 1 - ГПФМ2 исправен; 0 - ГПФМ2 не исправен  (ГПФМ2)
+			TMI_rabotosposobnost_priemnika_trakta_AFS1 : 1, // 1 - ГПФМ1 исправен; 0 - ГПФМ1 не исправен  (ГПФМ1)
+			ukazatel_gotovnost_dannih_samokontroly_AOS_M_CH : 1; // 1 - данные готовы; 0 - данные не готовы
+	};
+};
+
 class AOS_widg : public QWidget
 {
     Q_OBJECT
@@ -206,7 +303,8 @@ protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_ku_mk(int ku, int length_ku, double u_ku, int line_ku);
+	//void new_ku_mk(int ku, int length_ku, double u_ku, int line_ku);
+	void new_ku_mk(int name_ustroistva, int number_komplekta);
 
 private:
 	QString name = "АОС";//Имя устройства
@@ -218,6 +316,24 @@ private:
 	DEVICE_STATES gpfm2_dev;
 	DEVICE_STATES gpfm1_dev;
 	
+	AOS_shos shos;
+
+	QList<GSU_kommut> gsu_kommut;
+
+	QByteArray pprch_main_key_data;
+	int pprch_main_key_num;
+
+	QByteArray pprch_res_key_data;
+	int pprch_main_res_num;
+
+	QByteArray shps_main_key_data;
+	int shps_main_key_ps;
+
+	QByteArray shps_res_key_data;
+	int shps_res_key_ps;
+
+	int n_ka;
+
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
 

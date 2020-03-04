@@ -40,7 +40,7 @@ FILE(GLOB HEADERS *.h *.hpp)
   
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES  fsva7_socket_rpc.h fsva7_socket_rpc.cpp)
+SET(RPC_SOURCES  FSVA7_socket_rpc.h FSVA7_socket_rpc.cpp)
 
 add_executable(FSVA7_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES} )
 target_link_libraries (FSVA7_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
