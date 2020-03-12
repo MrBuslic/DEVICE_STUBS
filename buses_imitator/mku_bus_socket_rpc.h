@@ -31,6 +31,7 @@ public slots:
 	void new_ku_732(int ku_n, int length, double u, int line);
 	void new_ku_cbk(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void new_mt_at_state(int dev_name, int state);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -104,6 +105,7 @@ public:
 	QVariant ku_map_channels_setup(QVariantList& _values);
 	QVariant mshm_map_channels_setup(QVariantList& _values);
 	QVariant pshm_map_channels_setup(QVariantList& _values);
+	QVariant make_mt_at_state(QVariantList& _values);
 	QVariant get_tm(QVariantList& _values);
 	QVariant set_tm(QVariantList& _values);
 public slots:

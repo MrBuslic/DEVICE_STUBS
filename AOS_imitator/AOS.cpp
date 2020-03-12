@@ -63,8 +63,12 @@ AOS_widg::AOS_widg(QWidget *parent)
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	//connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
+	// connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
+	
 	connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk( int name_ustroistva, int number_komplekta ) ), this, SLOT(new_ku_mk( int name_ustroistva, int number_komplekta ) ) );
+	// connect(new_mt_at_state.get_obj().get(), SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), this, SLOT(new_ku_mk(int name_ustroistva, int number_komplekta)));
+	// connect(mku_bus.get_obj().get(), SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), this, SLOT(new_ku_mk(int name_ustroistva, int number_komplekta)));
+	
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
@@ -106,8 +110,8 @@ void AOS_widg::imit_on()
 }*/
 void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta)
 {
-    printf("%c %d", "ku = ", name_ustroistva);
-    printf("%c %d", "length_ku = ", number_komplekta);
+   // printf("%c %d", "ku = ", name_ustroistva);
+   // printf("%c %d", "length_ku = ", number_komplekta);
 
 	if (name_ustroistva == 8)
 	  {
@@ -118,18 +122,18 @@ void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta)
 
 		if (number_komplekta == 1)
 		{// включить 1-й комплект
-		
-		 // return emit включение 1-го комплекта // new_ku_mk(name_ustroistva, number_komplekta);
+			
+		//  return emit  make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 1-го комплекта //
 		};
 		if (number_komplekta == 2)
 		{// включить  2-й комплект
 			
-		//  return emit включение 2-го комплекта // new_ku_mk(name_ustroistva, number_komplekta);
+		//  return emit make_mt_at_state( name_ustroistva, number_komplekta); //  отправление информации отправителю от 2-го комплекта //
 		};
 		if (number_komplekta == 3)
 		{// включить  3-й комплект
 			
-		//  return emit включение 3-го комплекта // new_ku_mk(name_ustroistva, number_komplekta);
+		//  return emit make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 3-го комплекта // 
 		};
 
 	  }
