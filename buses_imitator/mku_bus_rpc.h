@@ -17,6 +17,7 @@ public slots:
 	int ku_map_channels_setup(int ku_n, int line);
 	int mshm_map_channels_setup(int mshm, int line_m);
 	int pshm_map_channels_setup(int pshm, int line_p);
+	void make_mt_at_state(int dev_name, int state);
 	void get_tm(QString tm_name, QVariant& tm_val);
 	void set_tm(QString tm_name, QVariant tm_val);
 	////////////////////////////////////
@@ -53,6 +54,7 @@ signals:
 	void new_ku_732(int ku_n, int length, double u, int line);
 	void new_ku_cbk(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void new_mt_at_state(int dev_name, int state);
 };
 
 class RPC_mku_bus_SIGNAL_Thread : public RPC_SIGNAL_Thread

@@ -88,6 +88,7 @@ include_directories("UNIS4")
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 
 include_directories("BECH_imitator")
+include_directories("BUFAR_imitator")
 include_directories("buses_imitator")
 include_directories("cbk_imitator_real_po/real_tpo/MY_BOS")
 
@@ -174,6 +175,7 @@ add_subdirectory(RM_MBK07_imitator)
 add_subdirectory(BAU_imitator)
 add_subdirectory(AOS_imitator)
 add_subdirectory(MKI_imitator)
+add_subdirectory(BUFAR_imitator)
 
 
 
