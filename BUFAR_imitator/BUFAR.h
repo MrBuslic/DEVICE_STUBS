@@ -15,6 +15,7 @@
 #include <QTime>
 #include <qplaintextedit.h>
 #include <qsettings.h>
+#include <mku_bus.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
@@ -94,24 +95,26 @@ private:
 	void set_new_tm();//составление ОК-ов
 	void imit_off();//включение имитатора
 	void imit_on();//выключение имитатора
-	void change_power(bool switch_og);//изменение мощности
 	void set_power_back();//возврат силы тока в зависимости от мощности
 	void I_1(QVariantList words);
 	void change_BUMs(int num, bool ch_1, bool ch_2, bool ch_3, bool ch_4);
 	void change_BUMs(int num, bool all_ch);
 protected:
 	void closeEvent(QCloseEvent *event);
-	public slots:
+public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void auto_scroll_clicked(int _state);
 	void log_timer_ontimer();
 	void get_power(double volt);
+	void new_mt_at_state(int dev_name, int state);
 private:
 	void msg_to_log(const QString& _msg);
 
-	int volt = 0;
-	int power_vt = 0;
+	int volt;
+	int power = 0;
+	int bus = 0; //Узнать точно
+	QString name = "БУФАР";
 
 	QTextEdit* edit;
 	QScrollBar* _scroll_bar;
