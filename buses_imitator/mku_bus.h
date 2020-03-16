@@ -5,22 +5,22 @@
 #include <QMap>
 #include "rpc_loger.h"
 
-enum
+enum BAU_at_mt
 {
-	UM = 0,
-	LBV = 1,
-	PRM_Ant_1 = 2,
-	PRM_Ant_2 = 3,
-	SGTS_Ant_2 = 4,
-	SGTS_Ant_1 = 5,
-	BOCH = 6,
-	FOS = 7,
-	AOS = 8,
-	UPch = 9,
-	ALPS = 10,
-	MFS = 11,
-	LPch = 12,
-	BUFAR = 13
+	UM_st = 0,
+	LBV_st = 1,
+	PRM_Ant_1_st = 2,
+	PRM_Ant_2_st = 3,
+	SGTS_Ant_2_st = 4,
+	SGTS_Ant_1_st = 5,
+	BOCH_st = 6,
+	FOS_st = 7,
+	AOS_st = 8,
+	UPch_st = 9,
+	ALPS_st = 10,
+	MFS_st = 11,
+	LPch_st = 12,
+	BUFAR_st = 13
 };
 
 class MKUWidget : public QWidget
