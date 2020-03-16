@@ -402,15 +402,15 @@ void BAU_widg::imit_on()
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 }
 
-//void BAU_widg::set_power_back()
-//{
-//	double curr;
-//	if (volt >= 1)
-//		curr = (double)power / volt;
-//	else
-//		curr = 0.0;
-//	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
-//}
+void BAU_widg::set_power_back()
+{
+	//double curr;
+	//if (power_vt >= 1)
+	//	curr = (double)power_vt / volt;
+	//else
+	//	curr = 0.0;
+	//power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
 
 void BAU_widg::imit_off()
 {
@@ -835,6 +835,7 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 
 	if (ZOB.zob_word == 0)
 	{
+		//mku_slot_thr.get_mku_bus_obj()->make_mt_at_state(1,1);
 		MT_widget.current_UM = UM(d_words.UM_com);
 		MT_widget.current_LBV = LBV(d_words.LBV_com);
 		MT_widget.current_BOCH = BOCH(BOCH_full.data_words);

@@ -1,4 +1,4 @@
-project(ZVH4_imitator)
+project(BUFAR_imitator)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_AUTOMOC ON)
@@ -10,10 +10,13 @@ find_package (Qt5Gui)
 find_package(Qt5Widgets)
 find_package(Qt5Network)
 
+
 add_definitions(${Qt5Core_DEFINITIONS})
 add_definitions(${Qt5Gui_DEFINITIONS})
 add_definitions(${Qt5Widgets_DEFINITIONS})
 add_definitions(${Qt5Network_DEFINITIONS})
+
+
 
 include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})
@@ -35,23 +38,29 @@ else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
   
-FILE(GLOB SOURCES *.cpp)
-FILE(GLOB HEADERS *.h *.hpp)  
-  
+SET(BKUPI_HEADERS BUFAR.h)
+SET(BKUPI_SOURCES main.cpp BUFAR.cpp)
+
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES  ZVH4_socket_rpc.h ZVH4_socket_rpc.cpp)
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
+SET(MKU_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp)
+SET(INTERRUPT_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
+SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
+#set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(ZVH4_imitator ${MY_WIN_FLAG} ${HEADERS} ${SOURCES} ${RPC_SOURCES} )
-target_link_libraries (ZVH4_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
+add_executable(BUFAR_imitator ${MY_WIN_FLAG} ${BKUPI_HEADERS} ${BKUPI_SOURCES} ${RPC_SOURCES} ${MKU_RPC_SOURCES} ${INTERRUPT_RPC_SOURCES} ${POWER_RPC_SOURCES})
+target_link_libraries (BUFAR_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
 if(WIN32)
-  qt5_use_modules(ZVH4_imitator Core Widgets Network Gui)
- # SET_TARGET_PROPERTIES(ZVH4_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
+  qt5_use_modules(BUFAR_imitator Core Widgets Network Gui)
+ # SET_TARGET_PROPERTIES(BUFAR_imitator PROPERTIES LINK_FLAGS  "/NODEFAULTLIB:\"LIBCMTD\"")
 endif()
 
-ADD_CUSTOM_COMMAND(TARGET ZVH4_imitator
-	PRE_BUILD
-	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/ZVH4_imitator.h ${PROJECT_SOURCE_DIR} ZVH4
-)
+
+
+
+
+
+
