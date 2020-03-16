@@ -162,7 +162,11 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 		}
 		if (tmp_cwd.subadr == 5)//данные коммутаторов ГСУ
 		{
+<<<<<<< HEAD
 			// gsu_kommut.clear();
+=======
+			gsu_kommut.clear();
+>>>>>>> 99841a5d2b42978f16c8ff9d4e00f44589ff7788
 			for (int i = 0; i < 32; i++)
 			{
 				gsu_kommut[i]._word = words.at(i).toInt();
