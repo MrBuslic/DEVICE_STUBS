@@ -21,7 +21,7 @@ AOS_widg::AOS_widg(QWidget *parent)
 	setWindowTitle("АОС");
 
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-	slot_thr.start(); 
+	slot_thr.start();
 
 	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
 	signal_thr.start();
@@ -47,7 +47,7 @@ AOS_widg::AOS_widg(QWidget *parent)
 	}
 
 	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
-	power_slot_thr.start(); 
+	power_slot_thr.start();
 
 	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
 	power_signal_thr.start();
@@ -64,13 +64,13 @@ AOS_widg::AOS_widg(QWidget *parent)
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
 	// connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
-	
-	connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk( int name_ustroistva, int number_komplekta ) ), this, SLOT(new_ku_mk( int name_ustroistva, int number_komplekta ) ) );
+
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), this, SLOT(new_ku_mk(int name_ustroistva, int number_komplekta)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("aos_geometry").toByteArray());
-	
+
 	kontr_dev = AOS_KP_OFF; // отключение устройства контроллера устройства  (значение kontr_dev равно нуль)
 	cgo_dev = AOS_KP_OFF;   // отключение устройства цифровой групповой обработки  (значение cgo_dev равно нуль)
 	gpfm2_dev = AOS_KP_OFF; // отключение устройства группового приемника фазоманипулированных сигналов (2) (значение gpfm2_dev равно нуль)
@@ -80,7 +80,7 @@ AOS_widg::AOS_widg(QWidget *parent)
 	{
 		gsu_kommut << GSU_kommut();
 	}
-	
+
 }
 
 
@@ -96,45 +96,45 @@ void AOS_widg::imit_on()
 
 void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta)
 {
-   // printf("%d %c ", name_ustroistva, " = name_ustroistva \n");
-   // printf("%d %c ", number_komplekta, " = number_komplekta \n");
+	// printf("%d %c ", name_ustroistva, " = name_ustroistva \n");
+	// printf("%d %c ", number_komplekta, " = number_komplekta \n");
 
 	if (name_ustroistva == 8)
-	  {
-		
+	{
+
 		if (number_komplekta == 0)
 		{// отключить все 3 комплекта
 			AOS_KP_OFF; // значение равно 0
-		  return;
+			return;
 		};
 
 		if (number_komplekta == 1)
 		{// включить 1-й комплект
-			// признак включения первого комплекта и передача этого признака отправителю
+		 // признак включения первого комплекта и передача этого признака отправителю
 			AOS_KP_1; // значение равно 4
 
-		//  return emit  make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 1-го комплекта //
+					  //  return emit  make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 1-го комплекта //
 		};
 		if (number_komplekta == 2)
 		{// включить  2-й комплект
-		    // признак включения второго комплекта и передача этого признака отправителю
+		 // признак включения второго комплекта и передача этого признака отправителю
 			AOS_KP_2; // значение равно 2
-		//  return emit make_mt_at_state( name_ustroistva, number_komplekta); //  отправление информации отправителю от 2-го комплекта //
+					  //  return emit make_mt_at_state( name_ustroistva, number_komplekta); //  отправление информации отправителю от 2-го комплекта //
 		};
 		if (number_komplekta == 3)
 		{// включить  3-й комплект
-		    // признак включения третьего комплекта и передача этого признака отправителю
+		 // признак включения третьего комплекта и передача этого признака отправителю
 			AOS_KP_3; // значение равно 1
-		//  return emit make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 3-го комплекта // 
+					  //  return emit make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 3-го комплекта // 
 		};
 
-	  }
+	}
 	else
-	  {
+	{
 		return;
-	  }
+	}
 
-	 
+
 }
 
 
@@ -147,7 +147,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
 		if (tmp_cwd.subadr == 3)//Конфигурация АОС
-		{   
+		{
 			AOS_modes aos_modes;
 			aos_modes._word = words.at(0).toInt();
 
@@ -161,7 +161,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 			}
 		}
 		if (tmp_cwd.subadr == 5)//данные коммутаторов ГСУ
-		{  
+		{
 			// gsu_kommut.clear();
 			for (int i = 0; i < 32; i++)
 			{
@@ -204,7 +204,7 @@ void AOS_widg::update_graphics()
 void AOS_widg::set_new_tm()
 {
 	QVariantList tmp_list;
-	for (int i =0 ; i < 7; i++)
+	for (int i = 0; i < 7; i++)
 		tmp_list.push_back(aos_state._words[i]);
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 14, tmp_list);
 }
