@@ -161,7 +161,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 			}
 		}
 		if (tmp_cwd.subadr == 5)//данные коммутаторов ГСУ
-		{
+		{  
 			// gsu_kommut.clear();
 			for (int i = 0; i < 32; i++)
 			{
