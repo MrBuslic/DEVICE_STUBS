@@ -81,6 +81,24 @@ void BUM_cl::create_BUMs()
 	BUMs_gbox = new QGroupBox("");
 	BUMs_glay = new QGridLayout(BUMs_gbox);
 
+	//BUMs_pbut << new QPushButton("1");
+	//BUMs_pbut[0]->setText("");
+	//BUMs_pbut[0]->setMaximumWidth(16);
+	//BUMs_pbut[0]->setMaximumHeight(16);
+	//BUMs_pbut[0]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//BUMs_pbut[0]->setCheckable(false);
+	//BUMs_pbut[0]->setText(QString("%1").arg(1));
+	//BUMs_glay->addWidget(BUMs_pbut[0], 2, 2);
+
+	//BUMs_pbut << new QPushButton("4");
+	//BUMs_pbut[1]->setText("");
+	//BUMs_pbut[1]->setMaximumWidth(16);
+	//BUMs_pbut[1]->setMaximumHeight(16);
+	//BUMs_pbut[1]->setStyleSheet("background-color: rgb(204, 204, 204);");
+	//BUMs_pbut[1]->setCheckable(false);
+	//BUMs_pbut[1]->setText(QString("%1").arg(4));
+	//BUMs_glay->addWidget(BUMs_pbut[1], 0, 0);
+
 	for (int n = 0; n < 2; n ++)
 	{
 		for (int i = 0; i < 2; i ++)
@@ -92,7 +110,8 @@ void BUM_cl::create_BUMs()
 			BUMs_pbut[i + n * 2]->setMaximumHeight(16);
 			BUMs_pbut[i + n * 2]->setStyleSheet("background-color: rgb(204, 204, 204);");
 			BUMs_pbut[i + n * 2]->setCheckable(false);
-			BUMs_glay->addWidget(BUMs_pbut[i + n * 2], i, n);
+			BUMs_pbut[i + n * 2]->setText(QString("%1").arg(i + n * 2 + 1));
+			BUMs_glay->addWidget(BUMs_pbut[i + n * 2], 2 - i, 2 - n);
 		}
 	}
 }
@@ -147,44 +166,49 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 			BUM_cl tmp_BUM_cl;
 			tmp_BUM_cl.create_BUMs();
 			BUM_cl_list.push_back(tmp_BUM_cl);
-			BUMs_glay->addWidget(BUM_cl_list.at(i+n*5).BUMs_gbox, i, n);
+			BUM_cl_list.at(i + n * 5).BUMs_gbox->setAlignment(Qt::AlignHCenter);
+			BUM_cl_list.at(i + n * 5).BUMs_gbox->setTitle(QString("БУМ %1"). arg(i + n * 5));
+			BUMs_glay->addWidget(BUM_cl_list.at(i+n*5).BUMs_gbox, n, i);
 		}
 	}
 
-	//BUM_cl_list.at(1).BUMs_pbut.at(1)->setStyleSheet();
+	///ДЕБАГ!!!
+	QVariantList tmp_debug_words;
+	I_1(tmp_debug_words);
+	///ДЕБАГ!!!
 
-	//slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-	//slot_thr.start(); // вот тут падает
+	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+	slot_thr.start(); // вот тут падает
 
-	//signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-	//signal_thr.start(); // вот тут падает
+	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+	signal_thr.start(); // вот тут падает
 
-	//if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
-	//	this->deleteLater();
-	//	return;
-	//}
+	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
+		this->deleteLater();
+		return;
+	}
 
-	//power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
-	//power_slot_thr.start(); // вот тут падает
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start(); // вот тут падает
 
-	//power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
-	//power_signal_thr.start(); // вот тут падает
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start(); // вот тут падает
 
-	//if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
-	//	this->deleteLater();
-	//	return;
-	//}
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
 
-	//connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
-	//slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	//connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
-	//connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(make_mt_at_state(int, int)), this, SLOT(make_mt_at_state(int, int)));
+	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 
 	//log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
 	//QDir dir("d:/logs");
@@ -223,33 +247,27 @@ void BUFAR_widg::get_power(double _volt)
 
 void BUFAR_widg::set_power_back()
 {
-	double curr;
-	if (power_vt >= 1)
-	{
-		curr = (double)power_vt / volt;
-	}
-	else
-		curr = 0.0;
+	//double curr;
+	//if (power_vt >= 1)
+	//{
+	//	curr = (double)power_vt / volt;
+	//}
+	//else
+	//	curr = 0.0;
 	//power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
 }
 
 void BUFAR_widg::imit_off()
 {
-	msg_to_log("Питание отключено");
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	update_graphics();
 }
 
 void BUFAR_widg::imit_on()
 {
-	change_power(true);
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	update_graphics();
 	set_new_tm();
-}
-
-void BUFAR_widg::change_power(bool)
-{
-
 }
 
 void BUFAR_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
@@ -345,37 +363,72 @@ void BUFAR_widg::change_BUMs(int num, bool all_ch)
 	BUM_current_list[num].chan_4 = all_ch;
 }
 
+void BUFAR_widg::new_mt_at_state(int dev_name, int state)
+{
+	if (dev_name = BAU_at_mt(BUFAR_st))
+		BUFAR_comp_le->setText(QString("%1").arg(state));
+}
+
 void BUFAR_widg::I_1(QVariantList words)
 {
 	I_1_DataWords d_words = words;
+	d_words.AFAR_mode = 4;
+	for (int i = 0; i < 25; i++)
+	{
+		change_BUMs(i, false);
+	}
 	switch (d_words.AFAR_mode)
 	{
 	case 0:
-		for (int i = 0; i < 25; i++)
-		{
-			change_BUMs(i, false);
-		}
 		break;
 	case 1:
-		for (int i = 0; i < 25; i++)
-		{
-			change_BUMs(i, false);
-		}
-		change_BUMs(1,true);
-		change_BUMs(2, true);
+		change_BUMs(0, true);
+		change_BUMs(1, true);
+		change_BUMs(2, false, false, true, true);
+		change_BUMs(5, true);
 		change_BUMs(6, true);
-		change_BUMs(7, true);
+		change_BUMs(7, false, false, true, true);
+		change_BUMs(10, false, true, false, true);
+		change_BUMs(11, false, true, false, true);
+		change_BUMs(12, false, false, false, true);
 		break;
 	case 2:
+		change_BUMs(2, true, true, false, false);
+		change_BUMs(3, true);
+		change_BUMs(4, true);
+		change_BUMs(7, true, true, false, false);
+		change_BUMs(8, true);
+		change_BUMs(9, true);
+		change_BUMs(12, false, true, false, false);
+		change_BUMs(13, false, true, false, true);
+		change_BUMs(14, false, true, false, true);
 		break;
 	case 3:
+		change_BUMs(10, true, false, true, false);
+		change_BUMs(11, true, false, true, false);
+		change_BUMs(12, false, false, true, false);
+		change_BUMs(15, true);
+		change_BUMs(16, true);
+		change_BUMs(17, false, false, true, true);
+		change_BUMs(20, true);
+		change_BUMs(21, true);
+		change_BUMs(22, false, false, true, true);
 		break;
 	case 4:
+		change_BUMs(12, true, false, false, false);
+		change_BUMs(13, true, false, true, false);
+		change_BUMs(14, true, false, true, false);
+		change_BUMs(17, true, true, false, false);
+		change_BUMs(18, true);
+		change_BUMs(19, true);
+		change_BUMs(22, true, true, false, false);
+		change_BUMs(23, true);
+		change_BUMs(24, true);
 		break;
 	case 5:
 		for (int i = 0; i < 25; i++)
 		{
-			change_BUMs(i, false);
+			change_BUMs(i, true);
 		}
 		break;
 	}
@@ -383,11 +436,31 @@ void BUFAR_widg::I_1(QVariantList words)
 		OY_faze = -1 * OY_faze;
 	if (d_words.OZ_pl_mn != OZ_faze)
 		OZ_faze = -1 * OZ_faze;
+	BUFAR_mode = BUFAR_MODEs(d_words.AFAR_mode);
+	update_graphics();
 }
 
 void BUFAR_widg::update_graphics()
 {
-	
+	for (int i = 0; i < 25; i++)
+	{
+		for (int n = 0; n < 4; n++)
+		{
+			BUM_cl_list[i].BUMs_pbut[n]->setStyleSheet("background-color: rgb(204, 204, 204);");
+		}
+	}
+	for (int i = 0; i < 25; i++)
+	{
+		if (BUM_current_list[i].chan_1)
+			BUM_cl_list[i].BUMs_pbut[0]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		if (BUM_current_list[i].chan_2)
+			BUM_cl_list[i].BUMs_pbut[1]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		if (BUM_current_list[i].chan_3)
+			BUM_cl_list[i].BUMs_pbut[2]->setStyleSheet("background-color: rgb(142, 198, 156);");
+		if (BUM_current_list[i].chan_4)
+			BUM_cl_list[i].BUMs_pbut[3]->setStyleSheet("background-color: rgb(142, 198, 156);");
+	}
+	BUFAR_mode_le->setText(QString("%1").arg(BUFAR_mode));
 }
 
 void BUFAR_widg::set_new_tm()
