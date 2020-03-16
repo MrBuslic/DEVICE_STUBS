@@ -297,7 +297,7 @@ class AOS_widg : public QWidget
 public:
 	AOS_widg(QWidget *parent = 0);
 	~AOS_widg();
-	
+	    
 private:
 	//AOS_KP current_KP = AOS_OFF;
 
@@ -307,8 +307,8 @@ private:
 
 	void update_graphics();  // обновление графики
 	void set_new_tm();      // составление ОК-ов
-	void TMI_1_AOS();   // составление ТМИ-1 
-	void TMI_2_AOS();  // составление ТМИ-2
+	void TMI_1_AOS();   // составление ТМИ - 1 
+	void TMI_2_AOS();  // составление ТМИ - 2
 	void imit_off();  // включение имитатора
 	void imit_on();  // выключение имитатора
 protected:
