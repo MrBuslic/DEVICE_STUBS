@@ -173,8 +173,8 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 	}
 
 	///ДЕБАГ!!!
-	QVariantList tmp_debug_words;
-	I_1(tmp_debug_words);
+	//QVariantList tmp_debug_words;
+	//I_1(tmp_debug_words);
 	///ДЕБАГ!!!
 
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
@@ -207,7 +207,7 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(make_mt_at_state(int, int)), this, SLOT(make_mt_at_state(int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(make_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 
 	//log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -285,6 +285,16 @@ void BUFAR_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u
 	}
 }
 
+int BUFAR_widg::faze_move(quint16 faze)
+{
+	int _faze = 0;
+	QVariantList tmp_faze;
+	for (int i = 0; i < 15; i++)
+	{
+		//faze[i] = 0;
+	}
+	return _faze;
+}
 
 void BUFAR_widg::msg_to_log(const QString& _msg)
 {
@@ -432,6 +442,10 @@ void BUFAR_widg::I_1(QVariantList words)
 		}
 		break;
 	}
+
+
+
+
 	if (d_words.OY_pl_mn != OY_faze)
 		OY_faze = -1 * OY_faze;
 	if (d_words.OZ_pl_mn != OZ_faze)
