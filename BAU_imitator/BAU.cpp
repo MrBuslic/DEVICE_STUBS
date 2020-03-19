@@ -377,7 +377,6 @@ BAU_widg::BAU_widg(QWidget *parent)
 	connect(omnibus_signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
-	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 
 	MT_widget.hide();
 	AT_widget.hide();
@@ -497,84 +496,6 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 				tm_data.VPBAU_2 = 0;
 				tm_data.VPBAU_3 = 1;
 				break;
-			//case 3:
-			//	if (current_MU = MU_1)
-			//	{
-			//		current_MU = MU_OFF;
-			//		current_MT = MT_OFF;
-			//		current_MK = MK_OFF;
-			//		MT_widget.current_UM = UM_OFF;
-			//		MT_widget.current_LBV = LBV_OFF;
-			//		MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
-			//		MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
-			//		MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
-			//		MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
-			//		MT_widget.current_BOCH = BOCH_OFF;
-			//		MT_widget.current_FOS = FOS_OFF;
-			//		MT_widget.current_AOS = AOS_OFF;
-			//		MT_widget.current_UPCH = UPCH_OFF;
-			//		AT_widget.current_ALPS = ALPS_OFF;
-			//		AT_widget.current_MFS = MFS_OFF;
-			//		AT_widget.current_LPch = LPch_OFF;
-			//		AT_widget.current_BUFAR = BUFAR_OFF;
-			//		tm_data.VBAU_1 = 0;
-			//		tm_data.VPBAU_1 = 0;
-			//		MT_widget.hide();
-			//		AT_widget.hide();
-			//	}
-			//	break;
-			//case 4:
-			//	if (current_MU = MU_2)
-			//	{
-			//		current_MU = MU_OFF;
-			//		current_MT = MT_OFF;
-			//		current_MK = MK_OFF;
-			//		MT_widget.current_UM = UM_OFF;
-			//		MT_widget.current_LBV = LBV_OFF;
-			//		MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
-			//		MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
-			//		MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
-			//		MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
-			//		MT_widget.current_BOCH = BOCH_OFF;
-			//		MT_widget.current_FOS = FOS_OFF;
-			//		MT_widget.current_AOS = AOS_OFF;
-			//		MT_widget.current_UPCH = UPCH_OFF;
-			//		AT_widget.current_ALPS = ALPS_OFF;
-			//		AT_widget.current_MFS = MFS_OFF;
-			//		AT_widget.current_LPch = LPch_OFF;
-			//		AT_widget.current_BUFAR = BUFAR_OFF;
-			//		tm_data.VBAU_2 = 0;
-			//		tm_data.VPBAU_2 = 0;
-			//		MT_widget.hide();
-			//		AT_widget.hide();
-			//	}
-			//	break;
-			//case 5:
-			//	if (current_MU = MU_3)
-			//	{
-			//		current_MU = MU_OFF;
-			//		current_MT = MT_OFF;
-			//		current_MK = MK_OFF;
-			//		MT_widget.current_UM = UM_OFF;
-			//		MT_widget.current_LBV = LBV_OFF;
-			//		MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
-			//		MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
-			//		MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
-			//		MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
-			//		MT_widget.current_BOCH = BOCH_OFF;
-			//		MT_widget.current_FOS = FOS_OFF;
-			//		MT_widget.current_AOS = AOS_OFF;
-			//		MT_widget.current_UPCH = UPCH_OFF;
-			//		AT_widget.current_ALPS = ALPS_OFF;
-			//		AT_widget.current_MFS = MFS_OFF;
-			//		AT_widget.current_LPch = LPch_OFF;
-			//		AT_widget.current_BUFAR = BUFAR_OFF;
-			//		tm_data.VBAU_3 = 0;
-			//		tm_data.VPBAU_3 = 0;
-			//		MT_widget.hide();
-			//		AT_widget.hide();
-			//	}
-			//	break;
 			default:
 				if ((tmp_mshm >= 3) && (tmp_mshm <= 5))
 				{
@@ -719,6 +640,21 @@ void BAU_widg::K_BRTK_A(QVariantList words)
 		AT_widget.current_MFS = MFS(d_words.MFS_com);
 		AT_widget.current_LPch = LPch(d_words.LPch_com);
 		AT_widget.current_BUFAR = BUFAR(d_words.BUFAR_com);
+		int tmp_current_bufar = 0;
+		switch (AT_widget.current_BUFAR)
+		{
+		case 1:
+			tmp_current_bufar = 3;
+			break;
+		case 2:
+			tmp_current_bufar = 2;
+			break;
+		case 4:
+			tmp_current_bufar = 1;
+			break;
+		}
+		if (tmp_current_bufar > 0)
+			mku_slot_thr.get_mku_bus_obj()->make_mt_at_state(BAU_at_mt(BUFAR_st), tmp_current_bufar);
 	}
 
 	QVariantList tmp_list;

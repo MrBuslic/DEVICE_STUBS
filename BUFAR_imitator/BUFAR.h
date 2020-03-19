@@ -99,6 +99,7 @@ private:
 	void I_1(QVariantList words);
 	void change_BUMs(int num, bool ch_1, bool ch_2, bool ch_3, bool ch_4);
 	void change_BUMs(int num, bool all_ch);
+	int faze_move(quint16 faze);
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:

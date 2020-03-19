@@ -15,6 +15,7 @@
 #include <QTime>
 #include <qplaintextedit.h>
 #include <qsettings.h>
+#include <mku_bus.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
