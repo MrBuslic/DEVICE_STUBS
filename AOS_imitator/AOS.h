@@ -296,8 +296,9 @@ class AOS_widg : public QWidget
 
 public:
 	AOS_widg(QWidget *parent = 0);
+//	AOS_widg();
 	~AOS_widg();
-	    
+	QTextEdit *name_ustroistva_Edit;
 private:
 	//AOS_KP current_KP = AOS_OFF;
 
@@ -330,10 +331,12 @@ private:
 	DEVICE_STATES gpfm1_dev;
 	
 	AOS_shos shos;
-
 	AOS_state aos_state;
-
 	QList<GSU_kommut> gsu_kommut;
+
+	//QGroupBox group_spravochnay_inform;
+	//QGroupBox group_komplektov;
+
 
 	QByteArray pprch_main_key_data;
 	int pprch_main_key_num;

@@ -192,7 +192,6 @@ BOOP::BOOP()
 	nuAngleIndicatorBloc->addWidget(nuAngleValue);
   
 
-
 	QHBoxLayout *nuAnglePiIndicatorBloc = new QHBoxLayout();
 	nuAnglePiIndicatorBloc->addWidget(nuAnglePiValue);
   

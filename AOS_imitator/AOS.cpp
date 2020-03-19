@@ -16,9 +16,10 @@ union MKOWord
 	};
 };
 
-AOS_widg::AOS_widg(QWidget *parent)
+AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
+//AOS_widg::AOS_widg()
 {
-	setWindowTitle("АОС");
+	setWindowTitle("АОС"); // вывод названия окна
 
 
 
@@ -69,6 +70,49 @@ AOS_widg::AOS_widg(QWidget *parent)
 	// connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
 
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), this, SLOT(new_ku_mk(int name_ustroistva, int number_komplekta)));
+
+	// добавление виджетов на форму ------- начало --------
+
+	QLabel *name_ustroistva_Label = new QLabel("Название устройства: ", this);
+	QLabel *nomer_vkluchaemogo_komplekta_Label = new QLabel("№ включенного комплекта = ", this);
+	name_ustroistva_Edit = new QTextEdit("AOS", this);              
+	QTextEdit *nomer_vkluchaemogo_komplekta_Edit = new QTextEdit("0", this); 
+	QGroupBox *group_spravochnay_inform = new QGroupBox(this);
+	QGridLayout *vbox_Grid = new QGridLayout;
+
+
+//	 name_ustroistva_Edit -> setText();
+
+	vbox_Grid->addWidget(name_ustroistva_Label, 0, 0);
+	name_ustroistva_Edit->setFixedSize(35, 25);
+	vbox_Grid->addWidget(name_ustroistva_Edit, 0, 1);
+	vbox_Grid->addWidget(nomer_vkluchaemogo_komplekta_Label, 1, 0);
+	nomer_vkluchaemogo_komplekta_Edit->setFixedSize(35, 25);
+	vbox_Grid->addWidget(nomer_vkluchaemogo_komplekta_Edit, 1, 1);
+
+
+
+	/*QVBoxLayout *vbox_label = new QVBoxLayout(this);
+	QHBoxLayout *vbox_Edit = new QHBoxLayout(this);
+
+
+	vbox_label -> addWidget(Name_ustroistva_Label);
+	vbox_label -> addWidget(nomer_vkluchaemogo_komplekta_Label);
+	vbox_Edit  -> addWidget(Name_ustroistva_Edit);*/
+	group_spravochnay_inform->setLayout(vbox_Grid);
+
+
+	//group_spravochnay_inform->setLayout(vbox_Edit);
+
+
+	//QVBoxLayout *spravochnay_inform = new  QVBoxLayout(this);
+	//spravochnay_inform -> addWidget(Name_ustroistva_Label);
+	//spravochnay_inform -> setSpacing(350);
+	//spravochnay_inform -> addWidget(nomer_vkluchaemogo_komplekta_Label);
+	//qwe.setLayout(spravochnay_inform);
+
+	// добавление виджетов на форму ------- конец --------
+
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
@@ -116,9 +160,10 @@ void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta)
 {
 	// printf("%d %c ", name_ustroistva, " = name_ustroistva \n");
 	// printf("%d %c ", number_komplekta, " = number_komplekta \n");
-
+	name_ustroistva_Edit->setText(QString("%1").arg(name_ustroistva));
 	if (name_ustroistva == 8)
 	{
+		name_ustroistva_Edit->setText("AOC");
 
 		if (number_komplekta == 0)
 		{// отключить все 3 комплекта
@@ -168,8 +213,9 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 		{
 			AOS_modes aos_modes;
 			aos_modes._word = words.at(0).toInt();
-
 			aos_state.kontr_mode = aos_modes.kontr_mode;
+
+
 		}
 		if (tmp_cwd.subadr == 4)//данные СхОС
 		{
@@ -219,7 +265,7 @@ void AOS_widg::update_graphics()
 
 }
 
-void AOS_widg::set_new_tm()
+void AOS_widg::set_new_tm() // состояние АОС
 {
 	QVariantList tmp_list;
 	for (int i = 0; i < 7; i++)
