@@ -296,12 +296,39 @@ class AOS_widg : public QWidget
 
 public:
 	AOS_widg(QWidget *parent = 0);
-//	AOS_widg();
 	~AOS_widg();
-	QTextEdit *name_ustroistva_Edit;
+
 private:
 	//AOS_KP current_KP = AOS_OFF;
+	// ---------- виджеты --------- начало --------
+	// QTextEdit *name_ustroistva_Edit; // С помощью этой переменной выводится номер 
+	//                                  // устройства, который мне присылают
+	QTextEdit *nomer_vkluchaemogo_komplekta_Edit; // С помощью этой переменной будет 
+	                                              // отображаться номер включённого комплекта,
+	                                              // который мне присылают
 
+	QLabel *nomer_vkluchaemogo_komplekta_Label;
+	QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie;
+	// ----- объявление кнопок ------- начало --------
+	QPushButton *perviy_komplekt_GPFM1;
+	QPushButton *vtoroi_komplekt_GPFM1;
+	QPushButton *tretiy_komplekt_GPFM1;
+
+	QPushButton *perviy_komplekt_GPFM2;
+	QPushButton *vtoroi_komplekt_GPFM2;
+	QPushButton *tretiy_komplekt_GPFM2;
+
+	QPushButton *perviy_komplekt_CGO;
+	QPushButton *vtorji_komplekt_CGO;
+	QPushButton *tretiy_komplekt_CGO;
+
+	QPushButton *perviy_komplekt_kontroly;
+	QPushButton *vtoroi_komplekt_kontroly;
+	QPushButton *tretiy_komplekt_kontroly;
+	// ----- объявление кнопок ------- конец --------
+
+    // ---------- виджеты --------- конец --------
+	int name_ustroistva, number_komplekta; // передаваемые параметры
 
 	const int MKO = 1;
 	const int adr = 21;
@@ -316,7 +343,6 @@ protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	//void new_ku_mk(int ku, int length_ku, double u_ku, int line_ku);
 	void new_ku_mk(int name_ustroistva, int number_komplekta);
 
 private:

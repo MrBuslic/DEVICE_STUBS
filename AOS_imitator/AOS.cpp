@@ -63,55 +63,149 @@ AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
 		return;
 	}
 
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(signal_thr.get_obj().get(), 
+		    SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), 
+		    this, 
+		    SLOT(new_message(QVariant, int, int, int, QVariantList, int))
+	       );
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
 	// connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), this, SLOT(new_ku_mk(int name_ustroistva, int number_komplekta)));
+	connect(mku_signal_thr.get_obj().get(), 
+		    SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), 
+		    this, 
+		    SLOT(new_ku_mk(int name_ustroistva, int number_komplekta))
+	       );
 
-	// добавление виджетов на форму ------- начало --------
+	// --------- добавление виджетов на форму ------- НАЧАЛО --------
+    
+	// -------------- группировка справочной информации ----------------------- начало ----------------
+	//QLabel *name_ustroistva_Label = new QLabel("Название устройства: ", this);
+	nomer_vkluchaemogo_komplekta_Label = new QLabel("№ включенного комплекта = ", this);
+	nomer_vkluchaemogo_komplekta_samo_znachenie = new QLabel("0",this);
+	//name_ustroistva_Edit = new QTextEdit("AOS", this);
+	//nomer_vkluchaemogo_komplekta_Edit = new QTextEdit("0", this);
+	QGroupBox *group_spravochnay_inform = new QGroupBox(this); // создание указателя на группировку справочной информации, которую мне присылают с "БАО"
+	group_spravochnay_inform -> setFixedSize(220, 50);
+	QGridLayout *vbox_Grid_sprav_inforn = new QGridLayout;     // отображение виджетов ввиде таблицы 2Х2.
 
-	QLabel *name_ustroistva_Label = new QLabel("Название устройства: ", this);
-	QLabel *nomer_vkluchaemogo_komplekta_Label = new QLabel("№ включенного комплекта = ", this);
-	name_ustroistva_Edit = new QTextEdit("AOS", this);              
-	QTextEdit *nomer_vkluchaemogo_komplekta_Edit = new QTextEdit("0", this); 
-	QGroupBox *group_spravochnay_inform = new QGroupBox(this);
-	QGridLayout *vbox_Grid = new QGridLayout;
+	//vbox_Grid_sprav_inforn -> addWidget(name_ustroistva_Label, 0, 0);
+	//name_ustroistva_Edit   -> setFixedSize(35, 25); // Задание размера окна, в которое выводится название присланного устройства
+	//vbox_Grid_sprav_inforn -> addWidget(name_ustroistva_Edit, 0, 1);
+	vbox_Grid_sprav_inforn -> addWidget(nomer_vkluchaemogo_komplekta_Label, 0, 0);
+	//nomer_vkluchaemogo_komplekta_Edit -> setFixedSize(35, 25); // Задание размера окна, в которое выводится номер комплекта
+	//vbox_Grid_sprav_inforn -> addWidget(nomer_vkluchaemogo_komplekta_Edit, 0, 1);
+	vbox_Grid_sprav_inforn -> addWidget(nomer_vkluchaemogo_komplekta_samo_znachenie, 0, 1);
+
+	group_spravochnay_inform -> setLayout(vbox_Grid_sprav_inforn);
+	// -------------- группировка справочной информации ----------------------- конец ----------------
+
+	// -------------- группировка данных для выбора комплектов устройств АОС и режим работы АОС -------------- начало -------------
+	QGroupBox *group_ustroistv = new QGroupBox("Данные для выбора комплектов устройств АОС и режим работы АОС", this);   // создание указателя на группировку для кнопок комплектов устройств
+	group_ustroistv -> setFixedSize(400, 270);
+	QGridLayout *vbox_Grid_ustruistv = new QGridLayout; // отображение группировок ввиде таблицы 2Х2
+
+	QGroupBox *group_GPFM1 = new QGroupBox("ГПФМ1", this);
+	group_GPFM1 -> setFixedSize(190, 110);
+	QVBoxLayout *vbox_Grid_GPFM1_knopok = new QVBoxLayout;
+
+	QGroupBox *group_GPFM2 = new QGroupBox("ГПФМ2", this);
+	group_GPFM2 -> setFixedSize(190, 110);
+	QVBoxLayout *vbox_Grid_GPFM2_knopok = new QVBoxLayout;
+
+	QGroupBox *group_ustroistvo_CGO = new QGroupBox("Устройство ЦГО", this);
+	group_ustroistvo_CGO -> setFixedSize(190, 110);
+	QVBoxLayout *vbox_Grid_ustroistvo_CGO_knopok = new QVBoxLayout;
+
+	QGroupBox *group_ustroistvo_kontroly = new QGroupBox("Устройство контроля", this);
+	group_ustroistvo_kontroly -> setFixedSize(190, 110);
+	QVBoxLayout *vbox_Grid_group_ustroistvo_kontroly_knopok = new QVBoxLayout;
+
+	vbox_Grid_ustruistv -> addWidget( group_GPFM1, 0, 0 );
+	vbox_Grid_ustruistv -> addWidget( group_GPFM2, 0, 1 );
+	vbox_Grid_ustruistv -> addWidget( group_ustroistvo_CGO, 1, 0 );
+	vbox_Grid_ustruistv -> addWidget( group_ustroistvo_kontroly, 1, 1 );
+	group_ustroistv -> setLayout( vbox_Grid_ustruistv );
+	// -------------- группировка данных для выбора комплектов устройств АОС и режим работы АОС -------------- конец -------------
+
+	// --------- группировка кнопок комплектов по устройсвам ----------- начало ---------------
+		perviy_komplekt_GPFM1 = new QPushButton("Первый комплект", this);
+		vtoroi_komplekt_GPFM1 = new QPushButton("Второй комплект", this);
+		tretiy_komplekt_GPFM1 = new QPushButton("Третий комплект", this);
+		  vbox_Grid_GPFM1_knopok -> addWidget(perviy_komplekt_GPFM1);
+		  vbox_Grid_GPFM1_knopok -> addWidget(vtoroi_komplekt_GPFM1);
+		  vbox_Grid_GPFM1_knopok -> addWidget(tretiy_komplekt_GPFM1);
+		  group_GPFM1 -> setLayout(vbox_Grid_GPFM1_knopok);
+
+		perviy_komplekt_GPFM2 = new QPushButton("Первый комплект", this);
+		vtoroi_komplekt_GPFM2 = new QPushButton("Второй комплект", this);
+		tretiy_komplekt_GPFM2 = new QPushButton("Третий комплект", this);
+	      vbox_Grid_GPFM2_knopok -> addWidget(perviy_komplekt_GPFM2);
+		  vbox_Grid_GPFM2_knopok -> addWidget(vtoroi_komplekt_GPFM2);
+		  vbox_Grid_GPFM2_knopok -> addWidget(tretiy_komplekt_GPFM2);
+		  group_GPFM2 -> setLayout(vbox_Grid_GPFM2_knopok);
+
+		perviy_komplekt_CGO = new QPushButton("Первый комплект", this);
+		vtorji_komplekt_CGO = new QPushButton("Второй комплект", this);
+		tretiy_komplekt_CGO = new QPushButton("Третий комплект", this);
+		  vbox_Grid_ustroistvo_CGO_knopok -> addWidget(perviy_komplekt_CGO);
+		  vbox_Grid_ustroistvo_CGO_knopok -> addWidget(vtorji_komplekt_CGO);
+		  vbox_Grid_ustroistvo_CGO_knopok -> addWidget(tretiy_komplekt_CGO);
+		  group_ustroistvo_CGO -> setLayout(vbox_Grid_ustroistvo_CGO_knopok);
+
+		perviy_komplekt_kontroly = new QPushButton("Первый комплект", this);
+		vtoroi_komplekt_kontroly = new QPushButton("Второй комплект", this);
+		tretiy_komplekt_kontroly = new QPushButton("Третий комплект", this);
+		  vbox_Grid_group_ustroistvo_kontroly_knopok -> addWidget(perviy_komplekt_kontroly);
+		  vbox_Grid_group_ustroistvo_kontroly_knopok -> addWidget(vtoroi_komplekt_kontroly);
+		  vbox_Grid_group_ustroistvo_kontroly_knopok -> addWidget(tretiy_komplekt_kontroly);
+		  group_ustroistvo_kontroly -> setLayout(vbox_Grid_group_ustroistvo_kontroly_knopok);	
+	// --------- группировка кнопок комплектов по устройсвам ----------- конец ---------------
+
+	// ----------- BIG  GroupBox ------- начало ----- 
+	QGroupBox *BIG_GroupBox = new QGroupBox(this);
+	BIG_GroupBox -> setFixedSize(640, 490);
+	QVBoxLayout *vbox_BIG_GroupBox = new QVBoxLayout;
+	vbox_BIG_GroupBox -> addWidget(group_spravochnay_inform);
+	vbox_BIG_GroupBox -> addWidget(group_ustroistv);
+	BIG_GroupBox      -> setLayout(vbox_BIG_GroupBox);
+	// ----------- BIG  GroupBox ------- конец -----
+
+    // --------- закрашивание кнопок серым цветом --------- начало -------------
+	perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	vtoroi_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	tretiy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+
+	perviy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	vtoroi_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	tretiy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);");
+
+	perviy_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	vtorji_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	tretiy_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);");
+
+	perviy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	vtoroi_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	tretiy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
+	// --------- закрашивание кнопок серым цветом --------- конец -------------
+	 /*   AOS_modes aos_modes;  // искуственная вставка номера комплекта
+	    aos_modes.gpfm1 = 1;
+		if (aos_modes.gpfm1 == 1)
+		{
+			nomer_vkluchaemogo_komplekta_samo_znachenie -> setText(QString("%1").arg(aos_modes.gpfm1));
+			perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(142, 198, 156);");
+		}
+		else
+		{
+			nomer_vkluchaemogo_komplekta_samo_znachenie -> setText(QString("%1").arg(aos_modes.gpfm1));
+			perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+		}; //*/
+	// --------- добавление виджетов на форму ------- КОНЕЦ --------
 
 
-//	 name_ustroistva_Edit -> setText();
 
-	vbox_Grid->addWidget(name_ustroistva_Label, 0, 0);
-	name_ustroistva_Edit->setFixedSize(35, 25);
-	vbox_Grid->addWidget(name_ustroistva_Edit, 0, 1);
-	vbox_Grid->addWidget(nomer_vkluchaemogo_komplekta_Label, 1, 0);
-	nomer_vkluchaemogo_komplekta_Edit->setFixedSize(35, 25);
-	vbox_Grid->addWidget(nomer_vkluchaemogo_komplekta_Edit, 1, 1);
-
-
-
-	/*QVBoxLayout *vbox_label = new QVBoxLayout(this);
-	QHBoxLayout *vbox_Edit = new QHBoxLayout(this);
-
-
-	vbox_label -> addWidget(Name_ustroistva_Label);
-	vbox_label -> addWidget(nomer_vkluchaemogo_komplekta_Label);
-	vbox_Edit  -> addWidget(Name_ustroistva_Edit);*/
-	group_spravochnay_inform->setLayout(vbox_Grid);
-
-
-	//group_spravochnay_inform->setLayout(vbox_Edit);
-
-
-	//QVBoxLayout *spravochnay_inform = new  QVBoxLayout(this);
-	//spravochnay_inform -> addWidget(Name_ustroistva_Label);
-	//spravochnay_inform -> setSpacing(350);
-	//spravochnay_inform -> addWidget(nomer_vkluchaemogo_komplekta_Label);
-	//qwe.setLayout(spravochnay_inform);
-
-	// добавление виджетов на форму ------- конец --------
 
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
@@ -140,39 +234,56 @@ void AOS_widg::imit_on()
 {
 
 }
+void AOS_widg::update_graphics()
+{
+	setStyleSheet(" background-color: rgb(142, 198, 156);");
+}
 
 void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta)
 {
 	// printf("%d %c ", name_ustroistva, " = name_ustroistva \n");
 	// printf("%d %c ", number_komplekta, " = number_komplekta \n");
-	name_ustroistva_Edit->setText(QString("%1").arg(name_ustroistva));
+	
 	if (name_ustroistva == 8)
 	{
-		name_ustroistva_Edit->setText("AOC");
-
 		if (number_komplekta == 0)
 		{// отключить все 3 комплекта
 			AOS_KP_OFF; // значение равно 0
+			nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(number_komplekta));
+
+			update_graphics();
 			return;
 		};
 
 		if (number_komplekta == 1)
 		{// включить 1-й комплект
 		 // признак включения первого комплекта и передача этого признака отправителю
-			AOS_KP_1; // значение равно 4
+			nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(number_komplekta));
 
+			update_graphics();
+			AOS_KP_1; // значение равно 4
+			return;
 					  //  return emit  make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 1-го комплекта //
 		};
 		if (number_komplekta == 2)
 		{// включить  2-й комплект
 		 // признак включения второго комплекта и передача этого признака отправителю
+			nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(number_komplekta));
+
+			update_graphics();
 			AOS_KP_2; // значение равно 2
+			return;
 					  //  return emit make_mt_at_state( name_ustroistva, number_komplekta); //  отправление информации отправителю от 2-го комплекта //
+			
 		};
 		if (number_komplekta == 3)
 		{// включить  3-й комплект
 		 // признак включения третьего комплекта и передача этого признака отправителю
+			nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(number_komplekta));
+
+			update_graphics();
 			AOS_KP_3; // значение равно 1
+			return;
 					  //  return emit make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 3-го комплекта // 
 		};
 
@@ -182,8 +293,8 @@ void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta)
 		return;
 	}
 
-
 }
+
 
 
 void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
@@ -194,11 +305,117 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
+
 		if (tmp_cwd.subadr == 3)//Конфигурация АОС
 		{
 			AOS_modes aos_modes;
 			aos_modes._word = words.at(0).toInt();
 			aos_state.kontr_mode = aos_modes.kontr_mode;
+			// --------- закрашиваине зелёным цветом конопок, которые оказались активными --------- начало -------
+			if (aos_modes.gpfm1 == 0)
+			{
+				nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1));
+				perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				vtoroi_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				tretiy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
+			};
+			if (aos_modes.gpfm1 == 1)
+			 {  nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1));
+				perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else 
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1));
+				perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if (aos_modes.gpfm1 == 2)
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1)); 
+				vtoroi_komplekt_GPFM1->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1)); 
+				vtoroi_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if (aos_modes.gpfm1 == 3)
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1));
+				tretiy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm1));
+				tretiy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			// ----------------------------------------------------------------------------------
+			if (aos_modes.gpfm2 == 0)
+			{
+				nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				perviy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				vtoroi_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				tretiy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);");
+			};
+			if (aos_modes.gpfm2 == 1)
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				perviy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				perviy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if (aos_modes.gpfm2 == 2)
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				vtoroi_komplekt_GPFM2->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				vtoroi_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if (aos_modes.gpfm2 == 3)
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				tretiy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.gpfm2));
+				tretiy_komplekt_GPFM2->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			// ----------------------------------------------------------------------------------
+			if (aos_modes.cgo == 0)
+			{
+				nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+				perviy_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				vtorji_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				tretiy_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);");
+			};
+			if ( aos_modes.cgo == 1 )
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+				perviy_komplekt_CGO->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+				perviy_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if ( aos_modes.cgo == 2 )
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+				vtorji_komplekt_CGO->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+				vtorji_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if ( aos_modes.cgo == 3 )
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+			    tretiy_komplekt_CGO->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.cgo));
+				tretiy_komplekt_CGO->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			// ----------------------------------------------------------------------------------
+			if (aos_modes.kontr == 0)
+			{
+				nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				perviy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				vtoroi_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
+				tretiy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
+			};
+			if ( aos_modes.kontr == 1 )
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				perviy_komplekt_kontroly->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				perviy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if ( aos_modes.kontr == 2 )
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				vtoroi_komplekt_kontroly->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				vtoroi_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			if ( aos_modes.kontr == 3 )
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				tretiy_komplekt_kontroly->setStyleSheet(" background-color: rgb(142, 198, 156);"); }
+			else
+			 {	nomer_vkluchaemogo_komplekta_Edit->setText(QString("%1").arg(aos_modes.kontr));
+				tretiy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);"); };
+			// --------- закрашиваине зелёным цветом конопок, которые оказались активными --------- конец -------
 
 
 		}
@@ -245,10 +462,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 }
 
 
-void AOS_widg::update_graphics()
-{
 
-}
 
 void AOS_widg::set_new_tm() // состояние АОС
 {
