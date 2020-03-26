@@ -301,14 +301,9 @@ public:
 private:
 	//AOS_KP current_KP = AOS_OFF;
 	// ---------- виджеты --------- начало --------
-	// QTextEdit *name_ustroistva_Edit; // С помощью этой переменной выводится номер 
-	//                                  // устройства, который мне присылают
-	QTextEdit *nomer_vkluchaemogo_komplekta_Edit; // С помощью этой переменной будет 
-	                                              // отображаться номер включённого комплекта,
-	                                              // который мне присылают
 
-	QLabel *nomer_vkluchaemogo_komplekta_Label;
-	QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie;
+	QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
+	QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie; // сам номер устройства
 	// ----- объявление кнопок ------- начало --------
 	QPushButton *perviy_komplekt_GPFM1;
 	QPushButton *vtoroi_komplekt_GPFM1;
@@ -328,14 +323,16 @@ private:
 	// ----- объявление кнопок ------- конец --------
 
     // ---------- виджеты --------- конец --------
-	int name_ustroistva, number_komplekta; // передаваемые параметры
+
+	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры
 
 	const int MKO = 1;
 	const int adr = 21;
 	QHBoxLayout *a;
 	QGroupBox *Group_Vkl_kompl_AOS;
 	void update_graphics();  // обновление графики
-	void set_new_tm();      // составление ОК-ов
+	void funk_perescheta(); // преобразует входные данные 0,1,2,3 в 0,1,2,4
+	void set_new_tm();     // составление ОК-ов
 	void TMI_1_AOS();   // составление ТМИ - 1 
 	void TMI_2_AOS();  // составление ТМИ - 2
 	void imit_off();  // включение имитатора
@@ -358,6 +355,7 @@ private:
 	
 	AOS_shos shos;
 	AOS_state aos_state;
+	AOS_modes aos_modes;
 	QList<GSU_kommut> gsu_kommut;
 
 	//QGroupBox group_spravochnay_inform;
