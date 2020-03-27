@@ -31,7 +31,7 @@ union I_1_DataWords
 		quint16
 			AFAR_mode : 4,
 			rez : 12;
-		quint16
+		quint16 
 			OY_AFAR : 15,
 			OY_pl_mn : 1;
 		quint16
@@ -203,11 +203,24 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 		return;
 	}
 
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
+
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
+
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с МКУ");
+		this->deleteLater();
+		return;
+	}
+
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	//slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(make_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 
 	//log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -375,14 +388,16 @@ void BUFAR_widg::change_BUMs(int num, bool all_ch)
 
 void BUFAR_widg::new_mt_at_state(int dev_name, int state)
 {
-	if (dev_name = BAU_at_mt(BUFAR_st))
-		BUFAR_comp_le->setText(QString("%1").arg(state));
+	if (dev_name == BAU_at_mt(BUFAR_st))
+		BUFAR_current = state;	
+	update_graphics();
 }
 
 void BUFAR_widg::I_1(QVariantList words)
 {
 	I_1_DataWords d_words = words;
-	d_words.AFAR_mode = 4;
+	OY_faze = 0;
+	OZ_faze = 0;
 	for (int i = 0; i < 25; i++)
 	{
 		change_BUMs(i, false);
@@ -442,13 +457,11 @@ void BUFAR_widg::I_1(QVariantList words)
 		}
 		break;
 	}
-
-
-
-
-	if (d_words.OY_pl_mn != OY_faze)
+	OY_faze = d_words.OY_AFAR * 0.011;
+	OZ_faze = d_words.OZ_AFAR * 0.011;
+	if (d_words.OY_pl_mn)
 		OY_faze = -1 * OY_faze;
-	if (d_words.OZ_pl_mn != OZ_faze)
+	if (d_words.OZ_pl_mn)
 		OZ_faze = -1 * OZ_faze;
 	BUFAR_mode = BUFAR_MODEs(d_words.AFAR_mode);
 	update_graphics();
@@ -475,6 +488,7 @@ void BUFAR_widg::update_graphics()
 			BUM_cl_list[i].BUMs_pbut[3]->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
 	BUFAR_mode_le->setText(QString("%1").arg(BUFAR_mode));
+	BUFAR_comp_le->setText(QString("%1").arg(BUFAR_current));
 }
 
 void BUFAR_widg::set_new_tm()
