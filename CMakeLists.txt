@@ -156,6 +156,7 @@ add_subdirectory(UNMVI102)
 #add_subdirectory(spobu_imitator)
 #add_subdirectory(cbk_imitator)
 add_subdirectory(cbk_imitator_real_po)
+add_subdirectory(cbk_imitator_tsrp)
 add_subdirectory(mbk04_imitator)
 add_subdirectory(LKAModules)
 
