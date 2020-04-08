@@ -177,7 +177,8 @@ add_subdirectory(BAU_imitator)
 add_subdirectory(AOS_imitator)
 add_subdirectory(MKI_imitator)
 add_subdirectory(BUFAR_imitator)
-
+add_subdirectory(BAO_imitator)
+add_subdirectory(BKIS_imitator)
 
 
 #set(SOURCES "cbk_imitator/main.cpp")
