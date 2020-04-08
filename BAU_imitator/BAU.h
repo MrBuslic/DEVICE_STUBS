@@ -15,6 +15,7 @@
 #include <QTime>
 #include <qplaintextedit.h>
 #include <qsettings.h>
+#include <mku_bus.h>
 
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
@@ -566,7 +567,8 @@ private:
 
 	bool kcbk = false;
 	bool ruk = false;
-
+signals:
+	void make_mt_at_state(int dev_name, int state);
 protected:
 	public slots :
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
@@ -595,8 +597,9 @@ private:
 	QSettings LKA_sett;
 
 	int volt;
-	int bus = 0; //Узнать точно
 	int power = 0;
+	int bus = 0; //Узнать точно
+	QString name = "БАУ";
 
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;

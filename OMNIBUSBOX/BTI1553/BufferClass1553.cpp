@@ -1,11 +1,12 @@
 #include "BTI1553/BufferClass1553.h"
 
-int rpc_buffer_class_1553::create_msg_addr(int addr, int saddr, int mko)
+int rpc_buffer_class_1553::create_msg_addr(int addr, int saddr, int mko, bool f5)
 {
 	MsgAddr tmp_msg;
 	tmp_msg.addr = addr;
 	tmp_msg.saddr = saddr;
 	tmp_msg.mko = mko;
+	tmp_msg.f5 = f5;
 	msg_ind++;
 	msg_addrs.insert(msg_ind, tmp_msg);
 	return msg_ind;
@@ -37,14 +38,19 @@ void rpc_buffer_class_1553::new_message(QVariant dt, int mko, int line, int cwd,
 
 	MkoWord1553 tmp_cwd;
 	tmp_cwd.cw = cwd;
-	tmp_cwd.count = 0;
 
 	QMutexLocker lock(&msg_mutex);
 
 	QMap<int, LstAddr>::iterator itr = lst_addrs.find(tmp_cwd.cw);
 	if (itr == lst_addrs.end())
-		return;
-
+	{
+		tmp_cwd.count = 0;
+		itr = lst_addrs.find(tmp_cwd.cw);
+		if (itr == lst_addrs.end())
+		{
+			return;
+		}
+	}
 	itr->words << QVariant(words);
 	if (itr->words.count() > itr->lst_size)
 		itr->words.pop_front();

@@ -64,8 +64,17 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 	MkoWord1553 tmp_cwd;
 	tmp_cwd.cw = xmitfields->cwd1;
 	QVariantList tmp_msgs;
-	for (int i = 0; i < tmp_cwd.count; i++)
-		tmp_msgs << xmitfields->data[i];
+	if ((tmp_cwd.subadr == 0) || (tmp_cwd.subadr == 31))
+	{
+		if (tmp_cwd.count == IMIT_SYNC_WITH_DW)
+		{
+			tmp_msgs << xmitfields->data[0];
+		}
+	}
+	else
+		for (int i = 0; i < tmp_cwd.count; i++)
+			tmp_msgs << xmitfields->data[i];
+
 	int os;
 	Srpc_buffer_class_1553::Instance().omnibus_slot_thr.get_omnibus_obj()->send_msg(channum, ((xmitfields->ctrlflags & MSGCRT1553_BUSB) == MSGCRT1553_BUSB) ? 1 : 0, xmitfields->cwd1, tmp_msgs, os);
 	if (os == -1)
@@ -76,8 +85,16 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 	{
 		xmitfields->errflags = 0;
 		xmitfields->swd1 = os;
-		for (int i = 0; i < tmp_cwd.count; i++)
-			xmitfields->data[i] = tmp_msgs[i].toInt();
+		if ((tmp_cwd.subadr == 0) || (tmp_cwd.subadr == 31))
+		{
+			if ((tmp_cwd.count == IMIT_SEND_VECTOR_WORD) || (tmp_cwd.count == IMIT_SYNC_WITH_DW))
+			{
+				xmitfields->data[0] = tmp_msgs[0].toInt();
+			}
+		}
+		else
+			for (int i = 0; i < tmp_cwd.count; i++)
+				xmitfields->data[i] = tmp_msgs[i].toInt();
 	}
 	return 0;
 }
@@ -159,7 +176,14 @@ BTI1553API VOID __stdcall BTI1553_MsgDataWr(LPUSHORT buf,INT count,MSGADDR msgad
 
 	rpc_buffer_class_1553& tmp_buf(Srpc_buffer_class_1553::Instance());
 	MsgAddr& tmp_addr(tmp_buf.msg_addrs[msgaddr]);
-	tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs);
+	if (tmp_addr.f5)
+	{
+		tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data_f5(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs.at(0).toInt());
+	}
+	else
+	{
+		tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs);
+	}
 }
 BTI1553API ULONG __stdcall BTI1553_MsgFieldRd(USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API ULONG __stdcall BTI1553_MsgFieldWr(ULONG fieldval,USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
@@ -194,7 +218,7 @@ BTI1553API LISTADDR __stdcall BTI1553_RTCreateList(ULONG listconfigval,INT count
 BTI1553API MSGADDR __stdcall BTI1553_RTCreateMsg(ULONG configval,BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval)
 {
 
-	return Srpc_buffer_class_1553::Instance().create_msg_addr(taval, saval, channum);
+	return Srpc_buffer_class_1553::Instance().create_msg_addr(taval, saval, channum, mcflag == MODECODE);
 }
 BTI1553API MSGADDR __stdcall BTI1553_RTGetMsg(BOOL mcflag,INT taval,BOOL trflag,INT saval,INT channum,HCORE handleval){ return 0; }
 BTI1553API ERRVAL __stdcall BTI1553_RTReset(INT taval,INT channum,HCORE handleval){ return 0; }
@@ -205,7 +229,11 @@ BTI1553API ERRVAL __stdcall BTI1553_RTSetMode(ULONG configval,INT taval,INT chan
 	return 0;
 }
 BTI1553API USHORT __stdcall BTI1553_RTSWDRd(INT taval,INT channum,HCORE handleval){ return 0; }
-BTI1553API ERRVAL __stdcall BTI1553_RTSWDWr(USHORT swdval,INT taval,INT channum,HCORE handleval){ return 0; }
+BTI1553API ERRVAL __stdcall BTI1553_RTSWDWr(USHORT swdval,INT taval,INT channum,HCORE handleval)
+{
+	Srpc_buffer_class_1553::Instance().omnibus_slot_thr.get_omnibus_obj()->switch_ab_os(channum, taval, swdval, -1);
+	return 0; 
+}
 BTI1553API ERRVAL __stdcall BTI1553_RTSyncDefine(BOOL enableflag,USHORT syncmask,USHORT pinpolarity,INT taval,ULONG rcvsamask,ULONG xmtsamask,ULONG rcvmcmask,ULONG xmtmcmask,INT channum,HCORE handleval){ return 0; }
 BTI1553API USHORT __stdcall BTI1553_ValPackCWD(INT TAval,INT TRflag,INT SAval,INT WCval)
 {

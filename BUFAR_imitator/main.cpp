@@ -1,4 +1,4 @@
-#include "BAU.h"
+#include "BUFAR.h"
 #include <QApplication>
 #include <QTextCodec>
 #include "rpc_loger.h"
@@ -16,11 +16,11 @@ int main(int argc, char **argv)
 #endif
     QApplication app(argc, argv);
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-	LogWidget log_w;
-	log_w.show();
-	
-	BAU_widg BAU_widget;
-	BAU_widget.show();
+//	LogWidget log_w;
+//	log_w.show();
+
+	BUFAR_widg BUFAR_widget;
+	BUFAR_widget.show();
 
     return app.exec();
 }

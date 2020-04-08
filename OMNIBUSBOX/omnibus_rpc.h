@@ -13,6 +13,7 @@ public slots:
 	void switch_ab_os(int mko, int addr, int _os, int _s_addr);
 	void switch_ab(int mko, int addr, bool _on);
 	void set_new_data(int mko, int addr, int saddr, QVariantList words);
+	void set_new_data_f5(int mko, int addr, int code, int word);
 	void send_msg(int mko, int line, int cwd, QVariantList& words, int& os);
 	void send_msg_mpko(int mko, int line, int cwd, QVariantList& words, int& os);
 	int unomnibus_map_channels_setup(int _n, int _chan);

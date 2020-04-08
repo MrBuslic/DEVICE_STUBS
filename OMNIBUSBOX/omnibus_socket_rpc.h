@@ -99,6 +99,7 @@ public:
 	QVariant switch_ab_os(QVariantList& _values);
 	QVariant switch_ab(QVariantList& _values);
 	QVariant set_new_data(QVariantList& _values);
+	QVariant set_new_data_f5(QVariantList& _values);
 	QVariant send_msg(QVariantList& _values);
 	QVariant send_msg_mpko(QVariantList& _values);
 	QVariant unomnibus_map_channels_setup(QVariantList& _values);

@@ -195,6 +195,17 @@ void RPC_omnibus_SLOT_Object::set_new_data(int mko, int addr, int saddr, QVarian
 	dynamic_call("set_new_data(int, int, int, QVariantList)", tmp_list);
 	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished set_new_data");
 }
+void RPC_omnibus_SLOT_Object::set_new_data_f5(int mko, int addr, int code, int word)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mko);
+	tmp_list << QVariant(addr);
+	tmp_list << QVariant(code);
+	tmp_list << QVariant(word);
+	SRPCSignalClass::Instance().toLog(QString("omnibus dynamic_call set_new_data_f5 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_new_data_f5(int, int, int, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("omnibus dynamic_call finished set_new_data_f5");
+}
 void RPC_omnibus_SLOT_Object::send_msg(int mko, int line, int cwd, QVariantList& words, int& os)
 {
 	QVariantList tmp_list;

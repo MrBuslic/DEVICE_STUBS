@@ -108,3 +108,9 @@ void MKUWidget::set_tm(QString tm_name, QVariant tm_val)
 	tm_map[tm_name] = tm_val;
 	log_widget->log_append(QString("Присваиваю сигналу %1 значение %2").arg(tm_name).arg(RPCSignalClass::QVariantToString(tm_val)));
 }
+
+void MKUWidget::make_mt_at_state(int dev_name, int state)
+{
+	log_widget->log_append(QString("Состояние аппаратуры БАУ под номером %1 равно %2").arg(dev_name).arg(get_line(state)));
+	emit new_mt_at_state(dev_name, state);
+}

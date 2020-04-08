@@ -27,12 +27,34 @@ union MkoWord1553
 	};
 };
 
+enum F4_COMMAND_IMIT
+{
+	IMIT_BEGIN = -1,
+	IMIT_TAKE_COMMAND,
+	IMIT_SYNC,
+	IMIT_TRANSMIT_BW,
+	IMIT_START_SELFTEST,
+	IMIT_BLOCK_TRANSMITTER,
+	IMIT_DEBLOCK_TRANSMITTER,
+	IMIT_BLOCK_ERROR_FLAG,
+	IMIT_DEBLOCK_ERROR_FLAG,
+	IMIT_REINIT,
+	IMIT_RESERVE,/*********************/
+	IMIT_SEND_VECTOR_WORD = 16,
+	IMIT_SYNC_WITH_DW,
+	IMIT_SEND_LAST_CMD,
+	IMIT_SEND_VSK_WORD,
+	IMIT_BLOCK_Nth_TRANSMITTER,
+	IMIT_DEBLOCK_Nth_TRANSMITTER,
+	IMIT_END
+};
 
 struct MsgAddr
 {
 	int addr;
 	int saddr;
 	int mko;
+	bool f5;
 };
 
 struct LstAddr
@@ -51,7 +73,7 @@ public:
 	rpc_buffer_class_1553() { msg_ind = 0;}
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
-	int create_msg_addr(int addr, int saddr, int mko);
+	int create_msg_addr(int addr, int saddr, int mko, bool f5);
 	int create_list_addr(int addr, int saddr, int mko, int list_size, int tr);
 	QMap<int, MsgAddr> msg_addrs;
 	QMap<int, LstAddr> lst_addrs;
