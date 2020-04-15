@@ -1,0 +1,50 @@
+LIBRARY AGMWSwitch
+EXPORTS
+
+AgMWSwitch_CanConnect @1
+AgMWSwitch_ClearError @2
+AgMWSwitch_ClearInterchangeWarnings @3
+AgMWSwitch_Connect @4
+AgMWSwitch_DiagnosticClearAllRelayCounts @5
+AgMWSwitch_DiagnosticClearRelayCount @6
+AgMWSwitch_DiagnosticGetRelayCount @7
+AgMWSwitch_Disable @8
+AgMWSwitch_Disconnect @9
+AgMWSwitch_DisconnectAll @10
+AgMWSwitch_GetAttributeViBoolean @11
+AgMWSwitch_GetAttributeViInt32 @12
+AgMWSwitch_GetAttributeViReal64 @13
+AgMWSwitch_GetAttributeViSession @14
+AgMWSwitch_GetAttributeViString @15
+AgMWSwitch_GetChannelName @16
+AgMWSwitch_GetError @17
+AgMWSwitch_GetNextCoercionRecord @18
+AgMWSwitch_GetNextInterchangeWarning @19
+AgMWSwitch_GetPath @20
+AgMWSwitch_InitWithOptions @21
+AgMWSwitch_InvalidateAllAttributes @22
+AgMWSwitch_IsDebounced @23
+AgMWSwitch_LockSession @24
+AgMWSwitch_ResetInterchangeCheck @25
+AgMWSwitch_ResetWithDefaults @26
+AgMWSwitch_RouteCloseChannel @27
+AgMWSwitch_RouteGetBankState @28
+AgMWSwitch_RouteIsChannelClosed @29
+AgMWSwitch_RouteOpenAll @30
+AgMWSwitch_RouteOpenChannel @31
+AgMWSwitch_SetAttributeViBoolean @32
+AgMWSwitch_SetAttributeViInt32 @33
+AgMWSwitch_SetAttributeViReal64 @34
+AgMWSwitch_SetAttributeViSession @35
+AgMWSwitch_SetAttributeViString @36
+AgMWSwitch_SetPath @37
+AgMWSwitch_UnlockSession @38
+AgMWSwitch_close @39
+AgMWSwitch_error_message @40
+AgMWSwitch_error_query @41
+AgMWSwitch_init @42
+AgMWSwitch_reset @43
+AgMWSwitch_revision_query @44
+AgMWSwitch_self_test @45
+
+

@@ -23,7 +23,7 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 	}
 		mpvn_modules << LKA_MV_MODULE(5, 0);
 	widg = new QWidget(this);
-	this->setFixedSize(572, 200);
+	this->setFixedSize(572, 250);
 	setWindowTitle("ЛКА-05");
 	MU1 = new QPushButton("МУ 1", this);
 	MU1 -> setFixedSize(180,50);

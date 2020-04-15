@@ -146,6 +146,13 @@ void PowerWidget::set_off()
 		set_u(i, 0);
 	}
 }
+
+void PowerWidget::set_bus_u(QString name, double volt)
+{
+	emit u_on_bus(name, volt);
+	log_widget->log_append(QString("На канале %1 установлено напряжение %2").arg(name).arg(volt));
+}
+
 void PowerWidget::closeEvent(QCloseEvent *event)
 {
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);

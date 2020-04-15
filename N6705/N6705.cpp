@@ -44,12 +44,25 @@ N6705Widget::N6705Widget() : QWidget()
 
 		h_lay->addLayout(v_lay);
 	}
-	calc_meas();
+
 	server = new QTcpServer();
 	connect(server, SIGNAL(newConnection()), this, SLOT(tcp_slot()));
 	connect(this, &N6705Widget::update_graphics_signal, this, &N6705Widget::update_graphics);
 	server->listen(QHostAddress::Any, N6705_PORT);
 
+	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
+	power_slot_thr.start();
+
+	power_signal_thr.set_connection_params("127.0.0.1", POWER_SIGNAL);
+	power_signal_thr.start();
+
+	if (!power_slot_thr.wait_connected(3) || !power_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с power_bus");
+		this->deleteLater();
+		return;
+	}
+	calc_meas();
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("n6705_geometry").toByteArray());
 }
@@ -204,6 +217,7 @@ void N6705Widget::calc_meas()
 			chan_states[i].u_meas = chan_states[i].u;
 			chan_states[i].i_meas = 0;
 		}
+		power_slot_thr.get_power_bus_obj()->set_bus_u(QString("N6705 %1").arg(i+1), chan_states[i].u_meas);
 	}
 }
 

@@ -80,6 +80,7 @@ int power_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["get_i(int, double&)"] = &power_bus_Socket_RPC_SLOT_Object::get_i;
 		operators_map["set_i(int, QString, double)"] = &power_bus_Socket_RPC_SLOT_Object::set_i;
 		operators_map["set_bus_state(int, int)"] = &power_bus_Socket_RPC_SLOT_Object::set_bus_state;
+		operators_map["set_bus_u(QString, double)"] = &power_bus_Socket_RPC_SLOT_Object::set_bus_u;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -117,6 +118,7 @@ int power_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
+		disconnect(app, SIGNAL(u_on_bus(QString, double)), this, SLOT(u_on_bus(QString, double)));
 		disconnect(app, SIGNAL(u_on_nk(double)), this, SLOT(u_on_nk(double)));
 		disconnect(app, SIGNAL(u_on_k1(double)), this, SLOT(u_on_k1(double)));
 		disconnect(app, SIGNAL(u_on_k2(double)), this, SLOT(u_on_k2(double)));
@@ -124,6 +126,8 @@ int power_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	void power_bus_Socket_RPC_SIGNAL_Object::set_app(PowerWidget* _app)
 	{
 		app = _app;
+		connect(app, SIGNAL(u_on_bus(QString, double)), this, SLOT(u_on_bus(QString, double)), Qt::DirectConnection);
+		data_map.insert("u_on_bus(QString, double)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(u_on_nk(double)), this, SLOT(u_on_nk(double)), Qt::DirectConnection);
 		data_map.insert("u_on_nk(double)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(u_on_k1(double)), this, SLOT(u_on_k1(double)), Qt::DirectConnection);
@@ -259,6 +263,31 @@ int power_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	void power_bus_Socket_RPC_SIGNAL_Object::u_on_bus(QString name, double volt)
+	{
+		auto& descriptor = *data_map["u_on_bus(QString, double)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("u_on_bus(QString, double)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal u_on_bus  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << name;
+		SRPCSignalClass::Instance().toLog(QString("u_on_bus  call_number %2 name =  %1").arg(RPCSignalClass::QVariantToString(name)).arg(call_number));
+		tmp_stream << volt;
+		SRPCSignalClass::Instance().toLog(QString("u_on_bus  call_number %2 volt =  %1").arg(RPCSignalClass::QVariantToString(volt)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal u_on_bus sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal u_on_bus finished").arg(objectName()));
+	}
 	void power_bus_Socket_RPC_SIGNAL_Object::u_on_nk(double volt)
 	{
 		auto& descriptor = *data_map["u_on_nk(double)"].get();
@@ -409,6 +438,25 @@ int power_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int bus = _values.at(0).value<int>();
 			int state = _values.at(1).value<int>();
 			app->set_bus_state(bus, state);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant power_bus_Socket_RPC_SLOT_Object::set_bus_u(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString name = _values.at(0).value<QString>();
+			double volt = _values.at(1).value<double>();
+			app->set_bus_u(name, volt);
 			return 0;
 		}
 		catch(const std::exception &)

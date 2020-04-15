@@ -411,6 +411,15 @@ int RPC_kpiu_SLOT_Object::get_connection_state(QVariantList& _chans)
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished get_connection_state %1").arg(tmp_ret_params));
 	return res.toInt();
 }
+void RPC_kpiu_SLOT_Object::power_bus_state_changed(QString name, double u)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(name);
+	tmp_list << QVariant(u);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call power_bus_state_changed %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("power_bus_state_changed(QString, double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished power_bus_state_changed");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

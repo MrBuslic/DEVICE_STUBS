@@ -111,6 +111,6 @@ void MKUWidget::set_tm(QString tm_name, QVariant tm_val)
 
 void MKUWidget::make_mt_at_state(int dev_name, int state)
 {
-	log_widget->log_append(QString("Состояние аппаратуры БАУ под номером %1 равно %2").arg(dev_name).arg(get_line(state)));
+	log_widget->log_append(QString("Состояние аппаратуры БАУ под номером %1 равно %2").arg(dev_name).arg(state));
 	emit new_mt_at_state(dev_name, state);
 }

@@ -29,7 +29,9 @@ endif()
 set(AG7972_SOURCES main.cpp AG7972.h AG7972.cpp)
 include_directories($ENV{VISA_HOME}include)
 
-add_executable(ag7972 WIN32 ${AG7972_SOURCES})
+SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
+
+add_executable(ag7972 WIN32 ${AG7972_SOURCES} ${POWER_RPC_SOURCES})
 set_target_properties(ag7972 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
-target_link_libraries(ag7972 ${QT_LIBRARIES})
+target_link_libraries(ag7972 ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(ag7972 Core Widgets Gui Network)

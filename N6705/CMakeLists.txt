@@ -32,7 +32,9 @@ set(N6705_SOURCES main.cpp N6705.h N6705.cpp)
 
 include_directories($ENV{VISA_HOME}include)
 
-add_executable(n6705 WIN32 ${N6705_SOURCES})
+SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
+
+add_executable(n6705 WIN32 ${N6705_SOURCES} ${POWER_RPC_SOURCES})
 set_target_properties(n6705 PROPERTIES COMPILE_FLAGS "/MP /EHa /Zc:wchar_t /wd\"4503\"" )
 target_link_libraries(n6705 ${QT_LIBRARIES} socket_rpc)
 qt5_use_modules(n6705 Core Widgets Gui Network)

@@ -21,6 +21,8 @@
 #include <loki/Singleton.h>
 #include "rpc_loger.h"
 
+#include "../buses_imitator/power_bus_rpc.h"
+
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 struct chan_state
@@ -55,6 +57,9 @@ private:
 	
 	QList<chan_state> chan_states;
 	LogWidget* log_widget;
+
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 signals:
 	void update_graphics_signal();
 	void power_out(int n, double _u);
