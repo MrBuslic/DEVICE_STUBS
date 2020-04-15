@@ -94,6 +94,15 @@ void RPC_n736_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+void RPC_n736_SLOT_Object::dataIn(QVariantList dataList, QVariantList maskList)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(dataList);
+	tmp_list << QVariant(maskList);
+	SRPCSignalClass::Instance().toLog(QString("n736 dynamic_call dataIn %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("dataIn(QVariantList, QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("n736 dynamic_call finished dataIn");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

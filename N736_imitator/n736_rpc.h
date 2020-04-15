@@ -10,6 +10,7 @@ public:
 	RPC_n736_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("n736_slot_obj");}
 	////////////////////////////////////
 public slots:
+	void dataIn(QVariantList dataList, QVariantList maskList);
 	////////////////////////////////////
 };
 

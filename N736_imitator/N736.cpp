@@ -89,12 +89,13 @@ N736_widg::N736_widg() : flag_on(false)
 	AbOn_tmr->setSingleShot(true);
 	//connect(AbOn_tmr, &QTimer::timeout, this, &MPR_widg::omni_connect);
 
-	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
-	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-	slot_thr.start(); // вот тут падает
 
-	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-	signal_thr.start(); // вот тут падает
+	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
+	//slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+	//slot_thr.start(); // вот тут падает
+
+	//signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+	//signal_thr.start(); // вот тут падает
 
 	/*if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
 	{
@@ -103,6 +104,26 @@ N736_widg::N736_widg() : flag_on(false)
 		return;
 	}*/
 
+
+	QString ip_str = "127.0.0.1";
+	int slot_port = N736_SLOT;
+	int signal_port = N736_SIGNAL;
+	n736_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new n736_Socket_RPC_SLOT_Server_Thread;
+	rpc_slot_srv->set_app(this);
+	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->start();
+	n736_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new n736_Socket_RPC_SIGNAL_Thread;
+	rpc_signal_srv->set_app(this);
+	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->start();
+
+
+	if (!isset(24, 24))
+	{
+		//kpi_list << FREQ_P_code;
+		qDebug() << "P";
+
+	}
 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
 	mku_slot_thr.start(); // вот тут падает
@@ -117,12 +138,21 @@ N736_widg::N736_widg() : flag_on(false)
 	//	return;
 	//}
 
-
-
-	QString ip_str = "127.0.0.1";
-	int slot_port = N736_SLOT;
-	int signal_port = N736_SIGNAL;
 	
+	ols_slot_thr.set_connection_params("127.0.0.1", OLS_SLOT);
+	ols_slot_thr.start();
+
+	ols_signal_thr.set_connection_params("127.0.0.1", OLS_SIGNAL);
+	ols_signal_thr.start();
+
+	if (!ols_slot_thr.wait_connected(3) || !ols_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с ols");
+		//this->deleteLater();
+		return;
+	}
+
+	connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr.get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &N736_widg::dataIn);
 
 
 	//MKO = 1;
@@ -135,9 +165,33 @@ N736_widg::N736_widg() : flag_on(false)
 	
 	//paint_buttons();
 
+
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("n736_geometry").toByteArray());
 //	set_new_tm();
+}
+
+bool N736_widg::isset(qulonglong x, qulonglong n)
+{
+	return (x & ((qulonglong)1 << n)) != 0;
+}
+
+
+void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
+{
+	if (maskList.isEmpty() || dataList.isEmpty())
+		return;
+	//KPIString = "";
+	QVariantList kpi_list;
+
+	for (auto const& i : boost::combine(dataList, maskList)) // range based
+	{
+		QVariant MASKVar, DATAVar;
+		boost::tie(DATAVar, MASKVar) = i;
+		qulonglong MASK = MASKVar.toULongLong();
+		qulonglong DATA = DATAVar.toULongLong();
+		qulonglong res = MASK & DATA;
+	}
 }
 
 void N736_widg::closeEvent(QCloseEvent *event)

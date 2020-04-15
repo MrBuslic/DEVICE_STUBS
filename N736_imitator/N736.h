@@ -12,10 +12,16 @@
 #include <QMainWindow>
 //#include "LKAModules.h"
 
+#include "../UNOLS/ols_rpc.h"
+#include "../buses_imitator/kpi_bus_rpc.h"
 #include "../OMNIBUSBOX/omnibus_rpc.h"
 //#include "../mbk04_imitator/mbk04_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 //#include "../buses_imitator/power_bus_rpc.h"
+
+#include <boost/range/combine.hpp>
+#include <boost/tuple/tuple.hpp>
+
 
 class N736_widg : public QWidget
 {
@@ -49,6 +55,19 @@ private:
 	QGridLayout *kit_glayout;
 	QGridLayout *line_glayout;
 
+
+
+	bool isset(qulonglong x, qulonglong n);
+
+	RPC_ols_SLOT_Thread ols_slot_thr;
+	RPC_ols_SIGNAL_Thread ols_signal_thr;
+
+	RPC_omnibus_SLOT_Thread slot_thr;
+	RPC_omnibus_SIGNAL_Thread signal_thr;
+
+	RPC_mku_bus_SLOT_Thread mku_slot_thr;
+	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
+
 	int MKO;
 	int adr;
 	int num_ku;
@@ -66,21 +85,17 @@ private:
 	double volt;
 	QTimer *AbOn_tmr;
 
+
+
+
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	//void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
-
+	void dataIn(QVariantList dataList, QVariantList maskList);
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 
-private:
-
-	RPC_omnibus_SLOT_Thread slot_thr;
-	RPC_omnibus_SIGNAL_Thread signal_thr;
-
-	RPC_mku_bus_SLOT_Thread mku_slot_thr;
-	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 };
 
 #endif // N736_H

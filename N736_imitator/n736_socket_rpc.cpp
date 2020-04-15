@@ -76,6 +76,7 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("n736_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &n736_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
+		operators_map["dataIn(QVariantList, QVariantList)"] = &n736_Socket_RPC_SLOT_Object::dataIn;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -290,6 +291,25 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	QVariant n736_Socket_RPC_SLOT_Object::dataIn(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->dataIn(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 

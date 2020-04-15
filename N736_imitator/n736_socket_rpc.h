@@ -94,6 +94,7 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
+	QVariant dataIn(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
