@@ -116,6 +116,7 @@ public:
 	QVariant mds_2_get_sample(QVariantList& _values);
 	QVariant get_resistance(QVariantList& _values);
 	QVariant get_connection_state(QVariantList& _values);
+	QVariant power_bus_state_changed(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

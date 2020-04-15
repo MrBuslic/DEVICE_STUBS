@@ -16,6 +16,10 @@ void RPC_power_bus_SIGNAL_Thread::run()
 
 void RPC_power_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_bus)) {
+		connect_signal("u_on_bus(QString, double)", true);
+	}
+	else
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_nk)) {
 		connect_signal("u_on_nk(double)", true);
 	}
@@ -31,6 +35,10 @@ void RPC_power_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 
 void RPC_power_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_bus)) {
+		connect_signal("u_on_bus(QString, double)", false);
+	}
+	else
 	if (signal == QMetaMethod::fromSignal(&RPC_power_bus_SIGNAL_Object::u_on_nk)) {
 		connect_signal("u_on_nk(double)", false);
 	}
@@ -77,6 +85,25 @@ void RPC_power_bus_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("power_bus new signal " + op_name);
 
+			if (op_name == "u_on_bus(QString, double)")
+			{
+				QString name;
+				tmp_stream >> name;
+				SRPCSignalClass::Instance().toLog("power_bus " + op_name +" call_number "+ QString::number(call_number) + " name = "+RPCSignalClass::QVariantToString(name));
+				double volt;
+				tmp_stream >> volt;
+				SRPCSignalClass::Instance().toLog("power_bus " + op_name +" call_number "+ QString::number(call_number) + " volt = "+RPCSignalClass::QVariantToString(volt));
+				emit u_on_bus(name, volt);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("power_bus signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 			if (op_name == "u_on_nk(double)")
 			{
 				double volt;
@@ -172,6 +199,15 @@ void RPC_power_bus_SLOT_Object::set_bus_state(int bus, int state)
 	SRPCSignalClass::Instance().toLog(QString("power_bus dynamic_call set_bus_state %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("set_bus_state(int, int)", tmp_list);
 	SRPCSignalClass::Instance().toLog("power_bus dynamic_call finished set_bus_state");
+}
+void RPC_power_bus_SLOT_Object::set_bus_u(QString name, double volt)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(name);
+	tmp_list << QVariant(volt);
+	SRPCSignalClass::Instance().toLog(QString("power_bus dynamic_call set_bus_u %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_bus_u(QString, double)", tmp_list);
+	SRPCSignalClass::Instance().toLog("power_bus dynamic_call finished set_bus_u");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

@@ -57,7 +57,7 @@ class KPIUServer : public QWidget
 {
 	Q_OBJECT
 public:
-	KPIUServer(QWidget* parent = 0);
+	KPIUServer(QString rm_type, QWidget* parent = 0);
 public slots:
 	//mku_bus_setup
 	int KU_NASTROYKA_CELOSTNOSTI_KANALOV(int ku_n, int line);
@@ -94,6 +94,8 @@ public slots:
 	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
 
+
+	void power_bus_state_changed(QString name, double u);
 private:
 	MDS1_CHANNELS mds1_chans;
 	MDS2_CHANNELS mds2_chans;
@@ -115,6 +117,10 @@ private:
 
 	RPC_vvk4_SLOT_Thread* vvk4_slot_thr;
 
+	QString rm_type;
+
+	int bufar_chan;
+	QMap<int, bool> ip_state;
 signals:
 	void string_msg(QString _msg);
 	void int_msg(int _msg);

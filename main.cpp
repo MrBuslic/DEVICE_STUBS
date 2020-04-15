@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	LogWidget log_widget;
 	log_widget.show();
 
-	KPIUServer kpiu_server;
-	kpiu_server.show();
+	KPIUServer* kpiu_server = new KPIUServer(QString(argv[1]));
+	kpiu_server->show();
 	return app.exec();
 }

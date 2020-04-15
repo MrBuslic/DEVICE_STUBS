@@ -25,6 +25,7 @@ find_package(libmongocxx REQUIRED)
 add_definitions(-DWIN32_LEAN_AND_MEAN)
 
 include_directories($ENV{VISA_HOME}/include)
+include_directories($ENV{IVI_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include)
 #include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
@@ -152,7 +153,8 @@ add_subdirectory(NRPZ_stub)
 add_subdirectory(SCHWARZ_stub)
 add_subdirectory(TEST1003)
 add_subdirectory(UNMVI102)
-
+add_subdirectory(MWSwitch)
+add_subdirectory(PCIMKO)
 
 #add_subdirectory(bkupi_imitator)
 #add_subdirectory(tpo_imitator)
