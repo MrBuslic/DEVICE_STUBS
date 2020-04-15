@@ -64,12 +64,14 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 	QProcess::execute(QApplication::applicationDirPath() + "/db_starter");
 	if (rm_type == "aik")
 	{
+		QProcess::startDetached(QApplication::applicationDirPath() + "/ag7972");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/afar_server");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/afar_mko_server");
 		QThread::currentThread()->msleep(2000);
 		QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
 		QThread::currentThread()->msleep(2000);
 		QProcess::startDetached(QApplication::applicationDirPath() + "/LKA-05_imitator");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/monitor");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/main_server");
 		//QThread::currentThread()->msleep(2000);
 		//QProcess::startDetached(QApplication::applicationDirPath() + "/client");
 	}
