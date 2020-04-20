@@ -37,7 +37,6 @@ public:
 	bool chan_2 = false;
 	bool chan_3 = false;
 	bool chan_4 = false;
-	qint16 faze_code = 0;
 };
 
 class BUM_cl
@@ -78,6 +77,7 @@ private:
 
 	int BUFAR_current = 0;
 	BUFAR_MODEs BUFAR_mode = MODE_1;
+	int BUFAR_sub_mode = 0;
 	QList<BUM_current> BUM_current_list;
 	int OY_faze = 0;
 	int OZ_faze = 0;
@@ -97,6 +97,7 @@ private:
 	void imit_on();//выключение имитатора
 	void set_power_back();//возврат силы тока в зависимости от мощности
 	void I_1(QVariantList words);
+	//void set_new_I_2();
 	void change_BUMs(int num, bool ch_1, bool ch_2, bool ch_3, bool ch_4);
 	void change_BUMs(int num, bool all_ch);
 	int faze_move(quint16 faze);
