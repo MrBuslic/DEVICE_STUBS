@@ -5,7 +5,7 @@
 
 int unols_state = UNOLS_STOP;
 unols_mKRUserCallback _interrupt_handle;
-
+int ols_count = 0;
 ols_rpc_buffer_class::ols_rpc_buffer_class()
 {
 	for (int i = 0; i < 5; i++)
@@ -24,8 +24,10 @@ ols_rpc_buffer_class::ols_rpc_buffer_class()
 		ols_slot_thr.push_back(slot_thr);
 		ols_signal_thr.push_back(signal_thr);
 
-		periods << 0;
-		series << 0;
+		periods << QVector <int>();
+		series << QVector <int>();
+
+		pack_num << 0;
 
 		ols_KF_buffer << QVariantList();
 		mask_buffer << QVariantList();
@@ -68,7 +70,8 @@ ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName,
 								ViBoolean 	id_query,
 								ViBoolean 	reset, 
 	ViPSession 	vi) {
-	*vi = 1;  
+	ols_count++;
+	*vi = ols_count;  
 return 0;
 }
 /****************************************************************************
@@ -97,11 +100,13 @@ ViStatus _VI_FUNC unols_config_mode (ViSession vi, ViUInt16 devise,
                                      ViUInt16 packs, ViUInt32 _VI_FAR periodPack[], 
                                      ViUInt32 _VI_FAR seriesPack[])
 {
-	Sols_rpc_buffer_class::Instance().pack_num = packs;
+	Sols_rpc_buffer_class::Instance().pack_num[vi-1] = packs;
+	Sols_rpc_buffer_class::Instance().periods[vi - 1].resize(packs);
+	Sols_rpc_buffer_class::Instance().series[vi - 1].resize(packs);
 	for (int i = 0; i < packs; i++) 
 	{
-		Sols_rpc_buffer_class::Instance().periods[i] = periodPack[i];
-		Sols_rpc_buffer_class::Instance().series[i] = seriesPack[i];
+		Sols_rpc_buffer_class::Instance().periods[vi - 1][i] = periodPack[i];
+		Sols_rpc_buffer_class::Instance().series[vi - 1][i] = seriesPack[i];
 	}
 	return 0; 
 }
