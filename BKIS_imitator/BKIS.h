@@ -196,17 +196,30 @@ private:
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
+	void change_button_color(QPushButton button);
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_ku_mk(int ku, int length_ku, double u_ku, int line_ku);
-	void set_blk_state(bool state);
+	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
+	void get_power(double _volt);
+	void set_blk_state(int state);
 	void set_interface_state(bool state);
+	int set_electric_heater_state(int name, bool state);
+	int pyro_group_set(int group_num, bool state);
+	void set_power_back();
+	void omni_connect();
 private:
-	QString name = "АОС";//Имя устройства
+	QString name = "BKIS";//Имя устройства
 	int bus  = 2;//номер шины для шины питания(power_bus)
 	int volt;//Принятое напряжение
 
-	bool blk_state;
+	int blk_state;
 	bool interface_state;
+	QMap<int, int> pyro_groups_states;
+	QMap<int, int> electric_heaters_states;
+	
+	QPushButton* main_blk;
+	QPushButton* reserve_blk;
+	QPushButton* main_interface;
+	QPushButton* reserve_interface;
 	
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;
