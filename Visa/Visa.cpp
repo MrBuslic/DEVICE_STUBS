@@ -108,6 +108,12 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 			mez = "iksa_server";
 		}
 
+		if (commapp == "afar_server")
+		{
+			mezanin_list_add("PXI17::8::0::INSTR", 5, 0x010D, 1, 1);		// ÕÃ
+			mez = "afar_server";
+		}
+
 		if (commapp == "mbk02")
 		{
 			mezanin_list_add("VXI::30::INSTR", VI_INTF_VXI, 0x0171, 1, 1);		//  œ100-30

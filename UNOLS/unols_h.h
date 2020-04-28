@@ -21,9 +21,9 @@ public:
 	int rec_event;
 	friend struct Loki::CreateUsingNew<ols_rpc_buffer_class>;
 		
-	int pack_num;
-	QVector <int> periods;
-	QVector <int> series;
+	QList<int> pack_num;
+	QList<QVector <int> > periods;
+	QList<QVector <int> > series;
 	QList<QVariantList> ols_KR_buffer;
 	QList<QVariantList> ols_KF_buffer;
 	QList<QVariantList> mask_buffer;
