@@ -27,7 +27,6 @@ N737_widg::N737_widg() : flag_on(false)
 
 	line_mko_0 = new QPushButton("0", this);
 	line_mko_1 = new QPushButton("1", this);
-
 	QStringList name_btn_lst;
 	name_btn_lst <<  "БЛОКИРОВКА" << "ВКЛЮЧИТЬ" << "ПОДКЛЮЧИТЬ" << "РАБОТА ФК"	<< "РАБОТА" 
 		<< "ГОТОВ К ЦУ" << "БЛОКИРОВКА УСТАНОВЛЕНА" << "ВКЛЮЧЕНО" << "ИСПРАВНО" << "ПОДКЛЮЧЕНО" << "РАБОТА ФК УСТАНОВЛЕНА" << "РАБОТА УСТАНОВЛЕНА" << "ЗАХВАТ ПСП";
@@ -90,18 +89,33 @@ N737_widg::N737_widg() : flag_on(false)
 	//connect(AbOn_tmr, &QTimer::timeout, this, &MPR_widg::omni_connect);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
+	
+	
+	QString ip_str = "127.0.0.1";
+	int slot_port = N737_SLOT;
+	int signal_port = N737_SIGNAL;
+
+	n737_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new n737_Socket_RPC_SLOT_Server_Thread;
+	rpc_slot_srv->set_app(this);
+	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->start();
+	n737_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new n737_Socket_RPC_SIGNAL_Thread;
+	rpc_signal_srv->set_app(this);
+	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->start();
+	
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
 	signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
 	signal_thr.start(); // вот тут падает
 
-	/*if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
+	if (!slot_thr.wait_connected(3) || !signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с rpc_omnibus");
 		this->deleteLater();
 		return;
-	}*/
+	}
 
 
 	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
@@ -110,35 +124,131 @@ N737_widg::N737_widg() : flag_on(false)
 	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
 	mku_signal_thr.start(); // вот тут падает
 
-	//if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
-	//{
-	//	QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
-	//	this->deleteLater();
-	//	return;
-	//}
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mku_bus");
+		this->deleteLater();
+		return;
+	}
 
 
-
-	QString ip_str = "127.0.0.1";
-	int slot_port = N737_SLOT;
-	int signal_port = N737_SIGNAL;
-	
 
 
 	//MKO = 1;
 	//adr = 4;
 
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-	connect(signal_thr.get_obj().get(), SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
-	//connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_732(int, int, double, int)), this, SLOT(new_ku_732(int, int, double, int)));
+	//connect(signal_thr.get_obj().get(), SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_data_737(QVariantList, QVariantList)), this, SLOT(dataIn(QVariantList, QVariantList)));
 
-	
-	//paint_buttons();
+	num_chnl = 0;
+	current_dev_7 = CURRENT_COMP_7::OFF;
+	current_mko_7 = CURRENT_MKO_7::OFF;
+
+	paint_buttons();
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("n737_geometry").toByteArray());
 //	set_new_tm();
 }
+
+void N737_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+{
+}
+void N737_widg::paint_buttons()
+{
+	switch (current_dev_7)
+	{
+	case CURRENT_COMP_7::MAIN:
+		main_comp->setStyleSheet("background-color: rgb(142, 198, 156);"); //green light - working
+		reserve_comp->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
+		QApplication::processEvents();
+		break;
+	case CURRENT_COMP_7::OFF:
+		main_comp->setStyleSheet("background-color: rgb(204, 204, 204);");
+		reserve_comp->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case CURRENT_COMP_7::RESERVE:
+		main_comp->setStyleSheet("background-color: rgb(204, 204, 204);");
+		reserve_comp->setStyleSheet("background-color: rgb(142, 198, 156);");
+		break;
+
+	default:
+		break;
+	}
+	switch (current_mko_7)
+	{
+	case CURRENT_MKO_7::MAIN:
+		line_mko_0->setStyleSheet("background-color: rgb(142, 198, 156);"); //green light - working
+		line_mko_1->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
+		QApplication::processEvents();
+		break;
+	case CURRENT_MKO_7::OFF:
+		line_mko_0->setStyleSheet("background-color: rgb(204, 204, 204);");
+		line_mko_1->setStyleSheet("background-color: rgb(204, 204, 204);");
+		break;
+	case CURRENT_MKO_7::RESERVE:
+		line_mko_0->setStyleSheet("background-color: rgb(204, 204, 204);");
+		line_mko_1->setStyleSheet("background-color: rgb(142, 198, 156);");
+		break;
+
+	default:
+		break;
+	}
+}
+
+void N737_widg::set_tm_state()
+{
+	qDebug() << "num_chnl=" << num_chnl;
+	mku_slot_thr.get_mku_bus_obj()->set_tm("737_TM", (uint)num_chnl);
+}
+
+
+bool N737_widg::isset(qulonglong x, qulonglong n)
+{
+	qDebug() << "isset=" << ((qulonglong)1 << n) << "n = " << n;
+	return (x & ((qulonglong)1 << n)) != 0;
+}
+
+
+void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
+{
+	//num_chnl = 0;
+	if (maskList.isEmpty() || dataList.isEmpty())
+		return;
+	//KPIString = "";
+	QVariantList kpi_list;
+	
+	//name_btn_lst << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_CONNECT_1 << CHAN_WORK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
+
+
+	in_lst << CHAN_R_BLOCK_1 << CHAN_R_INCLUDE_1 << CHAN_R_CONNECT_1 << CHAN_R_WORK_FK_1 << CHAN_R_WORK_1;
+	out_lst << CHAN_R_READY_CU_1 << CHAN_R_SET_BLOCK_1 << CHAN_R_SET_INCLUDE_1 << CHAN_R_SET_OK_1 << CHAN_R_SET_CONNECT_1 << CHAN_R_SET_WORK_FK_1 << CHAN_R_SET_WORK_1 << CHAN_R_PSP_1;
+	
+	//name_lst_1 << CHAN_R_BLOCK_2 << CHAN_R_INCLUDE_2 << CHAN_R_CONNECT_2 << CHAN_R_WORK_FK_2 << CHAN_R_WORK_2 << CHAN_R_READY_CU_2 << CHAN_R_SET_BLOCK_2 << CHAN_R_SET_INCLUDE_2 << CHAN_R_SET_OK_2 << CHAN_R_SET_CONNECT_2 << CHAN_R_SET_WORK_FK_2 << CHAN_R_SET_WORK_2 << CHAN_R_PSP_2;
+	for (auto const& i : boost::combine(dataList, maskList)) // range based
+	{
+		QVariant MASKVar, DATAVar;
+		boost::tie(DATAVar, MASKVar) = i;
+		qulonglong MASK = MASKVar.toULongLong();
+		qulonglong DATA = DATAVar.toULongLong();
+		qulonglong res = MASK & DATA;
+		qDebug() << "res=" << res;
+
+		if (isset(res, CHAN_R_BLOCK_1 - 1))
+		{
+		}
+
+
+		for (int i = 0; i < in_lst.count(); i++)
+		{
+			num_chnl |= (1i64 << (in_lst[i] - 1));
+			qDebug() << "num_chnl=" << num_chnl << (1i64 << (in_lst[i] - 1)) << (1i64 << (in_lst[i]));
+		}
+	}
+	set_tm_state();
+}
+
 
 void N737_widg::closeEvent(QCloseEvent *event)
 {

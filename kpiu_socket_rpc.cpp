@@ -94,6 +94,8 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["mds_2_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_2_get_sample;
 		operators_map["get_resistance(uint, QVariant&)"] = &kpiu_Socket_RPC_SLOT_Object::get_resistance;
 		operators_map["get_connection_state(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::get_connection_state;
+		operators_map["mshr_data_in(QVariantList, QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mshr_data_in;
+		operators_map["mshr_data_out(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::mshr_data_out;
 		operators_map["power_bus_state_changed(QString, double)"] = &kpiu_Socket_RPC_SLOT_Object::power_bus_state_changed;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
@@ -773,6 +775,46 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 1;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::mshr_data_in(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->mshr_data_in(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::mshr_data_out(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList data = _values.at(0).value<QVariantList>();
+			app->mshr_data_out(data);
+			_values[0] = data;
+			SRPCSignalClass::Instance().toLog(QString("%1 data = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
+			with_return = true;
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
 		}
 	}
 	QVariant kpiu_Socket_RPC_SLOT_Object::power_bus_state_changed(QVariantList& _values)

@@ -76,6 +76,8 @@ int n737_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("n737_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &n737_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
+		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &n737_Socket_RPC_SLOT_Object::new_message;
+		operators_map["dataIn(QVariantList, QVariantList)"] = &n737_Socket_RPC_SLOT_Object::dataIn;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -290,6 +292,48 @@ int n737_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	QVariant n737_Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariant dt = _values.at(0).value<QVariant>();
+			int mko = _values.at(1).value<int>();
+			int line = _values.at(2).value<int>();
+			int cwd = _values.at(3).value<int>();
+			QVariantList words = _values.at(4).value<QVariantList>();
+			int os = _values.at(5).value<int>();
+			app->new_message(dt, mko, line, cwd, words, os);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant n737_Socket_RPC_SLOT_Object::dataIn(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->dataIn(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 

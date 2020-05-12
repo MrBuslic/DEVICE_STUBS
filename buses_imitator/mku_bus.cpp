@@ -53,6 +53,20 @@ void MKUWidget::make_ku_732(int ku_n, int length, double u, int line)
 	emit new_ku_732(ku_n, length, u, line);
 }
 
+void MKUWidget::make_data_736(QVariantList dataList, QVariantList maskList)
+{
+	//log_widget->log_append(QString("КУ 736 %1").arg(ku_n));
+	log_widget->log_append(QString("КУ 736"));
+	emit new_data_736(dataList, maskList);
+}
+
+void MKUWidget::make_data_737(QVariantList dataList, QVariantList maskList)
+{
+	//log_widget->log_append(QString("КУ 736 %1").arg(ku_n));
+	log_widget->log_append(QString("КУ 737"));
+	emit new_data_737(dataList, maskList);
+}
+
 void MKUWidget::make_ku_cbk(int ku_n, int length, double u, int line)
 {
 	log_widget->log_append(QString("КУ ЦБК %1").arg(ku_n));

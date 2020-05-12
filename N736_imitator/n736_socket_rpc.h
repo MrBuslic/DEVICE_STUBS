@@ -27,7 +27,8 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void new_ku(int ku_n, int length, double u, int line);
+	void new_data();
+	void test(QVariantList dataList, QVariantList maskList);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -95,6 +96,7 @@ public:
 public:
 	QVariant QuerySlots(QVariantList& _values);
 	QVariant dataIn(QVariantList& _values);
+	QVariant new_message(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

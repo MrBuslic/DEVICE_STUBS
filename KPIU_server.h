@@ -94,6 +94,8 @@ public slots:
 	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
 
+	void mshr_data_in(QVariantList dataList, QVariantList maskList);
+	void mshr_data_out(QVariantList& data);
 
 	void power_bus_state_changed(QString name, double u);
 private:

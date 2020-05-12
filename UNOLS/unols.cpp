@@ -30,6 +30,7 @@ ols_rpc_buffer_class::ols_rpc_buffer_class()
 		pack_num << 0;
 
 		ols_KF_buffer << QVariantList();
+		ols_KR_buffer << QVariantList();
 		mask_buffer << QVariantList();
 	}
 }

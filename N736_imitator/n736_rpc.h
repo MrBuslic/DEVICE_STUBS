@@ -11,6 +11,7 @@ public:
 	////////////////////////////////////
 public slots:
 	void dataIn(QVariantList dataList, QVariantList maskList);
+	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	////////////////////////////////////
 };
 
@@ -41,7 +42,8 @@ protected:
 	void connectNotify(const QMetaMethod & signal);
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
-	void new_ku(int ku_n, int length, double u, int line);
+	void new_data();
+	void test(QVariantList dataList, QVariantList maskList);
 };
 
 class RPC_n736_SIGNAL_Thread : public RPC_SIGNAL_Thread
