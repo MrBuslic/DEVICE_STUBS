@@ -115,10 +115,11 @@ public:
 	vvk4_Socket_RPC_SLOT_Thread(RpcVvk4Widget* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<vvk4_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<vvk4_Socket_RPC_SLOT_Object> rpc_obj;
 	RpcVvk4Widget* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class vvk4_Socket_RPC_SLOT_Server : public QTcpServer

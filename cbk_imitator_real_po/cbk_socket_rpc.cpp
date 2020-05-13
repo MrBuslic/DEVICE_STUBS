@@ -3,6 +3,7 @@
 int cbk_Socket_RPC_SLOT_Object::obj_num = 0;
 int cbk_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int cbk_Socket_RPC_SIGNAL_Object::call_number = 0;
+int cbk_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	cbk_Socket_RPC_SIGNAL_Thread::cbk_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int cbk_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	cbk_Socket_RPC_SLOT_Thread::cbk_Socket_RPC_SLOT_Thread(CBK_MainWindow* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("cbk_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void cbk_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

@@ -118,10 +118,11 @@ public:
 	ols_Socket_RPC_SLOT_Thread(RpcOlsWidget* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<ols_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<ols_Socket_RPC_SLOT_Object> rpc_obj;
 	RpcOlsWidget* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class ols_Socket_RPC_SLOT_Server : public QTcpServer

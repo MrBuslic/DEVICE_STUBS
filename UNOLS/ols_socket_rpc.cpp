@@ -3,6 +3,7 @@
 int ols_Socket_RPC_SLOT_Object::obj_num = 0;
 int ols_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
+int ols_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	ols_Socket_RPC_SIGNAL_Thread::ols_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int ols_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	ols_Socket_RPC_SLOT_Thread::ols_Socket_RPC_SLOT_Thread(RpcOlsWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("ols_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void ols_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

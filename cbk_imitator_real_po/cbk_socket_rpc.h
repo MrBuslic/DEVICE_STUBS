@@ -116,10 +116,11 @@ public:
 	cbk_Socket_RPC_SLOT_Thread(CBK_MainWindow* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<cbk_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<cbk_Socket_RPC_SLOT_Object> rpc_obj;
 	CBK_MainWindow* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class cbk_Socket_RPC_SLOT_Server : public QTcpServer

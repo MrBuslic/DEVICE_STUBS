@@ -26,7 +26,6 @@ add_definitions(-DWIN32_LEAN_AND_MEAN)
 #include_directories ($ENV{SM_HOME}/target/OPO/OPO_h)
 #include_directories ($ENV{SM_HOME}/target/target_h)
 
-
 include_directories(${Qt5Core_INCLUDES})
 include_directories(${Qt5Gui_INCLUDES})
 include_directories(${Qt5Widgets_INCLUDES})
@@ -36,6 +35,7 @@ include_directories($ENV{LOKI_HOME}/include)
 
 add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(-DNOMINMAX)
+#add_definitions(-D_AFXDLL)
 
 include_directories("../../vendor/libgit2/include")
 include_directories("../../lib/my_git")
@@ -63,6 +63,8 @@ endif()
 FILE(GLOB CBK_HEADERS *.h)
 FILE(GLOB CBK_SOURCES *.cpp)
 
+FILE(GLOB CBK_CORE_SOURCES core/*.*)
+
 SET(OMNIBUSBOX_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
 SET(INTERRUPT_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
 SET(VIP_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
@@ -72,7 +74,9 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS} $ENV{MO
 
 set_source_files_properties(${RPC_SOURCES} PROPERTIES GENERATED TRUE)
 
-add_executable(cbk_imitator_tsrp ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${OMNIBUSBOX_SOURCES} ${INTERRUPT_SOURCES} ${VIP_SOURCES} ${MKU_SOURCES} icon.rc)
+source_group(core FILES ${CBK_CORE_SOURCES})
+
+add_executable(cbk_imitator_tsrp ${MY_WIN_FLAG} ${CBK_HEADERS} ${CBK_SOURCES} ${CBK_CORE_SOURCES} ${OMNIBUSBOX_SOURCES} ${INTERRUPT_SOURCES} ${VIP_SOURCES} ${MKU_SOURCES} icon.rc)
 target_link_libraries (cbk_imitator_tsrp ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES}  ${Qt5Network_LIBRARIES}
                                       ${Boost_LIBRARIES} ${ADDITIONAL_LIBS} socket_rpc) 
 
@@ -85,7 +89,5 @@ endif()
 #	PRE_BUILD
 #	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/cbk_imitator.h ${PROJECT_SOURCE_DIR} cbk
 #)
-
-
 
 

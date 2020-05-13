@@ -126,10 +126,11 @@ public:
 	mn8i_Socket_RPC_SLOT_Thread(RpcMN8IWidget* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<mn8i_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<mn8i_Socket_RPC_SLOT_Object> rpc_obj;
 	RpcMN8IWidget* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class mn8i_Socket_RPC_SLOT_Server : public QTcpServer

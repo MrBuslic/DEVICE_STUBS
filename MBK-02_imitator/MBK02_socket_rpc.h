@@ -123,10 +123,11 @@ public:
 	MBK02_Socket_RPC_SLOT_Thread(MBK02_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<MBK02_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<MBK02_Socket_RPC_SLOT_Object> rpc_obj;
 	MBK02_widg* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class MBK02_Socket_RPC_SLOT_Server : public QTcpServer
