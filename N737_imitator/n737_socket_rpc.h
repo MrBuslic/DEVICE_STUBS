@@ -94,6 +94,8 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
+	QVariant new_message(QVariantList& _values);
+	QVariant dataIn(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
@@ -112,10 +114,11 @@ public:
 	n737_Socket_RPC_SLOT_Thread(N737_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<n737_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<n737_Socket_RPC_SLOT_Object> rpc_obj;
 	N737_widg* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class n737_Socket_RPC_SLOT_Server : public QTcpServer

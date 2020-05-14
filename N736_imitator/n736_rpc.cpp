@@ -16,15 +16,23 @@ void RPC_n736_SIGNAL_Thread::run()
 
 void RPC_n736_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::new_ku)) {
-		connect_signal("new_ku(int, int, double, int)", true);
+	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::new_data)) {
+		connect_signal("new_data()", true);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::test)) {
+		connect_signal("test(QVariantList, QVariantList)", true);
 	}
 }
 
 void RPC_n736_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
-	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::new_ku)) {
-		connect_signal("new_ku(int, int, double, int)", false);
+	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::new_data)) {
+		connect_signal("new_data()", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::test)) {
+		connect_signal("test(QVariantList, QVariantList)", false);
 	}
 }
 
@@ -61,21 +69,28 @@ void RPC_n736_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("n736 new signal " + op_name);
 
-			if (op_name == "new_ku(int, int, double, int)")
+			if (op_name == "new_data()")
 			{
-				int ku_n;
-				tmp_stream >> ku_n;
-				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " ku_n = "+RPCSignalClass::QVariantToString(ku_n));
-				int length;
-				tmp_stream >> length;
-				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " length = "+RPCSignalClass::QVariantToString(length));
-				double u;
-				tmp_stream >> u;
-				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " u = "+RPCSignalClass::QVariantToString(u));
-				int line;
-				tmp_stream >> line;
-				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " line = "+RPCSignalClass::QVariantToString(line));
-				emit new_ku(ku_n, length, u, line);
+				emit new_data();
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("n736 signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
+			if (op_name == "test(QVariantList, QVariantList)")
+			{
+				QVariantList dataList;
+				tmp_stream >> dataList;
+				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " dataList = "+RPCSignalClass::QVariantToString(dataList));
+				QVariantList maskList;
+				tmp_stream >> maskList;
+				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " maskList = "+RPCSignalClass::QVariantToString(maskList));
+				emit test(dataList, maskList);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;
@@ -94,6 +109,28 @@ void RPC_n736_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+void RPC_n736_SLOT_Object::dataIn(QVariantList dataList, QVariantList maskList)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(dataList);
+	tmp_list << QVariant(maskList);
+	SRPCSignalClass::Instance().toLog(QString("n736 dynamic_call dataIn %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("dataIn(QVariantList, QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("n736 dynamic_call finished dataIn");
+}
+void RPC_n736_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(mko);
+	tmp_list << QVariant(line);
+	tmp_list << QVariant(cwd);
+	tmp_list << QVariant(words);
+	tmp_list << QVariant(os);
+	SRPCSignalClass::Instance().toLog(QString("n736 dynamic_call new_message %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("n736 dynamic_call finished new_message");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

@@ -121,10 +121,11 @@ public:
 	mfsk24_Socket_RPC_SLOT_Thread(RpcMFSK24Widget* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<mfsk24_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<mfsk24_Socket_RPC_SLOT_Object> rpc_obj;
 	RpcMFSK24Widget* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class mfsk24_Socket_RPC_SLOT_Server : public QTcpServer

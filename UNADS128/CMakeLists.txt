@@ -36,7 +36,7 @@ include_directories($ENV{VISA_HOME}include)
 
 add_library(unads128 SHARED ${UNADS128_HEADERS} ${UNADS128_SOURCES} export.def)
 
-target_link_libraries(unads128 socket_rpc)
+target_link_libraries(unads128 socket_rpc visa32)
 
 set(RPC_ADS128_SOURCES rpc_ads128.h rpc_ads128.cpp 
 ../buses_imitator/mku_bus_rpc.h ../buses_imitator/mku_bus_rpc.cpp

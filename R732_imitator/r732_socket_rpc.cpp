@@ -3,6 +3,7 @@
 int r732_Socket_RPC_SLOT_Object::obj_num = 0;
 int r732_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int r732_Socket_RPC_SIGNAL_Object::call_number = 0;
+int r732_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	r732_Socket_RPC_SIGNAL_Thread::r732_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int r732_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	r732_Socket_RPC_SLOT_Thread::r732_Socket_RPC_SLOT_Thread(R732_widg* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("r732_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void r732_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

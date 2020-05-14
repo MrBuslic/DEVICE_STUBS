@@ -349,13 +349,13 @@ QString RPC_kpiu_SLOT_Object::getXML()
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished getXML %1").arg(tmp_ret_params));
 	return res.toString();
 }
-void RPC_kpiu_SLOT_Object::mfsk_1_impulse(QVariantList channels)
+void RPC_kpiu_SLOT_Object::mfsk_2_impulse(QVariantList channels)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(channels);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mfsk_1_impulse %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("mfsk_1_impulse(QVariantList)", tmp_list);
-	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished mfsk_1_impulse");
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mfsk_2_impulse %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mfsk_2_impulse(QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished mfsk_2_impulse");
 }
 void RPC_kpiu_SLOT_Object::mds_1_get_sample(uint& buf, bool& flag)
 {
@@ -410,6 +410,26 @@ int RPC_kpiu_SLOT_Object::get_connection_state(QVariantList& _chans)
 	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished get_connection_state %1").arg(tmp_ret_params));
 	return res.toInt();
+}
+void RPC_kpiu_SLOT_Object::mshr_data_in(QVariantList dataList, QVariantList maskList)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(dataList);
+	tmp_list << QVariant(maskList);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mshr_data_in %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mshr_data_in(QVariantList, QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished mshr_data_in");
+}
+void RPC_kpiu_SLOT_Object::mshr_data_out(QVariantList& data)
+{
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(data);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mshr_data_out %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mshr_data_out(QVariantList&)", tmp_list);
+	data = tmp_list.at(0).toList();
+	tmp_ret_params += " data="+RPCSignalClass::QVariantToString(tmp_list.at(0));
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished mshr_data_out %1").arg(tmp_ret_params));
 }
 void RPC_kpiu_SLOT_Object::power_bus_state_changed(QString name, double u)
 {

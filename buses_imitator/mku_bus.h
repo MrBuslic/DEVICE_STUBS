@@ -39,6 +39,8 @@ public slots:
 	int mshm_map_channels_setup(int mshm, int line_m);
 	int pshm_map_channels_setup(int pshm, int line_p);
 	void make_mt_at_state(int dev_name, int state);
+	void make_data_736(QVariantList dataList, QVariantList maskList);
+	void make_data_737(QVariantList dataList, QVariantList maskList);
 
 	void get_tm(QString tm_name, QVariant& tm_val);
 	void set_tm(QString tm_name, QVariant tm_val);
@@ -48,6 +50,8 @@ signals:
 	void new_ku_cbk(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
 	void new_mt_at_state(int dev_name, int state);
+	void new_data_736(QVariantList dataList, QVariantList maskList);
+	void new_data_737(QVariantList dataList, QVariantList maskList);
 private:
 	LogWidget* log_widget;
 

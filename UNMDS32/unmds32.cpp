@@ -12,7 +12,7 @@ extern "C" {
 #include "unmds32_h.h"
 
 int mds_count = 0;
-
+QMap<int, int> vi_adr;
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
 #endif
@@ -31,7 +31,11 @@ ViStatus _VI_FUNC unmds32_init (ViRsrc rsrcName, ViBoolean IDquery,
 	return 0; 
 }
 ViStatus _VI_FUNC unmds32_connect (ViSession mezvi, ViSession vi, ViUInt16 m_num, ViBoolean IDquery,
-                                 ViBoolean doReset){ return 0; }
+                                 ViBoolean doReset)
+{
+	vi_adr.insert(mezvi, m_num - 1);
+	return 0;
+}
 #endif
 
 //--------------------- Set signle mode -------------                               
@@ -68,7 +72,7 @@ ViStatus _VI_FUNC unmds32_sample_period_q (ViSession arg0, ViReal64 *arg1){ retu
 
 //---------------------- Set input trigger ------------------------------
 ViStatus _VI_FUNC unmds32_input_trigger (ViSession mvi, ViBoolean state){
-	return Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_input_trigger(state);
+	return Srpc_buffer_class::Instance().mds32_slot_thr[vi_adr[mvi]]->get_mds32_obj()->unmds32_input_trigger(state);
 }
 
 
@@ -96,7 +100,7 @@ ViStatus _VI_FUNC unmds32_config_trigger (ViSession arg0, ViUInt16 arg1){ return
 
 //---------------------
 ViStatus _VI_FUNC unmds32_start (ViSession mvi){ 
-	return Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_start();
+	return Srpc_buffer_class::Instance().mds32_slot_thr[vi_adr[mvi]]->get_mds32_obj()->unmds32_start();
 }
 
 //---------------------
@@ -113,7 +117,7 @@ ViStatus _VI_FUNC unmds32_read_sample (ViSession mvi, ViPUInt32 buf,ViPUInt32 fi
 	uint tmp_buf;
 	uint _firstTime;
 	uint _lastTime;
-	Srpc_buffer_class::Instance().mds32_slot_thr[mvi-1]->get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
+	Srpc_buffer_class::Instance().mds32_slot_thr[vi_adr[mvi]]->get_mds32_obj()->unmds32_read_sample(tmp_buf,_firstTime,_lastTime);
 	*buf = tmp_buf;
 	*lastTime = _lastTime;
 	*firstTime = _firstTime;

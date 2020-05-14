@@ -1,0 +1,4 @@
+LIBRARY PKM
+EXPORTS
+
+init_pkm @1

@@ -3,6 +3,7 @@
 int n736_Socket_RPC_SLOT_Object::obj_num = 0;
 int n736_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
+int n736_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	n736_Socket_RPC_SIGNAL_Thread::n736_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	n736_Socket_RPC_SLOT_Thread::n736_Socket_RPC_SLOT_Thread(N736_widg* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("n736_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void n736_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
@@ -76,6 +79,8 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	setObjectName(QString("n736_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &n736_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
+		operators_map["dataIn(QVariantList, QVariantList)"] = &n736_Socket_RPC_SLOT_Object::dataIn;
+		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &n736_Socket_RPC_SLOT_Object::new_message;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -113,13 +118,16 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 		SRPCSignalClass::Instance().toLog(QString("%1 SIGNAL SOCK ERROR!!! %2").arg(this->objectName()).arg(_err));
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
-		disconnect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)));
+		disconnect(app, SIGNAL(new_data()), this, SLOT(new_data()));
+		disconnect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)));
 	}
 	void n736_Socket_RPC_SIGNAL_Object::set_app(N736_widg* _app)
 	{
 		app = _app;
-		connect(app, SIGNAL(new_ku(int, int, double, int)), this, SLOT(new_ku(int, int, double, int)), Qt::DirectConnection);
-		data_map.insert("new_ku(int, int, double, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_data()), this, SLOT(new_data()), Qt::DirectConnection);
+		data_map.insert("new_data()", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)), Qt::DirectConnection);
+		data_map.insert("test(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -249,34 +257,51 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void n736_Socket_RPC_SIGNAL_Object::new_ku(int ku_n, int length, double u, int line)
+	void n736_Socket_RPC_SIGNAL_Object::new_data()
 	{
-		auto& descriptor = *data_map["new_ku(int, int, double, int)"].get();
+		auto& descriptor = *data_map["new_data()"].get();
 		if (!descriptor.signal_needed)
 			return;
 		QByteArray tmp_arr;
 		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("new_ku(int, int, double, int)");
+		tmp_stream << QString("new_data()");
 		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_ku  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << ku_n;
-		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 ku_n =  %1").arg(RPCSignalClass::QVariantToString(ku_n)).arg(call_number));
-		tmp_stream << length;
-		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 length =  %1").arg(RPCSignalClass::QVariantToString(length)).arg(call_number));
-		tmp_stream << u;
-		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 u =  %1").arg(RPCSignalClass::QVariantToString(u)).arg(call_number));
-		tmp_stream << line;
-		SRPCSignalClass::Instance().toLog(QString("new_ku  call_number %2 line =  %1").arg(RPCSignalClass::QVariantToString(line)).arg(call_number));
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_data  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
 		QByteArray tmp_arr2;
 		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 		tmp_stream2 << tmp_arr.size();
 		tmp_arr2 += tmp_arr;
 		descriptor.mutex.lock();
 		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku sended").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data sended").arg(objectName()));
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_ku finished").arg(objectName()));
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data finished").arg(objectName()));
+	}
+	void n736_Socket_RPC_SIGNAL_Object::test(QVariantList dataList, QVariantList maskList)
+	{
+		auto& descriptor = *data_map["test(QVariantList, QVariantList)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("test(QVariantList, QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal test  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << dataList;
+		SRPCSignalClass::Instance().toLog(QString("test  call_number %2 dataList =  %1").arg(RPCSignalClass::QVariantToString(dataList)).arg(call_number));
+		tmp_stream << maskList;
+		SRPCSignalClass::Instance().toLog(QString("test  call_number %2 maskList =  %1").arg(RPCSignalClass::QVariantToString(maskList)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal test sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal test finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,6 +315,48 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	QVariant n736_Socket_RPC_SLOT_Object::dataIn(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->dataIn(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant n736_Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariant dt = _values.at(0).value<QVariant>();
+			int mko = _values.at(1).value<int>();
+			int line = _values.at(2).value<int>();
+			int cwd = _values.at(3).value<int>();
+			QVariantList words = _values.at(4).value<QVariantList>();
+			int os = _values.at(5).value<int>();
+			app->new_message(dt, mko, line, cwd, words, os);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 

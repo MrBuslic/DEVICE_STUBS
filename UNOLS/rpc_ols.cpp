@@ -49,14 +49,16 @@ int RpcOlsWidget::unols_read_data_kr(QVariantList data_buffer)
 */
 int RpcOlsWidget::unols_trigger_imm(int devise)//добавить параметр (выдача, приём)
 {
-	if (devise == 1)//возможно обойтись без ветвления?
-	{
-		log_widget->log_append(QString("Запуск чтения"));
-		emit send_data(rpc_ols_kr_buffer);//добавить связь сигнала rpc_ols с КПИУ
-	}
-	else if (devise == 2){
+
+	if (devise & 2){
 		log_widget->log_append(QString("Запуск выдачи"));
 		emit new_ols_data(rpc_ols_kf_buffer, rpc_mask_buffer);
+	}
+
+	if (devise & 1)//возможно обойтись без ветвления?
+	{
+		log_widget->log_append(QString("Запуск чтения"));
+		emit receive_data(rpc_ols_kr_buffer);//добавить связь сигнала rpc_ols с КПИУ
 	}
 	return 0;
 }

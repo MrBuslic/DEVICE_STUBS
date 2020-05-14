@@ -3,6 +3,7 @@
 int mfsk24_Socket_RPC_SLOT_Object::obj_num = 0;
 int mfsk24_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int mfsk24_Socket_RPC_SIGNAL_Object::call_number = 0;
+int mfsk24_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	mfsk24_Socket_RPC_SIGNAL_Thread::mfsk24_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int mfsk24_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	mfsk24_Socket_RPC_SLOT_Thread::mfsk24_Socket_RPC_SLOT_Thread(RpcMFSK24Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("mfsk24_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void mfsk24_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

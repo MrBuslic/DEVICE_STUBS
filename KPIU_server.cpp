@@ -6,6 +6,7 @@
 #include "mfsk24_rpc.h"
 #include "vvk4_rpc.h"
 #include "is4_rpc.h"
+#include "ols_rpc.h"
 
 
 KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_type(_rm_type), bufar_chan(0)
@@ -94,6 +95,8 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 
 
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_kp50");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_foi");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 0");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 2");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mds32 0");
@@ -101,7 +104,6 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 0");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 2");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 3");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 5");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 6");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 7");
@@ -117,6 +119,7 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/IBEP_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/kprd_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
 		QThread::currentThread()->msleep(2000);
 		QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
@@ -135,6 +138,8 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/common");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/MBK07");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/N736_imitator");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/N737_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
 		QThread::currentThread()->msleep(5000);
@@ -175,21 +180,21 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		connect(mds2_signal_thr->get_obj().get(), SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_2_get_sample(uint&, bool&)), Qt::DirectConnection);
 
 
-		RPC_mfsk24_SLOT_Thread* mfsk1_slot_thr = new RPC_mfsk24_SLOT_Thread;
-		mfsk1_slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT);
-		mfsk1_slot_thr->start();
+		RPC_mfsk24_SLOT_Thread* mfsk2_slot_thr = new RPC_mfsk24_SLOT_Thread;
+		mfsk2_slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT+1);
+		mfsk2_slot_thr->start();
 
-		RPC_mfsk24_SIGNAL_Thread* mfsk1_signal_thr = new RPC_mfsk24_SIGNAL_Thread;
-		mfsk1_signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL);
-		mfsk1_signal_thr->start();
+		RPC_mfsk24_SIGNAL_Thread* mfsk2_signal_thr = new RPC_mfsk24_SIGNAL_Thread;
+		mfsk2_signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL+1);
+		mfsk2_signal_thr->start();
 
-		if (!mfsk1_slot_thr->wait_connected(3) || !mfsk1_signal_thr->wait_connected(3))
+		if (!mfsk2_slot_thr->wait_connected(3) || !mfsk2_signal_thr->wait_connected(3))
 		{
-			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mfsk24 1");
+			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mfsk24 2");
 			this->deleteLater();
 			return;
 		}
-		connect(mfsk1_signal_thr->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk_1_impulse(QVariantList)), Qt::DirectConnection);
+		connect(mfsk2_signal_thr->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk_2_impulse(QVariantList)), Qt::DirectConnection);
 
 		mds1_chans.chans = 0xFFFFFFFF;
 		mds2_chans.chans = 0xFFFFFFFF;
@@ -261,6 +266,24 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		*/
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
+
+		RPC_ols_SLOT_Thread* ols3_slot_thr = new RPC_ols_SLOT_Thread;
+		ols3_slot_thr->set_connection_params("127.0.0.1", OLS_SLOT+2);
+		ols3_slot_thr->start();
+		RPC_ols_SIGNAL_Thread* ols3_signal_thr = new RPC_ols_SIGNAL_Thread;
+		ols3_signal_thr->set_connection_params("127.0.0.1", OLS_SIGNAL+2);
+		ols3_signal_thr->start();
+
+		if (!ols3_slot_thr->wait_connected(3) || !ols3_signal_thr->wait_connected(3))
+		{
+			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с is4");
+			this->deleteLater();
+			return;
+		}
+
+		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols3_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPIUServer::mshr_data_in, Qt::DirectConnection);
+		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols3_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::receive_data, this, &KPIUServer::mshr_data_out, Qt::DirectConnection);
+
 	}
 
 	connect(power_widget, &PowerWidget::u_on_bus, this, &KPIUServer::power_bus_state_changed);
@@ -396,7 +419,7 @@ enum eControlChan
 #endif
 };
 
-void KPIUServer::mfsk_1_impulse(QVariantList channels)
+void KPIUServer::mfsk_2_impulse(QVariantList channels)
 {
 	if ((channels.count() % 2) != 0)
 	{
@@ -440,11 +463,11 @@ void KPIUServer::mds_1_get_sample(uint& buf, bool& flag)
 {
 	flag = true;
 	QVariant tmp_buf;
-	mku_widget->get_tm("CBK_TM", tmp_buf);
-	mds1_chans.CBK_chans = (~tmp_buf.toUInt()) & 0x1FF;
+	mku_widget->get_tm("ONA_TM", tmp_buf);
+	mds1_chans.ONA_chans = (~tmp_buf.toUInt()) & 0x3;
 
-	mku_widget->get_tm("733_TM", tmp_buf);
-	mds1_chans.chans_733 = ((~tmp_buf.toUInt()) & 0x1F);
+	mku_widget->get_tm("732_TM", tmp_buf);
+	mds1_chans.chans_732 = ((~tmp_buf.toUInt()) & 0x1F);
 
 	buf = mds1_chans.chans;
 }
@@ -453,11 +476,11 @@ void KPIUServer::mds_2_get_sample(uint& buf, bool& flag)
 {
 	flag = true;
 	QVariant tmp_buf;
-	mku_widget->get_tm("ONA_TM", tmp_buf);
-	mds2_chans.ONA_chans = (~tmp_buf.toUInt()) & 0x3;
+	mku_widget->get_tm("CBK_TM", tmp_buf);
+	mds2_chans.CBK_chans = (~tmp_buf.toUInt()) & 0x1FF;
 
-	mku_widget->get_tm("732_TM", tmp_buf);
-	mds2_chans.chans_732 = ((~tmp_buf.toUInt()) & 0x1F);
+	mku_widget->get_tm("733_TM", tmp_buf);
+	mds2_chans.chans_733 = ((~tmp_buf.toUInt()) & 0x1F);
 
 	buf = mds2_chans.chans;
 }
@@ -519,6 +542,24 @@ int KPIUServer::get_connection_state(QVariantList& _chans)
 	return 0; //возвращать -1?
 }
 
+void KPIUServer::mshr_data_in(QVariantList dataList, QVariantList maskList)
+{
+	mku_widget->make_data_737(dataList, maskList);
+	mku_widget->make_data_736(dataList, maskList);
+}
+
+
+void KPIUServer::mshr_data_out(QVariantList& data)
+{
+	data.clear();
+	qulonglong chans = 0;
+	QVariant mpsh_chans;
+	mku_widget->get_tm("736_TM", mpsh_chans);
+	QVariant mpr_chans;
+	mku_widget->get_tm("737_TM", mpr_chans);
+	chans = mpsh_chans.toULongLong() + mpr_chans.toULongLong();
+	data << QVariant(chans);
+}
 
 void KPIUServer::power_bus_state_changed(QString name, double u)
 {

@@ -15,9 +15,9 @@
 #include "rpc_foi.h"
 #include "rpc_ols.h"
 #include "KPRD_imitator.h"
-//!!!!!!!!!!!!!!!!!!!!!!!!!!mds1 и 2 наоборот должны быть!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-union MDS2_CHANNELS
+
+union MDS1_CHANNELS
 {
 	quint32 chans;
 	struct
@@ -29,7 +29,7 @@ union MDS2_CHANNELS
 	};
 };
 
-union MDS1_CHANNELS
+union MDS2_CHANNELS
 {
 	quint32 chans;
 	struct
@@ -87,13 +87,15 @@ public slots:
 	QString getXML();
 	
 
-	void mfsk_1_impulse(QVariantList channels);
+	void mfsk_2_impulse(QVariantList channels);
 
 	void mds_1_get_sample(uint& buf, bool& flag);
 	void mds_2_get_sample(uint& buf, bool& flag);
 	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
 
+	void mshr_data_in(QVariantList dataList, QVariantList maskList);
+	void mshr_data_out(QVariantList& data);
 
 	void power_bus_state_changed(QString name, double u);
 private:

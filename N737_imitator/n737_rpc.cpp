@@ -94,6 +94,28 @@ void RPC_n737_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+void RPC_n737_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(dt);
+	tmp_list << QVariant(mko);
+	tmp_list << QVariant(line);
+	tmp_list << QVariant(cwd);
+	tmp_list << QVariant(words);
+	tmp_list << QVariant(os);
+	SRPCSignalClass::Instance().toLog(QString("n737 dynamic_call new_message %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_message(QVariant, int, int, int, QVariantList, int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("n737 dynamic_call finished new_message");
+}
+void RPC_n737_SLOT_Object::dataIn(QVariantList dataList, QVariantList maskList)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(dataList);
+	tmp_list << QVariant(maskList);
+	SRPCSignalClass::Instance().toLog(QString("n737 dynamic_call dataIn %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("dataIn(QVariantList, QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("n737 dynamic_call finished dataIn");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

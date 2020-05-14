@@ -3,6 +3,7 @@
 int mn8i_Socket_RPC_SLOT_Object::obj_num = 0;
 int mn8i_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int mn8i_Socket_RPC_SIGNAL_Object::call_number = 0;
+int mn8i_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	mn8i_Socket_RPC_SIGNAL_Thread::mn8i_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int mn8i_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	mn8i_Socket_RPC_SLOT_Thread::mn8i_Socket_RPC_SLOT_Thread(RpcMN8IWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("mn8i_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void mn8i_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

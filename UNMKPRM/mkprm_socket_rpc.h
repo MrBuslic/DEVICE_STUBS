@@ -115,10 +115,11 @@ public:
 	mkprm_Socket_RPC_SLOT_Thread(RpcMKPRMWidget* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<mkprm_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<mkprm_Socket_RPC_SLOT_Object> rpc_obj;
 	RpcMKPRMWidget* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class mkprm_Socket_RPC_SLOT_Server : public QTcpServer
