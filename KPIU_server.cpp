@@ -267,22 +267,22 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
 
-		RPC_ols_SLOT_Thread* ols_slot_thr = new RPC_ols_SLOT_Thread;
-		ols_slot_thr->set_connection_params("127.0.0.1", OLS_SLOT+1);
-		ols_slot_thr->start();
-		RPC_ols_SIGNAL_Thread* ols_signal_thr = new RPC_ols_SIGNAL_Thread;
-		ols_signal_thr->set_connection_params("127.0.0.1", OLS_SIGNAL+1);
-		ols_signal_thr->start();
+		RPC_ols_SLOT_Thread* ols3_slot_thr = new RPC_ols_SLOT_Thread;
+		ols3_slot_thr->set_connection_params("127.0.0.1", OLS_SLOT+2);
+		ols3_slot_thr->start();
+		RPC_ols_SIGNAL_Thread* ols3_signal_thr = new RPC_ols_SIGNAL_Thread;
+		ols3_signal_thr->set_connection_params("127.0.0.1", OLS_SIGNAL+2);
+		ols3_signal_thr->start();
 
-		if (!ols_slot_thr->wait_connected(3) || !ols_signal_thr->wait_connected(3))
+		if (!ols3_slot_thr->wait_connected(3) || !ols3_signal_thr->wait_connected(3))
 		{
 			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с is4");
 			this->deleteLater();
 			return;
 		}
 
-		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPIUServer::mshr_data_in, Qt::DirectConnection);
-		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::receive_data, this, &KPIUServer::mshr_data_out, Qt::DirectConnection);
+		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols3_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPIUServer::mshr_data_in, Qt::DirectConnection);
+		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols3_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::receive_data, this, &KPIUServer::mshr_data_out, Qt::DirectConnection);
 
 	}
 
