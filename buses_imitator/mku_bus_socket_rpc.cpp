@@ -3,7 +3,6 @@
 int mku_bus_Socket_RPC_SLOT_Object::obj_num = 0;
 int mku_bus_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
-int mku_bus_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	mku_bus_Socket_RPC_SIGNAL_Thread::mku_bus_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -62,9 +61,7 @@ int mku_bus_Socket_RPC_SLOT_Thread::obj_num = 0;
 	}
 
 	mku_bus_Socket_RPC_SLOT_Thread::mku_bus_Socket_RPC_SLOT_Thread(MKUWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{
-	setObjectName(QString("mku_bus_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
-	}
+	{}
 
 	void mku_bus_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

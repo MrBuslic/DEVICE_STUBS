@@ -563,8 +563,8 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                  
 	
 */
 	
-	*Present = mbase_list[vi].at(N).Present;
-	*Type = mbase_list[vi].at(N).Type;
+	*Present = mbase_list[vi].at(N-1).Present;
+	*Type = mbase_list[vi].at(N-1).Type;
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/

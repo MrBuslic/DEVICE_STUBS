@@ -3,35 +3,38 @@
 #include <windows.h>
 #include "rpc_ports.h"
 #include <Visa.h>
+#include <qcoreapplication.h>
 
-QMap<int, int> slot_vi_map;
+
+QMap<int, int> slot_vi_map_comapp1 = { {2,1}, {8,2}, {9,3} };
+QMap<int, int> slot_vi_map_comapp2 = { { 10,4 },{ 11,5 } };
 
 int unols_state = UNOLS_STOP;
 unols_mKRUserCallback _interrupt_handle;
 
 ols_rpc_buffer_class::ols_rpc_buffer_class()
 {
-	int start_i;
-	int end_i;
+	int start_i = 0;
+	int end_i = 5;
 
-	QString comapp = QCoreApplication::applicationName();
-	if (comapp == "comapp1")
-	{
-		start_i = 0;
-		end_i = 2;
+	//QString comapp = QCoreApplication::applicationName();
+	//if (comapp == "comapp1")
+	//{
+	//	start_i = 0;
+	//	end_i = 2;
 
-		slot_vi_map.insert(2, 0);
-		slot_vi_map.insert(8, 1);
-		slot_vi_map.insert(9, 2);
-	}
-	else
-	{
-		start_i = 3;
-		end_i = 4;
+	//	slot_vi_map.insert(2, 1);
+	//	slot_vi_map.insert(8, 2);
+	//	slot_vi_map.insert(9, 3);
+	//}
+	//else
+	//{
+	//	start_i = 3;
+	//	end_i = 4;
 
-		slot_vi_map.insert(10, 0);
-		slot_vi_map.insert(11, 1);
-	}
+	//	slot_vi_map.insert(10, 1);
+	//	slot_vi_map.insert(11, 2);
+	//}
 
 	for (int i = start_i; i <= end_i; i++)
 	{
@@ -102,8 +105,11 @@ ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName,
 	int device_slot;
 	viGetAttribute(tmp_sess, VI_ATTR_SLOT, &device_slot);
 	SRPCSignalClass::Instance().toLog(QString("ols %1 got slot %2").arg(rsrcName).arg(device_slot));
-	
-	*vi = slot_vi_map[device_slot];  
+	QString comapp = QCoreApplication::applicationName();
+	if (comapp == "comapp1")
+		*vi = slot_vi_map_comapp1[device_slot];  
+	else
+		*vi = slot_vi_map_comapp2[device_slot];
 return 0;
 }
 /****************************************************************************

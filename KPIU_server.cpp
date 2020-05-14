@@ -95,6 +95,7 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 
 
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_kp50");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_foi");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 0");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 2");
@@ -118,6 +119,7 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/IBEP_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/kprd_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
 		QThread::currentThread()->msleep(2000);
 		QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
