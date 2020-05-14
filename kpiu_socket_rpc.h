@@ -111,7 +111,7 @@ public:
 	QVariant USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(QVariantList& _values);
 	QVariant PYRO_USTANOVIT_SOSTOYANIE(QVariantList& _values);
 	QVariant getXML(QVariantList& _values);
-	QVariant mfsk_1_impulse(QVariantList& _values);
+	QVariant mfsk_2_impulse(QVariantList& _values);
 	QVariant mds_1_get_sample(QVariantList& _values);
 	QVariant mds_2_get_sample(QVariantList& _values);
 	QVariant get_resistance(QVariantList& _values);
@@ -137,10 +137,11 @@ public:
 	kpiu_Socket_RPC_SLOT_Thread(KPIUServer* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<kpiu_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<kpiu_Socket_RPC_SLOT_Object> rpc_obj;
 	KPIUServer* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class kpiu_Socket_RPC_SLOT_Server : public QTcpServer

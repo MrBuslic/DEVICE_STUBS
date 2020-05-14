@@ -2,13 +2,38 @@
 #include "unols_h.h"
 #include <windows.h>
 #include "rpc_ports.h"
+#include <Visa.h>
+
+QMap<int, int> slot_vi_map;
 
 int unols_state = UNOLS_STOP;
 unols_mKRUserCallback _interrupt_handle;
-int ols_count = 0;
+
 ols_rpc_buffer_class::ols_rpc_buffer_class()
 {
-	for (int i = 0; i < 5; i++)
+	int start_i;
+	int end_i;
+
+	QString comapp = QCoreApplication::applicationName();
+	if (comapp == "comapp1")
+	{
+		start_i = 0;
+		end_i = 2;
+
+		slot_vi_map.insert(2, 0);
+		slot_vi_map.insert(8, 1);
+		slot_vi_map.insert(9, 2);
+	}
+	else
+	{
+		start_i = 3;
+		end_i = 4;
+
+		slot_vi_map.insert(10, 0);
+		slot_vi_map.insert(11, 1);
+	}
+
+	for (int i = start_i; i <= end_i; i++)
 	{
 		RPC_ols_SLOT_Thread* slot_thr = new RPC_ols_SLOT_Thread;
 		slot_thr->set_connection_params("127.0.0.1", OLS_SLOT + i);
@@ -71,8 +96,14 @@ ViStatus _VI_FUNC unols_init (	ViRsrc 		rsrcName,
 								ViBoolean 	id_query,
 								ViBoolean 	reset, 
 	ViPSession 	vi) {
-	ols_count++;
-	*vi = ols_count;  
+	ViSession tmp_sess;
+	viOpen(0, rsrcName, 0, 0, &tmp_sess);
+
+	int device_slot;
+	viGetAttribute(tmp_sess, VI_ATTR_SLOT, &device_slot);
+	SRPCSignalClass::Instance().toLog(QString("ols %1 got slot %2").arg(rsrcName).arg(device_slot));
+	
+	*vi = slot_vi_map[device_slot];  
 return 0;
 }
 /****************************************************************************

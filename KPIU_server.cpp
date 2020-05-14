@@ -103,7 +103,6 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 0");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 2");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 3");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 5");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 6");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 7");
@@ -179,21 +178,21 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		connect(mds2_signal_thr->get_obj().get(), SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_2_get_sample(uint&, bool&)), Qt::DirectConnection);
 
 
-		RPC_mfsk24_SLOT_Thread* mfsk1_slot_thr = new RPC_mfsk24_SLOT_Thread;
-		mfsk1_slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT);
-		mfsk1_slot_thr->start();
+		RPC_mfsk24_SLOT_Thread* mfsk2_slot_thr = new RPC_mfsk24_SLOT_Thread;
+		mfsk2_slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT+1);
+		mfsk2_slot_thr->start();
 
-		RPC_mfsk24_SIGNAL_Thread* mfsk1_signal_thr = new RPC_mfsk24_SIGNAL_Thread;
-		mfsk1_signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL);
-		mfsk1_signal_thr->start();
+		RPC_mfsk24_SIGNAL_Thread* mfsk2_signal_thr = new RPC_mfsk24_SIGNAL_Thread;
+		mfsk2_signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL+1);
+		mfsk2_signal_thr->start();
 
-		if (!mfsk1_slot_thr->wait_connected(3) || !mfsk1_signal_thr->wait_connected(3))
+		if (!mfsk2_slot_thr->wait_connected(3) || !mfsk2_signal_thr->wait_connected(3))
 		{
-			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mfsk24 1");
+			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с mfsk24 2");
 			this->deleteLater();
 			return;
 		}
-		connect(mfsk1_signal_thr->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk_1_impulse(QVariantList)), Qt::DirectConnection);
+		connect(mfsk2_signal_thr->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk_2_impulse(QVariantList)), Qt::DirectConnection);
 
 		mds1_chans.chans = 0xFFFFFFFF;
 		mds2_chans.chans = 0xFFFFFFFF;
@@ -418,7 +417,7 @@ enum eControlChan
 #endif
 };
 
-void KPIUServer::mfsk_1_impulse(QVariantList channels)
+void KPIUServer::mfsk_2_impulse(QVariantList channels)
 {
 	if ((channels.count() % 2) != 0)
 	{
@@ -462,11 +461,11 @@ void KPIUServer::mds_1_get_sample(uint& buf, bool& flag)
 {
 	flag = true;
 	QVariant tmp_buf;
-	mku_widget->get_tm("CBK_TM", tmp_buf);
-	mds1_chans.CBK_chans = (~tmp_buf.toUInt()) & 0x1FF;
+	mku_widget->get_tm("ONA_TM", tmp_buf);
+	mds1_chans.ONA_chans = (~tmp_buf.toUInt()) & 0x3;
 
-	mku_widget->get_tm("733_TM", tmp_buf);
-	mds1_chans.chans_733 = ((~tmp_buf.toUInt()) & 0x1F);
+	mku_widget->get_tm("732_TM", tmp_buf);
+	mds1_chans.chans_732 = ((~tmp_buf.toUInt()) & 0x1F);
 
 	buf = mds1_chans.chans;
 }
@@ -475,11 +474,11 @@ void KPIUServer::mds_2_get_sample(uint& buf, bool& flag)
 {
 	flag = true;
 	QVariant tmp_buf;
-	mku_widget->get_tm("ONA_TM", tmp_buf);
-	mds2_chans.ONA_chans = (~tmp_buf.toUInt()) & 0x3;
+	mku_widget->get_tm("CBK_TM", tmp_buf);
+	mds2_chans.CBK_chans = (~tmp_buf.toUInt()) & 0x1FF;
 
-	mku_widget->get_tm("732_TM", tmp_buf);
-	mds2_chans.chans_732 = ((~tmp_buf.toUInt()) & 0x1F);
+	mku_widget->get_tm("733_TM", tmp_buf);
+	mds2_chans.chans_733 = ((~tmp_buf.toUInt()) & 0x1F);
 
 	buf = mds2_chans.chans;
 }

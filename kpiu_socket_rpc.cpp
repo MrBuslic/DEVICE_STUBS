@@ -3,6 +3,7 @@
 int kpiu_Socket_RPC_SLOT_Object::obj_num = 0;
 int kpiu_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
+int kpiu_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	kpiu_Socket_RPC_SIGNAL_Thread::kpiu_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	kpiu_Socket_RPC_SLOT_Thread::kpiu_Socket_RPC_SLOT_Thread(KPIUServer* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("kpiu_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void kpiu_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
@@ -89,7 +92,7 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA;
 		operators_map["PYRO_USTANOVIT_SOSTOYANIE(QString, int)"] = &kpiu_Socket_RPC_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE;
 		operators_map["getXML()"] = &kpiu_Socket_RPC_SLOT_Object::getXML;
-		operators_map["mfsk_1_impulse(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mfsk_1_impulse;
+		operators_map["mfsk_2_impulse(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mfsk_2_impulse;
 		operators_map["mds_1_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_1_get_sample;
 		operators_map["mds_2_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_2_get_sample;
 		operators_map["get_resistance(uint, QVariant&)"] = &kpiu_Socket_RPC_SLOT_Object::get_resistance;
@@ -667,13 +670,13 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return QString();
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::mfsk_1_impulse(QVariantList& _values)
+	QVariant kpiu_Socket_RPC_SLOT_Object::mfsk_2_impulse(QVariantList& _values)
 	{
 		try
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			QVariantList channels = _values.at(0).value<QVariantList>();
-			app->mfsk_1_impulse(channels);
+			app->mfsk_2_impulse(channels);
 			return 0;
 		}
 		catch(const std::exception &)

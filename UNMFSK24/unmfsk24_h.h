@@ -15,17 +15,36 @@ public:
 	QList<RPC_mfsk24_SIGNAL_Thread*> mfsk24_signal_thr;
 	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
 	int num_add;
+	QMap<int, QMap<int, int> > mfsk_addrs;
 private:
 	rpc_buffer_class()
 	{
 		QString comapp = QCoreApplication::applicationName();
+		num_add = 0;
 		if (comapp == "comapp1")
 		{
-			num_add = 0;
+			QMap<int, int> first_nm;
+			first_nm.insert(1, 0);
+			mfsk_addrs.insert(3, first_nm);
+
+			QMap<int, int> second_nm;
+			second_nm.insert(3, 1);
+			second_nm.insert(4, 2);
+			mfsk_addrs.insert(7, second_nm);
 		}
-		else
+		if (comapp == "comapp2")
 		{
 			num_add = 5;
+
+			QMap<int, int> first_nm;
+			first_nm.insert(1, 5);
+			first_nm.insert(4, 6);
+			mfsk_addrs.insert(8, first_nm);
+
+			QMap<int, int> second_nm;
+			second_nm.insert(3, 7);
+			second_nm.insert(4, 8);
+			mfsk_addrs.insert(9, second_nm);
 		}
 		qDebug() << "comapp " << comapp << " num_add " << num_add;
 		for (int i = 0; i < 4; i++)
