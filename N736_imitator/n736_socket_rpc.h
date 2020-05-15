@@ -28,7 +28,6 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void new_data();
-	void test(QVariantList dataList, QVariantList maskList);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -115,10 +114,11 @@ public:
 	n736_Socket_RPC_SLOT_Thread(N736_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<n736_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<n736_Socket_RPC_SLOT_Object> rpc_obj;
 	N736_widg* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class n736_Socket_RPC_SLOT_Server : public QTcpServer

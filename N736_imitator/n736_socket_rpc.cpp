@@ -3,6 +3,7 @@
 int n736_Socket_RPC_SLOT_Object::obj_num = 0;
 int n736_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
+int n736_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	n736_Socket_RPC_SIGNAL_Thread::n736_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	n736_Socket_RPC_SLOT_Thread::n736_Socket_RPC_SLOT_Thread(N736_widg* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("n736_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void n736_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
@@ -116,15 +119,12 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 		if (_err == QAbstractSocket::SocketError::SocketTimeoutError)
 			return;
 		disconnect(app, SIGNAL(new_data()), this, SLOT(new_data()));
-		disconnect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)));
 	}
 	void n736_Socket_RPC_SIGNAL_Object::set_app(N736_widg* _app)
 	{
 		app = _app;
 		connect(app, SIGNAL(new_data()), this, SLOT(new_data()), Qt::DirectConnection);
 		data_map.insert("new_data()", std::shared_ptr<SignalData>(new SignalData()));
-		connect(app, SIGNAL(test(QVariantList, QVariantList)), this, SLOT(test(QVariantList, QVariantList)), Qt::DirectConnection);
-		data_map.insert("test(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -274,31 +274,6 @@ int n736_Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.lock();
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data finished").arg(objectName()));
-	}
-	void n736_Socket_RPC_SIGNAL_Object::test(QVariantList dataList, QVariantList maskList)
-	{
-		auto& descriptor = *data_map["test(QVariantList, QVariantList)"].get();
-		if (!descriptor.signal_needed)
-			return;
-		QByteArray tmp_arr;
-		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
-		tmp_stream << QString("test(QVariantList, QVariantList)");
-		tmp_stream << (++call_number);
-		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal test  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
-		tmp_stream << dataList;
-		SRPCSignalClass::Instance().toLog(QString("test  call_number %2 dataList =  %1").arg(RPCSignalClass::QVariantToString(dataList)).arg(call_number));
-		tmp_stream << maskList;
-		SRPCSignalClass::Instance().toLog(QString("test  call_number %2 maskList =  %1").arg(RPCSignalClass::QVariantToString(maskList)).arg(call_number));
-		QByteArray tmp_arr2;
-		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-		tmp_stream2 << tmp_arr.size();
-		tmp_arr2 += tmp_arr;
-		descriptor.mutex.lock();
-		send_signal_func(&tmp_arr2);
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal test sended").arg(objectName()));
-		descriptor.mutex.lock();
-		descriptor.mutex.unlock();
-		SRPCSignalClass::Instance().toLog(QString("%1 send_signal test finished").arg(objectName()));
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////

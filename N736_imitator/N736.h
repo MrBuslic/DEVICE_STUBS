@@ -22,12 +22,12 @@
 #include <boost/range/combine.hpp>
 #include <boost/tuple/tuple.hpp>
 
-enum class CURRENT_CONNECT
-{
-	MAIN = 1,
-
-	OFF = 3
-};
+//enum class CURRENT_CONNECT
+//{
+//	MAIN = 1,
+//
+//	OFF = 3
+//};
 
 enum class CURRENT_MKO
 {
@@ -122,10 +122,7 @@ private:
 	void paint_buttons();
 	CURRENT_COMP current_dev;
 	CURRENT_MKO current_mko;
-	CURRENT_CONNECT current_connect;
 
-	QVariantList maskListTest;
-	QVariantList dataListTest;
 
 	int MKO;
 	int adr;
@@ -133,7 +130,6 @@ private:
 	QVariantList words;
 	bool flag_on;
 	bool kr;
-	int j;
 	bool off_device;
 	//QCheckBox* add_set(QString name, QString data, bool is_main = true);
 
@@ -152,7 +148,6 @@ public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 signals:
 	void new_data();
-	void test(QVariantList dataList, QVariantList maskList);
 };
 
 #endif // N736_H
