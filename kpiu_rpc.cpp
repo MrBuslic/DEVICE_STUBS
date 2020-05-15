@@ -349,13 +349,13 @@ QString RPC_kpiu_SLOT_Object::getXML()
 	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call finished getXML %1").arg(tmp_ret_params));
 	return res.toString();
 }
-void RPC_kpiu_SLOT_Object::mfsk_1_impulse(QVariantList channels)
+void RPC_kpiu_SLOT_Object::mfsk_2_impulse(QVariantList channels)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(channels);
-	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mfsk_1_impulse %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("mfsk_1_impulse(QVariantList)", tmp_list);
-	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished mfsk_1_impulse");
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call mfsk_2_impulse %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("mfsk_2_impulse(QVariantList)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished mfsk_2_impulse");
 }
 void RPC_kpiu_SLOT_Object::mds_1_get_sample(uint& buf, bool& flag)
 {

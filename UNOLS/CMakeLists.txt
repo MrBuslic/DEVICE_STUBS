@@ -31,7 +31,7 @@ set(UNOLS_SOURCES unols.cpp unols_h.h ols_rpc.h ols_rpc.cpp DllMain.cpp)
 include_directories($ENV{VISA_HOME}include)
 
 add_library(unols_32 SHARED ${UNOLS_HEADERS} ${UNOLS_SOURCES} export.def)
-target_link_libraries(unols_32 socket_rpc)
+target_link_libraries(unols_32 socket_rpc visa32)
 
 set(RPC_OLS_SOURCES rpc_ols.h rpc_ols.cpp ols_main.cpp ols_socket_rpc.h ols_socket_rpc.cpp)
 add_executable(rpc_ols WIN32 ${RPC_OLS_SOURCES})

@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 int mt8k4l_count = 0;
-
+QMap<int, int> vi_adr;
 /*----------------------------------------------------------------------*/
 /*  Функции                                                       */
 /*----------------------------------------------------------------------*/
@@ -20,7 +20,11 @@ ViStatus _VI_FUNC unmt8k4l_init (ViRsrc rsrcName, ViBoolean IDquery,
 	return 0;
 	}
 ViStatus _VI_FUNC unmt8k4l_connect (ViSession mezvi, ViSession vi, ViUInt16 m_num, ViBoolean IDquery,
-								 ViBoolean doReset){return 0;}
+								 ViBoolean doReset)
+{
+	vi_adr.insert(mezvi, m_num - 1);
+	return 0;
+}
 //--------------------- Set signle mode -------------                               
 ViStatus _VI_FUNC unmt8k4l_mode_1 (ViSession arg0){return 0;}
 
@@ -42,7 +46,7 @@ ViStatus _VI_FUNC unmt8k4l_sample_period_q (ViSession arg0, ViReal64 *arg1,ViUIn
 
 //--------------------------
 ViStatus _VI_FUNC unmt8k4l_input_trigger (ViSession mvi, ViBoolean state){
-	return Srpc_buffer_class::Instance().mt8k4l_slot_thr[mvi - 1]->get_mt8k4l_obj()->unmt8k4l_input_trigger(state);
+	return Srpc_buffer_class::Instance().mt8k4l_slot_thr[vi_adr[mvi]]->get_mt8k4l_obj()->unmt8k4l_input_trigger(state);
 }
 
 //-------------------------- Query
@@ -58,7 +62,7 @@ ViStatus _VI_FUNC unmt8k4l_alloc_q (ViSession arg0, ViUInt32 *arg1){return 0;}
 ViStatus _VI_FUNC unmt8k4l_sample_width_q (ViSession mvi, ViPUInt16 nWords, ViPUInt16 nBytes){
 	uint frame_width;
 	uint width_in_bytes;
-	Srpc_buffer_class::Instance().mt8k4l_slot_thr[mvi - 1]->get_mt8k4l_obj()->unmt8k4l_sample_width_q(frame_width, width_in_bytes);
+	Srpc_buffer_class::Instance().mt8k4l_slot_thr[vi_adr[mvi]]->get_mt8k4l_obj()->unmt8k4l_sample_width_q(frame_width, width_in_bytes);
 	*nWords = frame_width;
 	*nBytes = width_in_bytes;
 	return 0;
@@ -86,7 +90,7 @@ ViStatus _VI_FUNC unmt8k4l_config_trigger (ViSession arg0, ViUInt16 arg1){return
 
 //----------------------------------------
 ViStatus _VI_FUNC unmt8k4l_start (ViSession mvi){
-	return Srpc_buffer_class::Instance().mt8k4l_slot_thr[mvi - 1]->get_mt8k4l_obj()->unmt8k4l_start();
+	return Srpc_buffer_class::Instance().mt8k4l_slot_thr[vi_adr[mvi]]->get_mt8k4l_obj()->unmt8k4l_start();
 }
 
 //----------------------------------------
@@ -104,7 +108,7 @@ ViStatus _VI_FUNC unmt8k4l_read_sample (ViSession mvi, ViPReal64 buf,
 	QVariantList  tmp_buf;
 	uint _firstTime;
 	uint _thisTime;
-	Srpc_buffer_class::Instance().mt8k4l_slot_thr[mvi - 1]->get_mt8k4l_obj()->unmt8k4l_read_sample(tmp_buf, _firstTime, _thisTime);
+	Srpc_buffer_class::Instance().mt8k4l_slot_thr[vi_adr[mvi]]->get_mt8k4l_obj()->unmt8k4l_read_sample(tmp_buf, _firstTime, _thisTime);
 	for (int i = 0; i < 8; i++)
 		buf[i] = tmp_buf.at(i).toDouble();
 	*firstTime = _firstTime;
