@@ -20,6 +20,15 @@ AOS_widg::AOS_widg(QWidget *parent)
 {
 	setWindowTitle("АОС");
 
+
+	ab = new QGroupBox("Включённый комплект АОС", this);
+	QLabel* Imitator = new QLabel("№ комплекта: ");	
+	ab->setMinimumWidth(165);
+	a = new QVBoxLayout(this);
+	
+	a->addWidget(Imitator);
+
+	ab->setLayout(a);
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start();
 
