@@ -27,7 +27,8 @@ public:
 signals:
 	void send_signal(QByteArray* _arr);
 public slots:
-	void new_ku(int ku_n, int length, double u, int line);
+	void new_data();
+	void test(QVariantList dataList, QVariantList maskList);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -94,6 +95,8 @@ public:
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
+	QVariant dataIn(QVariantList& _values);
+	QVariant new_message(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
@@ -112,10 +115,11 @@ public:
 	n736_Socket_RPC_SLOT_Thread(N736_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<n736_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<n736_Socket_RPC_SLOT_Object> rpc_obj;
 	N736_widg* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class n736_Socket_RPC_SLOT_Server : public QTcpServer

@@ -1,4 +1,5 @@
 #include <unads128.h>
+#include <Visa.h>
 #include <socket_rpc.h>
 #include <windows.h>
 #include "ads128_rpc.h"
@@ -34,8 +35,12 @@ ads128_rpc_buffer_class::ads128_rpc_buffer_class()
 		ViBoolean do_RESET,
 		ViPSession vi) 
 	{
-		ads128_count++;
-		*vi = ads128_count;
+		ViSession tmp_sess;
+		viOpen(0, rsrcName, 0, 0, &tmp_sess);
+
+		int device_slot;
+		viGetAttribute(tmp_sess, VI_ATTR_SLOT, &device_slot);
+		*vi = device_slot-5;
 		return 0;
 	}
 

@@ -14,7 +14,7 @@ public:
 private:
 	rpc_buffer_class()
 	{
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			RPC_mt8k4l_SLOT_Thread* slot_thr = new RPC_mt8k4l_SLOT_Thread;
 			slot_thr->set_connection_params("127.0.0.1", 30030 + i);

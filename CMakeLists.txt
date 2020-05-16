@@ -162,6 +162,7 @@ add_subdirectory(PCIMKO)
 #add_subdirectory(cbk_imitator)
 add_subdirectory(cbk_imitator_real_po)
 add_subdirectory(cbk_imitator_tsrp)
+add_subdirectory(PKM)
 add_subdirectory(mbk04_imitator)
 add_subdirectory(LKAModules)
 
@@ -190,8 +191,8 @@ add_subdirectory(N736_imitator)
 file(GLOB_RECURSE SOURCES *.cpp *.c)
 file(GLOB_RECURSE HEADERS *.h)
 #file(GLOB_RECURSE REMOVE_SOURCES "*main.cpp")
-file(GLOB_RECURSE REMOVE_SOURCES "tor_bk_t_new.cpp" "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp" "cbk_imitator/*.cpp" "spobu_imitator/*.cpp" "tpo_imitator/*.cpp" "*BUSES.cpp" "cbk_imitator_real_po/real_tpo/DebugUnit.c" "cbk_imitator_real_po/real_tpo/ProtoUnit1.c" "cbk_imitator_real_po/real_tpo/ProtoUnit2.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Erti.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Koi.c" "DllMain.cpp" "cbk_imitator_real_po/*.cpp" "cbk_imitator_real_po/*.c" "kpiu_server_plugin.cpp")
-file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h" "cbk_imitator/*.h" "spobu_imitator/*.h" "tpo_imitator/*.h" "*BUSES.h" "cbk_imitator_real_po/*.h" "kpiu_server_plugin.h")#Выделить заголовочные файлы МКО в отдельную папку
+file(GLOB_RECURSE REMOVE_SOURCES "tor_bk_t_new.cpp" "PKM/*.cpp" "bkupi_imitator/*.cpp" "*main.cpp" "mko_bus.cpp" "mko_main.cpp" "cbk_imitator_tsrp/*.cpp" "cbk_imitator/*.cpp" "spobu_imitator/*.cpp" "tpo_imitator/*.cpp" "*BUSES.cpp" "cbk_imitator_real_po/real_tpo/DebugUnit.c" "cbk_imitator_real_po/real_tpo/ProtoUnit1.c" "cbk_imitator_real_po/real_tpo/ProtoUnit2.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Erti.c" "cbk_imitator_real_po/real_tpo/Source/OKTable-Koi.c" "DllMain.cpp" "cbk_imitator_real_po/*.cpp" "cbk_imitator_real_po/*.c" "kpiu_server_plugin.cpp")
+file(GLOB_RECURSE REMOVE_HEADERS "bkupi_imitator/*.h" "mko_bus.h" "PKM/*.h" "cbk_imitator_tsrp/*.h" "cbk_imitator/*.h" "spobu_imitator/*.h" "tpo_imitator/*.h" "*BUSES.h" "cbk_imitator_real_po/*.h" "kpiu_server_plugin.h")#Выделить заголовочные файлы МКО в отдельную папку
 #list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
 list(REMOVE_ITEM SOURCES ${REMOVE_SOURCES})
 list(REMOVE_ITEM HEADERS ${REMOVE_HEADERS})

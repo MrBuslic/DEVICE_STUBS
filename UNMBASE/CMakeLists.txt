@@ -32,6 +32,6 @@ set(UNMBASE_SOURCES unmbase.cpp)
 include_directories($ENV{VISA_HOME}/include)
 
 add_library(unmbase_32 SHARED ${UNMBASE_HEADERS} ${UNMBASE_SOURCES} export.def)
-target_link_libraries(unmbase_32 ${QT_LIBRARIES} )
+target_link_libraries(unmbase_32 ${QT_LIBRARIES} visa32)
 
 qt5_use_modules(unmbase_32 Core)

@@ -19,7 +19,7 @@
    extern "C" {
 #endif
 
-
+QMap<QString, int> dev_nums;
 QList<mezanin_struct> mezanin_list;
 int mezanin_list_poiner = 0;
 
@@ -38,6 +38,8 @@ void mezanin_list_add(QString desc, int type, int model, int slot, int commapp)
 	mez.slot = slot;
 	mez.commapp = commapp;
 	mezanin_list.push_back(mez);
+	dev_nums.insert(desc, mezanin_list_poiner);
+	mezanin_list_poiner++;
 }
 
 /*- Resource Manager Functions and Operations -------------------------------*/
@@ -58,7 +60,6 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 		mezanin_list_poiner = 0;
 		if(commapp == "comapp1")
 		{
-			mezanin_list_poiner = 0;
 			mezanin_list_add("VXI::1::INSTR", VI_INTF_VXI, 0x0168, 2, 1);		// нкя
 			mezanin_list_add("VXI::5::INSTR", VI_INTF_VXI, 0x0155, 3, 1);		// млс
 			mezanin_list_add("VXI::20::INSTR", VI_INTF_VXI, 0xF10B, 4, 1);		// тнх
@@ -137,7 +138,7 @@ ViStatus _VI_FUNC  viFindRsrc      (ViSession sesn, ViString expr, ViPFindList v
 		if (!xml.read(&file, mezanin_list))
 			return 1;
 		*/
-
+		mezanin_list_poiner = 0;
 		*retCnt = mezanin_list.size();
 		if(!mezanin_list.empty())
 			strcpy(desc, mezanin_list.at(0).desc);
@@ -163,7 +164,7 @@ ViStatus _VI_FUNC  viParseRsrcEx   (ViSession rmSesn, ViRsrc rsrcName, ViPUInt16
 
 ViStatus _VI_FUNC  viOpen          (ViSession sesn, ViRsrc name, ViAccessMode mode,
 	ViUInt32 timeout, ViPSession vi){
-	*vi = 1; return 0;
+	*vi = dev_nums[QString(name)]; return 0;
 }
 
 /*- Resource Template Operations --------------------------------------------*/
@@ -177,14 +178,14 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		case VI_ATTR_INTF_TYPE:
 		{
 			int* tmp_res = (int*)attrValue;
-			*tmp_res = mezanin_list.at(mezanin_list_poiner).type;
+			*tmp_res = mezanin_list.at(vi).type;
 			break;
 		}
 		case VI_ATTR_MODEL_CODE:
 		{
 			int* tmp_res = (int*)attrValue;
 			//*tmp_res = 0x10B;// FOI
-			*tmp_res = mezanin_list.at(mezanin_list_poiner).model;
+			*tmp_res = mezanin_list.at(vi).model;
 
 			//*tmp_res = 0x010D;//MBASE
 			break;
@@ -193,7 +194,7 @@ ViStatus _VI_FUNC  viGetAttribute  (ViObject vi, ViAttr attrName, void _VI_PTR a
 		{
 			int* tmp_res = (int*)attrValue;
 			//*tmp_res = 2;
-			*tmp_res = mezanin_list.at(mezanin_list_poiner).slot;
+			*tmp_res = mezanin_list.at(vi).slot;
 			break;
 		}
 	};
