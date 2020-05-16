@@ -18,8 +18,6 @@ union MKOWord
 
 BKIS_widg::BKIS_widg(QWidget *parent)
 {
-	//QWidget* widg;
-	//widg = new QWidget(this);
 	setWindowTitle("BKIS");
 
 	main_blk = new QPushButton("Вкл основной БЛК", this);
@@ -37,10 +35,7 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	lay->addWidget(reserve_blk);
 	lay->addWidget(main_interface);
 	lay->addWidget(reserve_interface);
-	
-	connect(main_blk, &QPushButton::clicked, this, main_blk->setStyleSheet("background-color: red"));
-
-	
+			
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start();
 
@@ -84,7 +79,7 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(make_ku(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
@@ -99,87 +94,32 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	for (int i = 1; i <= 6; i++) {
 		pyro_groups_states[i] = 0;
 	}
-}
-/*
-void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
-{
-	MKOWord tmp_cwd;
-	tmp_cwd.com_word = cwd;
-	if (os == -1)
-		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr))
-	{
-		//	QString _msg = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
-		//	msg_to_log(_msg);
 
-		int tmp_word = words[0].toInt();
-
-		char reset = tmp_word & 0x1F;
-		if (reset != 15)
-		{
-			char finik_rezh_ch = tmp_word & 0x30;
-			char tmp = tmp_word & 3;
-			if ((tmp_word & 3) > 0)
-			{
-				if (current_OG != OG((tmp_word & 3) - 1))
-				{
-					if (warm_og_tmr->isActive())
-						warm_og_tmr->stop();
-					set_warm_og();
-					current_OG = OG((tmp_word & 3) - 1);
-					update_time();
-					change_power(true);
-				}
-			}
-			if ((tmp_word & 0xC) >> 2 > 0)
-				current_FINIK = FINIK(((tmp_word & 0xC) >> 2) - 1);
-			switch (finik_rezh_ch)
-			{
-			case 16:
-				current_FINIK_REZH = FINIK_REZH_PI8;
-				break;
-			case 32:
-				current_FINIK_REZH = FINIK_REZH_PI15;
-				break;
-			}
-		}
-		else
-		{
-			current_OG = OG_1;
-			current_FINIK = FINIK_1;
-			current_FINIK_REZH = FINIK_REZH_PI8;
-		}
-
-		update_graphics();
-		set_new_tm();
+	//инициализация нагревателей для проверки
+	for (int i = 1; i <= 14; i++) {
+		electric_heaters_states[i] = i%2;
 	}
 }
-*/
-void change_button_color(QPushButton button)
-{
-	button->setStyleSheet("background-color: red");
-}
 
-
-void BKIS_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
+void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
 {
-	switch (tmp_mshm)
+	switch (ku_n)
 	{
-	case 3:
+	case 19:
 		blk_state = 1;
-		LKA_sett.setValue("LKA", 1);
+		main_blk->setStyleSheet("background-color: green"); 
+		reserve_blk->setStyleSheet("background-color: gray");
+		omni_connect();
 		break;
-	case 4:
+	case 20:
 		blk_state = 2;
-		LKA_sett.setValue("LKA", 2);
+		main_blk->setStyleSheet("background-color: gray");
+		reserve_blk->setStyleSheet("background-color: green");
 		break;
-	case 8:
+	case 21:
 		blk_state = 0;
-		LKA_sett.setValue("KP", 1);
-		break;
-	case 9:
-		current_KP = KP_2;
-		LKA_sett.setValue("KP", 2);
+		main_blk->setStyleSheet("background-color: gray");
+		reserve_blk->setStyleSheet("background-color: gray");
 		break;
 	}
 }
@@ -200,10 +140,15 @@ int BKIS_widg::set_electric_heater_state(int name, bool state)
 	return 0;
 }
 
-int BKIS_widg::pyro_group_set(int group_num, bool state)
+int BKIS_widg::set_pyro_group_state(int group_num, bool state)
 {
-	pyro_groups_states[group_num] = state;
-	return 0;
+	if (pyro_buses_state != 0)
+	{
+		pyro_groups_states[group_num] = state;
+		return 0;
+	}
+	else
+		return -1;
 }
 
 void BKIS_widg::get_power(double _volt)
@@ -225,8 +170,6 @@ void BKIS_widg::imit_on()
 
 }
 
-
-
 void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	MKOWord tmp_cwd;
@@ -235,7 +178,33 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
-	
+		int tmp_word = words[0].toInt();
+		if (tmp_cwd.subadr == 2)
+		{
+			/* Подрыв пиропатронов*/
+			if (tmp_word >> 4 == 0x660)
+			{
+				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 биты хранят данные о том, какая группа подрывается
+				pyro_groups_states[group_num] = 1;
+				emit send_pyro_group_activation(group_num);
+				return;//todo для быстроты работы?
+			}
+			//вкл. основного/резервного внутреннего интерфейса
+			switch (tmp_word)
+			{
+				//вкл. основного/резервного внутренних интерфейсов
+			case 0x1444:
+				interface_state = 1; //включение основного внутреннего интерфейса
+				main_interface->setStyleSheet("background-color: green");
+				reserve_interface->setStyleSheet("background-color: gray");
+				break;
+			case 0x1333:
+				interface_state = 0;//включение резервного внутреннего интерфейса
+				main_interface->setStyleSheet("background-color: gray");
+				reserve_interface->setStyleSheet("background-color: green");
+				break;
+			}
+		}
 		update_graphics();
 		set_new_tm();
 	}
@@ -250,8 +219,13 @@ void BKIS_widg::set_new_tm()
 {
 	unsigned short _word = 0;
 	QVariantList tmp_list;
+	for (QMap<int, int>::iterator it = pyro_groups_states.begin(); it != pyro_groups_states.end(); it++)
+	{
+		tmp_list << it.value();
+	}
+	//tmp_list.push_back(_word);//зачем?
 
-	tmp_list.push_back(_word);
+	
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
 }
 
@@ -265,6 +239,11 @@ void BKIS_widg::omni_connect()
 {
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	set_new_tm();
+}
+
+void BKIS_widg::set_pyro_bus_state(int bus_num)//bus_num - номера групп рэле, 0 - выключение шин
+{
+	pyro_buses_state = bus_num;
 }
 
 BKIS_widg::~BKIS_widg()
