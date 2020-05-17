@@ -18,8 +18,24 @@ union MKOWord
 
 BKIS_widg::BKIS_widg(QWidget *parent)
 {
-	setWindowTitle("АОС");
+	setWindowTitle("BKIS");
 
+	main_blk = new QPushButton("Вкл основной БЛК", this);
+	main_blk->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+	reserve_blk = new QPushButton("Вкл резервный БЛК", this);
+	reserve_blk->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+	main_interface = new QPushButton("Вкл основной интерфейс", this);
+	main_interface->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+	reserve_interface = new QPushButton("Вкл резервный интерфейс", this);
+	reserve_interface->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+
+	QVBoxLayout* lay = new QVBoxLayout(this);
+	lay->addStretch(10);
+	lay->addWidget(main_blk);
+	lay->addWidget(reserve_blk);
+	lay->addWidget(main_interface);
+	lay->addWidget(reserve_interface);
+			
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start();
 
@@ -63,17 +79,52 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(make_ku(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
-	restoreGeometry(settings.value("aos_geometry").toByteArray());
+	restoreGeometry(settings.value("bkis_geometry").toByteArray());
 
 	blk_state = 0;
 	interface_state = 0;
+	for (int i = 1; i <= 14; i++) {
+		electric_heaters_states[i] = 0;
+	}
+
+	for (int i = 1; i <= 6; i++) {
+		pyro_groups_states[i] = 0;
+	}
+
+	//инициализация нагревателей для проверки
+	for (int i = 1; i <= 14; i++) {
+		electric_heaters_states[i] = i%2;
+	}
 }
 
-void BKIS_widg::set_blk_state(bool state)
+void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
+{
+	switch (ku_n)
+	{
+	case 19:
+		blk_state = 1;
+		main_blk->setStyleSheet("background-color: green"); 
+		reserve_blk->setStyleSheet("background-color: gray");
+		omni_connect();
+		break;
+	case 20:
+		blk_state = 2;
+		main_blk->setStyleSheet("background-color: gray");
+		reserve_blk->setStyleSheet("background-color: green");
+		break;
+	case 21:
+		blk_state = 0;
+		main_blk->setStyleSheet("background-color: gray");
+		reserve_blk->setStyleSheet("background-color: gray");
+		break;
+	}
+}
+
+void BKIS_widg::set_blk_state(int state)
 {
 	blk_state = state;
 }
@@ -81,6 +132,32 @@ void BKIS_widg::set_blk_state(bool state)
 void BKIS_widg::set_interface_state(bool state)
 {
 	interface_state = state;
+}
+
+int BKIS_widg::set_electric_heater_state(int name, bool state)
+{
+	electric_heaters_states[name] = state;
+	return 0;
+}
+
+int BKIS_widg::set_pyro_group_state(int group_num, bool state)
+{
+	if (pyro_buses_state != 0)
+	{
+		pyro_groups_states[group_num] = state;
+		return 0;
+	}
+	else
+		return -1;
+}
+
+void BKIS_widg::get_power(double _volt)
+{
+	volt = _volt;
+	if (volt >= 20.0)
+		imit_on();
+	else
+		if (volt < 1) imit_off();
 }
 
 void BKIS_widg::imit_off()
@@ -93,12 +170,6 @@ void BKIS_widg::imit_on()
 
 }
 
-void BKIS_widg::new_ku_mk(int ku, int length_ku, double u_ku, int line_ku)
-{
-
-}
-
-
 void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	MKOWord tmp_cwd;
@@ -107,27 +178,72 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
-	
+		int tmp_word = words[0].toInt();
+		if (tmp_cwd.subadr == 2)
+		{
+			/* Подрыв пиропатронов*/
+			if (tmp_word >> 4 == 0x660)
+			{
+				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 биты хранят данные о том, какая группа подрывается
+				pyro_groups_states[group_num] = 1;
+				emit send_pyro_group_activation(group_num);
+				return;//todo для быстроты работы?
+			}
+			//вкл. основного/резервного внутреннего интерфейса
+			switch (tmp_word)
+			{
+				//вкл. основного/резервного внутренних интерфейсов
+			case 0x1444:
+				interface_state = 1; //включение основного внутреннего интерфейса
+				main_interface->setStyleSheet("background-color: green");
+				reserve_interface->setStyleSheet("background-color: gray");
+				break;
+			case 0x1333:
+				interface_state = 0;//включение резервного внутреннего интерфейса
+				main_interface->setStyleSheet("background-color: gray");
+				reserve_interface->setStyleSheet("background-color: green");
+				break;
+			}
+		}
 		update_graphics();
 		set_new_tm();
 	}
 }
-
 
 void BKIS_widg::update_graphics()
 {
 
 }
 
-//void BKIS_widg::get_
-
 void BKIS_widg::set_new_tm()
 {
 	unsigned short _word = 0;
 	QVariantList tmp_list;
+	for (QMap<int, int>::iterator it = pyro_groups_states.begin(); it != pyro_groups_states.end(); it++)
+	{
+		tmp_list << it.value();
+	}
+	//tmp_list.push_back(_word);//зачем?
 
-	tmp_list.push_back(_word);
+	
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
+}
+
+void BKIS_widg::set_power_back()
+{
+	int curr = 1;
+	power_slot_thr.get_power_bus_obj()->set_i(bus, name, curr);
+}
+
+void BKIS_widg::omni_connect()
+{
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
+	set_new_tm();
+}
+
+void BKIS_widg::set_pyro_bus_state(int bus_num)//bus_num - номера групп рэле, 0 - выключение шин
+{
+	pyro_buses_state = bus_num;
 }
 
 BKIS_widg::~BKIS_widg()
@@ -145,6 +261,6 @@ BKIS_widg::~BKIS_widg()
 void BKIS_widg::closeEvent(QCloseEvent *event)
 {
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
-	settings.setValue("aos_geometry", saveGeometry());
+	settings.setValue("bkis_geometry", saveGeometry());
 	QWidget::closeEvent(event);
 }
