@@ -107,19 +107,19 @@ void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
 	{
 	case 19:
 		blk_state = 1;
-		main_blk->setStyleSheet("background-color: green"); 
-		reserve_blk->setStyleSheet("background-color: gray");
+		main_blk->setStyleSheet("background-color: rgb(142, 198, 156)"); 
+		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		omni_connect();
 		break;
 	case 20:
 		blk_state = 2;
-		main_blk->setStyleSheet("background-color: gray");
-		reserve_blk->setStyleSheet("background-color: green");
+		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
+		reserve_blk->setStyleSheet("background-color: rgb(142, 198, 156)");
 		break;
 	case 21:
 		blk_state = 0;
-		main_blk->setStyleSheet("background-color: gray");
-		reserve_blk->setStyleSheet("background-color: gray");
+		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
+		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		break;
 	}
 }
@@ -181,7 +181,8 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		int tmp_word = words[0].toInt();
 		if (tmp_cwd.subadr == 2)
 		{
-			/* Подрыв пиропатронов*/
+			/*
+			Подрыв пиропатронов
 			if (tmp_word >> 4 == 0x660)
 			{
 				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 биты хранят данные о том, какая группа подрывается
@@ -189,19 +190,20 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				emit send_pyro_group_activation(group_num);
 				return;//todo для быстроты работы?
 			}
+			*/
 			//вкл. основного/резервного внутреннего интерфейса
 			switch (tmp_word)
 			{
 				//вкл. основного/резервного внутренних интерфейсов
 			case 0x1444:
 				interface_state = 1; //включение основного внутреннего интерфейса
-				main_interface->setStyleSheet("background-color: green");
-				reserve_interface->setStyleSheet("background-color: gray");
+				main_interface->setStyleSheet("background-color: rgb(142, 198, 156)");
+				reserve_interface->setStyleSheet("background-color: rgb(204, 204, 204)");
 				break;
 			case 0x1333:
 				interface_state = 0;//включение резервного внутреннего интерфейса
-				main_interface->setStyleSheet("background-color: gray");
-				reserve_interface->setStyleSheet("background-color: green");
+				main_interface->setStyleSheet("background-color: rgb(204, 204, 204)");
+				reserve_interface->setStyleSheet("background-color: rgb(142, 198, 156)");
 				break;
 			}
 		}

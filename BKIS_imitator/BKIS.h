@@ -29,7 +29,7 @@ public:
 	~BKIS_widg();
 	
 private:
-	const int MKO = 1;//проверить номер шины
+	const int MKO = 0;//проверить номер шины
 	const int adr = 22;
 
 	void update_graphics();//обновление графики
