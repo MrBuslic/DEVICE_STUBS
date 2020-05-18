@@ -304,7 +304,8 @@ private:
 
 	const int MKO = 1;
 	const int adr = 21;
-
+	QHBoxLayout *a;
+	QGroupBox *Group_Vkl_kompl_AOS;
 	void update_graphics();  // обновление графики
 	void set_new_tm();      // составление ОК-ов
 	void TMI_1_AOS();   // составление ТМИ - 1 
