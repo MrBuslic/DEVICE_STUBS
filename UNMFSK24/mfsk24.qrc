@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>icons/dark.PNG</file>
-        <file>icons/light.PNG</file>
+        <file>icons/dark.png</file>
+        <file>icons/light.png</file>
     </qresource>
 </RCC>

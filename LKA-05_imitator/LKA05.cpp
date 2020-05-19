@@ -2,14 +2,15 @@
 #include "lka05_socket_rpc.h"
 #include <QMessageBox>
 #include "rpc_ports.h"
+
 union MKOWord
 {
 	quint16 com_word;				 // командное слово целиком
 	struct
 	{
 		quint16 count_word : 5,    // число сл.данных / команда
-			subadr : 5,   // подадрес
-			trans_dir : 1,       // направление передачи(1-чт.ќ”)
+			subadr : 5,			   // подадрес
+			trans_dir : 1,        // направление передачи(1-чт.ќ”)
 			adr : 5;
 	};
 };
@@ -140,7 +141,7 @@ LKA05_widg::LKA05_widg() : flag_on(false)
 		this->deleteLater();
 		return;
 	}
-
+	
 	power_slot_thr.set_connection_params("127.0.0.1", POWER_SLOT);
 	power_slot_thr.start(); // вот тут падает
 
@@ -585,7 +586,7 @@ void LKA05_widg::set_new_tm()
 		tm_words << mvmk_modules[i].get_tm();
 	}
 	tm_words << mpvn_modules[0].get_tm(); //МПВН нужен ли?
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words); 
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 17, tm_words);
 }
 
 void LKA05_widg::new_data_mv(int saddr)
@@ -616,4 +617,28 @@ void LKA05_widg::new_tm(int tm)
 	QVariantList tm_words;
 	tm_words << tm;
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tm_words);
+}
+
+int LKA05_widg::set_mu_working(int _dev, bool _flag)
+{
+	mu_module.set_working(LKA_CURRENT_DEV(_dev), _flag);
+	return 0;
+}
+
+int LKA05_widg::set_ku_working(int module_num, int _dev, bool _flag)
+{
+	mvku_modules[module_num].set_working(LKA_CURRENT_DEV(_dev), _flag);
+	return 0;
+}
+
+int LKA05_widg::set_mk_working(int module_num, int _dev, bool _flag)
+{
+	mvmk_modules[module_num].set_working(LKA_CURRENT_DEV(_dev), _flag);
+	return 0;
+}
+
+int LKA05_widg::set_mpvn_working(int _dev, bool _flag)
+{
+	mpvn_modules[0].set_working(LKA_CURRENT_DEV(_dev), _flag);
+	return 0;
 }

@@ -80,14 +80,14 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::MSHM_NASTROYKA_CELOSTNOSTI_KANALOV;
 		operators_map["PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::PSHM_NASTROYKA_CELOSTNOSTI_KANALOV;
 		operators_map["FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::FOI_NASTROYKA_CELOSTNOSTI_KANALOV;
-		operators_map["OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList, QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA;
-		operators_map["OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_REGISTRACII;
-		operators_map["OLS_BISTRIY_START(int)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_BISTRIY_START;
-		operators_map["OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII;
 		operators_map["ANTENNA_USTANOVKA_KOMMUTACII(QString, QString)"] = &kpiu_Socket_RPC_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII;
 		operators_map["OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV;
 		operators_map["USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int, int)"] = &kpiu_Socket_RPC_SLOT_Object::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA;
 		operators_map["PYRO_USTANOVIT_SOSTOYANIE(QString, int)"] = &kpiu_Socket_RPC_SLOT_Object::PYRO_USTANOVIT_SOSTOYANIE;
+		operators_map["LKA05_KU_USTANOVIT_SOSTOYANIE(int, int, bool)"] = &kpiu_Socket_RPC_SLOT_Object::LKA05_KU_USTANOVIT_SOSTOYANIE;
+		operators_map["LKA05_MK_USTANOVIT_SOSTOYANIE(int, int, bool)"] = &kpiu_Socket_RPC_SLOT_Object::LKA05_MK_USTANOVIT_SOSTOYANIE;
+		operators_map["LKA05_MPVN_USTANOVIT_SOSTOYANIE(int, bool)"] = &kpiu_Socket_RPC_SLOT_Object::LKA05_MPVN_USTANOVIT_SOSTOYANIE;
+		operators_map["LKA05_MU_USTANOVIT_SOSTOYANIE(int, bool)"] = &kpiu_Socket_RPC_SLOT_Object::LKA05_MU_USTANOVIT_SOSTOYANIE;
 		operators_map["getXML()"] = &kpiu_Socket_RPC_SLOT_Object::getXML;
 		operators_map["mfsk_1_impulse(QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mfsk_1_impulse;
 		operators_map["mds_1_get_sample(uint&, bool&)"] = &kpiu_Socket_RPC_SLOT_Object::mds_1_get_sample;
@@ -487,86 +487,6 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			return 1;
 		}
 	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QVariantList data_buffer = _values.at(0).value<QVariantList>();
-			QVariantList mask_buffer = _values.at(1).value<QVariantList>();
-			int res = app->OLS_ZAPIS_DANNIH_FORMIROVANIYA(data_buffer, mask_buffer);
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QVariantList data_buffer = _values.at(0).value<QVariantList>();
-			int res = app->OLS_ZAPIS_DANNIH_REGISTRACII(data_buffer);
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_BISTRIY_START(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			int devise = _values.at(0).value<int>();
-			int res = app->OLS_BISTRIY_START(devise);
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
-	QVariant kpiu_Socket_RPC_SLOT_Object::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& _values)
-	{
-		try
-		{
-			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
-			QVariantList data_buffer = _values.at(0).value<QVariantList>();
-			int res = app->OLS_CHTENIE_DANNICH_REGISTRACII(data_buffer);
-			_values[0] = data_buffer;
-			SRPCSignalClass::Instance().toLog(QString("%1 data_buffer = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values[0])));
-			with_return = true;
-			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
-			return res;
-		}
-		catch(const std::exception &)
-		{
-			return 1;
-		}
-		catch(...)
-		{
-			return 1;
-		}
-	}
 	QVariant kpiu_Socket_RPC_SLOT_Object::ANTENNA_USTANOVKA_KOMMUTACII(QVariantList& _values)
 	{
 		try
@@ -635,6 +555,88 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 			QString name = _values.at(0).value<QString>();
 			int state = _values.at(1).value<int>();
 			int res = app->PYRO_USTANOVIT_SOSTOYANIE(name, state);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::LKA05_KU_USTANOVIT_SOSTOYANIE(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int module_num = _values.at(0).value<int>();
+			int _dev = _values.at(1).value<int>();
+			bool _flag = _values.at(2).value<bool>();
+			int res = app->LKA05_KU_USTANOVIT_SOSTOYANIE(module_num, _dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::LKA05_MK_USTANOVIT_SOSTOYANIE(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int module_num = _values.at(0).value<int>();
+			int _dev = _values.at(1).value<int>();
+			bool _flag = _values.at(2).value<bool>();
+			int res = app->LKA05_MK_USTANOVIT_SOSTOYANIE(module_num, _dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::LKA05_MPVN_USTANOVIT_SOSTOYANIE(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int _dev = _values.at(0).value<int>();
+			bool _flag = _values.at(1).value<bool>();
+			int res = app->LKA05_MPVN_USTANOVIT_SOSTOYANIE(_dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::LKA05_MU_USTANOVIT_SOSTOYANIE(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int _dev = _values.at(0).value<int>();
+			bool _flag = _values.at(1).value<bool>();
+			int res = app->LKA05_MU_USTANOVIT_SOSTOYANIE(_dev, _flag);
 			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
 			return res;
 		}
