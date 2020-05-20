@@ -132,7 +132,7 @@ private:
 	bool kr;
 	bool off_device;
 	//QCheckBox* add_set(QString name, QString data, bool is_main = true);
-
+	QList<int> name_lst_0;
 	
 
 	QString name = "14Н736"; // русская н

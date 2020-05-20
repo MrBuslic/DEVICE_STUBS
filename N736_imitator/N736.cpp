@@ -85,6 +85,10 @@ N736_widg::N736_widg() : flag_on(false)
 	v_l->addLayout(kit_line_hlayout);
 	v_l->addLayout(h_l);
 
+
+	name_lst_0 << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_CONNECT_1 << CHAN_WORK_1 << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
+	//name_lst_1 << CHAN_BLOCK_2 << CHAN_INCLUDE_2 << CHAN_CONNECT_2 << CHAN_WORK_2 << CHAN_READY_CU_2 << CHAN_SET_BLOCK_2 << CHAN_SET_INCLUDE_2 << CHAN_SET_OK_2 << CHAN_SET_CONNECT_2 << CHAN_SET_WORK_2;
+
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
 	//connect(AbOn_tmr, &QTimer::timeout, this, &MPR_widg::omni_connect);
@@ -251,14 +255,12 @@ void N736_widg::paint_buttons()
 // ответ в ОЛС через МКУ 
 void N736_widg::set_tm_state()
 {
-	qDebug() << "num_chnl="<< num_chnl;
 	mku_slot_thr.get_mku_bus_obj()->set_tm("736_TM", QVariant(num_chnl));
 }
 
 
 bool N736_widg::isset(qulonglong x, qulonglong n)
 {
-	qDebug() << "isset=" << ((qulonglong)1 << n) << "n = " << n;
 	return (x & ((qulonglong)1 << n)) != 0;
 }
 
@@ -266,16 +268,9 @@ bool N736_widg::isset(qulonglong x, qulonglong n)
 void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 {
 	
-	//num_chnl = 0;
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
-	QVariantList kpi_list;
-	QList<int> name_lst_0, name_lst_1;
-	//name_btn_lst << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_CONNECT_1 << CHAN_WORK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
-
 	
-	name_lst_0 << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_CONNECT_1 << CHAN_WORK_1 << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
-	name_lst_1 << CHAN_BLOCK_2 << CHAN_INCLUDE_2 << CHAN_CONNECT_2 << CHAN_WORK_2 << CHAN_READY_CU_2 << CHAN_SET_BLOCK_2 << CHAN_SET_INCLUDE_2 << CHAN_SET_OK_2 << CHAN_SET_CONNECT_2 << CHAN_SET_WORK_2;
 	for (auto const& i : boost::combine(dataList, maskList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
@@ -292,7 +287,6 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 				qDebug() << "1комплект ";
 				current_dev = CURRENT_COMP::MAIN;
 				kr = true;
-				//off_device = true;
 			}
 			else if (isset(res, CHAN_BLOCK_2 - 1))
 			{
@@ -354,6 +348,7 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 			if (num_chnl == 0)
 			{
 				current_dev = CURRENT_COMP::OFF;
+				//current_mko = CURRENT_MKO::OFF; мко тоже выключать?
 				paint_buttons();
 				off_device = true;
 				qDebug() << "Комплект выключен ";
