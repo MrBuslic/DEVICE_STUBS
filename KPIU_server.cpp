@@ -9,36 +9,38 @@
 #include "ols_rpc.h"
 #include "unis4.h"
 
-KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_type(_rm_type), bufar_chan(0)
+KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_type(platform), bufar_chan(0)
 {
 	QString ip_str = "127.0.0.1";
-	QGridLayout* bus_grd_layout = new QGridLayout(this);
+	QVBoxLayout* main_lay = new QVBoxLayout(this);
+	QTabWidget* tab_widget = new QTabWidget(this);
+	main_lay->addWidget(tab_widget);
+
+	QWidget* bus_widget = new QWidget(this);
+
+
+	QGridLayout* bus_grd_layout = new QGridLayout(bus_widget);
+
 	bus_grd_layout->setVerticalSpacing(10);
 	bus_grd_layout->setHorizontalSpacing(10);
+
+	tab_widget->addTab(bus_widget, "Buses");
+	
 	omnibus_widget = new RpcOmnibusWidget(this);
 	interrupt_widget = new InterruptWidget(this);
 	kpi_widget = new KPIWidget(this);
 	mku_widget = new MKUWidget(this);
 	frame_widget = new FrameBusWidget(this);
 	power_widget = new PowerWidget(this);
-/*
-	ols_widget = new RpcOlsWidget(this, 0);
-	QThread::currentThread()->msleep(2000);
-	kprd_widget = new KPRD_imitator(this);
-	foi_widget = new RpcFoiWidget(this);
-	*/
+
+
 	QLabel* omnibus_label = new QLabel("OMNIBUS");
 	QLabel* interrupt_label = new QLabel("Interrupt");
 	QLabel* kpi_label = new QLabel("KPI");
 	QLabel* mku_label = new QLabel("MKU");
 	QLabel* frame_label = new QLabel("Frame bus");
 	QLabel* power_label = new QLabel("Power bus");
-	/*
-	QLabel* ols_label = new QLabel("Ols");
-	QLabel* kprd_label = new QLabel("KPRD");
-	QLabel* foi_label = new QLabel("Foi");
-	*/
-	//connect(ols_widget, &RpcOlsWidget::new_ols_data, kprd_widget, &KPRD_imitator::dataIn);
+
 	bus_grd_layout->addWidget(omnibus_label, 0, 0, Qt::AlignCenter);
 	bus_grd_layout->addWidget(interrupt_label, 0, 1, Qt::AlignCenter);
 	bus_grd_layout->addWidget(kpi_label, 0, 2, Qt::AlignCenter);
@@ -49,33 +51,184 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 	bus_grd_layout->addWidget(frame_label, 2, 1, Qt::AlignCenter);
 	bus_grd_layout->addWidget(power_label, 2, 2, Qt::AlignCenter);
 	bus_grd_layout->addWidget(mku_widget, 3, 0);
-	bus_grd_layout->addWidget(frame_widget, 3, 1);
+	bus_grd_layout->addWidget(frame_widget, 3, 1);	
 	bus_grd_layout->addWidget(power_widget, 3, 2, Qt::AlignTop);
-	/*
-	bus_grd_layout->addWidget(ols_label, 4, 0, Qt::AlignCenter);
-	bus_grd_layout->addWidget(kprd_label, 4, 1, Qt::AlignCenter);
-	bus_grd_layout->addWidget(foi_label, 4, 2, Qt::AlignCenter);
-	bus_grd_layout->addWidget(ols_widget, 5, 0, Qt::AlignTop);	
-	bus_grd_layout->addWidget(kprd_widget, 5, 1, Qt::AlignTop);
-	bus_grd_layout->addWidget(foi_widget, 5, 2);
-	*/
+	if ((rm_type == "bkupi") || (rm_type == "mca"))
+	{
 
+		QWidget* ols_widget = new QWidget(this);
+		QWidget* device_1_widget = new QWidget(this);
+		QWidget* device_2_widget = new QWidget(this);
+		QWidget* device_3_widget = new QWidget(this);
+		QWidget* device_4_widget = new QWidget(this);
+		QWidget* mfsk24_widget = new QWidget(this);
+		QGridLayout* ols_grd_layout = new QGridLayout(ols_widget);
+		QGridLayout* device_1_grd_layout = new QGridLayout(device_1_widget);
+		QGridLayout* device_2_grd_layout = new QGridLayout(device_2_widget);
+		QGridLayout* device_3_grd_layout = new QGridLayout(device_3_widget);
+		QGridLayout* device_4_grd_layout = new QGridLayout(device_4_widget);
+		QGridLayout* mfsk24_grd_layout = new QGridLayout(mfsk24_widget);
+		ols_grd_layout->setVerticalSpacing(10);
+		ols_grd_layout->setHorizontalSpacing(10);
+
+		device_1_grd_layout->setVerticalSpacing(10);
+		device_1_grd_layout->setHorizontalSpacing(10);
+		tab_widget->addTab(ols_widget, "OLS Imitators");
+		tab_widget->addTab(device_1_widget, "Devices 1 page");
+		tab_widget->addTab(device_2_widget, "Devices 2 page");
+		tab_widget->addTab(device_3_widget, "Devices 3 page");
+		tab_widget->addTab(device_4_widget, "Devices 4 page");
+		tab_widget->addTab(mfsk24_widget, "MFSK24 Imitators");
+
+
+		QLabel* kprd_label = new QLabel("KPRD");
+		QLabel* foi_label = new QLabel("Foi");
+		QLabel* kp50_label = new QLabel("KP50");
+		QLabel* ols_0_label = new QLabel("Ols_0");
+		QLabel* ols_1_label = new QLabel("Ols_1");
+		QLabel* ols_2_label = new QLabel("Ols_2");
+		QLabel* ols_3_label = new QLabel("Ols_3");
+		QLabel* ols_4_label = new QLabel("Ols_4");
+		QLabel* mds32_0_label = new QLabel("mds32_0");
+		QLabel* mds32_1_label = new QLabel("mds32_1");
+		QLabel* mfsk24_0_label = new QLabel("mfsk24_0");
+		QLabel* mfsk24_1_label = new QLabel("mfsk24_1");
+		QLabel* mfsk24_2_label = new QLabel("mfsk24_2");
+		QLabel* mfsk24_3_label = new QLabel("mfsk24_3");
+		QLabel* mfsk24_4_label = new QLabel("mfsk24_4");
+		QLabel* mfsk24_5_label = new QLabel("mfsk24_5");
+		QLabel* mfsk24_6_label = new QLabel("mfsk24_6");
+		QLabel* mfsk24_7_label = new QLabel("mfsk24_7");
+		QLabel* mfsk24_8_label = new QLabel("mfsk24_8");
+		QLabel* mt8k4l_0_label = new QLabel("mt8k4l_0");
+		QLabel* mt8k4l_1_label = new QLabel("mt8k4l_1");
+		QLabel* mt8k4l_2_label = new QLabel("mt8k4l_2");
+		QLabel* ads128_0_label = new QLabel("ads128_0");
+		QLabel* ads128_1_label = new QLabel("ads128_1");
+		QLabel* mn8i_label = new QLabel("mn8i");
+		QLabel* vvk4_label = new QLabel("vvk4");
+		QLabel* is4_label = new QLabel("is4");
+		QLabel* rm_mbk07_label = new QLabel("rm_mbk07");
+		QLabel* mkprm_label = new QLabel("mkprm");
+		QLabel* sorensen_label = new QLabel("sorensen");
+		QLabel* n6707_label = new QLabel("n6707");
+		QLabel* mki_label = new QLabel("MKI");
+		QLabel* ibep_label = new QLabel("IBEP");
+
+		ols_0_widget = new RpcOlsWidget(0);
+		ols_1_widget = new RpcOlsWidget(0, 1);
+		ols_2_widget = new RpcOlsWidget(0, 2);
+		ols_3_widget = new RpcOlsWidget(0, 3);
+		ols_4_widget = new RpcOlsWidget(0, 4);
+		QThread::currentThread()->msleep(2000);
+		kprd_widget = new KPRD_imitator(this);
+		foi_widget = new RpcFoiWidget(this);
+		kp50_widget = new RpcKP50Widget();
+		mds32_0_widget = new RpcMDS32Widget(0);
+		mds32_1_widget = new RpcMDS32Widget(1);
+		mfsk24_0_widget = new RpcMFSK24Widget(0);
+		mfsk24_1_widget = new RpcMFSK24Widget(1);
+		mfsk24_2_widget = new RpcMFSK24Widget(2);
+		mfsk24_3_widget = new RpcMFSK24Widget(3);
+		mfsk24_4_widget = new RpcMFSK24Widget(4);
+		mfsk24_5_widget = new RpcMFSK24Widget(5);
+		mfsk24_6_widget = new RpcMFSK24Widget(6);
+		mfsk24_7_widget = new RpcMFSK24Widget(7);
+		mfsk24_8_widget = new RpcMFSK24Widget(8);
+		ads128_0_widget = new RpcADS128Widget(0);
+		ads128_1_widget = new RpcADS128Widget(1);
+
+		mt8k4l_0_widget = new RpcMT8K4LWidget(MT8K4L_SLOT, MT8K4L_SIGNAL);
+		mt8k4l_1_widget = new RpcMT8K4LWidget(MT8K4L_SLOT + 1, MT8K4L_SIGNAL + 1);
+		mt8k4l_2_widget = new RpcMT8K4LWidget(MT8K4L_SLOT + 2, MT8K4L_SIGNAL + 2);
+
+		mn8i_widget = new RpcMN8IWidget(0);
+		vvk4_widget = new RpcVvk4Widget;
+		is4_widget = new RpcIS4Widget(0);
+		rm_mbk07_widget = new RM_MBK07_imitator;
+		mkprm_widget = new RpcMKPRMWidget;
+		sorensen_widget = new SORENSENWidget;
+		n6705_widget = new N6705Widget;
+		ibep_widget = new IBEP_imitator;
+
+		ols_grd_layout->addWidget(ols_0_label, 0, 0, Qt::AlignCenter);
+		ols_grd_layout->addWidget(ols_1_label, 0, 1, Qt::AlignCenter);
+		ols_grd_layout->addWidget(ols_2_label, 0, 2, Qt::AlignCenter);
+		ols_grd_layout->addWidget(ols_0_widget, 1, 0, Qt::AlignTop);
+		ols_grd_layout->addWidget(ols_1_widget, 1, 1, Qt::AlignTop);
+		ols_grd_layout->addWidget(ols_2_widget, 1, 2, Qt::AlignTop);
+		ols_grd_layout->addWidget(ols_3_label, 2, 0, Qt::AlignCenter);
+		ols_grd_layout->addWidget(ols_4_label, 2, 1, Qt::AlignCenter);
+		ols_grd_layout->addWidget(kprd_label, 2, 2, Qt::AlignCenter);
+		ols_grd_layout->addWidget(ols_3_widget, 3, 0, Qt::AlignTop);
+		ols_grd_layout->addWidget(ols_4_widget, 3, 1, Qt::AlignTop);
+		ols_grd_layout->addWidget(kprd_widget, 3, 2, Qt::AlignTop);
+
+		device_1_grd_layout->addWidget(mds32_0_label, 0, 0, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(mds32_1_label, 0, 1, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(foi_label, 0, 2, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(mds32_0_widget, 1, 0, Qt::AlignTop);
+		device_1_grd_layout->addWidget(mds32_1_widget, 1, 1, Qt::AlignTop);
+		device_1_grd_layout->addWidget(foi_widget, 1, 2);
+		device_1_grd_layout->addWidget(mt8k4l_0_label, 2, 0, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(mt8k4l_1_label, 2, 1, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(mt8k4l_2_label, 2, 2, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(mt8k4l_0_widget, 3, 0, Qt::AlignCenter);
+		device_1_grd_layout->addWidget(mt8k4l_1_widget, 3, 1);
+		device_1_grd_layout->addWidget(mt8k4l_2_widget, 3, 2);
+
+		device_2_grd_layout->addWidget(ads128_0_label, 0, 0, Qt::AlignCenter);
+		device_2_grd_layout->addWidget(ads128_1_label, 0, 1, Qt::AlignCenter);
+		device_2_grd_layout->addWidget(mn8i_label, 0, 2, Qt::AlignCenter);
+		device_2_grd_layout->addWidget(ads128_0_widget, 1, 0);
+		device_2_grd_layout->addWidget(ads128_1_widget, 1, 1);
+		device_2_grd_layout->addWidget(mn8i_widget, 1, 2);
+		device_2_grd_layout->addWidget(is4_label, 2, 0, Qt::AlignCenter);
+		device_2_grd_layout->addWidget(vvk4_label, 2, 1, Qt::AlignCenter);
+		//device_2_grd_layout->addWidget(rm_mbk07_label, 2, 2, Qt::AlignCenter);
+		device_2_grd_layout->addWidget(is4_widget, 3, 0);
+		device_2_grd_layout->addWidget(vvk4_widget, 3, 1);
+		//device_2_grd_layout->addWidget(rm_mbk07_widget, 3, 2, Qt::AlignTop);
+
+		device_3_grd_layout->addWidget(sorensen_label, 0, 0, Qt::AlignCenter);
+		device_3_grd_layout->addWidget(n6707_label, 0, 1, Qt::AlignCenter);
+		device_3_grd_layout->addWidget(ibep_label, 0, 2);
+		device_3_grd_layout->addWidget(sorensen_widget, 1, 0, Qt::AlignCenter);
+		device_3_grd_layout->addWidget(n6705_widget, 1, 1, Qt::AlignTop);
+		device_3_grd_layout->addWidget(ibep_widget, 1, 2, Qt::AlignCenter);
+		device_3_grd_layout->addWidget(kp50_label, 2, 0, Qt::AlignCenter);
+		device_3_grd_layout->addWidget(kp50_widget, 3, 0, Qt::AlignCenter);
+
+		device_4_grd_layout->addWidget(rm_mbk07_label, 0, 0, Qt::AlignCenter);
+		device_4_grd_layout->addWidget(mkprm_label, 0, 1, Qt::AlignCenter);
+		device_4_grd_layout->addWidget(mki_label, 0, 2, Qt::AlignCenter);
+		device_4_grd_layout->addWidget(rm_mbk07_widget, 1, 0, Qt::AlignTop);
+		device_4_grd_layout->addWidget(mkprm_widget, 1, 1, Qt::AlignTop);
+		//device_4_grd_layout->addWidget(mki_widget, 1, 2);
+
+		mfsk24_grd_layout->addWidget(mfsk24_0_label, 0, 0, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_1_label, 0, 1, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_2_label, 0, 2, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_0_widget, 1, 0);//отладить 
+		mfsk24_grd_layout->addWidget(mfsk24_1_widget, 1, 1);
+		mfsk24_grd_layout->addWidget(mfsk24_2_widget, 1, 2);
+		mfsk24_grd_layout->addWidget(mfsk24_3_label, 2, 0, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_4_label, 2, 1, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_5_label, 2, 2, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_3_widget, 3, 0);
+		mfsk24_grd_layout->addWidget(mfsk24_4_widget, 3, 1);
+		mfsk24_grd_layout->addWidget(mfsk24_5_widget, 3, 2, Qt::AlignTop);
+		mfsk24_grd_layout->addWidget(mfsk24_6_label, 4, 0, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_7_label, 4, 1, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_8_label, 4, 2, Qt::AlignCenter);
+		mfsk24_grd_layout->addWidget(mfsk24_6_widget, 5, 0);//отладить 
+		mfsk24_grd_layout->addWidget(mfsk24_7_widget, 5, 1);
+		mfsk24_grd_layout->addWidget(mfsk24_8_widget, 5, 2);
+	}
 
 	QProcess::execute(QApplication::applicationDirPath() + "/mongodb_export db");
 	QProcess::execute(QApplication::applicationDirPath() + "/db_starter");
-	if (rm_type == "aik")
-	{
-		QProcess::startDetached(QApplication::applicationDirPath() + "/ag7972");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/afar_server");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/afar_mko_server");
-		QThread::currentThread()->msleep(2000);
-		QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
-		QThread::currentThread()->msleep(2000);
-		QProcess::startDetached(QApplication::applicationDirPath() + "/LKA-05_imitator");
-		//QThread::currentThread()->msleep(2000);
-		//QProcess::startDetached(QApplication::applicationDirPath() + "/client");
-	}
+
 
 	if (rm_type == "afar")
 	{
@@ -90,38 +243,10 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		ip_state.insert(2, false);
 		ip_state.insert(3, false);
 	}
-	if (rm_type == "mkpa")
+	if ((rm_type == "bkupi")|| (rm_type == "mca"))
 	{
-
-
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_kp50");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_foi");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 0");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 1");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ols 2");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mds32 0");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mds32 1");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 0");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 1");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 2");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 5");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 6");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 7");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mfsk24 8");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 0");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_ads128 1");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mn8i");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_vvk4");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_is4");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/RM_MBK07_imitator");
 		QThread::currentThread()->msleep(3000);
-		QProcess::startDetached(QApplication::applicationDirPath() + "/rpc_mkprm");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/sorensen");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/IBEP_imitator");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/n6705");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/kprd_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/cbk_imitator_real_po");
-		QThread::currentThread()->msleep(2000);
 		QProcess::startDetached(QApplication::applicationDirPath() + "/mbk04_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/MBK-02_imitator");
 		QThread::currentThread()->msleep(2000);
@@ -132,157 +257,93 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/BECH_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/ASN_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/LKA-05_imitator");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/BAU_imitator");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/UNVVK4");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/UNIS4");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/common");
+
+
+		if (rm_type == "mca")
+		{
+			QProcess::startDetached(QApplication::applicationDirPath() + "/N736_imitator");
+			QProcess::startDetached(QApplication::applicationDirPath() + "/N737_imitator");
+			QProcess::startDetached(QApplication::applicationDirPath() + "/BAU_imitator");
+			QProcess::startDetached(QApplication::applicationDirPath() + "/BAO");
+			QProcess::startDetached(QApplication::applicationDirPath() + "/BKIS_imitator");
+		}
+
+		//QProcess::startDetached(QApplication::applicationDirPath() + "/common");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/monitor");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/MBK07");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/N736_imitator");
-		QProcess::startDetached(QApplication::applicationDirPath() + "/N737_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
 		//QThread::currentThread()->msleep(5000);
 		//QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
 
+		connect(mds32_0_widget, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_1_get_sample(uint&, bool&)), Qt::DirectConnection);
+		connect(mds32_1_widget, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_2_get_sample(uint&, bool&)), Qt::DirectConnection);
 
-
-
-		RPC_mds32_SLOT_Thread* mds1_slot_thr = new RPC_mds32_SLOT_Thread;
-		mds1_slot_thr->set_connection_params("127.0.0.1", MDS_SLOT);
-		mds1_slot_thr->start();
-
-		RPC_mds32_SIGNAL_Thread* mds1_signal_thr = new RPC_mds32_SIGNAL_Thread;
-		mds1_signal_thr->set_connection_params("127.0.0.1", MDS_SIGNAL);
-		mds1_signal_thr->start();
-
-		if (!mds1_slot_thr->wait_connected(3) || !mds1_signal_thr->wait_connected(3))
-		{
-			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ mds32 1");
-			this->deleteLater();
-			return;
-		}
-		connect(mds1_signal_thr->get_obj().get(), SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_1_get_sample(uint&, bool&)), Qt::DirectConnection);
-
-
-
-		RPC_mds32_SIGNAL_Thread* mds2_signal_thr = new RPC_mds32_SIGNAL_Thread;
-		mds2_signal_thr->set_connection_params("127.0.0.1", MDS_SIGNAL + 1);
-		mds2_signal_thr->start();
-
-		if (!mds2_signal_thr->wait_connected(3))
-		{
-			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ mds32 2");
-			this->deleteLater();
-			return;
-		}
-		connect(mds2_signal_thr->get_obj().get(), SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_2_get_sample(uint&, bool&)), Qt::DirectConnection);
-
-
-		RPC_mfsk24_SLOT_Thread* mfsk2_slot_thr = new RPC_mfsk24_SLOT_Thread;
-		mfsk2_slot_thr->set_connection_params("127.0.0.1", MFSK_SLOT+1);
-		mfsk2_slot_thr->start();
-
-		RPC_mfsk24_SIGNAL_Thread* mfsk2_signal_thr = new RPC_mfsk24_SIGNAL_Thread;
-		mfsk2_signal_thr->set_connection_params("127.0.0.1", MFSK_SIGNAL+1);
-		mfsk2_signal_thr->start();
-
-		if (!mfsk2_slot_thr->wait_connected(3) || !mfsk2_signal_thr->wait_connected(3))
-		{
-			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ mfsk24 2");
-			this->deleteLater();
-			return;
-		}
-		connect(mfsk2_signal_thr->get_obj().get(), SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk_2_impulse(QVariantList)), Qt::DirectConnection);
+		connect(mfsk24_1_widget, SIGNAL(mfsk24_impulse_change(QVariantList)), this, SLOT(mfsk_2_impulse(QVariantList)), Qt::DirectConnection);
 
 		mds1_chans.chans = 0xFFFFFFFF;
 		mds2_chans.chans = 0xFFFFFFFF;
+	
+		///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
+		lka05_slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+		lka05_slot_thr.start(); // вот тут падает
 
-		vvk4_slot_thr = new RPC_vvk4_SLOT_Thread;
-		vvk4_slot_thr->set_connection_params("127.0.0.1", VVK_SLOT);
-		vvk4_slot_thr->start();
+		lka05_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+		lka05_signal_thr.start(); // вот тут падает
 
-		RPC_vvk4_SIGNAL_Thread* vvk4_signal_thr = new RPC_vvk4_SIGNAL_Thread;
-		vvk4_signal_thr->set_connection_params("127.0.0.1", VVK_SIGNAL);
-		vvk4_signal_thr->start();
-
-		if (!vvk4_slot_thr->wait_connected(3) || !vvk4_signal_thr->wait_connected(3))
+		if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
 		{
-			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ vvk4");
-			this->deleteLater();
-			return;
-		}
-		//connect(mfsk1_signal_thr->get_obj().get(), SIGNAL(vvk4_get_channels_list(QVariantList& ei_list, QVariantList& sum_list)), this, SLOT(get_commut_chanels_list(QVariantList& ei_list, QVariantList& sum_list)), Qt::DirectConnection);
-
-		RPC_is4_SLOT_Thread* is4_slot_thr = new RPC_is4_SLOT_Thread;
-		is4_slot_thr->set_connection_params("127.0.0.1", IS4_SLOT);
-		is4_slot_thr->start();
-		RPC_is4_SIGNAL_Thread* is4_signal_thr = new RPC_is4_SIGNAL_Thread;
-		is4_signal_thr->set_connection_params("127.0.0.1", IS4_SIGNAL);
-		is4_signal_thr->start();
-
-		if (!is4_slot_thr->wait_connected(3) || !is4_signal_thr->wait_connected(3))
-		{
-			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ is4");
+			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka_05");
 			this->deleteLater();
 			return;
 		}
 
-		connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
+		connect(this, SLOT(LKA05_MK_USTANOVIT_SOSTOYANIE(int, int, bool)), lka05_slot_thr.get_obj().get(), SLOT(set_mk_working(int, int, bool)));
 
-		/*
-		pyro_state.insert("РџРџ1_Рћ",  pyro_chan_state(QList<int>() << 111 << 112, 0));
-		pyro_state.insert("РџРџ1_Р ",  pyro_chan_state(QList<int>() << 113 << 114, 0));
-		pyro_state.insert("РџРџ2_Рћ",  pyro_chan_state(QList<int>() << 115 << 116, 0));
-		pyro_state.insert("РџРџ2_Р ",  pyro_chan_state(QList<int>() << 117 << 118, 0));
-		pyro_state.insert("РџРџ3_Рћ",  pyro_chan_state(QList<int>() << 119 << 120, 0));
-		pyro_state.insert("РџРџ3_Р ",  pyro_chan_state(QList<int>() << 121 << 122, 0));
-		pyro_state.insert("РџРџ4_Рћ",  pyro_chan_state(QList<int>() << 123 << 124, 0));
-		pyro_state.insert("РџРџ4_Р ",  pyro_chan_state(QList<int>() << 125 << 126, 0));
 
-		pyro_state.insert("РџРџ5_пїЅ",  pyro_chan_state(QList<int>() << 161 << 162, 0));
-		pyro_state.insert("РџРџ5_пїЅ",  pyro_chan_state(QList<int>() << 163 << 164, 0));
-		pyro_state.insert("РџРџ6_пїЅ",  pyro_chan_state(QList<int>() << 165 << 166, 0));
-		pyro_state.insert("РџРџ6_пїЅ",  pyro_chan_state(QList<int>() << 167 << 168, 0));
+		connect(is4_widget, SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
 
-		pyro_state.insert("РџРџ7_пїЅ",  pyro_chan_state(QList<int>() << 169 << 170, 0));
-		pyro_state.insert("РџРџ7_пїЅ",  pyro_chan_state(QList<int>() << 171 << 172, 0));
-		pyro_state.insert("РџРџ8_пїЅ",  pyro_chan_state(QList<int>() << 173 << 174, 0));
-		pyro_state.insert("РџРџ8_пїЅ",  pyro_chan_state(QList<int>() << 175 << 176, 0));
-		pyro_state.insert("РџРџ9_пїЅ",  pyro_chan_state(QList<int>() << 177 << 178, 0));
-		pyro_state.insert("РџРџ9_пїЅ",  pyro_chan_state(QList<int>() << 179 << 180, 0));
-		pyro_state.insert("РџРџ10_пїЅ",  pyro_chan_state(QList<int>() << 181 << 182, 0));
-		pyro_state.insert("РџРџ10_пїЅ",  pyro_chan_state(QList<int>() << 183 << 184, 0));
+		
+		pyro_state.insert("ПП1_О",  pyro_chan_state(QList<int>() << 111 << 112, 0));
+		pyro_state.insert("ПП1_Р",  pyro_chan_state(QList<int>() << 113 << 114, 0));
+		pyro_state.insert("ПП2_О",  pyro_chan_state(QList<int>() << 115 << 116, 0));
+		pyro_state.insert("ПП2_Р",  pyro_chan_state(QList<int>() << 117 << 118, 0));
+		pyro_state.insert("ПП3_О",  pyro_chan_state(QList<int>() << 119 << 120, 0));
+		pyro_state.insert("ПП3_Р",  pyro_chan_state(QList<int>() << 121 << 122, 0));
+		pyro_state.insert("ПП4_О",  pyro_chan_state(QList<int>() << 123 << 124, 0));
+		pyro_state.insert("ПП4_Р",  pyro_chan_state(QList<int>() << 125 << 126, 0));
 
-		pyro_state.insert("РџРџ11_пїЅ",  pyro_chan_state(QList<int>() << 185 << 186, 0));
-		pyro_state.insert("РџРџ11_пїЅ",  pyro_chan_state(QList<int>() << 187 << 188, 0));
-		pyro_state.insert("РџРџ12_пїЅ",  pyro_chan_state(QList<int>() << 189 << 190, 0));
-		pyro_state.insert("РџРџ12_пїЅ",  pyro_chan_state(QList<int>() << 191 << 192, 0));
-		pyro_state.insert("РџРџ13_пїЅ",  pyro_chan_state(QList<int>() << 193 << 194, 0));
-		pyro_state.insert("РџРџ13_пїЅ",  pyro_chan_state(QList<int>() << 195 << 196, 0));
-		pyro_state.insert("РџРџ14_пїЅ",  pyro_chan_state(QList<int>() << 197 << 198, 0));
-		pyro_state.insert("РџРџ14_пїЅ",  pyro_chan_state(QList<int>() << 199 << 200, 0));
-		*/
+		pyro_state.insert("ПП5_О",  pyro_chan_state(QList<int>() << 161 << 162, 0));
+		pyro_state.insert("ПП5_Р",  pyro_chan_state(QList<int>() << 163 << 164, 0));
+		pyro_state.insert("ПП6_О",  pyro_chan_state(QList<int>() << 165 << 166, 0));
+		pyro_state.insert("ПП6_Р",  pyro_chan_state(QList<int>() << 167 << 168, 0));
+
+		pyro_state.insert("ПП7_О",  pyro_chan_state(QList<int>() << 169 << 170, 0));
+		pyro_state.insert("ПП7_Р",  pyro_chan_state(QList<int>() << 171 << 172, 0));
+		pyro_state.insert("ПП8_О",  pyro_chan_state(QList<int>() << 173 << 174, 0));
+		pyro_state.insert("ПП8_Р",  pyro_chan_state(QList<int>() << 175 << 176, 0));
+		pyro_state.insert("ПП9_О",  pyro_chan_state(QList<int>() << 177 << 178, 0));
+		pyro_state.insert("ПП9_Р",  pyro_chan_state(QList<int>() << 179 << 180, 0));
+		pyro_state.insert("ПП10_О",  pyro_chan_state(QList<int>() << 181 << 182, 0));
+		pyro_state.insert("ПП10_Р",  pyro_chan_state(QList<int>() << 183 << 184, 0));
+
+		pyro_state.insert("ПП11_О",  pyro_chan_state(QList<int>() << 185 << 186, 0));
+		pyro_state.insert("ПП11_Р",  pyro_chan_state(QList<int>() << 187 << 188, 0));
+		pyro_state.insert("ПП12_О",  pyro_chan_state(QList<int>() << 189 << 190, 0));
+		pyro_state.insert("ПП12_Р",  pyro_chan_state(QList<int>() << 191 << 192, 0));
+		pyro_state.insert("ПП13_О",  pyro_chan_state(QList<int>() << 193 << 194, 0));
+		pyro_state.insert("ПП13_Р",  pyro_chan_state(QList<int>() << 195 << 196, 0));
+		pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
+		pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
+		
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
 
-		RPC_ols_SLOT_Thread* ols3_slot_thr = new RPC_ols_SLOT_Thread;
-		ols3_slot_thr->set_connection_params("127.0.0.1", OLS_SLOT+2);
-		ols3_slot_thr->start();
-		RPC_ols_SIGNAL_Thread* ols3_signal_thr = new RPC_ols_SIGNAL_Thread;
-		ols3_signal_thr->set_connection_params("127.0.0.1", OLS_SIGNAL+2);
-		ols3_signal_thr->start();
 
-		if (!ols3_slot_thr->wait_connected(3) || !ols3_signal_thr->wait_connected(3))
-		{
-			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ is4");
-			this->deleteLater();
-			return;
-		}
-
-		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols3_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::new_ols_data, this, &KPIUServer::mshr_data_in, Qt::DirectConnection);
-		connect(static_cast<RPC_ols_SIGNAL_Object*>(ols3_signal_thr->get_obj().get()), &RPC_ols_SIGNAL_Object::receive_data, this, &KPIUServer::mshr_data_out, Qt::DirectConnection);
+		connect(ols_2_widget, &RpcOlsWidget::new_ols_data, this, &KPIUServer::mshr_data_in, Qt::DirectConnection);
+		connect(ols_2_widget, &RpcOlsWidget::receive_data, this, &KPIUServer::mshr_data_out, Qt::DirectConnection);
 
 	}
 
@@ -321,31 +382,6 @@ int KPIUServer::FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 	return 0;
 }
 
-//unols_setup
-int KPIUServer::OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer)
-{
-	ols_widget->unols_write_data_kf(data_buffer, mask_buffer);
-	return 0;
-}
-
-int KPIUServer::OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer)
-{
-	ols_widget->unols_read_data_kr(data_buffer);
-	return 0;
-}
-
-int KPIUServer::OLS_BISTRIY_START(int devise)
-{
-	ols_widget->unols_trigger_imm(devise);
-	return 0;
-}
-
-int KPIUServer::OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer)
-{
-	ols_widget->unols_read_data_kr(data_buffer);
-	return 0;
-}
-
 //KPRD_setup
 int KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name)
 {
@@ -357,7 +393,7 @@ int KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString conne
 int KPIUServer::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 {
 	omnibus_widget->unomnibus_map_channels_setup(_n, _chan);
-	SRPCSignalClass::Instance().toLog(QString("РџСЂРёСЃРІР°РёРІР°СЋ РєР°РЅР°Р»Сѓ %1 Р·РЅР°С‡РµРЅРёРµ %2").arg(_n).arg(_chan));
+	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(_n).arg(_chan));
 	return 0;
 }
 
@@ -369,13 +405,13 @@ int KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 }
 
 //pyro
-int KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ?
+int KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
 {
 	QMap<QString, pyro_chan_state>::iterator itr = pyro_state.find(_name);
 
 	if (itr == pyro_state.end())
 	{
-		SRPCSignalClass::Instance().toLog(QString("РЎРѕРµРґРёРЅРµРЅРёРµ %1 РЅРµ РЅР°Р№РґРµРЅРѕ!").arg(_name));
+		SRPCSignalClass::Instance().toLog(QString("Соединение %1 не найдено!").arg(_name));
 		return 1;
 	}
 	itr->state = _state;
@@ -491,7 +527,7 @@ void KPIUServer::get_resistance(uint NProcess, QVariant& resistance)
 	QVariantList sum_chanels_list;
 	int connection_state;
 	QVariantList channels;
-	vvk4_slot_thr->get_vvk4_obj()->get_commut_chanels_list(ei_chanels_list, sum_chanels_list);
+	vvk4_widget->get_commut_chanels_list(ei_chanels_list, sum_chanels_list);
 
 
 	if (NProcess == IS4_MeasVoltDC)
@@ -528,7 +564,7 @@ void KPIUServer::get_resistance(uint NProcess, QVariant& resistance)
 		else
 		{
 			channels = ei_chanels_list + sum_chanels_list;
-			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+			// вставить функцию опроса ВВК
 			connection_state = get_connection_state(channels);
 			switch (connection_state)
 			{
@@ -551,11 +587,11 @@ int KPIUServer::get_connection_state(QVariantList& _chans)
 	for (; it != connections.end(); it++)
 	{
 		if (((it->chan_num[0] == _chans[0]) && (it->chan_num[1] == _chans[1])) || ((it->chan_num[1] == _chans[0]) && (it->chan_num[0] == _chans[1])))
-			//((it->chan_num[0] == _chans[0]) || (it->chan_num[1] == _chans[0]) || (it->chan_num[0] == _chans[1]) || (it->chan_num[1] == _chans[1]))//todo пїЅпїЅпїЅпїЅпїЅпїЅ
+			//((it->chan_num[0] == _chans[0]) || (it->chan_num[1] == _chans[0]) || (it->chan_num[0] == _chans[1]) || (it->chan_num[1] == _chans[1]))//todo ??????
 			return it->state;
 	}
-	SRPCSignalClass::Instance().toLog(QString("РќРµ РЅР°Р№РґРµРЅРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ РєР°РЅР°Р»РѕРІ РїРёСЂРѕРїР°С‚СЂРѕРЅРѕРІ %1 %2").arg(_chans[0].toString()).arg(_chans[1].toString()));
-	return 0; //РІРѕР·РІСЂР°С‰Р°С‚СЊ -1?
+	SRPCSignalClass::Instance().toLog(QString("Не найдено соединения каналов пиропатронов %1 %2").arg(_chans[0].toString()).arg(_chans[1].toString()));
+	return 0; //возвращать -1?
 }
 
 void KPIUServer::mshr_data_in(QVariantList dataList, QVariantList maskList)
@@ -606,4 +642,30 @@ void KPIUServer::power_bus_state_changed(QString name, double u)
 			}
 		}
 	}
+}
+
+
+//LKA05
+int KPIUServer::LKA05_KU_USTANOVIT_SOSTOYANIE(int module_num, int _dev, bool _flag)
+{
+	lka05_slot_thr.get_lka05_obj()->set_ku_working(module_num, _dev, _flag);
+	return 0;
+}
+
+int KPIUServer::LKA05_MK_USTANOVIT_SOSTOYANIE(int module_num, int _dev, bool _flag)
+{
+	lka05_slot_thr.get_lka05_obj()->set_mk_working(module_num, _dev, _flag);
+	return 0;
+}
+
+int KPIUServer::LKA05_MPVN_USTANOVIT_SOSTOYANIE(int _dev, bool _flag)
+{
+	lka05_slot_thr.get_lka05_obj()->set_mpvn_working(_dev, _flag);
+	return 0; 
+}
+
+int KPIUServer::LKA05_MU_USTANOVIT_SOSTOYANIE(int _dev, bool _flag)
+{
+	lka05_slot_thr.get_lka05_obj()->set_mu_working(_dev, _flag);
+	return 0;
 }
