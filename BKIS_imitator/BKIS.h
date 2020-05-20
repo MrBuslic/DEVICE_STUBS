@@ -54,7 +54,7 @@ signals:
 	void send_pyro_group_activation(int group_num);
 private:
 	QString name = "BKIS";//Имя устройства
-	int bus  = 2;//номер шины для шины питания(power_bus)
+	int bus  = 2;//номер шины для шины питания(power_bus) уточнить!
 	int volt;//Принятое напряжение
 
 	int blk_state;

@@ -99,6 +99,8 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	for (int i = 1; i <= 14; i++) {
 		electric_heaters_states[i] = i%2;
 	}
+	//инициализация состояния шин пиропатронов
+	pyro_buses_state = 0;
 }
 
 void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
@@ -151,6 +153,11 @@ int BKIS_widg::set_pyro_group_state(int group_num, bool state)
 		return -1;
 }
 
+void BKIS_widg::set_pyro_bus_state(int bus_num)//bus_num - номера групп рэле, 0 - выключение шин
+{
+	pyro_buses_state = bus_num;
+}
+
 void BKIS_widg::get_power(double _volt)
 {
 	volt = _volt;
@@ -181,8 +188,16 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		int tmp_word = words[0].toInt();
 		if (tmp_cwd.subadr == 2)
 		{
-			/*
-			Подрыв пиропатронов
+			/* Переключение шин пиропатронов*/
+			if (tmp_word >> 4 == 0x600)
+			{
+				int bus_num = tmp_word & 0x000F;
+				if (bus_num == 4) pyro_buses_state = 0; 
+				else pyro_buses_state = bus_num;
+				return;
+			}
+				
+			/*Подрыв пиропатронов*/
 			if (tmp_word >> 4 == 0x660)
 			{
 				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 биты хранят данные о том, какая группа подрывается
@@ -190,7 +205,7 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				emit send_pyro_group_activation(group_num);
 				return;//todo для быстроты работы?
 			}
-			*/
+			
 			//вкл. основного/резервного внутреннего интерфейса
 			switch (tmp_word)
 			{
@@ -241,11 +256,6 @@ void BKIS_widg::omni_connect()
 {
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	set_new_tm();
-}
-
-void BKIS_widg::set_pyro_bus_state(int bus_num)//bus_num - номера групп рэле, 0 - выключение шин
-{
-	pyro_buses_state = bus_num;
 }
 
 BKIS_widg::~BKIS_widg()

@@ -145,10 +145,6 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QThread::currentThread()->msleep(5000);
 		QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
-
-
-
-
 		RPC_mds32_SLOT_Thread* mds1_slot_thr = new RPC_mds32_SLOT_Thread;
 		mds1_slot_thr->set_connection_params("127.0.0.1", MDS_SLOT);
 		mds1_slot_thr->start();
@@ -231,7 +227,6 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 
 		connect(is4_signal_thr->get_obj().get(), SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
 
-		/*
 		pyro_state.insert("ПП1_О",  pyro_chan_state(QList<int>() << 111 << 112, 0));
 		pyro_state.insert("ПП1_Р",  pyro_chan_state(QList<int>() << 113 << 114, 0));
 		pyro_state.insert("ПП2_О",  pyro_chan_state(QList<int>() << 115 << 116, 0));
@@ -241,29 +236,29 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		pyro_state.insert("ПП4_О",  pyro_chan_state(QList<int>() << 123 << 124, 0));
 		pyro_state.insert("ПП4_Р",  pyro_chan_state(QList<int>() << 125 << 126, 0));
 
-		pyro_state.insert("ПП5_�",  pyro_chan_state(QList<int>() << 161 << 162, 0));
-		pyro_state.insert("ПП5_�",  pyro_chan_state(QList<int>() << 163 << 164, 0));
-		pyro_state.insert("ПП6_�",  pyro_chan_state(QList<int>() << 165 << 166, 0));
-		pyro_state.insert("ПП6_�",  pyro_chan_state(QList<int>() << 167 << 168, 0));
+		pyro_state.insert("ПП5_О",  pyro_chan_state(QList<int>() << 161 << 162, 0));
+		pyro_state.insert("ПП5_Р",  pyro_chan_state(QList<int>() << 163 << 164, 0));
+		pyro_state.insert("ПП6_О",  pyro_chan_state(QList<int>() << 165 << 166, 0));
+		pyro_state.insert("ПП6_Р",  pyro_chan_state(QList<int>() << 167 << 168, 0));
 
-		pyro_state.insert("ПП7_�",  pyro_chan_state(QList<int>() << 169 << 170, 0));
-		pyro_state.insert("ПП7_�",  pyro_chan_state(QList<int>() << 171 << 172, 0));
-		pyro_state.insert("ПП8_�",  pyro_chan_state(QList<int>() << 173 << 174, 0));
-		pyro_state.insert("ПП8_�",  pyro_chan_state(QList<int>() << 175 << 176, 0));
-		pyro_state.insert("ПП9_�",  pyro_chan_state(QList<int>() << 177 << 178, 0));
-		pyro_state.insert("ПП9_�",  pyro_chan_state(QList<int>() << 179 << 180, 0));
-		pyro_state.insert("ПП10_�",  pyro_chan_state(QList<int>() << 181 << 182, 0));
-		pyro_state.insert("ПП10_�",  pyro_chan_state(QList<int>() << 183 << 184, 0));
+		pyro_state.insert("ПП7_О",  pyro_chan_state(QList<int>() << 169 << 170, 0));
+		pyro_state.insert("ПП7_Р",  pyro_chan_state(QList<int>() << 171 << 172, 0));
+		pyro_state.insert("ПП8_О",  pyro_chan_state(QList<int>() << 173 << 174, 0));
+		pyro_state.insert("ПП8_Р",  pyro_chan_state(QList<int>() << 175 << 176, 0));
+		pyro_state.insert("ПП9_О",  pyro_chan_state(QList<int>() << 177 << 178, 0));
+		pyro_state.insert("ПП9_Р",  pyro_chan_state(QList<int>() << 179 << 180, 0));
+		pyro_state.insert("ПП10_О",  pyro_chan_state(QList<int>() << 181 << 182, 0));
+		pyro_state.insert("ПП10_Р",  pyro_chan_state(QList<int>() << 183 << 184, 0));
 
-		pyro_state.insert("ПП11_�",  pyro_chan_state(QList<int>() << 185 << 186, 0));
-		pyro_state.insert("ПП11_�",  pyro_chan_state(QList<int>() << 187 << 188, 0));
-		pyro_state.insert("ПП12_�",  pyro_chan_state(QList<int>() << 189 << 190, 0));
-		pyro_state.insert("ПП12_�",  pyro_chan_state(QList<int>() << 191 << 192, 0));
-		pyro_state.insert("ПП13_�",  pyro_chan_state(QList<int>() << 193 << 194, 0));
-		pyro_state.insert("ПП13_�",  pyro_chan_state(QList<int>() << 195 << 196, 0));
-		pyro_state.insert("ПП14_�",  pyro_chan_state(QList<int>() << 197 << 198, 0));
-		pyro_state.insert("ПП14_�",  pyro_chan_state(QList<int>() << 199 << 200, 0));
-		*/
+		pyro_state.insert("ПП11_О",  pyro_chan_state(QList<int>() << 185 << 186, 0));
+		pyro_state.insert("ПП11_Р",  pyro_chan_state(QList<int>() << 187 << 188, 0));
+		pyro_state.insert("ПП12_О",  pyro_chan_state(QList<int>() << 189 << 190, 0));
+		pyro_state.insert("ПП12_Р",  pyro_chan_state(QList<int>() << 191 << 192, 0));
+		pyro_state.insert("ПП13_О",  pyro_chan_state(QList<int>() << 193 << 194, 0));
+		pyro_state.insert("ПП13_Р",  pyro_chan_state(QList<int>() << 195 << 196, 0));
+		pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
+		pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
+		
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
 
@@ -590,4 +585,10 @@ void KPIUServer::power_bus_state_changed(QString name, double u)
 			}
 		}
 	}
+}
+
+void activate_pyro(int group_num)
+{
+	switch(group_num)
+		case 
 }
