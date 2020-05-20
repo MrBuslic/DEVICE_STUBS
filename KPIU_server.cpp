@@ -7,7 +7,7 @@
 #include "vvk4_rpc.h"
 #include "is4_rpc.h"
 #include "ols_rpc.h"
-
+#include "unis4.h"
 
 KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_type(_rm_type), bufar_chan(0)
 {
@@ -142,8 +142,8 @@ KPIUServer::KPIUServer(QString _rm_type, QWidget* parent) : QWidget(parent), rm_
 		QProcess::startDetached(QApplication::applicationDirPath() + "/N737_imitator");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
-		QThread::currentThread()->msleep(5000);
-		QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
+		//QThread::currentThread()->msleep(5000);
+		//QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
 
 
@@ -493,36 +493,52 @@ void KPIUServer::get_resistance(uint NProcess, QVariant& resistance)
 	QVariantList channels;
 	vvk4_slot_thr->get_vvk4_obj()->get_commut_chanels_list(ei_chanels_list, sum_chanels_list);
 
-	if (sum_chanels_list.contains(bau_ground))
+
+	if (NProcess == IS4_MeasVoltDC)
 	{
-		resistance = 13000000;
-		if (ei_chanels_list.empty())
-			return;
-		int ei_chan = ei_chanels_list.at(0).toInt();
 
-		int bau_ind = bau_chans.indexOf(ei_chan);
-		if (bau_ind == -1)
-			return;
-
-		QVariant bau_tm;
-		mku_widget->get_tm("BAU_TM", bau_tm);
-
-		if ( (bau_tm.toUInt() & (1 << bau_ind)) != 0)
-			resistance = 0.8;
+		if (ei_chanels_list.contains(101) || sum_chanels_list.contains(102))
+		{
+			resistance = 0.3;
+			if (ei_chanels_list.contains(101) && sum_chanels_list.contains(102))
+				resistance = 27.0;
+		}
+			
 	}
+
 	else
 	{
-		channels = ei_chanels_list + sum_chanels_list;
-		// �������� ������� ������ ���
-		connection_state = get_connection_state(channels);
-		switch (connection_state)
+		if (sum_chanels_list.contains(bau_ground))
 		{
-		case 1:
-			resistance = 10;
-		case 2:
-			resistance = 0.8;
-		case 3:
 			resistance = 13000000;
+			if (ei_chanels_list.empty())
+				return;
+			int ei_chan = ei_chanels_list.at(0).toInt();
+
+			int bau_ind = bau_chans.indexOf(ei_chan);
+			if (bau_ind == -1)
+				return;
+
+			QVariant bau_tm;
+			mku_widget->get_tm("BAU_TM", bau_tm);
+
+			if ((bau_tm.toUInt() & (1 << bau_ind)) != 0)
+				resistance = 0.8;
+		}
+		else
+		{
+			channels = ei_chanels_list + sum_chanels_list;
+			// �������� ������� ������ ���
+			connection_state = get_connection_state(channels);
+			switch (connection_state)
+			{
+			case 1:
+				resistance = 10;
+			case 2:
+				resistance = 0.8;
+			case 3:
+				resistance = 13000000;
+			}
 		}
 	}
 }
