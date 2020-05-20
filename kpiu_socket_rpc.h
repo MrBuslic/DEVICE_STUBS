@@ -102,14 +102,14 @@ public:
 	QVariant MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
 	QVariant PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
 	QVariant FOI_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
-	QVariant OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList& _values);
-	QVariant OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList& _values);
-	QVariant OLS_BISTRIY_START(QVariantList& _values);
-	QVariant OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& _values);
 	QVariant ANTENNA_USTANOVKA_KOMMUTACII(QVariantList& _values);
 	QVariant OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(QVariantList& _values);
 	QVariant USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(QVariantList& _values);
 	QVariant PYRO_USTANOVIT_SOSTOYANIE(QVariantList& _values);
+	QVariant LKA05_KU_USTANOVIT_SOSTOYANIE(QVariantList& _values);
+	QVariant LKA05_MK_USTANOVIT_SOSTOYANIE(QVariantList& _values);
+	QVariant LKA05_MPVN_USTANOVIT_SOSTOYANIE(QVariantList& _values);
+	QVariant LKA05_MU_USTANOVIT_SOSTOYANIE(QVariantList& _values);
 	QVariant getXML(QVariantList& _values);
 	QVariant mfsk_2_impulse(QVariantList& _values);
 	QVariant mds_1_get_sample(QVariantList& _values);
