@@ -11,7 +11,6 @@
 
 RpcOlsWidget::RpcOlsWidget(QWidget* parent, int ols_num) : QWidget(parent)
 {
-
 	log_widget = new LogWidget(this, QString("ols_%1").arg(ols_num));
 	QVBoxLayout* v_lay = new QVBoxLayout(this);
 	v_lay->addWidget(log_widget);

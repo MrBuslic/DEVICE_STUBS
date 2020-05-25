@@ -1,5 +1,5 @@
 #include "FSVA7_imitator.h"
-#include "FSVA7_socket_rpc.h"
+#include "fsva7_socket_rpc.h"
 #include "rpc_ports.h"
 
 FSVA7_imitator::FSVA7_imitator()
@@ -20,11 +20,11 @@ FSVA7_imitator::FSVA7_imitator()
 	QString ip_str = "127.0.0.1";
 	int slot_port = FSVA7_SLOT;
 	int signal_port = FSVA7_SIGNAL;
-	FSVA7_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new FSVA7_Socket_RPC_SLOT_Server_Thread;
+	fsva7_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new fsva7_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
 	rpc_slot_srv->start();
-	FSVA7_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new FSVA7_Socket_RPC_SIGNAL_Thread;
+	fsva7_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new fsva7_Socket_RPC_SIGNAL_Thread;
 	rpc_signal_srv->set_app(this);
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();

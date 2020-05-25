@@ -31,9 +31,9 @@ RpcMFSK24Widget::RpcMFSK24Widget(int mfsk_num) : QWidget(), auto_scroll(true)
 		{
 			QPushButton* tmp_label = new QPushButton;
 			//tmp_label->setText("t");
-			tmp_label->setIcon(QIcon("d:/icons/dark.png"));
-			tmp_label->setIconSize(QSize(64, 64));
-			tmp_label->setFixedSize(64, 64);
+			tmp_label->setIcon(QIcon(":/icons/dark.png"));
+			tmp_label->setIconSize(QSize(32, 32));
+			tmp_label->setFixedSize(32, 32);
 			labels << tmp_label;
 			state << false;
 			gr_layout->addWidget(tmp_label, i, j);
@@ -73,7 +73,7 @@ int RpcMFSK24Widget::unmfsk24_manual_group_cmd(int _state_chan, QVariantList _ve
 			if (_state_chan)
 			{
 				state[i] = true;
-				labels[i]->setIcon(QIcon("d:/icons/light.png"));
+				labels[i]->setIcon(QIcon(":/icons/light.png"));
 			}
 			else
 			{
@@ -112,13 +112,13 @@ int RpcMFSK24Widget::unmfsk24_manual_cmd(int _chan, int _state_chan)
 	{
 		emit mfsk24_state_change(_chan, _state_chan);
 		state[_chan] = true;
-		labels[_chan]->setIcon(QIcon("d:/icons/light.png"));
+		labels[_chan]->setIcon(QIcon(":/icons/light.png"));
 	}
 	else
 	{
 		emit mfsk24_state_change(_chan, _state_chan);
 		state[_chan] = false;
-		labels[_chan]->setIcon(QIcon("d:/icons/dark.png"));
+		labels[_chan]->setIcon(QIcon(":/icons/dark.png"));
 	}
 
 	QString _msg = QString("%1 %2 канал: %3 ").arg(QTime::currentTime().toString("hh:mm : ss.zzz")).arg((_state_chan == 1) ? "замыкаю" : "размыкаю").arg(_chan);
