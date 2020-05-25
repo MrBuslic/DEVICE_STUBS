@@ -3,6 +3,7 @@
 int frame_bus_Socket_RPC_SLOT_Object::obj_num = 0;
 int frame_bus_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int frame_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
+int frame_bus_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	frame_bus_Socket_RPC_SIGNAL_Thread::frame_bus_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int frame_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	frame_bus_Socket_RPC_SLOT_Thread::frame_bus_Socket_RPC_SLOT_Thread(FrameBusWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("frame_bus_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void frame_bus_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

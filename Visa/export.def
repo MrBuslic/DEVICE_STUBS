@@ -10,6 +10,7 @@ viOpen @131
 viOpenDefaultRM @141
 viSetBuf @267
 viPrintf @269
+viScanf @271
 viQueryf @279
 viIn32 @281
 viOut32 @282

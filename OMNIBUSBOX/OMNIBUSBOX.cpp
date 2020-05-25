@@ -45,7 +45,7 @@ RpcOmnibusWidget::RpcOmnibusWidget(QWidget* parent) : QWidget(parent)
 	
 	QString ip_str = instr::GetIpFromSettings("rpc_omnibus");
 	
-		
+	
 	//QString ip_str = "127.0.0.1";
 	int slot_port = OMNIBUS_SLOT;
 	int signal_port = OMNIBUS_SIGNAL;
@@ -93,7 +93,6 @@ void RpcOmnibusWidget::switch_ab_os(int mko, int addr, int _os, int _s_addr)
 	emit message_to_log(_msg);
 }
 
-
 void RpcOmnibusWidget::switch_ab(int mko, int addr, bool _on)
 {
 	abonents[mko][addr].on = _on;
@@ -120,7 +119,7 @@ void RpcOmnibusWidget::set_new_data_f5(int mko, int addr, int code, int word)
 
 void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words, int& os)
 {
-	MkoWord tmp_cwd;	
+	MkoWord tmp_cwd;
 	tmp_cwd.cw = cwd;
 	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
 	//mko = 1 - mko;

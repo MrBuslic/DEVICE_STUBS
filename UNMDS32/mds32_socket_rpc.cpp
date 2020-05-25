@@ -3,6 +3,7 @@
 int mds32_Socket_RPC_SLOT_Object::obj_num = 0;
 int mds32_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
+int mds32_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	mds32_Socket_RPC_SIGNAL_Thread::mds32_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int mds32_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	mds32_Socket_RPC_SLOT_Thread::mds32_Socket_RPC_SLOT_Thread(RpcMDS32Widget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("mds32_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void mds32_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

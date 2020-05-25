@@ -16,6 +16,8 @@ int main(int argc, char **argv)
 
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 	QApplication app(argc, argv);
+	LogWidget log_widget;
+	log_widget.show();
 	AG7972Widget _widget;
 	_widget.show();
 	return app.exec();

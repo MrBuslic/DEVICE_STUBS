@@ -27,7 +27,6 @@ public:
 	std::shared_ptr<RPC_ols_SLOT_Object> get_ols_obj() {return rpc_obj;}
 private:
 	std::shared_ptr<RPC_ols_SLOT_Object> rpc_obj;
-
 };
 
 class RPC_ols_SIGNAL_Object : public RPC_SIGNAL_Object
@@ -44,6 +43,7 @@ protected:
 	void connectNotify(const QMetaMethod & signal);
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
+	void receive_data(QVariantList& data_buffer);
 	void new_ols_data(QVariantList data_buffer, QVariantList mask_buffer);
 	void packet_ready(QVariantList data_buffer);
 };

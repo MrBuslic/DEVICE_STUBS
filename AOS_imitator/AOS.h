@@ -328,7 +328,8 @@ private:
 
 	const int MKO = 1;
 	const int adr = 21;
-
+	QHBoxLayout *a;
+	QGroupBox *Group_Vkl_kompl_AOS;
 	void update_graphics();  // обновление графики
 	void funk_perescheta(); // преобразует входные данные 0,1,2,3 в 0,1,2,4
 	void set_new_tm();     // составление ОК-ов

@@ -115,10 +115,11 @@ public:
 	FSVA7_Socket_RPC_SLOT_Thread(FSVA7_imitator* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<FSVA7_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<FSVA7_Socket_RPC_SLOT_Object> rpc_obj;
 	FSVA7_imitator* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class FSVA7_Socket_RPC_SLOT_Server : public QTcpServer

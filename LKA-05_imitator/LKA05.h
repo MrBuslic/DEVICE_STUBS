@@ -80,10 +80,14 @@ private:
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
-	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
-	void new_tm(int tm); 
+	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
+	void new_tm(int tm);
 	void new_ku_732(int ku_n, int length, double u, int line);
 	void get_power(double _volt);
+	int set_mu_working(int _dev, bool _flag);
+	int set_ku_working(int module_num, int _dev, bool _flag);
+	int set_mk_working(int module_num, int _dev, bool _flag);
+	int set_mpvn_working(int _dev, bool _flag);
 signals:
 	void new_ku(int ku_n, int length, double u, int line);
 	void new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p);
