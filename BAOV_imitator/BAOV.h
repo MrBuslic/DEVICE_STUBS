@@ -30,39 +30,6 @@
 
 using namespace std;
 
-enum LKA
-{
-	LKA_1 = 0,
-	LKA_2 = 1,
-	LKA_OFF = 3
-};
-enum OG
-{
-	OG_1 = 0,
-	OG_2 = 1,
-	OG_3 = 2,
-	OG_ERR = 3
-};
-enum FINIK
-{
-	FINIK_1 = 0,
-	FINIK_2 = 1,
-	FINIK_3 = 2,
-	FINIK_ERR = 3
-};
-enum FINIK_REZH
-{
-	FINIK_REZH_PI15 = 0,
-	FINIK_REZH_PI8 = 1,
-	FINIK_REZH_ERR = 2
-};
-enum KP
-{
-	KP_1 = 0,
-	KP_2 = 1,
-	KP_OFF = 3
-};
-
 // BAO
 enum RC
 {
@@ -174,12 +141,6 @@ private:
 	QMainWindow* main_widg;
 	//Хранимые текущие
 
-	OG current_OG = OG_ERR;
-	FINIK current_FINIK = FINIK_ERR;
-	FINIK_REZH current_FINIK_REZH = FINIK_REZH_ERR;
-	KP current_KP = KP_OFF;
-	LKA current_LKA = LKA_OFF;
-
 	const int DEFAULT_DETECTION_THRESHOLD = 5;
 
 	bool sensors_enabled = false;
@@ -277,8 +238,6 @@ private:
 	QSettings LKA_sett;
 
 	QMap<int, QString> mode_names;
-	QMap<OG, qint64> OG_start_warm;//Мап старта прогрева
-	QMap<OG, qint64> OG_finish_warm;//Мап окончания прогрева
 
 	int standart_tm = 120000;//стандартное время прогрева
 	int tm_towarm;//текущее время прогрева, с растчетом прогретости
