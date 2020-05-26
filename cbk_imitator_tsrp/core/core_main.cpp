@@ -92,7 +92,7 @@ void start_core()
 	opr_th->start();
 	OnLoadRom();
 	QThread* proz_th = QThread::create(&prozessor);
-	proz_th->start();
+	proz_th->start(QThread::TimeCriticalPriority);
 
 
 	//очистка массивом отладочной информации

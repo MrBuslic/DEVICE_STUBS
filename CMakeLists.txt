@@ -106,6 +106,7 @@ include_directories("BAU_imitator")
 include_directories("IBEP_imitator")
 include_directories("MBK-02_imitator")
 include_directories("BKIS_imitator")
+include_directories("BAOV_imitator")
 
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 

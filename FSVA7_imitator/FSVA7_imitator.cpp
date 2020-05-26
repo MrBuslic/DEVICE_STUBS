@@ -20,6 +20,7 @@ FSVA7_imitator::FSVA7_imitator()
 	QString ip_str = "127.0.0.1";
 	int slot_port = FSVA7_SLOT;
 	int signal_port = FSVA7_SIGNAL;
+
 	fsva7_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new fsva7_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);
