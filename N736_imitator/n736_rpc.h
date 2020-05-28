@@ -43,7 +43,6 @@ protected:
 	void disconnectNotify(const QMetaMethod & signal);
 signals:
 	void new_data();
-	void test(QVariantList dataList, QVariantList maskList);
 };
 
 class RPC_n736_SIGNAL_Thread : public RPC_SIGNAL_Thread

@@ -84,6 +84,9 @@ N737_widg::N737_widg() : flag_on(false)
 	v_l->addLayout(kit_line_hlayout);
 	v_l->addLayout(h_l);
 
+	in_lst << CHAN_R_BLOCK_1 << CHAN_R_INCLUDE_1 << CHAN_R_CONNECT_1 << CHAN_R_WORK_FK_1 << CHAN_R_WORK_1;
+	out_lst << CHAN_R_READY_CU_1 << CHAN_R_SET_BLOCK_1 << CHAN_R_SET_INCLUDE_1 << CHAN_R_SET_OK_1 << CHAN_R_SET_CONNECT_1 << CHAN_R_SET_WORK_FK_1 << CHAN_R_SET_WORK_1 << CHAN_R_PSP_1;
+
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
 	//connect(AbOn_tmr, &QTimer::timeout, this, &MPR_widg::omni_connect);
@@ -132,8 +135,6 @@ N737_widg::N737_widg() : flag_on(false)
 	}
 
 
-
-
 	//MKO = 1;
 	//adr = 4;
 
@@ -141,11 +142,13 @@ N737_widg::N737_widg() : flag_on(false)
 	//connect(signal_thr.get_obj().get(), SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_data_737(QVariantList, QVariantList)), this, SLOT(dataIn(QVariantList, QVariantList)));
 
-	num_chnl = 0;
+	num_chnl = 0x0;
 	current_dev_7 = CURRENT_COMP_7::OFF;
 	current_mko_7 = CURRENT_MKO_7::OFF;
 
 	paint_buttons();
+	off_device = true;
+	kr = true;
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("n737_geometry").toByteArray());
@@ -200,7 +203,7 @@ void N737_widg::paint_buttons()
 void N737_widg::set_tm_state()
 {
 	qDebug() << "num_chnl=" << num_chnl;
-	mku_slot_thr.get_mku_bus_obj()->set_tm("737_TM", (uint)num_chnl);
+	mku_slot_thr.get_mku_bus_obj()->set_tm("737_TM", QVariant(num_chnl));
 }
 
 
@@ -216,15 +219,7 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 	//num_chnl = 0;
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
-	//KPIString = "";
-	QVariantList kpi_list;
-	
-	//name_btn_lst << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_CONNECT_1 << CHAN_WORK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
 
-
-	in_lst << CHAN_R_BLOCK_1 << CHAN_R_INCLUDE_1 << CHAN_R_CONNECT_1 << CHAN_R_WORK_FK_1 << CHAN_R_WORK_1;
-	out_lst << CHAN_R_READY_CU_1 << CHAN_R_SET_BLOCK_1 << CHAN_R_SET_INCLUDE_1 << CHAN_R_SET_OK_1 << CHAN_R_SET_CONNECT_1 << CHAN_R_SET_WORK_FK_1 << CHAN_R_SET_WORK_1 << CHAN_R_PSP_1;
-	
 	//name_lst_1 << CHAN_R_BLOCK_2 << CHAN_R_INCLUDE_2 << CHAN_R_CONNECT_2 << CHAN_R_WORK_FK_2 << CHAN_R_WORK_2 << CHAN_R_READY_CU_2 << CHAN_R_SET_BLOCK_2 << CHAN_R_SET_INCLUDE_2 << CHAN_R_SET_OK_2 << CHAN_R_SET_CONNECT_2 << CHAN_R_SET_WORK_FK_2 << CHAN_R_SET_WORK_2 << CHAN_R_PSP_2;
 	for (auto const& i : boost::combine(dataList, maskList)) // range based
 	{
@@ -235,18 +230,135 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 		qulonglong res = MASK & DATA;
 		qDebug() << "res=" << res;
 
-		if (isset(res, CHAN_R_BLOCK_1 - 1))
+		if (off_device == true)
 		{
+			if (isset(res, CHAN_R_BLOCK_1 - 1))
+			{
+				qDebug() << "1комплект ";
+				current_dev_7 = CURRENT_COMP_7::MAIN;
+				kr = true;
+			}
+			else if (isset(res, CHAN_R_BLOCK_2 - 1))
+			{
+				qDebug() << "2комплект ";
+				current_dev_7 = CURRENT_COMP_7::RESERVE;
+				kr = false;
+			}
+			paint_buttons();
+			QApplication::processEvents();
 		}
+		if (kr == false)
+		{
+			res = res >> 32;
+			num_chnl = num_chnl >> 32;
+		}
+		if (off_device == false)
+		 {
+			for (int i = 0; i < in_lst.count(); i++)
+			{
+				if (!isset(res, ((in_lst[i]) - 1)))
+				{
+					main_btn[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
+					qDebug() << "Отключение  i =" << i << "off_device = " << off_device << " num_chnl ====" << num_chnl;
+					num_chnl &= ~(1i64 << (in_lst[i] - 1));
 
-
+					switch (i)
+					{
+					case 0:
+						main_btn[5]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[0] - 1));
+						main_btn[6]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[1] - 1));
+						break;
+					case 1:
+						main_btn[7]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[2] - 1));
+						main_btn[8]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[3] - 1));
+						break;
+					case 2:
+						main_btn[9]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[4] - 1));
+						break;
+					case 3:
+						main_btn[10]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[5] - 1));
+						break;
+					case 4:
+						main_btn[11]->setStyleSheet("background-color: rgb(204, 204, 204);");
+						num_chnl &= ~(1i64 << (out_lst[6] - 1));
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			if (kr == false)
+				num_chnl = num_chnl << 32;
+			set_tm_state();
+			qDebug() << "res=====" << res << num_chnl;
+			//if ((res & 0xf) == 0x0)
+			if (num_chnl == 0)
+			{
+				current_dev_7 = CURRENT_COMP_7::OFF;
+				//current_mko = CURRENT_MKO::OFF; мко тоже выключать?
+				paint_buttons();
+				off_device = true;
+				qDebug() << "Комплект выключен ";
+			}
+			return;
+		}
 		for (int i = 0; i < in_lst.count(); i++)
 		{
-			num_chnl |= (1i64 << (in_lst[i] - 1));
-			qDebug() << "num_chnl=" << num_chnl << (1i64 << (in_lst[i] - 1)) << (1i64 << (in_lst[i]));
-		}
+
+			if (isset(res, ((in_lst[i]) - 1)))
+			{
+				num_chnl |= (1i64 << (in_lst[i] - 1));
+				main_btn[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
+				switch (i)
+				{
+				case 0:
+					main_btn[6]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[1] - 1));
+					break;
+				case 1:
+					main_btn[7]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[2] - 1));
+					main_btn[8]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[3] - 1));
+					break;
+				case 2:
+					main_btn[9]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[4] - 1));
+					break;
+				case 3:
+					main_btn[10]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[5] - 1));
+					break;
+				case 4:
+					main_btn[11]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[6] - 1));
+					main_btn[5]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[0] - 1));
+					break;
+				default:
+					break;
+				}
+				if (((res & 0x1F0000) == 0x1F0000)|| ((res & 0x1E0000) == 0x1E0000))  /// сделать везде как здесь
+				{
+					qDebug() << "(res & 0xF) = " << (res & 0xF) << (res && 0xF);
+					off_device = false;
+				}
+			}
+		} 
+
+		
 	}
+	if (kr == false)
+		num_chnl = num_chnl << 32;
 	set_tm_state();
+	//paint_buttons();
+	
 }
 
 

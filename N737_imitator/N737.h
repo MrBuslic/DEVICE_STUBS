@@ -117,6 +117,10 @@ private:
 	CURRENT_COMP_7 current_dev_7;
 	CURRENT_MKO_7 current_mko_7;
 	QList<int> in_lst, out_lst;
+	bool kr;
+	bool off_device;
+
+
 
 	int MKO;
 	int adr;

@@ -19,20 +19,12 @@ void RPC_n736_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::new_data)) {
 		connect_signal("new_data()", true);
 	}
-	else
-	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::test)) {
-		connect_signal("test(QVariantList, QVariantList)", true);
-	}
 }
 
 void RPC_n736_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::new_data)) {
 		connect_signal("new_data()", false);
-	}
-	else
-	if (signal == QMetaMethod::fromSignal(&RPC_n736_SIGNAL_Object::test)) {
-		connect_signal("test(QVariantList, QVariantList)", false);
 	}
 }
 
@@ -72,25 +64,6 @@ void RPC_n736_SIGNAL_Object::read_data()
 			if (op_name == "new_data()")
 			{
 				emit new_data();
-				QByteArray tmp_arr2;
-				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
-				tmp_stream2 << op_name;
-				QByteArray tmp_arr3;
-				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
-				tmp_stream3 << tmp_arr2.size();
-				_sock->write(tmp_arr3 + tmp_arr2);
-				_sock->waitForBytesWritten(3000);
-				SRPCSignalClass::Instance().toLog("n736 signal finished " + op_name +" call_number "+ QString::number(call_number));
-			}
-			if (op_name == "test(QVariantList, QVariantList)")
-			{
-				QVariantList dataList;
-				tmp_stream >> dataList;
-				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " dataList = "+RPCSignalClass::QVariantToString(dataList));
-				QVariantList maskList;
-				tmp_stream >> maskList;
-				SRPCSignalClass::Instance().toLog("n736 " + op_name +" call_number "+ QString::number(call_number) + " maskList = "+RPCSignalClass::QVariantToString(maskList));
-				emit test(dataList, maskList);
 				QByteArray tmp_arr2;
 				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
 				tmp_stream2 << op_name;

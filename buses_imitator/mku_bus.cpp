@@ -1,7 +1,6 @@
 #include "mku_bus.h"
 #include "rpc_loger.h"
 #include <QMessageBox>
-
 #include "rpc_ports.h"
 #include "mku_bus_socket_rpc.h"
 

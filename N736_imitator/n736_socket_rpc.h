@@ -28,7 +28,6 @@ signals:
 	void send_signal(QByteArray* _arr);
 public slots:
 	void new_data();
-	void test(QVariantList dataList, QVariantList maskList);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
