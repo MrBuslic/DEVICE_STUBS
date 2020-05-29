@@ -15,7 +15,12 @@ union MKOWord
 			adr : 5;
 	};
 };
-
+/*
+union OK_TMWord
+{
+	quint16 word;
+}
+*/
 BKIS_widg::BKIS_widg(QWidget *parent)
 {
 	setWindowTitle("BKIS");
@@ -109,17 +114,27 @@ void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
 	{
 	case 19:
 		blk_state = 1;
+		BLKIIH_word.s_main_blk_on = 1;
+		if (BLKIIH_word.s_res_blk_on)
+			BLKIIH_word.s_res_blk_on = 0;
 		main_blk->setStyleSheet("background-color: rgb(142, 198, 156)"); 
 		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		omni_connect();
 		break;
 	case 20:
 		blk_state = 2;
+		BLKIIH_word.s_res_blk_on = 1;
+		if (BLKIIH_word.s_main_blk_on)
+			BLKIIH_word.s_main_blk_on = 0;
 		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		reserve_blk->setStyleSheet("background-color: rgb(142, 198, 156)");
 		break;
 	case 21:
 		blk_state = 0;
+		if (BLKIIH_word.s_res_blk_on)
+			BLKIIH_word.s_res_blk_on = 0;
+		if (BLKIIH_word.s_main_blk_on)
+			BLKIIH_word.s_main_blk_on = 0;
 		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		break;
@@ -200,7 +215,7 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			/*Подрыв пиропатронов*/
 			if (tmp_word >> 4 == 0x660)
 			{
-				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 биты хранят данные о том, какая группа подрывается
+				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 бита хранят данные о том, какая группа подрывается
 				pyro_groups_states[group_num] = 1;
 				emit send_pyro_group_activation(group_num);
 				return;//todo для быстроты работы?
@@ -212,11 +227,14 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				//вкл. основного/резервного внутренних интерфейсов
 			case 0x1444:
 				interface_state = 1; //включение основного внутреннего интерфейса
+				BLKIIH_word.s_main_internal_interface_work = 1;
+				BLKIIH_word.s_internal_interface_OK = 1;
 				main_interface->setStyleSheet("background-color: rgb(142, 198, 156)");
 				reserve_interface->setStyleSheet("background-color: rgb(204, 204, 204)");
 				break;
 			case 0x1333:
 				interface_state = 0;//включение резервного внутреннего интерфейса
+				BLKIIH_word.s_internal_interface_OK = 1;
 				main_interface->setStyleSheet("background-color: rgb(204, 204, 204)");
 				reserve_interface->setStyleSheet("background-color: rgb(142, 198, 156)");
 				break;
@@ -236,13 +254,37 @@ void BKIS_widg::set_new_tm()
 {
 	unsigned short _word = 0;
 	QVariantList tmp_list;
+	/*
 	for (QMap<int, int>::iterator it = pyro_groups_states.begin(); it != pyro_groups_states.end(); it++)
 	{
 		tmp_list << it.value();
 	}
 	//tmp_list.push_back(_word);//зачем?
+	switch (blk_state)
+	{
+	case 0:
+		_word = 0x8;
+		break;
+	case 1:
+		_word = 0x10;
+		break;
+	}
 
-	
+	switch (interface_state)
+	{
+	case 0:
+		_word += 0x20;
+		break;
+	case 1:
+		_word += 0x100;
+		break;
+	}
+	*/
+	for (int i = 0; i < 9; i++)
+	{
+		tmp_list.push_back(BLKIIH_word.ok_tm_word[i]);
+	}
+	tmp_list.push_back(_word);
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
 }
 

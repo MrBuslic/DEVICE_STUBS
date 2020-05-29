@@ -120,7 +120,6 @@ public slots:
 	void mshr_data_out(QVariantList& data);
 
 	void power_bus_state_changed(QString name, double u);
-
 	void activate_pyro(int group_num);
 private:
 	MDS1_CHANNELS mds1_chans;
@@ -130,6 +129,7 @@ private:
 	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
 
 	QMap<QString, pyro_chan_state> pyro_state;
+	QStringList first_pyros_in_groups;//содержит названия пиропатронов с которых начинаются группы
 
 	QList<int> bau_chans;
 	int bau_ground = 147;

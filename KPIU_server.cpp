@@ -338,6 +338,8 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 		pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
 		pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
 		
+		first_pyros_in_groups << "ПП1_О" << "ПП3_О" << "ПП5_О" << "ПП7_О" << "ПП9_О" << "ПП11_О";
+
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
 
@@ -670,8 +672,21 @@ int KPIUServer::LKA05_MU_USTANOVIT_SOSTOYANIE(int _dev, bool _flag)
 	return 0;
 }
 
-void activate_pyro(int group_num)
+void KPIUServer::activate_pyro(int group_num)
 {
-	switch(group_num)
-		case 
+	QString pyro_group_name;//название первого пиропатрона в группе
+	QMap<QString, pyro_chan_state>::iterator itr;
+	int i_last;
+	pyro_group_name = first_pyros_in_groups[group_num - 1];
+	itr = pyro_state.find(pyro_group_name);
+
+	if (group_num == 6)
+		i_last = 8;
+	else i_last = 4;
+	for (int i = 0; i < i_last; i++)
+	{
+		itr->state = 1;
+		SRPCSignalClass::Instance().toLog(QString("Активирован пиропатрон %1").arg(itr.key()));
+		itr++;
+	}
 }
