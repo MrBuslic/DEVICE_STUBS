@@ -79,6 +79,7 @@ int n737_Socket_RPC_SLOT_Thread::obj_num = 0;
 	setObjectName(QString("n737_SLOT_Object_%1").arg(obj_num++));
 		operators_map["QuerySlots()"] = &n737_Socket_RPC_SLOT_Object::QuerySlots;
 		///////////////////////////////////////////////////////////////////////
+		operators_map["new_frame(QString, QVariant)"] = &n737_Socket_RPC_SLOT_Object::new_frame;
 		operators_map["new_message(QVariant, int, int, int, QVariantList, int)"] = &n737_Socket_RPC_SLOT_Object::new_message;
 		operators_map["dataIn(QVariantList, QVariantList)"] = &n737_Socket_RPC_SLOT_Object::dataIn;
 		///////////////////////////////////////////////////////////////////////
@@ -295,6 +296,25 @@ int n737_Socket_RPC_SLOT_Thread::obj_num = 0;
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	QVariant n737_Socket_RPC_SLOT_Object::new_frame(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QString mode = _values.at(0).value<QString>();
+			QVariant frame_data = _values.at(1).value<QVariant>();
+			app->new_frame(mode, frame_data);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
 	QVariant n737_Socket_RPC_SLOT_Object::new_message(QVariantList& _values)
 	{
 		try

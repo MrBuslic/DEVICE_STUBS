@@ -2,6 +2,7 @@
 #include "N736_socket_rpc.h"
 #include <QMessageBox>
 #include "rpc_ports.h"
+#include <mkpa.h>
 union MKOWord
 {
 	quint16 com_word;				 // командное слово целиком
@@ -91,7 +92,7 @@ N736_widg::N736_widg() : flag_on(false)
 
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
-	//connect(AbOn_tmr, &QTimer::timeout, this, &MPR_widg::omni_connect);
+	connect(AbOn_tmr, &QTimer::timeout, this, &N736_widg::omni_connect);
 	
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
@@ -150,7 +151,9 @@ N736_widg::N736_widg() : flag_on(false)
 	paint_buttons();
 	off_device = true;
 	kr = true;
-
+	adr_0 = 10;
+	adr_1 = 26;
+	MKO = 0; //??? на 0
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("n736_geometry").toByteArray());
 
@@ -162,22 +165,102 @@ void N736_widg::example_but() {
 }
 
 
+void N736_widg::omni_connect()
+{
+	AbOn_tmr->stop();
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr_device, true);
+
+	new_tm(0xFFFF);
+	
+}
+
+void N736_widg::new_tm(int tm)
+{
+	QVariantList tm_words;
+	tm_words << tm;
+	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 2, tm_words);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_0, 2, tm_words);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_1, 2, tm_words);
+}
+
 void N736_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	//сделать проверку cwd
-	switch (line)
+	// Adr14H736_KR1	0x0A
+	// Adr14H736_KR2	0x1A
+	MKOWord tmp_cwd;
+	tmp_cwd.com_word = cwd;
+	ZaprSinch word;
+	
+	if ((tmp_cwd.adr == adr_0) || (tmp_cwd.adr == adr_1))
 	{
-	case 0:
-		current_mko = CURRENT_MKO::MAIN;
-		break;
-	case 1:
-		current_mko = CURRENT_MKO::RESERVE;
-		break;
-	default:
-		break;
+		switch (line)
+		{
+		case 0:
+			current_mko = CURRENT_MKO::MAIN;
+			break;
+		case 1:
+			current_mko = CURRENT_MKO::RESERVE;
+			break;
+		default:
+			break;
+		}
+		paint_buttons();
+		QApplication::processEvents();
 	}
-	paint_buttons();
-	QApplication::processEvents();
+	//step 0
+	if (tmp_cwd.subadr == 1)
+	{
+		for (int i = 0; i < 4; i++)
+			word.Zapr_word = words[i].toInt();
+				
+		/*
+		WORD Num_Synxr_2;
+		Num_Synxr_2 = (word.NumVxW2 << 6);
+
+		DWORD num_sync;
+		num_sync = word.NumVxW1 || Num_Synxr_2; */
+
+		synchr_strct.pr = word.pRegim; //признак режима ПК1 ПК2
+		synchr_strct.nkp = word.NumKP; //номер КП
+		synchr_strct.niis = word.NumSI; //номер ИИС
+		synchr_strct.nsync = word.NumVxW1 || (word.NumVxW2 << 6);
+		
+		//CreateSync_new(SCHZK, PR, N KP, NKL, NSYNC, SYNC);
+		CreateSync_new(synchr_strct.schzk, synchr_strct.pr, synchr_strct.nkp, synchr_strct.niis, synchr_strct.nsync, synchr_strct.sync);
+		msg_syn(synchr_strct.sync);
+
+	}
+	//step 2
+	if (tmp_cwd.subadr == 2)
+	{
+		//PrepareSCHBK_new();
+		//make_schbk(const QString& com_chan_mnem)
+		//{
+		//	if ((com_chan_mnem == "ПК1") && (omnibusKPI->getSCHBKReceived()))
+		
+				unsigned int schbk;
+				BYTE* tmp_arr = (BYTE*)(&schbk);
+				if (word.pRegim)
+					PrepareSCHBK_new((BYTE*)(&schbk));
+				else
+					PrepareSCHBK((BYTE*)(&schbk));
+	}
+	//step 3
+	if (tmp_cwd.subadr == 3)
+	{
+		//CreateZKPI_new();
+	}
+	QVariantList synchr_w;
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_0, tmp_cwd.subadr, synchr_w);
+	
+}
+
+void N736_widg::msg_syn(unsigned char* msg)
+{
+	unsigned int* msg_int = (unsigned int*)msg;
+	QVariantList synchr_w;
+
 }
 
 void N736_widg::paint_buttons()
@@ -284,12 +367,14 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 		{
 			if (isset(res, CHAN_BLOCK_1 - 1))
 			{
+				adr_device = adr_0;
 				qDebug() << "1комплект ";
 				current_dev = CURRENT_COMP::MAIN;
 				kr = true;
 			}
 			else if (isset(res, CHAN_BLOCK_2 - 1))
 			{
+				adr_device = adr_1;
 				qDebug() << "2комплект ";
 				current_dev = CURRENT_COMP::RESERVE;
 				kr = false;

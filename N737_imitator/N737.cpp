@@ -89,7 +89,7 @@ N737_widg::N737_widg() : flag_on(false)
 
 	AbOn_tmr = new QTimer(this);
 	AbOn_tmr->setSingleShot(true);
-	//connect(AbOn_tmr, &QTimer::timeout, this, &MPR_widg::omni_connect);
+	connect(AbOn_tmr, &QTimer::timeout, this, &N737_widg::omni_connect);
 
 	///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 	
@@ -107,6 +107,19 @@ N737_widg::N737_widg() : flag_on(false)
 	rpc_signal_srv->set_params(ip_str, signal_port);
 	rpc_signal_srv->start();
 	
+	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
+	frame_slot_thr.start();
+
+	frame_signal_thr.set_connection_params("127.0.0.1", FRAME_SIGNAL);
+	frame_signal_thr.start();
+
+	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus");
+		this->deleteLater();
+		return;
+	}
+
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
 
@@ -134,29 +147,82 @@ N737_widg::N737_widg() : flag_on(false)
 		return;
 	}
 
-
-	//MKO = 1;
-	//adr = 4;
-
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	//connect(signal_thr.get_obj().get(), SIGNAL(new_message_mpko(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_data_737(QVariantList, QVariantList)), this, SLOT(dataIn(QVariantList, QVariantList)));
-
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_rm07(QString, QVariant)), this, SLOT(new_frame(QString, QVariant)));
 	num_chnl = 0x0;
 	current_dev_7 = CURRENT_COMP_7::OFF;
 	current_mko_7 = CURRENT_MKO_7::OFF;
-
+	adr_0 = 11;
+	adr_1 = 27;
+	MKO = 0;
 	paint_buttons();
 	off_device = true;
 	kr = true;
-
+	frame_bool = false;
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("n737_geometry").toByteArray());
 //	set_new_tm();
 }
 
+void N737_widg::imit_on()
+{
+	AbOn_tmr->start();
+}
+
+void N737_widg::omni_connect()
+{
+	AbOn_tmr->stop();
+	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr_device, true);
+
+	new_tm(0xFFFF);
+	// paint_buttons();
+	//set_new_tm();
+}
+
+void N737_widg::new_tm(int tm)
+{
+	QVariantList tm_words;
+	tm_words << tm;
+	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 2, tm_words);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_0, 2, tm_words);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_1, 2, tm_words);
+}
+
+void N737_widg::new_frame(QString mode, QVariant frame_data)
+{
+	//if (regime == mode)
+		frame_slot_thr.get_frame_bus_obj()->make_new_frame_n737(mode, frame_data);
+	frame_bool = true; 
+}
+
 void N737_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
+	
+	// Adr14H737_KR1	0x0B
+	// Adr14H737_KR2	0x1B
+	MKOWord tmp_cwd;
+	tmp_cwd.com_word = cwd;
+	//if ((tmp_cwd.adr == adr_0) || (tmp_cwd.adr == adr_1))
+	if (tmp_cwd.adr == adr_device)
+	{
+		switch (line)
+		{
+		case 0:
+			current_mko_7 = CURRENT_MKO_7::MAIN;
+			break;
+		case 1:
+			current_mko_7 = CURRENT_MKO_7::RESERVE;
+			break;
+		default:
+			break;
+		}
+		paint_buttons();
+		//QApplication::processEvents();
+	}
+
+
 }
 void N737_widg::paint_buttons()
 {
@@ -216,7 +282,6 @@ bool N737_widg::isset(qulonglong x, qulonglong n)
 
 void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 {
-	//num_chnl = 0;
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
 
@@ -235,12 +300,14 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 			if (isset(res, CHAN_R_BLOCK_1 - 1))
 			{
 				qDebug() << "1комплект ";
+				adr_device = 11;
 				current_dev_7 = CURRENT_COMP_7::MAIN;
 				kr = true;
 			}
 			else if (isset(res, CHAN_R_BLOCK_2 - 1))
 			{
 				qDebug() << "2комплект ";
+				adr_device = 27;
 				current_dev_7 = CURRENT_COMP_7::RESERVE;
 				kr = false;
 			}
@@ -269,6 +336,7 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 						num_chnl &= ~(1i64 << (out_lst[0] - 1));
 						main_btn[6]->setStyleSheet("background-color: rgb(204, 204, 204);");
 						num_chnl &= ~(1i64 << (out_lst[1] - 1));
+					
 						break;
 					case 1:
 						main_btn[7]->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -293,11 +361,15 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 					}
 				}
 			}
+			if (frame_bool == false)
+			{
+				main_btn[12]->setStyleSheet("background-color: rgb(204, 204, 204);");
+				num_chnl &= ~(1i64 << (out_lst[7] - 1));
+			}
 			if (kr == false)
 				num_chnl = num_chnl << 32;
 			set_tm_state();
 			qDebug() << "res=====" << res << num_chnl;
-			//if ((res & 0xf) == 0x0)
 			if (num_chnl == 0)
 			{
 				current_dev_7 = CURRENT_COMP_7::OFF;
@@ -344,6 +416,12 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 				default:
 					break;
 				}
+				if (frame_bool == true)
+				{
+					main_btn[12]->setStyleSheet("background-color: rgb(142, 198, 156);");
+					num_chnl |= (1i64 << (out_lst[7] - 1));
+					frame_bool = false;
+				}
 				if (((res & 0x1F0000) == 0x1F0000)|| ((res & 0x1E0000) == 0x1E0000))  /// сделать везде как здесь
 				{
 					qDebug() << "(res & 0xF) = " << (res & 0xF) << (res && 0xF);
@@ -357,6 +435,7 @@ void N737_widg::dataIn(QVariantList dataList, QVariantList maskList)
 	if (kr == false)
 		num_chnl = num_chnl << 32;
 	set_tm_state();
+	imit_on();
 	//paint_buttons();
 	
 }

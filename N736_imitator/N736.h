@@ -11,7 +11,8 @@
 #include <QPushButton>
 #include <QMainWindow>
 #include <qlist.h>
-//#include "LKAModules.h"
+
+
 
 #include "../buses_imitator/kpi_bus_rpc.h"
 #include "../OMNIBUSBOX/omnibus_rpc.h"
@@ -70,7 +71,37 @@ enum chnl {
 	CHAN_SET_WORK_2 = 42
 
 };
+union ZaprSinch {
+	WORD  Zapr_word;
+	struct
+	{
+		WORD  pSP : 1,     // признак синхронизации
+			pRegim : 2,  // режим синхронизации
+			pSKPI : 1,   // признак передачи КПИ
+			pKPI : 2,    // признак КПИ
+			NumKA : 4,   // номер КА
+			NumSI : 4,   // номер СИ
+			Rezerve : 2;
 
+		WORD pRegim2 : 2, // режим синхронизации
+			NumKP : 4,   // номер КП
+			NumSI2 : 4,  // номер СИ
+			NumVxW1 : 6; // номер вхождения в синхронизацию
+
+		WORD NumVxW2;   // номер вхождения в синхронизацию
+	};
+};
+
+struct SYNCHR_STRUCT
+{
+
+	unsigned char schzk[10];
+	unsigned char pr;
+	unsigned char nkp;
+	unsigned char niis;
+	unsigned int nsync;
+	unsigned char sync[16];
+};
 
 
 class N736_widg : public QWidget
@@ -78,7 +109,7 @@ class N736_widg : public QWidget
     Q_OBJECT
 
 public:
-//	explicit LKA05_widg(QWidget *parent = 0);
+
 	N736_widg();
 	~N736_widg();
 	//void set_new_tm();
@@ -125,7 +156,7 @@ private:
 
 
 	int MKO;
-	int adr;
+	//int adr;
 	int num_ku;
 	QVariantList words;
 	bool flag_on;
@@ -134,13 +165,20 @@ private:
 	//QCheckBox* add_set(QString name, QString data, bool is_main = true);
 	QList<int> name_lst_0;
 	
+	int adr_0;
+	int adr_1;
+	int adr_device;
+	void omni_connect();
+	void new_tm(int tm);
+
+
 
 	QString name = "14Н736"; // русская н
 	QTimer *AbOn_tmr;
-
+	SYNCHR_STRUCT synchr_strct;
 	void example_but();
 
-
+	void msg_syn(unsigned char* msg);
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:

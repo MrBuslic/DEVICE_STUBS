@@ -94,6 +94,15 @@ void RPC_n737_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+void RPC_n737_SLOT_Object::new_frame(QString mode, QVariant frame_data)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mode);
+	tmp_list << QVariant(frame_data);
+	SRPCSignalClass::Instance().toLog(QString("n737 dynamic_call new_frame %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("new_frame(QString, QVariant)", tmp_list);
+	SRPCSignalClass::Instance().toLog("n737 dynamic_call finished new_frame");
+}
 void RPC_n737_SLOT_Object::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
 {
 	QVariantList tmp_list;
