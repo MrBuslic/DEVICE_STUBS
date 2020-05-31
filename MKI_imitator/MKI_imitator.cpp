@@ -31,7 +31,7 @@ MKI_imitator::MKI_imitator()
 
 	tcpServer = new QTcpServer(widg);
 	connect(tcpServer, SIGNAL(newConnection()), this, SLOT(newConn()));
-	tcpServer->listen(QHostAddress::Any, 33333);
+	tcpServer->listen(QHostAddress::Any, 50224);
 	
 	frame_slot_thr.set_connection_params("127.0.0.1", FRAME_SLOT);
 	frame_slot_thr.start();
@@ -42,7 +42,7 @@ MKI_imitator::MKI_imitator()
 	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в ");	// Mkprm?
 
-	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_07(QString, int, int, int, QString, QVariant)), this, SLOT(new_frame_07(QString, int, int, int, QString, QVariant)));
+	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_04(QString, QVariant)), this, SLOT(new_frame_04(QString, QVariant)));
 
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("rmmbk07_geometry").toByteArray());
@@ -64,7 +64,7 @@ QByteArray MKI_imitator::createCommandHeader(const int & command, const int & da
 	numberIntoBA(header, command, header_MsgTypeC_ind);
 
 	//PVC
-	header[0] = BYTE(0x55); header[1] = BYTE(0xAA);	header[2] = BYTE(0x01); header[3] = BYTE(0x00);
+	header[0] = BYTE(0x55); header[1] = BYTE(0xAA);	header[2] = BYTE(0x01); header[3] = BYTE(0x532);
 	header[header_addr_receiver_ind] = BYTE(0x02);//Адреса получателя 
 	header[header_addr_sender_ind] = BYTE(0x01);//Адреса отправителя
 
@@ -106,7 +106,8 @@ void MKI_imitator::sendKRO(int MsgTypeC)
 {
 	sock.disconnectFromHost();
 	sock.waitForDisconnected(3000);
-	sock.connectToHost("10.44.4.13", 50164);
+	//sock.connectToHost("10.44.4.13", 50164);
+	sock.connectToHost("127.0.0.1", 50164);	
 	if (!sock.waitForConnected(3000))
 		log_msg("Ошибка сокета: " + sock.errorString());
 
@@ -167,10 +168,54 @@ void MKI_imitator::read()
 
 }
 
-void MKI_imitator::new_frame_07(QString mode_in, int psp_in, int lit_in, int _fm, QString _ant, QVariant frame_data)
+void MKI_imitator::new_frame_04(QString mode_in, QVariant frame_data)
 {
+	QTime timer;
 
-	frame_slot_thr.get_frame_bus_obj()->make_new_frame_rm07(mode_in, frame_data);
+	sock.disconnectFromHost();
+	sock.waitForDisconnected(3000);
+	
+	timer.start();
+	//sock.connectToHost("10.44.4.13", 50164);
+	sock.connectToHost("127.0.0.1", 50164);
+	if (!sock.waitForConnected(3000))
+	{
+		log_msg("Ошибка сокета: " + sock.errorString());
+		return;
+	}
+	
+	QByteArray ba = frame_data.toByteArray();
+	
+	FrameParams p;
+	auto t = p.getParams().value(mode_in, QList<int>());
+	int str_count = t[0];	
+	int byte_in_str = t[1]; 
+	int byte_in_psp = t[26]; 
+	int spec_inf = 8;
+	QByteArray spec_inf_ba(spec_inf, 1);
+	int hat_size = 68;
+	QByteArray hat_ba(hat_size, 0);
+	int CRC32 = 4;
+	QByteArray crc32_ba(CRC32, 0);
+
+	auto head = createCommandHeader(1, str_count*(byte_in_str + byte_in_psp + spec_inf) + hat_size + CRC32);
+	QByteArray msg;
+
+	for (int i = 0; i < str_count; ++i)
+	{
+		msg.push_back(ba.mid(i*(byte_in_str + byte_in_psp), byte_in_psp));
+		msg.push_back(ba.mid(i*(byte_in_str + byte_in_psp) + byte_in_psp, byte_in_str));
+		msg.push_back(spec_inf_ba);
+	}
+	head += hat_ba + msg + crc32_ba;
+	sock.write(head);
+	log_msg(QString("Кадр %1 отправлен").arg(mode_in));
+
+	if (sock.waitForReadyRead(3000) && sock.bytesAvailable())
+	{
+		log_msg("Пришла квитанция");
+		QByteArray kvit = sock.readAll();
+	}
 
 	return;
 }
@@ -220,4 +265,3 @@ void MKI_imitator::slotReadClient()
 
 	sendKRO(MsgTypeC);
 }
-

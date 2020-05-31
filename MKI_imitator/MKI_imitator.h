@@ -17,6 +17,7 @@
 #include "KPAdefines.h"
 #include "../buses_imitator/frame_bus_rpc.h"
 #include "rpc_ports.h"
+#include "frameSettings.hpp"
 
 /**
 *	\class таймер
@@ -197,11 +198,12 @@ protected:
 	void closeEvent(QCloseEvent *event);
 signals:
 	void make_new_frame_rm07(QString mode, QVariant frame_data);
+	void make_new_frame_rm04(QString mode, QVariant frame_data);
 
 public slots :
 	void error_Slot(QAbstractSocket::SocketError socketError);
 	void read();
-	void new_frame_07(QString mode_in, int psp_in, int lit_in, int _fm, QString _ant, QVariant frame_data);
+	void new_frame_04(QString mode_in, QVariant frame_data);
 	void newConn();
 	void slotReadClient();
 };

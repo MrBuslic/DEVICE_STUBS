@@ -1,28 +1,28 @@
-#include "FSVA7_rpc.h"
+#include "fsva7_rpc.h"
 
-void RPC_FSVA7_SLOT_Thread::run()
+void RPC_fsva7_SLOT_Thread::run()
 {
-	rpc_obj = std::shared_ptr<RPC_FSVA7_SLOT_Object>(new RPC_FSVA7_SLOT_Object(addr, port));
+	rpc_obj = std::shared_ptr<RPC_fsva7_SLOT_Object>(new RPC_fsva7_SLOT_Object(addr, port));
 	rpc_obj->connect_to_server();
 	exec();
 }
 
-void RPC_FSVA7_SIGNAL_Thread::run()
+void RPC_fsva7_SIGNAL_Thread::run()
 {
-	rpc_obj = std::shared_ptr<RPC_FSVA7_SIGNAL_Object>(new RPC_FSVA7_SIGNAL_Object(addr, port));
+	rpc_obj = std::shared_ptr<RPC_fsva7_SIGNAL_Object>(new RPC_fsva7_SIGNAL_Object(addr, port));
 	rpc_obj->connect_to_server();
 	exec();
 }
 
-void RPC_FSVA7_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
+void RPC_fsva7_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
 }
 
-void RPC_FSVA7_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
+void RPC_fsva7_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
 }
 
-void RPC_FSVA7_SIGNAL_Object::read_data()
+void RPC_fsva7_SIGNAL_Object::read_data()
 {
 	int tmp_size;
 	while (_sock->bytesAvailable())
@@ -53,7 +53,7 @@ void RPC_FSVA7_SIGNAL_Object::read_data()
 			int call_number;
 			tmp_stream >> call_number;
 
-			SRPCSignalClass::Instance().toLog("FSVA7 new signal " + op_name);
+			SRPCSignalClass::Instance().toLog("fsva7 new signal " + op_name);
 
 		}
 	}
@@ -63,34 +63,34 @@ void RPC_FSVA7_SIGNAL_Object::read_data()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-void RPC_FSVA7_SLOT_Object::error_Slot(QAbstractSocket::SocketError socketError)
+void RPC_fsva7_SLOT_Object::error_Slot(QAbstractSocket::SocketError socketError)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(socketError);
-	SRPCSignalClass::Instance().toLog(QString("FSVA7 dynamic_call error_Slot %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	SRPCSignalClass::Instance().toLog(QString("fsva7 dynamic_call error_Slot %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("error_Slot(QAbstractSocket::SocketError)", tmp_list);
-	SRPCSignalClass::Instance().toLog("FSVA7 dynamic_call finished error_Slot");
+	SRPCSignalClass::Instance().toLog("fsva7 dynamic_call finished error_Slot");
 }
-void RPC_FSVA7_SLOT_Object::read()
+void RPC_fsva7_SLOT_Object::read()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("FSVA7 dynamic_call read %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	SRPCSignalClass::Instance().toLog(QString("fsva7 dynamic_call read %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("read()", tmp_list);
-	SRPCSignalClass::Instance().toLog("FSVA7 dynamic_call finished read");
+	SRPCSignalClass::Instance().toLog("fsva7 dynamic_call finished read");
 }
-void RPC_FSVA7_SLOT_Object::connect_ag()
+void RPC_fsva7_SLOT_Object::connect_ag()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("FSVA7 dynamic_call connect_ag %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	SRPCSignalClass::Instance().toLog(QString("fsva7 dynamic_call connect_ag %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("connect_ag()", tmp_list);
-	SRPCSignalClass::Instance().toLog("FSVA7 dynamic_call finished connect_ag");
+	SRPCSignalClass::Instance().toLog("fsva7 dynamic_call finished connect_ag");
 }
-void RPC_FSVA7_SLOT_Object::read_ag()
+void RPC_fsva7_SLOT_Object::read_ag()
 {
 	QVariantList tmp_list;
-	SRPCSignalClass::Instance().toLog(QString("FSVA7 dynamic_call read_ag %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	SRPCSignalClass::Instance().toLog(QString("fsva7 dynamic_call read_ag %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("read_ag()", tmp_list);
-	SRPCSignalClass::Instance().toLog("FSVA7 dynamic_call finished read_ag");
+	SRPCSignalClass::Instance().toLog("fsva7 dynamic_call finished read_ag");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
