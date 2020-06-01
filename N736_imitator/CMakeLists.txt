@@ -38,7 +38,7 @@ else()
 endif()
   
 SET(BKUPI_HEADERS N736.h)
-SET(BKUPI_SOURCES main.cpp N736.cpp)
+SET(BKUPI_SOURCES main.cpp N736.cpp mkpa.c)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
