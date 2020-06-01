@@ -391,7 +391,7 @@ WORD AutoSync
  CreateSync(SCHZK,PR,NKP,NKL,NSYNC,SYNC);
 
  // И передается по каналу связи в ЛКА
- ExitCode=SendMessageKPI(SYNC,&Kvit,&SCHBK);
+ //ExitCode=SendMessageKPI(SYNC,&Kvit,&SCHBK);
 
  // Если контролируются квитанции
  if (CHECK)
@@ -410,7 +410,7 @@ WORD AutoSync
  FirstZKPI(ZKPI);
  Sleep(300);
  // И передается по каналу связи в ЛКА
- ExitCode=SendMessageKPI(ZKPI,&Kvit, &SCHBK);
+ //ExitCode=SendMessageKPI(ZKPI,&Kvit, &SCHBK);
 
  // Если контролируются квитанции
  if (CHECK)
@@ -424,7 +424,7 @@ WORD AutoSync
 
  Sleep(200);
  // И передается по каналу связи в ЛКА
- ExitCode=SendMessageKPI(ZKPI,&Kvit, &SCHBK);
+ //ExitCode=SendMessageKPI(ZKPI,&Kvit, &SCHBK);
 
  // Если контролируются квитанции
  if (CHECK)

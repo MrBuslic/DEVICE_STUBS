@@ -2,7 +2,10 @@
 #include "N736_socket_rpc.h"
 #include <QMessageBox>
 #include "rpc_ports.h"
-#include <mkpa.h>
+extern "C"
+{
+#include "mkpa.h"
+}
 union MKOWord
 {
 	quint16 com_word;				 // командное слово целиком
@@ -241,10 +244,10 @@ void N736_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		
 				unsigned int schbk;
 				BYTE* tmp_arr = (BYTE*)(&schbk);
-				if (word.pRegim)
+				/*if (word.pRegim)
 					PrepareSCHBK_new((BYTE*)(&schbk));
 				else
-					PrepareSCHBK((BYTE*)(&schbk));
+					PrepareSCHBK((BYTE*)(&schbk));*/
 	}
 	//step 3
 	if (tmp_cwd.subadr == 3)
