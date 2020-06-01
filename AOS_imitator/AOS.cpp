@@ -218,20 +218,6 @@ AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("aos_geometry").toByteArray());
 	
-	QString buf; // переменная, чтобы вывест полученный номер включённого комплекта на форму
-	
-	int number_komplekta = 3; // строка, которую необходимо в дальнейшем удалить!!!!!
-
-	buf.setNum(number_komplekta); // перевод полученного номера из целого числа в строку
-	Group_Vkl_kompl_AOS = new QGroupBox("Включённый комплект АОС", this);
-	QLabel *Label_Imitator = new QLabel("№ комплекта: ");
-	QLabel *Label_Imitator_number_kompl = new QLabel(buf); // вывод неосредственно самого номера комплекта (значения: 1 || 2 || 3).
-	Group_Vkl_kompl_AOS->setMinimumWidth(165);
-	Group_Vkl_kompl_AOS->setMinimumHeight(10);
-	a = new QHBoxLayout(this);
-	a->addWidget(Label_Imitator);
-	a->addWidget(Label_Imitator_number_kompl);
-	Group_Vkl_kompl_AOS->setLayout(a);
 
 	kontr_dev = AOS_KP_OFF; // отключение устройства контроллера устройства  (значение kontr_dev равно нуль)
 	cgo_dev = AOS_KP_OFF;   // отключение устройства цифровой групповой обработки  (значение cgo_dev равно нуль)

@@ -137,11 +137,10 @@ public:
 	kpiu_Socket_RPC_SLOT_Thread(KPIUServer* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<kpiu_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-private:
+	private:
 	std::shared_ptr<kpiu_Socket_RPC_SLOT_Object> rpc_obj;
 	KPIUServer* app;
 	int socketDescriptor;
-	static int obj_num;
 };
 
 class kpiu_Socket_RPC_SLOT_Server : public QTcpServer
