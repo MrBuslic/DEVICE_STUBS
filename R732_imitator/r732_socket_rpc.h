@@ -117,10 +117,11 @@ public:
 	r732_Socket_RPC_SLOT_Thread(R732_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<r732_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<r732_Socket_RPC_SLOT_Object> rpc_obj;
 	R732_widg* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class r732_Socket_RPC_SLOT_Server : public QTcpServer

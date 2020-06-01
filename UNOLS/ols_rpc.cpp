@@ -16,6 +16,10 @@ void RPC_ols_SIGNAL_Thread::run()
 
 void RPC_ols_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::receive_data)) {
+		connect_signal("receive_data(QVariantList&)", true);
+	}
+	else
 	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::new_ols_data)) {
 		connect_signal("new_ols_data(QVariantList, QVariantList)", true);
 	}
@@ -27,6 +31,10 @@ void RPC_ols_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 
 void RPC_ols_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 {
+	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::receive_data)) {
+		connect_signal("receive_data(QVariantList&)", false);
+	}
+	else
 	if (signal == QMetaMethod::fromSignal(&RPC_ols_SIGNAL_Object::new_ols_data)) {
 		connect_signal("new_ols_data(QVariantList, QVariantList)", false);
 	}
@@ -69,6 +77,25 @@ void RPC_ols_SIGNAL_Object::read_data()
 
 			SRPCSignalClass::Instance().toLog("ols new signal " + op_name);
 
+			if (op_name == "receive_data(QVariantList&)")
+			{
+				QVariantList data_buffer;
+				tmp_stream >> data_buffer;
+				SRPCSignalClass::Instance().toLog("ols " + op_name +" call_number "+ QString::number(call_number) + " data_buffer = "+RPCSignalClass::QVariantToString(data_buffer));
+				emit receive_data(data_buffer);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QVariantList return_list;
+				return_list << QVariant(data_buffer);
+				tmp_stream2 << return_list;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("ols signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 			if (op_name == "new_ols_data(QVariantList, QVariantList)")
 			{
 				QVariantList data_buffer;

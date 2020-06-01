@@ -150,8 +150,8 @@ R733_widg::R733_widg() : LKA06_MODULE(6)
 	}
 
 	QString ip_str = "127.0.0.1";
-	int slot_port = 30208/*R733_SLOT*/;
-	int signal_port = 30209/*R733_SIGNAL*/; //изменить порт
+	int slot_port = R733_SLOT; /*30208*/
+	int signal_port = R733_SIGNAL; /*30209*/ //изменить порт
 	r733_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new r733_Socket_RPC_SLOT_Server_Thread;
 	rpc_slot_srv->set_app(this);
 	rpc_slot_srv->set_params(ip_str, slot_port);

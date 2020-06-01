@@ -1,7 +1,6 @@
 #include "mku_bus.h"
 #include "rpc_loger.h"
 #include <QMessageBox>
-
 #include "rpc_ports.h"
 #include "mku_bus_socket_rpc.h"
 
@@ -51,6 +50,20 @@ void MKUWidget::make_ku_732(int ku_n, int length, double u, int line)
 {
 	log_widget->log_append(QString("КУ 732 %1").arg(ku_n));
 	emit new_ku_732(ku_n, length, u, line);
+}
+
+void MKUWidget::make_data_736(QVariantList dataList, QVariantList maskList)
+{
+	//log_widget->log_append(QString("КУ 736 %1").arg(ku_n));
+	log_widget->log_append(QString("КУ 736"));
+	emit new_data_736(dataList, maskList);
+}
+
+void MKUWidget::make_data_737(QVariantList dataList, QVariantList maskList)
+{
+	//log_widget->log_append(QString("КУ 736 %1").arg(ku_n));
+	log_widget->log_append(QString("КУ 737"));
+	emit new_data_737(dataList, maskList);
 }
 
 void MKUWidget::make_ku_cbk(int ku_n, int length, double u, int line)
@@ -111,6 +124,6 @@ void MKUWidget::set_tm(QString tm_name, QVariant tm_val)
 
 void MKUWidget::make_mt_at_state(int dev_name, int state)
 {
-	log_widget->log_append(QString("Состояние аппаратуры БАУ под номером %1 равно %2").arg(dev_name).arg(get_line(state)));
+	log_widget->log_append(QString("Состояние аппаратуры БАУ под номером %1 равно %2").arg(dev_name).arg(state));
 	emit new_mt_at_state(dev_name, state);
 }

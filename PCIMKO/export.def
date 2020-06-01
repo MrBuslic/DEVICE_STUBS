@@ -1,0 +1,7 @@
+LIBRARY PCI_MKO_BASE_DLL
+EXPORTS
+
+Init_MKO_PCI_C @1
+Exit_MKO_PCI_C @2
+MkoSend_C @3
+MkoSend_SetNbus_C @4

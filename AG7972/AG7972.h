@@ -20,6 +20,8 @@
 #include <qlayout.h>
 #include <loki/Singleton.h>
 
+#include "../buses_imitator/power_bus_rpc.h"
+
 #define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class AG7972Widget : public QWidget
@@ -50,8 +52,10 @@ private:
 	double i_meas;
 	void calc_meas();
 	
+	RPC_power_bus_SLOT_Thread power_slot_thr;
+	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 signals:
-	void power_out(int n, double _u);
+	void update_graphics_signal();
 };
 
 #endif //AG7972_H

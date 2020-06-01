@@ -40,68 +40,14 @@ union I_1_DataWords
 	};
 };
 
-union I_2_DataWords
-{
-	quint16 data_words[15];
-	I_2_DataWords(QVariantList raw_words)
-	{
-		for (int i = 0; i < raw_words.size(); i++)
-			this->data_words[i] = static_cast<quint16>(raw_words.at(i).toInt());
-	}
-	struct
-	{
-		quint16
-			BUM1_16 : 16;
-		quint16
-			BUM_17_25 : 9,
-			rez : 3,
-			AFAR_mode : 4;
-		quint16
-			BUM_1_Power_1_4 : 4,
-			BUM_Power : 1,
-			rez_1 : 3,
-			BUM_2_Power_2_4 : 4,
-			rez_2 : 3;
-			;
-	};
-
-};
-
-//void BUM_chan :: default_button_state()
-//{
-//	BUM_chan_pbut->setText("");
-//	BUM_chan_pbut->setMaximumWidth(16);
-//	BUM_chan_pbut->setMaximumHeight(16);
-//	BUM_chan_pbut->setStyleSheet("background-color: rgb(204, 204, 204);");
-//	BUM_chan_pbut->setCheckable(false);
-//}
-
 void BUM_cl::create_BUMs()
 {
 	BUMs_gbox = new QGroupBox("");
 	BUMs_glay = new QGridLayout(BUMs_gbox);
 
-	//BUMs_pbut << new QPushButton("1");
-	//BUMs_pbut[0]->setText("");
-	//BUMs_pbut[0]->setMaximumWidth(16);
-	//BUMs_pbut[0]->setMaximumHeight(16);
-	//BUMs_pbut[0]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//BUMs_pbut[0]->setCheckable(false);
-	//BUMs_pbut[0]->setText(QString("%1").arg(1));
-	//BUMs_glay->addWidget(BUMs_pbut[0], 2, 2);
-
-	//BUMs_pbut << new QPushButton("4");
-	//BUMs_pbut[1]->setText("");
-	//BUMs_pbut[1]->setMaximumWidth(16);
-	//BUMs_pbut[1]->setMaximumHeight(16);
-	//BUMs_pbut[1]->setStyleSheet("background-color: rgb(204, 204, 204);");
-	//BUMs_pbut[1]->setCheckable(false);
-	//BUMs_pbut[1]->setText(QString("%1").arg(4));
-	//BUMs_glay->addWidget(BUMs_pbut[1], 0, 0);
-
-	for (int n = 0; n < 2; n ++)
+	for (int n = 0; n < 2; n++)
 	{
-		for (int i = 0; i < 2; i ++)
+		for (int i = 0; i < 2; i++)
 		{
 			QString numb = QString::number(i + n * 2);
 			BUMs_pbut << new QPushButton(numb);
@@ -150,7 +96,7 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 	BUFAR_compl_hlay->addWidget(BUFAR_comp_le);
 	BUFAR_mode_hlay->addWidget(BUFAR_mode_lb);
 	BUFAR_mode_hlay->addWidget(BUFAR_mode_le);
-	
+
 	for (int i = 0; i < 25; i++)
 	{
 		BUM_current tmp_BUM;
@@ -167,15 +113,10 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 			tmp_BUM_cl.create_BUMs();
 			BUM_cl_list.push_back(tmp_BUM_cl);
 			BUM_cl_list.at(i + n * 5).BUMs_gbox->setAlignment(Qt::AlignHCenter);
-			BUM_cl_list.at(i + n * 5).BUMs_gbox->setTitle(QString("БУМ %1"). arg(i + n * 5));
-			BUMs_glay->addWidget(BUM_cl_list.at(i+n*5).BUMs_gbox, n, i);
+			BUM_cl_list.at(i + n * 5).BUMs_gbox->setTitle(QString("БУМ %1").arg((i + n * 5) + 1));
+			BUMs_glay->addWidget(BUM_cl_list.at(i + n * 5).BUMs_gbox, n, i);
 		}
 	}
-
-	///ДЕБАГ!!!
-	//QVariantList tmp_debug_words;
-	//I_1(tmp_debug_words);
-	///ДЕБАГ!!!
 
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start(); // вот тут падает
@@ -203,11 +144,24 @@ BUFAR_widg::BUFAR_widg(QWidget *parent)
 		return;
 	}
 
+	mku_slot_thr.set_connection_params("127.0.0.1", MKU_SLOT);
+	mku_slot_thr.start(); // вот тут падает
+
+	mku_signal_thr.set_connection_params("127.0.0.1", MKU_SIGNAL);
+	mku_signal_thr.start(); // вот тут падает
+
+	if (!mku_slot_thr.wait_connected(3) || !mku_signal_thr.wait_connected(3))
+	{
+		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с МКУ");
+		this->deleteLater();
+		return;
+	}
+
 	connect(signal_thr.get_obj().get(), SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), this, SLOT(new_message(QVariant, int, int, int, QVariantList, int)));
 
-	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
+	//slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
-	connect(mku_signal_thr.get_obj().get(), SIGNAL(make_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)));
+	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_nk(double)), this, SLOT(get_power(double)));
 
 	//log_filename = QString("d:/logs/%1_%2.log").arg(QCoreApplication::applicationName()).arg(QDateTime::currentDateTime().toString("yyyy.MM.dd_hh.mm.ss"));
@@ -267,7 +221,7 @@ void BUFAR_widg::imit_on()
 {
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, true);
 	update_graphics();
-	set_new_tm();
+	//set_new_tm();
 }
 
 void BUFAR_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
@@ -336,7 +290,7 @@ void BUFAR_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 	tmp_cwd.com_word = cwd;
 	if (os == -1)
 		return;
-	if ((mko == MKO) && (tmp_cwd.adr == adr))
+	if ((mko == MKO) && (tmp_cwd.adr == adr) && (BUFAR_current != 0))
 	{
 		//	QString _msg = QString("%1 принял сигнал на подадресе %2 c КС %3").arg(QTime::currentTime().toString("hh:mm:ss.zzz")).arg(tmp_cwd.subadr).arg(tmp_cwd.com_word);
 		//	msg_to_log(_msg);
@@ -375,17 +329,20 @@ void BUFAR_widg::change_BUMs(int num, bool all_ch)
 
 void BUFAR_widg::new_mt_at_state(int dev_name, int state)
 {
-	if (dev_name = BAU_at_mt(BUFAR_st))
-		BUFAR_comp_le->setText(QString("%1").arg(state));
+	if (dev_name == BAU_at_mt(BUFAR_st))
+		BUFAR_current = state;
+	update_graphics();
 }
 
 void BUFAR_widg::I_1(QVariantList words)
 {
 	I_1_DataWords d_words = words;
-	d_words.AFAR_mode = 4;
+	OY_faze = 0;
+	OZ_faze = 0;
 	for (int i = 0; i < 25; i++)
 	{
 		change_BUMs(i, false);
+		BUFAR_mode = MODE_1;
 	}
 	switch (d_words.AFAR_mode)
 	{
@@ -401,6 +358,7 @@ void BUFAR_widg::I_1(QVariantList words)
 		change_BUMs(10, false, true, false, true);
 		change_BUMs(11, false, true, false, true);
 		change_BUMs(12, false, false, false, true);
+		BUFAR_mode = MODE_2;
 		break;
 	case 2:
 		change_BUMs(2, true, true, false, false);
@@ -412,6 +370,7 @@ void BUFAR_widg::I_1(QVariantList words)
 		change_BUMs(12, false, true, false, false);
 		change_BUMs(13, false, true, false, true);
 		change_BUMs(14, false, true, false, true);
+		BUFAR_mode = MODE_2;
 		break;
 	case 3:
 		change_BUMs(10, true, false, true, false);
@@ -423,6 +382,7 @@ void BUFAR_widg::I_1(QVariantList words)
 		change_BUMs(20, true);
 		change_BUMs(21, true);
 		change_BUMs(22, false, false, true, true);
+		BUFAR_mode = MODE_2;
 		break;
 	case 4:
 		change_BUMs(12, true, false, false, false);
@@ -434,23 +394,23 @@ void BUFAR_widg::I_1(QVariantList words)
 		change_BUMs(22, true, true, false, false);
 		change_BUMs(23, true);
 		change_BUMs(24, true);
+		BUFAR_mode = MODE_2;
 		break;
 	case 5:
 		for (int i = 0; i < 25; i++)
 		{
 			change_BUMs(i, true);
+			BUFAR_mode = MODE_3;
 		}
 		break;
 	}
-
-
-
-
-	if (d_words.OY_pl_mn != OY_faze)
+	OY_faze = d_words.OY_AFAR * 0.011;
+	OZ_faze = d_words.OZ_AFAR * 0.011;
+	if (d_words.OY_pl_mn)
 		OY_faze = -1 * OY_faze;
-	if (d_words.OZ_pl_mn != OZ_faze)
+	if (d_words.OZ_pl_mn)
 		OZ_faze = -1 * OZ_faze;
-	BUFAR_mode = BUFAR_MODEs(d_words.AFAR_mode);
+	BUFAR_sub_mode = d_words.AFAR_mode;
 	update_graphics();
 }
 
@@ -474,13 +434,112 @@ void BUFAR_widg::update_graphics()
 		if (BUM_current_list[i].chan_4)
 			BUM_cl_list[i].BUMs_pbut[3]->setStyleSheet("background-color: rgb(142, 198, 156);");
 	}
-	BUFAR_mode_le->setText(QString("%1").arg(BUFAR_mode));
+	if (BUFAR_mode == MODE_2)
+	{
+		BUFAR_mode_le->setText(QString("%1 - %2").arg(BUFAR_mode).arg(BUFAR_sub_mode));
+	}
+	else
+		BUFAR_mode_le->setText(QString("%1").arg(BUFAR_mode));
+	BUFAR_comp_le->setText(QString("%1").arg(BUFAR_current));
 }
 
 void BUFAR_widg::set_new_tm()
 {
-	//omnibus_slot_thr.get_omnibus_obj()->switch_ab_os()
-	// slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
+	QVariantList tmp_list;
+	unsigned short tmp_word = 0;
+	unsigned short tmp_bit = 1;
+	for (int i = 0; i < 16; i++)
+	{
+		if ((BUM_current_list[i].chan_1) || (BUM_current_list[i].chan_2) || (BUM_current_list[i].chan_3) || (BUM_current_list[i].chan_4))
+		{
+			tmp_word = tmp_word + (tmp_bit << i);
+			tmp_bit = 1;
+		}
+	}
+	tmp_list.push_back(tmp_word);
+	tmp_word = 0;
+
+	for (int i = 0; i < 9; i++)
+	{
+		if ((BUM_current_list[i + 16].chan_1) || (BUM_current_list[i + 16].chan_2) || (BUM_current_list[i + 16].chan_3) || (BUM_current_list[i + 16].chan_4))
+		{
+			tmp_word = tmp_word + (tmp_bit << i);
+			tmp_bit = 1;
+		}
+	}
+	tmp_bit = BUFAR_sub_mode;
+	tmp_word = tmp_word + (tmp_bit << 12);
+	tmp_list.push_back(tmp_word);
+	tmp_word = 0;
+
+	if (BUFAR_mode = MODE_2)
+	{
+		int tmp_count = 0;
+		for (int n = 0; n < 12; n++)
+		{
+			tmp_word = 0;
+			if ((BUM_current_list[tmp_count].chan_1) || (BUM_current_list[tmp_count].chan_2) || (BUM_current_list[tmp_count].chan_3) || (BUM_current_list[tmp_count].chan_4))
+			{
+				tmp_word = tmp_word + 0x10;
+			}
+			if (BUM_current_list[tmp_count].chan_1)
+				tmp_word = tmp_word + 1;
+			if (BUM_current_list[tmp_count].chan_2)
+				tmp_word = tmp_word + 2;
+			if (BUM_current_list[tmp_count].chan_3)
+				tmp_word = tmp_word + 4;
+			if (BUM_current_list[tmp_count].chan_4)
+				tmp_word = tmp_word + 8;
+
+			if ((BUM_current_list[tmp_count + 1].chan_1) || (BUM_current_list[tmp_count + 1].chan_2) || (BUM_current_list[tmp_count + 1].chan_3) || (BUM_current_list[tmp_count + 1].chan_4))
+			{
+				tmp_word = tmp_word + 0x1000;
+			}
+
+			if (BUM_current_list[tmp_count + 1].chan_1)
+				tmp_word = tmp_word + 0x100;
+			if (BUM_current_list[tmp_count + 1].chan_2)
+				tmp_word = tmp_word + 0x200;
+			if (BUM_current_list[tmp_count + 1].chan_3)
+				tmp_word = tmp_word + 0x400;
+			if (BUM_current_list[tmp_count + 1].chan_4)
+				tmp_word = tmp_word + 0x800;
+
+			tmp_count = tmp_count + 2;
+			tmp_list.push_back(tmp_word);
+		}
+
+		tmp_word = 0;
+		if ((BUM_current_list[24].chan_1) || (BUM_current_list[24].chan_2) || (BUM_current_list[24].chan_3) || (BUM_current_list[24].chan_4))
+		{
+			tmp_word = tmp_word + 0x10;
+		}
+
+		if (BUM_current_list[24].chan_1)
+			tmp_word = tmp_word + 1;
+		if (BUM_current_list[24].chan_2)
+			tmp_word = tmp_word + 2;
+		if (BUM_current_list[24].chan_3)
+			tmp_word = tmp_word + 4;
+		if (BUM_current_list[24].chan_4)
+			tmp_word = tmp_word + 8;
+		tmp_list.push_back(tmp_word);
+	}
+	else
+	{
+		if (BUFAR_mode = MODE_1)
+		{
+			for (int i = 0; i < 13; i++)
+			{
+				tmp_word = 0x1010;
+				tmp_list.push_back(tmp_word);
+			}
+			tmp_word = 0x10;
+			tmp_list.push_back(tmp_word);
+		}
+	}
+	tmp_list.push_back(tmp_word);
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 2, tmp_list);
 }
 
 BUFAR_widg::~BUFAR_widg()

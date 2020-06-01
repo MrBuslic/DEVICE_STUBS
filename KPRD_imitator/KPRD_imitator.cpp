@@ -10,7 +10,7 @@ KPRD_imitator::KPRD_imitator(QWidget* parent) : QWidget(parent)
 	for (list_it = antenna_name_list.begin(); list_it != antenna_name_list.end(); list_it++)
 		kprd_state_map.insert(*list_it, *list_it);
 
-	setMaximumSize(300, 300);
+	//setMaximumSize(300, 300);
 	setWindowTitle("Имитатор КПРД");
 
 	pause_btn = new QPushButton("П", this);
@@ -103,8 +103,8 @@ KPRD_imitator::KPRD_imitator(QWidget* parent) : QWidget(parent)
 	}
 
 
-	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
-	restoreGeometry(settings.value("kprd_geometry").toByteArray());
+	//QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	//restoreGeometry(settings.value("kprd_geometry").toByteArray());
 }
 
 void KPRD_imitator::closeEvent(QCloseEvent *event)

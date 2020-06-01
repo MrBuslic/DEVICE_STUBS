@@ -24,12 +24,12 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR cmdLine, int)
 int main(int argc, char **argv)
 {
 #endif
+	if (argc == 1) argv[1] = "mca";
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 	QApplication app(argc, argv);
 	LogWidget log_widget;
 	log_widget.show();
-
-	KPIUServer kpiu_server;
+	KPIUServer kpiu_server(0, argv[1]);
 	kpiu_server.show();
-	return app.exec();
+	return app.exec();	
 }

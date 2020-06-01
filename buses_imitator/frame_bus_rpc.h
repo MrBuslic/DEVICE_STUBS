@@ -14,6 +14,7 @@ public slots:
 	void make_new_frame_733(QString mode, QVariant frame_data);
 	void make_new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
 	void make_new_frame_rm07(QString mode, QVariant frame_data);
+	void make_new_frame_n737(QString mode, QVariant frame_data);
 	////////////////////////////////////
 };
 
@@ -48,6 +49,7 @@ signals:
 	void new_frame_733(QString mode, QVariant frame_data);
 	void new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
 	void new_frame_rm07(QString mode, QVariant frame_data);
+	void new_frame_n737(QString mode, QVariant frame_data);
 };
 
 class RPC_frame_bus_SIGNAL_Thread : public RPC_SIGNAL_Thread

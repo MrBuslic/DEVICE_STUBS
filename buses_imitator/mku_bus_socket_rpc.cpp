@@ -84,6 +84,8 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["mshm_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::mshm_map_channels_setup;
 		operators_map["pshm_map_channels_setup(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::pshm_map_channels_setup;
 		operators_map["make_mt_at_state(int, int)"] = &mku_bus_Socket_RPC_SLOT_Object::make_mt_at_state;
+		operators_map["make_data_736(QVariantList, QVariantList)"] = &mku_bus_Socket_RPC_SLOT_Object::make_data_736;
+		operators_map["make_data_737(QVariantList, QVariantList)"] = &mku_bus_Socket_RPC_SLOT_Object::make_data_737;
 		operators_map["get_tm(QString, QVariant&)"] = &mku_bus_Socket_RPC_SLOT_Object::get_tm;
 		operators_map["set_tm(QString, QVariant)"] = &mku_bus_Socket_RPC_SLOT_Object::set_tm;
 		///////////////////////////////////////////////////////////////////////
@@ -128,6 +130,8 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		disconnect(app, SIGNAL(new_ku_cbk(int, int, double, int)), this, SLOT(new_ku_cbk(int, int, double, int)));
 		disconnect(app, SIGNAL(new_mk(int, int, int, int, double, double, int, int, int)), this, SLOT(new_mk(int, int, int, int, double, double, int, int, int)));
 		disconnect(app, SIGNAL(new_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)));
+		disconnect(app, SIGNAL(new_data_736(QVariantList, QVariantList)), this, SLOT(new_data_736(QVariantList, QVariantList)));
+		disconnect(app, SIGNAL(new_data_737(QVariantList, QVariantList)), this, SLOT(new_data_737(QVariantList, QVariantList)));
 	}
 	void mku_bus_Socket_RPC_SIGNAL_Object::set_app(MKUWidget* _app)
 	{
@@ -142,6 +146,10 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		data_map.insert("new_mk(int, int, int, int, double, double, int, int, int)", std::shared_ptr<SignalData>(new SignalData()));
 		connect(app, SIGNAL(new_mt_at_state(int, int)), this, SLOT(new_mt_at_state(int, int)), Qt::DirectConnection);
 		data_map.insert("new_mt_at_state(int, int)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_data_736(QVariantList, QVariantList)), this, SLOT(new_data_736(QVariantList, QVariantList)), Qt::DirectConnection);
+		data_map.insert("new_data_736(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
+		connect(app, SIGNAL(new_data_737(QVariantList, QVariantList)), this, SLOT(new_data_737(QVariantList, QVariantList)), Qt::DirectConnection);
+		data_map.insert("new_data_737(QVariantList, QVariantList)", std::shared_ptr<SignalData>(new SignalData()));
 
 	}
 
@@ -422,6 +430,56 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 		descriptor.mutex.unlock();
 		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_mt_at_state finished").arg(objectName()));
 	}
+	void mku_bus_Socket_RPC_SIGNAL_Object::new_data_736(QVariantList dataList, QVariantList maskList)
+	{
+		auto& descriptor = *data_map["new_data_736(QVariantList, QVariantList)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_data_736(QVariantList, QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_data_736  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << dataList;
+		SRPCSignalClass::Instance().toLog(QString("new_data_736  call_number %2 dataList =  %1").arg(RPCSignalClass::QVariantToString(dataList)).arg(call_number));
+		tmp_stream << maskList;
+		SRPCSignalClass::Instance().toLog(QString("new_data_736  call_number %2 maskList =  %1").arg(RPCSignalClass::QVariantToString(maskList)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data_736 sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data_736 finished").arg(objectName()));
+	}
+	void mku_bus_Socket_RPC_SIGNAL_Object::new_data_737(QVariantList dataList, QVariantList maskList)
+	{
+		auto& descriptor = *data_map["new_data_737(QVariantList, QVariantList)"].get();
+		if (!descriptor.signal_needed)
+			return;
+		QByteArray tmp_arr;
+		QDataStream tmp_stream(&tmp_arr, QIODevice::WriteOnly);
+		tmp_stream << QString("new_data_737(QVariantList, QVariantList)");
+		tmp_stream << (++call_number);
+		SRPCSignalClass::Instance().toLog(QString("%1 from thread %2 send_signal new_data_737  call_number %3").arg(objectName()).arg(QThread::currentThread()->objectName()).arg(call_number));
+		tmp_stream << dataList;
+		SRPCSignalClass::Instance().toLog(QString("new_data_737  call_number %2 dataList =  %1").arg(RPCSignalClass::QVariantToString(dataList)).arg(call_number));
+		tmp_stream << maskList;
+		SRPCSignalClass::Instance().toLog(QString("new_data_737  call_number %2 maskList =  %1").arg(RPCSignalClass::QVariantToString(maskList)).arg(call_number));
+		QByteArray tmp_arr2;
+		QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+		tmp_stream2 << tmp_arr.size();
+		tmp_arr2 += tmp_arr;
+		descriptor.mutex.lock();
+		send_signal_func(&tmp_arr2);
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data_737 sended").arg(objectName()));
+		descriptor.mutex.lock();
+		descriptor.mutex.unlock();
+		SRPCSignalClass::Instance().toLog(QString("%1 send_signal new_data_737 finished").arg(objectName()));
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	QVariant mku_bus_Socket_RPC_SLOT_Object::QuerySlots(QVariantList& _values)
@@ -591,6 +649,44 @@ int mku_bus_Socket_RPC_SIGNAL_Object::call_number = 0;
 			int dev_name = _values.at(0).value<int>();
 			int state = _values.at(1).value<int>();
 			app->make_mt_at_state(dev_name, state);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant mku_bus_Socket_RPC_SLOT_Object::make_data_736(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->make_data_736(dataList, maskList);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant mku_bus_Socket_RPC_SLOT_Object::make_data_737(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			QVariantList dataList = _values.at(0).value<QVariantList>();
+			QVariantList maskList = _values.at(1).value<QVariantList>();
+			app->make_data_737(dataList, maskList);
 			return 0;
 		}
 		catch(const std::exception &)

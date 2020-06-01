@@ -14,20 +14,23 @@ public slots:
 	int MSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int mshm, int line_m);
 	int PSHM_NASTROYKA_CELOSTNOSTI_KANALOV(int pshm, int line_p);
 	int FOI_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
-	int OLS_ZAPIS_DANNIH_FORMIROVANIYA(QVariantList data_buffer, QVariantList mask_buffer);
-	int OLS_ZAPIS_DANNIH_REGISTRACII(QVariantList data_buffer);
-	int OLS_BISTRIY_START(int devise);
-	int OLS_CHTENIE_DANNICH_REGISTRACII(QVariantList& data_buffer);
 	int ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString connected_antenna_name);
 	int OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan);
 	int USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state);
 	int PYRO_USTANOVIT_SOSTOYANIE(QString name, int state);
+	int LKA05_KU_USTANOVIT_SOSTOYANIE(int module_num, int _dev, bool _flag);
+	int LKA05_MK_USTANOVIT_SOSTOYANIE(int module_num, int _dev, bool _flag);
+	int LKA05_MPVN_USTANOVIT_SOSTOYANIE(int _dev, bool _flag);
+	int LKA05_MU_USTANOVIT_SOSTOYANIE(int _dev, bool _flag);
 	QString getXML();
-	void mfsk_1_impulse(QVariantList channels);
+	void mfsk_2_impulse(QVariantList channels);
 	void mds_1_get_sample(uint& buf, bool& flag);
 	void mds_2_get_sample(uint& buf, bool& flag);
 	void get_resistance(uint NProcess, QVariant& resistance);
 	int get_connection_state(QVariantList& _chans);
+	void mshr_data_in(QVariantList dataList, QVariantList maskList);
+	void mshr_data_out(QVariantList& data);
+	void power_bus_state_changed(QString name, double u);
 	////////////////////////////////////
 };
 

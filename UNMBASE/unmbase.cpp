@@ -1,6 +1,8 @@
 #include <unmbase.h>
+#include <Visa.h>
 #include <windows.h>
 #include <qcoreapplication.h>
+#include <qmap.h>
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
@@ -54,16 +56,15 @@ struct mezanin_struct
 	ViInt16 Present;
 	ViInt16 Type;
 };
-
-QList<mezanin_struct> unmbase_mezanin_list;
-int unmbase_mezanin_list_pointer = 0;
+QMap<int, QList<mezanin_struct> > mbase_list;
+QList<mezanin_struct> tmp_list;
 
 void unmbase_mezanin_list_add(ViInt16 Present, ViInt16 Type)
 {
 	mezanin_struct mez;
 	mez.Present = Present;
 	mez.Type = Type;
-	unmbase_mezanin_list.push_back(mez);
+	tmp_list.push_back(mez);
 }
 
 
@@ -72,6 +73,13 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 							ViBoolean reset,
 							ViSession *vi)
 {
+	tmp_list.clear();
+	ViSession tmp_sess;
+	viOpen(0, rsrcName, 0, 0, &tmp_sess);
+
+	int device_slot;
+	viGetAttribute(tmp_sess, VI_ATTR_SLOT, &device_slot);
+	*vi = device_slot;
 	QString commapp = QCoreApplication::applicationName();
 	if (commapp == "comapp1")
 	{
@@ -87,88 +95,110 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		unmbase_mezanin_list_add(0, 0);
 		unmbase_mezanin_list_add(0, 0);
 		*/
+		switch (device_slot)
+		{
+		case 3:
+			// НМУ
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			break;
 
-		unmbase_mezanin_list_add(1, 0x021);	// OSC5
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(1, 0x1A);	// MC
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		case 6:
+			unmbase_mezanin_list_add(1, 0x021);	// OSC5
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(1, 0x1A);	// MC
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			break;
 
-		unmbase_mezanin_list_add(1, 0x9);	// MDS32
-		unmbase_mezanin_list_add(1, 0x9);	// MDS32
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		case 7:
+			unmbase_mezanin_list_add(1, 0x9);	// MDS32
+			unmbase_mezanin_list_add(1, 0x9);	// MDS32
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			break;
 
-		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
-		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
-		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
-		unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		case 12:
+			unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+			unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+			unmbase_mezanin_list_add(1, 0x5);	// MT8K4L
+			unmbase_mezanin_list_add(0, 0);	
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			break;
 
-		// НМУ
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		}
 	}
 
 	if (commapp == "comapp2")
 	{
 		// Сначала инициализируется НМ, потом НМ-АРМ затем МНУ
 		// НМ
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(1, 0x17);	// MN8I
-		unmbase_mezanin_list_add(1, 0x1F);	// MN3I
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		switch (device_slot)
+		{
+		case 8:
 
-		unmbase_mezanin_list_add(1, 0x021);	// OSC5
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(1, 0x17);	// MN8I
+			unmbase_mezanin_list_add(1, 0x1F);	// MN3I
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			break;
+		case 9:
+			unmbase_mezanin_list_add(1, 0x021);	// OSC5
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(1, 0x0A);	// MFSK24
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			break;
+		}
 	}
 
 	if (commapp == "comappFrame")
 	{
-		unmbase_mezanin_list_add(1, 0x36);	// MKPRM
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		switch (device_slot)
+		{
+		case 6:
+			unmbase_mezanin_list_add(1, 0x36);	// MKPRM
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
 
-		unmbase_mezanin_list_add(1, 0x37);	// MBKUPI
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
-		unmbase_mezanin_list_add(0, 0);
+		case 7:
+			unmbase_mezanin_list_add(1, 0x37);	// MBKUPI
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+			unmbase_mezanin_list_add(0, 0);
+		}
 	}
 
 	if (commapp == "iksa_server")
@@ -194,6 +224,8 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_init (ViRsrc rsrcName,
 		unmbase_mezanin_list_add(0, 0);
 		unmbase_mezanin_list_add(0, 0);
 	}
+
+	mbase_list.insert(device_slot, tmp_list);
 
 	return 0; 
 }
@@ -531,9 +563,8 @@ _UNMBASE_API ViStatus _VI_FUNC unmbase_m_type_q (ViSession vi,                  
 	
 */
 	
-	*Present = unmbase_mezanin_list.at(unmbase_mezanin_list_pointer).Present;
-	*Type = unmbase_mezanin_list.at(unmbase_mezanin_list_pointer).Type;
-	unmbase_mezanin_list_pointer++;
+	*Present = mbase_list[vi].at(N-1).Present;
+	*Type = mbase_list[vi].at(N-1).Type;
 	return 0; 
 }
 /*--------------------------------------------------------------------------*/

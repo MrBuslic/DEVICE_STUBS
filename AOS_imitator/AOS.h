@@ -297,16 +297,42 @@ class AOS_widg : public QWidget
 public:
 	AOS_widg(QWidget *parent = 0);
 	~AOS_widg();
-	    
+
 private:
 	//AOS_KP current_KP = AOS_OFF;
+	// ---------- виджеты --------- начало --------
 
+	QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
+	QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie; // сам номер устройства
+	// ----- объявление кнопок ------- начало --------
+	QPushButton *perviy_komplekt_GPFM1;
+	QPushButton *vtoroi_komplekt_GPFM1;
+	QPushButton *tretiy_komplekt_GPFM1;
+
+	QPushButton *perviy_komplekt_GPFM2;
+	QPushButton *vtoroi_komplekt_GPFM2;
+	QPushButton *tretiy_komplekt_GPFM2;
+
+	QPushButton *perviy_komplekt_CGO;
+	QPushButton *vtorji_komplekt_CGO;
+	QPushButton *tretiy_komplekt_CGO;
+
+	QPushButton *perviy_komplekt_kontroly;
+	QPushButton *vtoroi_komplekt_kontroly;
+	QPushButton *tretiy_komplekt_kontroly;
+	// ----- объявление кнопок ------- конец --------
+
+    // ---------- виджеты --------- конец --------
+
+	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры
 
 	const int MKO = 1;
 	const int adr = 21;
-
+	QHBoxLayout *a;
+	QGroupBox *Group_Vkl_kompl_AOS;
 	void update_graphics();  // обновление графики
-	void set_new_tm();      // составление ОК-ов
+	void funk_perescheta(); // преобразует входные данные 0,1,2,3 в 0,1,2,4
+	void set_new_tm();     // составление ОК-ов
 	void TMI_1_AOS();   // составление ТМИ - 1 
 	void TMI_2_AOS();  // составление ТМИ - 2
 	void imit_off();  // включение имитатора
@@ -315,7 +341,6 @@ protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	//void new_ku_mk(int ku, int length_ku, double u_ku, int line_ku);
 	void new_ku_mk(int name_ustroistva, int number_komplekta);
 
 private:
@@ -329,10 +354,13 @@ private:
 	DEVICE_STATES gpfm1_dev;
 	
 	AOS_shos shos;
-
 	AOS_state aos_state;
-
+	AOS_modes aos_modes;
 	QList<GSU_kommut> gsu_kommut;
+
+	//QGroupBox group_spravochnay_inform;
+	//QGroupBox group_komplektov;
+
 
 	QByteArray pprch_main_key_data;
 	int pprch_main_key_num;

@@ -66,7 +66,7 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 	QVariantList tmp_msgs;
 	if ((tmp_cwd.subadr == 0) || (tmp_cwd.subadr == 31))
 	{
-		if (tmp_cwd.count == SYNC_WITH_DW)
+		if (tmp_cwd.count == IMIT_SYNC_WITH_DW)
 		{
 			tmp_msgs << xmitfields->data[0];
 		}
@@ -87,7 +87,7 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 		xmitfields->swd1 = os;
 		if ((tmp_cwd.subadr == 0) || (tmp_cwd.subadr == 31))
 		{
-			if ((tmp_cwd.count == SEND_VECTOR_WORD) || (tmp_cwd.count == SYNC_WITH_DW))
+			if ((tmp_cwd.count == IMIT_SEND_VECTOR_WORD) || (tmp_cwd.count == IMIT_SYNC_WITH_DW))
 			{
 				xmitfields->data[0] = tmp_msgs[0].toInt();
 			}

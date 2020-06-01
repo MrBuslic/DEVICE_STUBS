@@ -13,12 +13,12 @@
 
 #include "rpc_loger.h"
 #include "socket_rpc.h"
-class FSVA7_Socket_RPC_SIGNAL_Object : public QObject
+class fsva7_Socket_RPC_SIGNAL_Object : public QObject
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SIGNAL_Object();
-	~FSVA7_Socket_RPC_SIGNAL_Object()
+	fsva7_Socket_RPC_SIGNAL_Object();
+	~fsva7_Socket_RPC_SIGNAL_Object()
 	{
 	}
 	void set_app(FSVA7_imitator* _app);
@@ -42,11 +42,11 @@ private:
 };
 
 
-class FSVA7_Socket_RPC_SIGNAL_Server : public QObject
+class fsva7_Socket_RPC_SIGNAL_Server : public QObject
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
+	fsva7_Socket_RPC_SIGNAL_Server(QString _conn_ip, int _conn_port);
 	void set_app(FSVA7_imitator* _app)
 	{
 		app = _app;
@@ -56,14 +56,14 @@ public slots:
 private:
 	QTcpServer* rpc_server;
 	FSVA7_imitator* app;
-	QList<std::shared_ptr<FSVA7_Socket_RPC_SIGNAL_Object> > rpc_objects;
+	QList<std::shared_ptr<fsva7_Socket_RPC_SIGNAL_Object> > rpc_objects;
 };
 
-class FSVA7_Socket_RPC_SIGNAL_Thread : public QThread
+class fsva7_Socket_RPC_SIGNAL_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SIGNAL_Thread();
+	fsva7_Socket_RPC_SIGNAL_Thread();
 	void set_app(FSVA7_imitator* _app)
 	{
 		app = _app;
@@ -75,21 +75,21 @@ public:
 	}
 	void run();
 private:
-	FSVA7_Socket_RPC_SIGNAL_Server* rpc_srv;
+	fsva7_Socket_RPC_SIGNAL_Server* rpc_srv;
 	FSVA7_imitator* app;
 	QString conn_ip;
 	int conn_port;
 };
 
-class FSVA7_Socket_RPC_SLOT_Object : public QObject
+class fsva7_Socket_RPC_SLOT_Object : public QObject
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SLOT_Object(FSVA7_imitator* _app, int socketDescriptor);
-	~FSVA7_Socket_RPC_SLOT_Object()
+	fsva7_Socket_RPC_SLOT_Object(FSVA7_imitator* _app, int socketDescriptor);
+	~fsva7_Socket_RPC_SLOT_Object()
 	{
 	}
-	typedef QVariant (FSVA7_Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
+	typedef QVariant (fsva7_Socket_RPC_SLOT_Object::*OPERATOR_EXECUTOR)(QVariantList&);
 	typedef QMap<QString, OPERATOR_EXECUTOR> OPERATORS_MAP;
 public:
 	QVariant QuerySlots(QVariantList& _values);
@@ -108,36 +108,37 @@ private:
 	static int obj_num;
 };
 
-class FSVA7_Socket_RPC_SLOT_Thread : public QThread
+class fsva7_Socket_RPC_SLOT_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SLOT_Thread(FSVA7_imitator* _app, int _socketDescriptor);
+	fsva7_Socket_RPC_SLOT_Thread(FSVA7_imitator* _app, int _socketDescriptor);
 	void run();
-	std::shared_ptr<FSVA7_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
-	std::shared_ptr<FSVA7_Socket_RPC_SLOT_Object> rpc_obj;
+	std::shared_ptr<fsva7_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
+private:
+	std::shared_ptr<fsva7_Socket_RPC_SLOT_Object> rpc_obj;
 	FSVA7_imitator* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
-class FSVA7_Socket_RPC_SLOT_Server : public QTcpServer
+class fsva7_Socket_RPC_SLOT_Server : public QTcpServer
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, FSVA7_imitator* _app);
+	fsva7_Socket_RPC_SLOT_Server(QString _conn_ip, int _conn_port, FSVA7_imitator* _app);
 protected:
 	void incomingConnection(qintptr socketDescriptor) Q_DECL_OVERRIDE;
 private:
 	FSVA7_imitator* app;
-	QList<std::shared_ptr<FSVA7_Socket_RPC_SLOT_Thread> > rpc_objects;
+	QList<std::shared_ptr<fsva7_Socket_RPC_SLOT_Thread> > rpc_objects;
 };
 
-class FSVA7_Socket_RPC_SLOT_Server_Thread : public QThread
+class fsva7_Socket_RPC_SLOT_Server_Thread : public QThread
 {
 	Q_OBJECT
 public:
-	FSVA7_Socket_RPC_SLOT_Server_Thread();
+	fsva7_Socket_RPC_SLOT_Server_Thread();
 	void set_app(FSVA7_imitator* _app)
 	{
 		app = _app;
@@ -149,7 +150,7 @@ public:
 	}
 	void run();
 private:
-	FSVA7_Socket_RPC_SLOT_Server* rpc_srv;
+	fsva7_Socket_RPC_SLOT_Server* rpc_srv;
 	FSVA7_imitator* app;
 	QString conn_ip;
 	int conn_port;

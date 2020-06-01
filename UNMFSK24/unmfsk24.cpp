@@ -6,6 +6,7 @@
 #include "unmfsk24_h.h"
 
 int mfsk_count = 0;
+QMap<int, int> mfsk_vi_adr;
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {
@@ -26,11 +27,17 @@ ViStatus _VI_FUNC unmfsk24_init (ViRsrc rsrcName, ViBoolean IDquery,
 	return 0;
 }
 ViStatus _VI_FUNC unmfsk24_connect (ViSession mezvi, ViSession vi, ViUInt16 m_num, ViBoolean IDquery,
-                                 ViBoolean doReset){ return 0;}
+                                 ViBoolean doReset)
+{ 
+	QString comapp = QCoreApplication::applicationName();
+	mfsk_vi_adr.insert(mezvi, Srpc_buffer_class::Instance().mfsk_addrs[vi][m_num]);
+
+	return 0;
+}
 #endif
 ViStatus _VI_FUNC unmfsk24_set_cmd_time (ViSession line, ViInt16 chan,
 										 ViReal64 time){
-	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_set_cmd_time(chan, time*1000);
+	return Srpc_buffer_class::Instance().mfsk24_slot_thr[mfsk_vi_adr[line]]->get_mfsk24_obj()->unmfsk24_set_cmd_time(chan, time*1000);
 }
 ViStatus _VI_FUNC unmfsk24_config_trigger (ViSession arg0, ViUInt16 arg1){ return 0; }
 
@@ -47,7 +54,7 @@ ViStatus _VI_FUNC unmfsk24_start (ViSession line, ViInt16 _VI_FAR state[]){
 		for (int i = 0; i < 24; i++)
 			tmp_state << state[i];
 	}
-	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_start(tmp_state);
+	return Srpc_buffer_class::Instance().mfsk24_slot_thr[mfsk_vi_adr[line]]->get_mfsk24_obj()->unmfsk24_start(tmp_state);
 }
 
 ViStatus _VI_FUNC unmfsk24_gstart_q (ViSession mvi, ViInt16 *state){ return 0; }
@@ -57,7 +64,7 @@ ViStatus _VI_FUNC unmfsk24_stop (ViSession arg0){ return 0; }
 ViStatus _VI_FUNC unmfsk24_state (ViSession line, ViBoolean state[]){
 
 	QVariantList tmp_state;
-	Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_state(tmp_state);
+	Srpc_buffer_class::Instance().mfsk24_slot_thr[mfsk_vi_adr[line]]->get_mfsk24_obj()->unmfsk24_state(tmp_state);
 	for (int i = 0; i < 24; i++)
 		state[i] = tmp_state[i].toInt();
 	return 0;
@@ -82,7 +89,7 @@ ViStatus _VI_FUNC unmfsk24_manual_group_cmd (ViSession line, ViInt16 state_chan,
 		for (int i = 0; i < 24; i++)
 			tmp_mass << mass[i];
 	}
-	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_manual_group_cmd(state_chan, tmp_mass);
+	return Srpc_buffer_class::Instance().mfsk24_slot_thr[mfsk_vi_adr[line]]->get_mfsk24_obj()->unmfsk24_manual_group_cmd(state_chan, tmp_mass);
 }
 ViStatus _VI_FUNC unmfsk24_reset (ViSession arg0){ return 0; }
 ViStatus _VI_FUNC unmfsk24_self_test (ViSession arg0, ViPInt16 arg1, ViChar _VI_FAR arg2[]){ return 0; }

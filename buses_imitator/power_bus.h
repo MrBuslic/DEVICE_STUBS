@@ -24,11 +24,12 @@ public slots:
 	void get_i(int bus, double& curr);
 	void set_i(int bus, QString name, double curr);
 	void set_bus_state(int bus, int state);
-
+	void set_bus_u(QString name, double volt);
 private slots:
 	void set_on();
 	void set_off();
 signals:
+	void u_on_bus(QString name, double volt);
 	void u_on_nk(double volt);
 	void u_on_k1(double volt);
 	void u_on_k2(double volt);
