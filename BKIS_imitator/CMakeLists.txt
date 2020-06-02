@@ -34,13 +34,13 @@ if(WIN32)
 else()
 	set(ADDITIONAL_LIBS pthread)
 endif()
-  
+
 SET(BKIS_HEADERS BKIS.h)
 SET(BKIS_SOURCES main.cpp BKIS.cpp)
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${Boost_LIBRARY_DIRS})
 
-SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp)
+SET(RPC_SOURCES ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.h ${PROJECT_SOURCE_DIR}/../OMNIBUSBOX/omnibus_rpc.cpp bkis_socket_rpc.h bkis_socket_rpc.cpp)
 SET(MKU_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/mku_bus_rpc.cpp)
 #SET(INTERRUPT_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/interrupt_bus_rpc.cpp)
 SET(POWER_RPC_SOURCES ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.h ${PROJECT_SOURCE_DIR}/../buses_imitator/power_bus_rpc.cpp)
@@ -53,3 +53,9 @@ target_link_libraries (BKIS_imitator ${Qt5Core_LIBRARIES} ${Qt5Widgets_LIBRARIES
 if(WIN32)
   qt5_use_modules(BKIS_imitator Core Widgets Network Gui)
 endif()
+
+ADD_CUSTOM_COMMAND(TARGET BKIS_imitator
+	PRE_BUILD
+	COMMAND rpc_parser ${PROJECT_SOURCE_DIR}/BKIS.h ${PROJECT_SOURCE_DIR} bkis
+)
+
