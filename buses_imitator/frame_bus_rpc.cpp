@@ -31,6 +31,10 @@ void RPC_frame_bus_SIGNAL_Object::connectNotify(const QMetaMethod & signal)
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_rm07)) {
 		connect_signal("new_frame_rm07(QString, QVariant)", true);
 	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_n737)) {
+		connect_signal("new_frame_n737(QString, QVariant)", true);
+	}
 }
 
 void RPC_frame_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
@@ -49,6 +53,10 @@ void RPC_frame_bus_SIGNAL_Object::disconnectNotify(const QMetaMethod & signal)
 	else
 	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_rm07)) {
 		connect_signal("new_frame_rm07(QString, QVariant)", false);
+	}
+	else
+	if (signal == QMetaMethod::fromSignal(&RPC_frame_bus_SIGNAL_Object::new_frame_n737)) {
+		connect_signal("new_frame_n737(QString, QVariant)", false);
 	}
 }
 
@@ -173,6 +181,25 @@ void RPC_frame_bus_SIGNAL_Object::read_data()
 				_sock->waitForBytesWritten(3000);
 				SRPCSignalClass::Instance().toLog("frame_bus signal finished " + op_name +" call_number "+ QString::number(call_number));
 			}
+			if (op_name == "new_frame_n737(QString, QVariant)")
+			{
+				QString mode;
+				tmp_stream >> mode;
+				SRPCSignalClass::Instance().toLog("frame_bus " + op_name +" call_number "+ QString::number(call_number) + " mode = "+RPCSignalClass::QVariantToString(mode));
+				QVariant frame_data;
+				tmp_stream >> frame_data;
+				SRPCSignalClass::Instance().toLog("frame_bus " + op_name +" call_number "+ QString::number(call_number) + " frame_data = "+RPCSignalClass::QVariantToString(frame_data));
+				emit new_frame_n737(mode, frame_data);
+				QByteArray tmp_arr2;
+				QDataStream tmp_stream2(&tmp_arr2, QIODevice::WriteOnly);
+				tmp_stream2 << op_name;
+				QByteArray tmp_arr3;
+				QDataStream tmp_stream3(&tmp_arr3, QIODevice::WriteOnly);
+				tmp_stream3 << tmp_arr2.size();
+				_sock->write(tmp_arr3 + tmp_arr2);
+				_sock->waitForBytesWritten(3000);
+				SRPCSignalClass::Instance().toLog("frame_bus signal finished " + op_name +" call_number "+ QString::number(call_number));
+			}
 		}
 	}
 }
@@ -220,6 +247,15 @@ void RPC_frame_bus_SLOT_Object::make_new_frame_rm07(QString mode, QVariant frame
 	SRPCSignalClass::Instance().toLog(QString("frame_bus dynamic_call make_new_frame_rm07 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
 	dynamic_call("make_new_frame_rm07(QString, QVariant)", tmp_list);
 	SRPCSignalClass::Instance().toLog("frame_bus dynamic_call finished make_new_frame_rm07");
+}
+void RPC_frame_bus_SLOT_Object::make_new_frame_n737(QString mode, QVariant frame_data)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(mode);
+	tmp_list << QVariant(frame_data);
+	SRPCSignalClass::Instance().toLog(QString("frame_bus dynamic_call make_new_frame_n737 %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("make_new_frame_n737(QString, QVariant)", tmp_list);
+	SRPCSignalClass::Instance().toLog("frame_bus dynamic_call finished make_new_frame_n737");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

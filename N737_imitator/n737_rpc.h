@@ -10,6 +10,7 @@ public:
 	RPC_n737_SLOT_Object(QString _addr, int _port) : RPC_SLOT_Object(_addr, _port) {this->QObject::setObjectName("n737_slot_obj");}
 	////////////////////////////////////
 public slots:
+	void new_frame(QString mode, QVariant frame_data);
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 	void dataIn(QVariantList dataList, QVariantList maskList);
 	////////////////////////////////////

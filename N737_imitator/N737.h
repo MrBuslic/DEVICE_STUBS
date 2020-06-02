@@ -16,7 +16,7 @@
 //#include "../mbk04_imitator/mbk04_rpc.h"
 #include "../buses_imitator/mku_bus_rpc.h"
 //#include "../buses_imitator/power_bus_rpc.h"
-
+#include "../buses_imitator/frame_bus_rpc.h"
 
 #include <boost/range/combine.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -54,7 +54,7 @@ enum chnl_7 {
 	CHAN_R_SET_INCLUDE_1 = 30,
 	CHAN_R_SET_OK_1 = 28,
 	CHAN_R_SET_CONNECT_1 = 31,
-	CHAN_R_SET_WORK_FK_1 = 25,
+	CHAN_R_SET_WORK_FK_1 = 25,  
 	CHAN_R_SET_WORK_1 = 27,
 	CHAN_R_PSP_1 = 29,
 
@@ -111,6 +111,9 @@ private:
 	RPC_mku_bus_SLOT_Thread mku_slot_thr;
 	RPC_mku_bus_SIGNAL_Thread mku_signal_thr;
 
+	RPC_frame_bus_SLOT_Thread frame_slot_thr;
+	RPC_frame_bus_SIGNAL_Thread frame_signal_thr;
+
 	void set_tm_state();
 	void paint_buttons();
 
@@ -123,7 +126,14 @@ private:
 
 
 	int MKO;
-	int adr;
+	int adr_0;
+	int adr_1;
+	int adr_device;
+	void omni_connect();
+	void new_tm(int tm);
+	bool frame_bool;
+
+
 	int num_ku;
 	QVariantList words;
 	bool flag_on;
@@ -133,10 +143,11 @@ private:
 	QString name = "14Н737"; // русская н
 	
 	QTimer *AbOn_tmr;
-
+	void imit_on();
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
+	void new_frame(QString mode, QVariant frame_data);
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os); 
 	void dataIn(QVariantList dataList, QVariantList maskList);
 signals:

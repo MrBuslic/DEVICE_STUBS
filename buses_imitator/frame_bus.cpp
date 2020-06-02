@@ -50,6 +50,11 @@ void FrameBusWidget::make_new_frame_rm07(QString mode, QVariant frame_data)
 	emit new_frame_rm07(mode, frame_data);
 }
 
+void FrameBusWidget::make_new_frame_n737(QString mode, QVariant frame_data)
+{
+	emit new_frame_n737(mode, frame_data);
+} // от него беру и пердаю мки
+
 void FrameBusWidget::closeEvent(QCloseEvent *event)
 {
 	QSettings settings(QApplication::applicationDirPath()+"/positions.ini", QSettings::IniFormat);

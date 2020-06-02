@@ -31,6 +31,7 @@ public slots:
 	void new_frame_733(QString mode, QVariant frame_data);
 	void new_frame_07(QString mode, int psp, int lit, int fm, QString ant, QVariant frame_data);
 	void new_frame_rm07(QString mode, QVariant frame_data);
+	void new_frame_n737(QString mode, QVariant frame_data);
 
 	void send_signal_slot(QByteArray* _arr);
 	void read_data();
@@ -101,6 +102,7 @@ public:
 	QVariant make_new_frame_733(QVariantList& _values);
 	QVariant make_new_frame_07(QVariantList& _values);
 	QVariant make_new_frame_rm07(QVariantList& _values);
+	QVariant make_new_frame_n737(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);

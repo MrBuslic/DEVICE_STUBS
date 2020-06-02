@@ -14,10 +14,6 @@ public slots:
 	void new_tm(int tm);
 	void new_ku_732(int ku_n, int length, double u, int line);
 	void get_power(double _volt);
-	int set_mu_working(int _dev, bool _flag);
-	int set_ku_working(int module_num, int _dev, bool _flag);
-	int set_mk_working(int module_num, int _dev, bool _flag);
-	int set_mpvn_working(int _dev, bool _flag);
 	////////////////////////////////////
 };
 
