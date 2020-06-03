@@ -79,7 +79,7 @@ ViStatus _VI_FUNC unmfsk24_group_command (ViSession arg0, ViReal64 arg1,
 	return 0;
 }
 ViStatus _VI_FUNC unmfsk24_manual_cmd (ViSession line, ViInt16 chan, ViInt16 state_chan){ 
-	return Srpc_buffer_class::Instance().mfsk24_slot_thr[line-1]->get_mfsk24_obj()->unmfsk24_manual_cmd(chan, state_chan);
+	return Srpc_buffer_class::Instance().mfsk24_slot_thr[mfsk_vi_adr[line]]->get_mfsk24_obj()->unmfsk24_manual_cmd(chan, state_chan);
 }
 ViStatus _VI_FUNC unmfsk24_manual_group_cmd (ViSession line, ViInt16 state_chan,
 											 ViInt16 _VI_FAR mass[]){ 

@@ -111,14 +111,14 @@ int RpcMFSK24Widget::unmfsk24_manual_cmd(int _chan, int _state_chan)
 	if (_state_chan)
 	{
 		emit mfsk24_state_change(_chan, _state_chan);
-		state[_chan] = true;
-		labels[_chan]->setIcon(QIcon(":/icons/light.png"));
+		state[_chan-1] = true;
+		labels[_chan-1]->setIcon(QIcon(":/icons/light.png"));
 	}
 	else
 	{
 		emit mfsk24_state_change(_chan, _state_chan);
-		state[_chan] = false;
-		labels[_chan]->setIcon(QIcon(":/icons/dark.png"));
+		state[_chan-1] = false;
+		labels[_chan-1]->setIcon(QIcon(":/icons/dark.png"));
 	}
 
 	QString _msg = QString("%1 %2 канал: %3 ").arg(QTime::currentTime().toString("hh:mm : ss.zzz")).arg((_state_chan == 1) ? "замыкаю" : "размыкаю").arg(_chan);
