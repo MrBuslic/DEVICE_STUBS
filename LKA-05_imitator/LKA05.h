@@ -20,7 +20,6 @@
 class LKA05_widg : public QWidget
 {
     Q_OBJECT
-
 public:
 //	explicit LKA05_widg(QWidget *parent = 0);
 	LKA05_widg();

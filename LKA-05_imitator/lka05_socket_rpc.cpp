@@ -3,6 +3,7 @@
 int lka05_Socket_RPC_SLOT_Object::obj_num = 0;
 int lka05_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int lka05_Socket_RPC_SIGNAL_Object::call_number = 0;
+int lka05_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	lka05_Socket_RPC_SIGNAL_Thread::lka05_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int lka05_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	lka05_Socket_RPC_SLOT_Thread::lka05_Socket_RPC_SLOT_Thread(LKA05_widg* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("lka05_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void lka05_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
@@ -80,6 +83,10 @@ int lka05_Socket_RPC_SIGNAL_Object::call_number = 0;
 		operators_map["new_tm(int)"] = &lka05_Socket_RPC_SLOT_Object::new_tm;
 		operators_map["new_ku_732(int, int, double, int)"] = &lka05_Socket_RPC_SLOT_Object::new_ku_732;
 		operators_map["get_power(double)"] = &lka05_Socket_RPC_SLOT_Object::get_power;
+		operators_map["set_mu_working(int, bool)"] = &lka05_Socket_RPC_SLOT_Object::set_mu_working;
+		operators_map["set_ku_working(int, int, bool)"] = &lka05_Socket_RPC_SLOT_Object::set_ku_working;
+		operators_map["set_mk_working(int, int, bool)"] = &lka05_Socket_RPC_SLOT_Object::set_mk_working;
+		operators_map["set_mpvn_working(int, bool)"] = &lka05_Socket_RPC_SLOT_Object::set_mpvn_working;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -414,6 +421,88 @@ int lka05_Socket_RPC_SIGNAL_Object::call_number = 0;
 		catch(...)
 		{
 			return 0;
+		}
+	}
+	QVariant lka05_Socket_RPC_SLOT_Object::set_mu_working(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int _dev = _values.at(0).value<int>();
+			bool _flag = _values.at(1).value<bool>();
+			int res = app->set_mu_working(_dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant lka05_Socket_RPC_SLOT_Object::set_ku_working(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int module_num = _values.at(0).value<int>();
+			int _dev = _values.at(1).value<int>();
+			bool _flag = _values.at(2).value<bool>();
+			int res = app->set_ku_working(module_num, _dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant lka05_Socket_RPC_SLOT_Object::set_mk_working(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int module_num = _values.at(0).value<int>();
+			int _dev = _values.at(1).value<int>();
+			bool _flag = _values.at(2).value<bool>();
+			int res = app->set_mk_working(module_num, _dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
+		}
+	}
+	QVariant lka05_Socket_RPC_SLOT_Object::set_mpvn_working(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int _dev = _values.at(0).value<int>();
+			bool _flag = _values.at(1).value<bool>();
+			int res = app->set_mpvn_working(_dev, _flag);
+			SRPCSignalClass::Instance().toLog(QString("%1 return = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(res)));
+			return res;
+		}
+		catch(const std::exception &)
+		{
+			return 1;
+		}
+		catch(...)
+		{
+			return 1;
 		}
 	}
 		///////////////////////////////////////////////////////////////////////
