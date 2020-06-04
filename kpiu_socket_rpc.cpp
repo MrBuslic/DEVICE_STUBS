@@ -100,6 +100,7 @@ int kpiu_Socket_RPC_SLOT_Thread::obj_num = 0;
 		operators_map["mshr_data_in(QVariantList, QVariantList)"] = &kpiu_Socket_RPC_SLOT_Object::mshr_data_in;
 		operators_map["mshr_data_out(QVariantList&)"] = &kpiu_Socket_RPC_SLOT_Object::mshr_data_out;
 		operators_map["power_bus_state_changed(QString, double)"] = &kpiu_Socket_RPC_SLOT_Object::power_bus_state_changed;
+		operators_map["activate_pyro(int)"] = &kpiu_Socket_RPC_SLOT_Object::activate_pyro;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -830,6 +831,24 @@ int kpiu_Socket_RPC_SLOT_Thread::obj_num = 0;
 			QString name = _values.at(0).value<QString>();
 			double u = _values.at(1).value<double>();
 			app->power_bus_state_changed(name, u);
+			return 0;
+		}
+		catch(const std::exception &)
+		{
+			return 0;
+		}
+		catch(...)
+		{
+			return 0;
+		}
+	}
+	QVariant kpiu_Socket_RPC_SLOT_Object::activate_pyro(QVariantList& _values)
+	{
+		try
+		{
+			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
+			int group_num = _values.at(0).value<int>();
+			app->activate_pyro(group_num);
 			return 0;
 		}
 		catch(const std::exception &)
