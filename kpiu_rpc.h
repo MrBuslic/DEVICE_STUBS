@@ -31,6 +31,7 @@ public slots:
 	void mshr_data_in(QVariantList dataList, QVariantList maskList);
 	void mshr_data_out(QVariantList& data);
 	void power_bus_state_changed(QString name, double u);
+	void activate_pyro(int group_num);
 	////////////////////////////////////
 };
 

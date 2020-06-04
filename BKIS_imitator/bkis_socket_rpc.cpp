@@ -88,7 +88,7 @@ int bkis_Socket_RPC_SLOT_Thread::obj_num = 0;
 		operators_map["set_pyro_group_state(int, bool)"] = &bkis_Socket_RPC_SLOT_Object::set_pyro_group_state;
 		operators_map["set_power_back()"] = &bkis_Socket_RPC_SLOT_Object::set_power_back;
 		operators_map["omni_connect()"] = &bkis_Socket_RPC_SLOT_Object::omni_connect;
-		operators_map["set_pyro_bus_state(int)"] = &bkis_Socket_RPC_SLOT_Object::set_pyro_bus_state;
+		operators_map["set_pyro_bus_state(int, bool)"] = &bkis_Socket_RPC_SLOT_Object::set_pyro_bus_state;
 		///////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////
 		rpc_socket = new QTcpSocket();
@@ -473,7 +473,8 @@ int bkis_Socket_RPC_SLOT_Thread::obj_num = 0;
 		{
 			SRPCSignalClass::Instance().toLog(QString("%1 _values = %2").arg(objectName()).arg(RPCSignalClass::QVariantToString(_values)));
 			int bus_num = _values.at(0).value<int>();
-			app->set_pyro_bus_state(bus_num);
+			bool state = _values.at(1).value<bool>();
+			app->set_pyro_bus_state(bus_num, state);
 			return 0;
 		}
 		catch(const std::exception &)

@@ -173,12 +173,13 @@ void RPC_bkis_SLOT_Object::omni_connect()
 	dynamic_call("omni_connect()", tmp_list);
 	SRPCSignalClass::Instance().toLog("bkis dynamic_call finished omni_connect");
 }
-void RPC_bkis_SLOT_Object::set_pyro_bus_state(int bus_num)
+void RPC_bkis_SLOT_Object::set_pyro_bus_state(int bus_num, bool state)
 {
 	QVariantList tmp_list;
 	tmp_list << QVariant(bus_num);
+	tmp_list << QVariant(state);
 	SRPCSignalClass::Instance().toLog(QString("bkis dynamic_call set_pyro_bus_state %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
-	dynamic_call("set_pyro_bus_state(int)", tmp_list);
+	dynamic_call("set_pyro_bus_state(int, bool)", tmp_list);
 	SRPCSignalClass::Instance().toLog("bkis dynamic_call finished set_pyro_bus_state");
 }
 

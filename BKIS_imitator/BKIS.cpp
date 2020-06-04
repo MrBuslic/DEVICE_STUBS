@@ -104,7 +104,9 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 		electric_heaters_states[i] = i%2;
 	}
 	//инициализация состояния шин пиропатронов
-	pyro_buses_state = 0;
+	for (int i = 0; i < 3 ; i++) {
+		pyro_buses_state[i] = 0;
+	}
 }
 
 void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
@@ -158,7 +160,7 @@ int BKIS_widg::set_electric_heater_state(int name, bool state)
 
 int BKIS_widg::set_pyro_group_state(int group_num, bool state)
 {
-	if (pyro_buses_state != 0)
+	if ((pyro_buses_state[0] + pyro_buses_state[1] + pyro_buses_state[2]) == 0)
 	{
 		pyro_groups_states[group_num] = state;
 		return 0;
@@ -167,9 +169,9 @@ int BKIS_widg::set_pyro_group_state(int group_num, bool state)
 		return -1;
 }
 
-void BKIS_widg::set_pyro_bus_state(int bus_num)//bus_num - номера групп рэле, 0 - выключение шин
+void BKIS_widg::set_pyro_bus_state(int bus_num, bool state)//bus_num - номера групп рэле
 {
-	pyro_buses_state = bus_num;
+	pyro_buses_state[bus_num] = state;
 }
 
 void BKIS_widg::get_power(double _volt)
@@ -206,8 +208,13 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 			if (tmp_word >> 4 == 0x600)
 			{
 				int bus_num = tmp_word & 0x000F;
-				if (bus_num == 4) pyro_buses_state = 0; 
-				else pyro_buses_state = bus_num;
+				if (bus_num == 4)
+				{
+					pyro_buses_state[0] = 0;
+					pyro_buses_state[1] = 0;
+					pyro_buses_state[2] = 0;
+				}
+				else pyro_buses_state[bus_num] = 1;
 				return;
 			}
 				

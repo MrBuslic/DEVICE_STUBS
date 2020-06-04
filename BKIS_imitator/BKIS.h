@@ -189,18 +189,18 @@ public slots:
 	int set_pyro_group_state(int group_num, bool state);
 	void set_power_back();
 	void omni_connect();
-	void set_pyro_bus_state(int bus_num);
+	void set_pyro_bus_state(int bus_num, bool state);
 signals:
 	void send_pyro_group_activation(int group_num);
 private:
 	QString name = "BKIS";//Имя устройства
-	int bus  = 2;//номер шины для шины питания(power_bus) уточнить!!!
+	int bus  = 1;//номер шины для шины питания(power_bus): НК
 	int volt;//Принятое напряжение
 	
 	BLKIIH_Word BLKIIH_word; //подумать над другим названием!!!
 	int blk_state;
 	bool interface_state;
-	int pyro_buses_state;
+	QMap<int, int> pyro_buses_state;
 	QMap<int, int> pyro_groups_states;
 	QMap<int, int> electric_heaters_states;
 	

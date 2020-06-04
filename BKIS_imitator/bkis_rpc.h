@@ -19,7 +19,7 @@ public slots:
 	int set_pyro_group_state(int group_num, bool state);
 	void set_power_back();
 	void omni_connect();
-	void set_pyro_bus_state(int bus_num);
+	void set_pyro_bus_state(int bus_num, bool state);
 	////////////////////////////////////
 };
 

@@ -300,7 +300,22 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 			return;
 		}
 
+		bkis_slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
+		bkis_slot_thr.start(); // вот тут падает
+
+		bkis_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
+		bkis_signal_thr.start(); // вот тут падает
+
+		if (!bkis_slot_thr.wait_connected(3) || !bkis_signal_thr.wait_connected(3))
+		{
+			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka_05");
+			this->deleteLater();
+			return;
+		}
+
 		connect(this, SLOT(LKA05_MK_USTANOVIT_SOSTOYANIE(int, int, bool)), lka05_slot_thr.get_obj().get(), SLOT(set_mk_working(int, int, bool)));
+
+		connect(bkis_signal_thr.get_obj().get(), SLOT(send_pyro_group_activation(int)), this, SLOT(activate_pyro(int)));
 
 
 		connect(is4_widget, SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
@@ -338,7 +353,7 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 		pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
 		pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
 		
-		first_pyros_in_groups << "ПП1_О" << "ПП3_О" << "ПП5_О" << "ПП7_О" << "ПП9_О" << "ПП11_О";
+		first_pyros_in_groups << "ПП1_О" << "ПП3_О" << "ПП5_О" << "ПП7_О" << "ПП9_О" << "ПП11_О";//инициализация первых пиропатронов в группах
 
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
