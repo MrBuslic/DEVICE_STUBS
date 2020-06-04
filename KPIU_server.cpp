@@ -268,14 +268,14 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BKIS_imitator");
 		}
 
-		//QProcess::startDetached(QApplication::applicationDirPath() + "/common");
+		QProcess::startDetached(QApplication::applicationDirPath() + "/common");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/monitor");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp1");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/MBK07");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comapp2");
 		QProcess::startDetached(QApplication::applicationDirPath() + "/comappFrame");
-		//QThread::currentThread()->msleep(5000);
-		//QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
+		QThread::currentThread()->msleep(5000);
+		QProcess::startDetached(QApplication::applicationDirPath() + "/client --imit");
 
 
 		connect(mds32_0_widget, SIGNAL(mds32_get_sample(uint&, bool&)), this, SLOT(mds_1_get_sample(uint&, bool&)), Qt::DirectConnection);

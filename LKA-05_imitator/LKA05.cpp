@@ -390,11 +390,10 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			max_p = 0;
 			int num_vertic;
 			//QVariantList pshm_list;
-			
-			foreach(auto mvmk, mvmk_modules)
+			for (int i =0; i< mvmk_modules.count(); i++)
 			{
-				mvmk.set_ku_p(-1);
-				mvmk.set_ku_m(-1);
+				mvmk_modules[i].set_ku_p(-1);
+				mvmk_modules[i].set_ku_m(-1);
 			}
 
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
@@ -436,9 +435,9 @@ void LKA05_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLi
 			int max_ku;
 			max_ku = 0;
 
-			foreach(auto mvku, mvku_modules)
+			for (int i = 0; i< mvku_modules.count(); i++)
 			{
-				mvku.set_ku_p(-1);
+				mvku_modules[i].set_ku_p(-1);
 			}
 
 			for (QVariantList::iterator itr = words.begin(); itr != words.end(); itr++)
