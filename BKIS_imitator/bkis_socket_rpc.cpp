@@ -232,6 +232,8 @@ int bkis_Socket_RPC_SLOT_Thread::obj_num = 0;
 			QVariantList signal_data;
 			QString signal_name;
 			tmp_stream >> signal_name;
+			if (!data_map.contains(signal_name))
+				return;
 			if (signal_name == "connect")
 			{
 				tmp_stream >> signal_name;

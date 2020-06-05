@@ -23,6 +23,10 @@ union OK_TMWord
 BKIS_widg::BKIS_widg(QWidget *parent)
 {
 	setWindowTitle("BKIS");
+	for (int i = 0; i < 9; i++)
+	{
+		BLKIIH_word.ok_tm_word[i] = 0;
+	}
 
 	main_blk = new QPushButton("Вкл основной БЛК", this);
 	main_blk->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
@@ -116,28 +120,27 @@ void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
 	case 19:
 		blk_state = 1;
 		BLKIIH_word.s_main_blk_on = 1;
-		if (BLKIIH_word.s_res_blk_on)
-			BLKIIH_word.s_res_blk_on = 0;
+		BLKIIH_word.s_res_blk_on = 0;
 		main_blk->setStyleSheet("background-color: rgb(142, 198, 156)"); 
 		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
-		omni_connect();
+		imit_on();
 		break;
 	case 20:
 		blk_state = 2;
 		BLKIIH_word.s_res_blk_on = 1;
-		if (BLKIIH_word.s_main_blk_on)
-			BLKIIH_word.s_main_blk_on = 0;
+		BLKIIH_word.s_main_blk_on = 0;
 		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		reserve_blk->setStyleSheet("background-color: rgb(142, 198, 156)");
+		imit_on();
 		break;
 	case 21:
 		blk_state = 0;
-		if (BLKIIH_word.s_res_blk_on)
-			BLKIIH_word.s_res_blk_on = 0;
-		if (BLKIIH_word.s_main_blk_on)
-			BLKIIH_word.s_main_blk_on = 0;
+		BLKIIH_word.s_res_blk_on = 0;
+		BLKIIH_word.s_main_blk_on = 0;
+		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
+
 		break;
 	}
 }
@@ -177,20 +180,26 @@ void BKIS_widg::set_pyro_bus_state(int bus_num, bool state)//bus_num - номе�
 void BKIS_widg::get_power(double _volt)
 {
 	volt = _volt;
-	if (volt >= 20.0)
-		imit_on();
-	else
-		if (volt < 1) imit_off();
+	if (volt < 1) imit_off();
 }
 
 void BKIS_widg::imit_off()
 {
-
+	for (int i = 0; i < 9; i++)
+	{
+		BLKIIH_word.ok_tm_word[i] = 0;
+	}
 }
 
 void BKIS_widg::imit_on()
 {
+	interface_state = 1; //включение основного внутреннего интерфейса
+	BLKIIH_word.s_main_internal_interface_work = 1;
+	BLKIIH_word.s_internal_interface_OK = 1;
+	omni_connect();
 
+	main_interface->setStyleSheet("background-color: rgb(142, 198, 156)");
+	reserve_interface->setStyleSheet("background-color: rgb(204, 204, 204)");
 }
 
 void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
@@ -286,11 +295,14 @@ void BKIS_widg::set_new_tm()
 		break;
 	}
 	*/
+	for (int i = 0; i < 19; i++)
+		tmp_list.push_back(_word);
+
 	for (int i = 0; i < 9; i++)
 	{
 		tmp_list.push_back(BLKIIH_word.ok_tm_word[i]);
 	}
-	tmp_list.push_back(_word);
+	
 	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr, 1, tmp_list);
 }
 
