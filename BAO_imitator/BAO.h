@@ -708,7 +708,7 @@ private:
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
 
-	const int MKO = 1;
+	const int MKO = 0;
 	QVariantList tmp_list;
 	WFC_Word word_for_WFC;
 	NFC_Word word_for_NFC;

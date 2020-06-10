@@ -443,6 +443,14 @@ void RPC_kpiu_SLOT_Object::power_bus_state_changed(QString name, double u)
 	dynamic_call("power_bus_state_changed(QString, double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished power_bus_state_changed");
 }
+void RPC_kpiu_SLOT_Object::activate_pyro(int group_num)
+{
+	QVariantList tmp_list;
+	tmp_list << QVariant(group_num);
+	SRPCSignalClass::Instance().toLog(QString("kpiu dynamic_call activate_pyro %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("activate_pyro(int)", tmp_list);
+	SRPCSignalClass::Instance().toLog("kpiu dynamic_call finished activate_pyro");
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

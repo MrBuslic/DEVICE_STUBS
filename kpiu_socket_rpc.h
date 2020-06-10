@@ -119,6 +119,7 @@ public:
 	QVariant mshr_data_in(QVariantList& _values);
 	QVariant mshr_data_out(QVariantList& _values);
 	QVariant power_bus_state_changed(QVariantList& _values);
+	QVariant activate_pyro(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
