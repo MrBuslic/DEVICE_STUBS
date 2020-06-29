@@ -24,10 +24,33 @@
 
 enum BUFAR_MODEs
 {
+	MODE_OFF = 0,
 	MODE_1 = 1,
 	MODE_2 = 2,
 	MODE_3 = 3,
 	MODE_4 = 4
+};
+
+union I_3_DataWords
+{
+	quint16 data_words;
+	struct
+	{
+		quint16
+			G1 : 1,
+			G2 : 1,
+			G3 : 1,
+			G4 : 1,
+			G5 : 1,
+			//Gn : 5,
+			V1 : 1,
+			V2 : 1,
+			V3 : 1,
+			V4 : 1,
+			V5 : 1,
+			//Vn : 5,
+			rez : 6;
+	};
 };
 
 class BUM_current
@@ -37,6 +60,8 @@ public:
 	bool chan_2 = false;
 	bool chan_3 = false;
 	bool chan_4 = false;
+	bool power = false;
+	int faze = 0;
 };
 
 class BUM_cl
@@ -97,10 +122,18 @@ private:
 	void imit_on();//выключение имитатора
 	void set_power_back();//возврат силы тока в зависимости от мощности
 	void I_1(QVariantList words);
+	void I_3(QVariantList words);
+	void I_4(QVariantList words);
+	void I_5();
+	void I_6(QVariantList words);
+	void I_7();
+	void I_8(QVariantList words);
+	void I_9(int BUM_numb);
+	void I_3_coord(int x, I_3_DataWords words);
+	void faze_calc(int BUM_numb, int ind_faze, int chan);
 	//void set_new_I_2();
 	void change_BUMs(int num, bool ch_1, bool ch_2, bool ch_3, bool ch_4);
 	void change_BUMs(int num, bool all_ch);
-	int faze_move(quint16 faze);
 protected:
 	void closeEvent(QCloseEvent *event);
 public slots:

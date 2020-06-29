@@ -746,12 +746,28 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 	if (ZOB.zob_word == 0)
 	{
 		//mku_slot_thr.get_mku_bus_obj()->make_mt_at_state(1,1);
+		
 		MT_widget.current_UM = UM(d_words.UM_com);
 		MT_widget.current_LBV = LBV(d_words.LBV_com);
 		MT_widget.current_BOCH = BOCH(BOCH_full.data_words);
 		MT_widget.current_FOS = FOS(d_words.FOS_com);
 		MT_widget.current_AOS = AOS(d_words.AOS_com);
 		MT_widget.current_UPCH = UPCH(d_words.UPCH_com);
+
+		int tmp_current_bufar = 0;
+		switch (MT_widget.current_AOS)
+		{
+		case 1:
+			tmp_current_bufar = 3;
+			break;
+		case 2:
+			tmp_current_bufar = 2;
+			break;
+		case 4:
+			tmp_current_bufar = 1;
+			break;
+		}
+		mku_slot_thr.get_mku_bus_obj()->make_mt_at_state(BAU_at_mt(AOS_st), MT_widget.current_AOS);
 
 		///ПРМ, антена 1
 		MT_widget.current_PRM_Ant_1 = PRM(d_words.PRM_ant_one_com);
