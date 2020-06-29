@@ -182,6 +182,60 @@ void RPC_lka05_SLOT_Object::get_power(double _volt)
 	dynamic_call("get_power(double)", tmp_list);
 	SRPCSignalClass::Instance().toLog("lka05 dynamic_call finished get_power");
 }
+int RPC_lka05_SLOT_Object::set_mu_working(int _dev, bool _flag)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(_dev);
+	tmp_list << QVariant(_flag);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call set_mu_working %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_mu_working(int, bool)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call finished set_mu_working %1").arg(tmp_ret_params));
+	return res.toInt();
+}
+int RPC_lka05_SLOT_Object::set_ku_working(int module_num, int _dev, bool _flag)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(module_num);
+	tmp_list << QVariant(_dev);
+	tmp_list << QVariant(_flag);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call set_ku_working %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_ku_working(int, int, bool)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call finished set_ku_working %1").arg(tmp_ret_params));
+	return res.toInt();
+}
+int RPC_lka05_SLOT_Object::set_mk_working(int module_num, int _dev, bool _flag)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(module_num);
+	tmp_list << QVariant(_dev);
+	tmp_list << QVariant(_flag);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call set_mk_working %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_mk_working(int, int, bool)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call finished set_mk_working %1").arg(tmp_ret_params));
+	return res.toInt();
+}
+int RPC_lka05_SLOT_Object::set_mpvn_working(int _dev, bool _flag)
+{
+	if(!connected) return 1;
+	QVariantList tmp_list;
+	QString tmp_ret_params;
+	tmp_list << QVariant(_dev);
+	tmp_list << QVariant(_flag);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call set_mpvn_working %1").arg(RPCSignalClass::QVariantToString(tmp_list)));
+	dynamic_call("set_mpvn_working(int, bool)", tmp_list);
+	tmp_ret_params += " return="+RPCSignalClass::QVariantToString(res);
+	SRPCSignalClass::Instance().toLog(QString("lka05 dynamic_call finished set_mpvn_working %1").arg(tmp_ret_params));
+	return res.toInt();
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////

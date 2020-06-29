@@ -22,6 +22,7 @@
 #include "rpc_mt8k4l.h"
 #include "rpc_vvk4.h"
 #include "rpc_is4.h"
+#include "bkis_rpc.h"
 #include "RM_MBK07_imitator.h"
 #include "rpc_mkprm.h"
 #include "sorensen.h"
@@ -36,6 +37,7 @@
 #include "ASN.h"
 #include "LKA05.h"
 #include "LKA-05_imitator\lka05_rpc.h"
+#include "bkis_rpc.h"
 #include "IBEP_imitator.h"
 
 
@@ -120,6 +122,7 @@ public slots:
 	void mshr_data_out(QVariantList& data);
 
 	void power_bus_state_changed(QString name, double u);
+	void activate_pyro(int group_num);
 private:
 	MDS1_CHANNELS mds1_chans;
 	MDS2_CHANNELS mds2_chans;
@@ -127,7 +130,11 @@ private:
 	RPC_lka05_SLOT_Thread lka05_slot_thr;
 	RPC_lka05_SIGNAL_Thread lka05_signal_thr;
 
+	RPC_bkis_SLOT_Thread bkis_slot_thr;
+	RPC_bkis_SIGNAL_Thread bkis_signal_thr;
+
 	QMap<QString, pyro_chan_state> pyro_state;
+	QStringList first_pyros_in_groups;//содержит названия пиропатронов с которых начинаются группы
 
 	QList<int> bau_chans;
 	int bau_ground = 147;
@@ -189,6 +196,4 @@ signals:
 	void toLogs(QString message);
 	void toProtocols(QString message);
 };
-
-
 #endif //KPIU_SERVER_H

@@ -22,6 +22,7 @@ N736_widg::N736_widg() : flag_on(false)
 {
 	
 	widg = new QWidget(this);
+	_state.state = 0;
 	this->setFixedSize(382, 280);
 	setWindowTitle("14Н736");
 	main_comp = new QPushButton("Основной", this);
@@ -90,7 +91,7 @@ N736_widg::N736_widg() : flag_on(false)
 	v_l->addLayout(h_l);
 
 
-	name_lst_0 << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_CONNECT_1 << CHAN_WORK_1 << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
+	name_lst_0 << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_CONNECT_1 << CHAN_WORK_1; // << CHAN_READY_CU_1 << CHAN_SET_BLOCK_1 << CHAN_SET_INCLUDE_1 << CHAN_SET_OK_1 << CHAN_SET_CONNECT_1 << CHAN_SET_WORK_1;
 	//name_lst_1 << CHAN_BLOCK_2 << CHAN_INCLUDE_2 << CHAN_CONNECT_2 << CHAN_WORK_2 << CHAN_READY_CU_2 << CHAN_SET_BLOCK_2 << CHAN_SET_INCLUDE_2 << CHAN_SET_OK_2 << CHAN_SET_CONNECT_2 << CHAN_SET_WORK_2;
 
 	AbOn_tmr = new QTimer(this);
@@ -153,6 +154,7 @@ N736_widg::N736_widg() : flag_on(false)
 	current_mko = CURRENT_MKO::OFF;
 	paint_buttons();
 	off_device = true;
+	active_device = false;
 	kr = true;
 	adr_0 = 10;
 	adr_1 = 26;
@@ -167,9 +169,16 @@ void N736_widg::example_but() {
 	
 }
 
+void N736_widg::imit_on()
+{
+	AbOn_tmr->start(20000);
+}
+
 
 void N736_widg::omni_connect()
 {
+	//off_device = false;
+	active_device = true;
 	AbOn_tmr->stop();
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr_device, true);
 
@@ -181,9 +190,9 @@ void N736_widg::new_tm(int tm)
 {
 	QVariantList tm_words;
 	tm_words << tm;
-	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 2, tm_words);
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_0, 2, tm_words);
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_1, 2, tm_words);
+
+	//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 2, tm_words); // уточнить подадрес 
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 2, tm_words);
 }
 
 void N736_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
@@ -193,77 +202,140 @@ void N736_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 	// Adr14H736_KR2	0x1A
 	MKOWord tmp_cwd;
 	tmp_cwd.com_word = cwd;
+	qDebug() << "tmp_cwd.subadr = " << tmp_cwd.subadr <<" tmp_cwd.trans_dir = " << tmp_cwd.trans_dir;
 	ZaprSinch word;
-	
-	if ((tmp_cwd.adr == adr_0) || (tmp_cwd.adr == adr_1))
+	word_SP synchr_pos;
+	format_SCHBK schbk_word;
+	if ((tmp_cwd.adr == adr_0) || (tmp_cwd.adr == adr_1)) /*&& (tmp_cwd.trans_dir == 0)) //запись */
 	{
-		switch (line)
+		adr_device = tmp_cwd.adr;
+		if (tmp_cwd.trans_dir == 0) //запись 
 		{
-		case 0:
-			current_mko = CURRENT_MKO::MAIN;
-			break;
-		case 1:
-			current_mko = CURRENT_MKO::RESERVE;
-			break;
-		default:
-			break;
-		}
-		paint_buttons();
-		QApplication::processEvents();
-	}
-	//step 0
-	if (tmp_cwd.subadr == 1)
-	{
-		for (int i = 0; i < 4; i++)
-			word.Zapr_word = words[i].toInt();
+			
+			switch (line)
+			{
+			case 0:
+				current_mko = CURRENT_MKO::MAIN;
+				break;
+			case 1:
+				current_mko = CURRENT_MKO::RESERVE;
+				break;
+			default:
+				break;
+			}
+			paint_buttons();
+			//QApplication::processEvents();
+
+			//step 0
+			if (tmp_cwd.subadr == 1)
+			{
+				for (int i = 0; i < (words.count() - 1); i++)
+					word.Zapr_word[i] = words[i].toInt();
+
+				/*
+				WORD Num_Synxr_2;
+				Num_Synxr_2 = (word.NumVxW2 << 6);
+
+				DWORD num_sync;
+				num_sync = word.NumVxW1 || Num_Synxr_2; */
+
+				for (int i = 1; i < 11; i++)
+				{
+					synchr_strct.schzk[i - 1] = i;
+				}
+				synchr_strct.pr = word.pRegim; //признак режима ПК1 ПК2
+				synchr_strct.nkp = word.NumKP; //номер КП
+				synchr_strct.niis = word.NumSI; //номер ИИС  //номер ключа 
+				synchr_strct.nsync = word.NumVxW1 || (word.NumVxW2 << 6);
+				qDebug() << "synchr_strct.schzk = " << synchr_strct.schzk[0] << synchr_strct.schzk[1] << synchr_strct.schzk[2] << synchr_strct.schzk[3];
+				qDebug() << "synchr_strct.pr = " << synchr_strct.pr << "word.pRegim =" << word.pRegim;
+				//CreateSync_new(synchr_strct.schzk, word.pRegim, word.NumKP, word.NumSI, synchr_strct.nsync, synchr_strct.sync);
 				
-		/*
-		WORD Num_Synxr_2;
-		Num_Synxr_2 = (word.NumVxW2 << 6);
+				
+				CreateSync_new(synchr_strct.schzk, synchr_strct.pr, synchr_strct.nkp, synchr_strct.niis, synchr_strct.nsync, synchr_strct.sync);
+				qDebug() << "synchr_strct.sync" << synchr_strct.sync;
+				msg_syn(synchr_strct.sync);
+				_state.pRSP = 1;
+				set_state();
+			}
+			//step 2
+			if (tmp_cwd.subadr == 2)
+			{
+				for (int i = 0; i < words.count(); i++)
+				{
+					synchr_pos.SP[i] = words[i].toInt();
+				}
+				_state.pRSSP = 1;
 
-		DWORD num_sync;
-		num_sync = word.NumVxW1 || Num_Synxr_2; */
+				//if (synchr_strct.pr == 2) //ПК 2 СЧБК не нужен?
 
-		synchr_strct.pr = word.pRegim; //признак режима ПК1 ПК2
-		synchr_strct.nkp = word.NumKP; //номер КП
-		synchr_strct.niis = word.NumSI; //номер ИИС
-		synchr_strct.nsync = word.NumVxW1 || (word.NumVxW2 << 6);
-		
-		//CreateSync_new(SCHZK, PR, N KP, NKL, NSYNC, SYNC);
-		CreateSync_new(synchr_strct.schzk, synchr_strct.pr, synchr_strct.nkp, synchr_strct.niis, synchr_strct.nsync, synchr_strct.sync);
-		msg_syn(synchr_strct.sync);
+				set_state();
+			}
+			//step 4  СЧБК
+			if (tmp_cwd.subadr == 3)
+			{
+				unsigned char* schbk[2];
+				for (int i = 0; i < (words.count() - 1); i++)
+				{
+					schbk_word.SCHBK_word[i] = words[i].toInt();
+					schbk[0] = (unsigned char*)schbk_word.SCHBK_word[i];
+				}
 
-	}
-	//step 2
-	if (tmp_cwd.subadr == 2)
-	{
-		//PrepareSCHBK_new();
-		//make_schbk(const QString& com_chan_mnem)
+				//unsigned int* schbk_1 = (unsigned int*)schbk_word.scbk_1;
+				//unsigned int* schbk_2 = (unsigned int*)schbk_word.scbk_2;
+
+
+				//unsigned char* schbk_1_char = (unsigned char*)schbk_word.scbk_1;
+				//unsigned char* schbk_2_char = (unsigned char*)schbk_word.scbk_2;
+				//приходит два шорта, собрать в один и конвертировать
+				//unsigned int schbk;
+				//schbk = (*schbk_1 << 16) || *schbk_2;
+				//BYTE* tmp_arr = (BYTE*)(&schbk);
+				PrepareSCHBK_new((BYTE*)(&schbk));
+
+			
+				/*schbk[0] = (unsigned char*)schbk_word.scbk_1;
+				schbk[1] = (unsigned char*)schbk_word.scbk_2;
+				PrepareSCHBK_new((unsigned char*)schbk);*/
+
+				_state.pRSSCHBK = 1;
+				set_state();
+
+				//CreateZKPI_new();
+			}
+
+			if (tmp_cwd.subadr == 21)
+			{
+				_state.state = 0;
+				//slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 21, QVariantList() << _state.state);
+				set_state();
+			}
+		}
+		//if (tmp_cwd.trans_dir == 1) //чтение
 		//{
-		//	if ((com_chan_mnem == "ПК1") && (omnibusKPI->getSCHBKReceived()))
-		
-				unsigned int schbk;
-				BYTE* tmp_arr = (BYTE*)(&schbk);
-				/*if (word.pRegim)
-					PrepareSCHBK_new((BYTE*)(&schbk));
-				else
-					PrepareSCHBK((BYTE*)(&schbk));*/
+		//	
+		//}
+
 	}
-	//step 3
-	if (tmp_cwd.subadr == 3)
-	{
-		//CreateZKPI_new();
-	}
-	QVariantList synchr_w;
-	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_0, tmp_cwd.subadr, synchr_w);
 	
+}
+
+void N736_widg::set_state()
+{
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 21, QVariantList() << _state.state);
+	qDebug() << "_state.state = " << _state.state;
 }
 
 void N736_widg::msg_syn(unsigned char* msg)
 {
 	unsigned int* msg_int = (unsigned int*)msg;
-	QVariantList synchr_w;
-
+	QString tmp_str;
+	for (int i = 0; i < 16; i+=2)
+	{
+		synchr_w.push_back(msg_int[i] << 8 + msg_int[i+1]);
+	}
+	slot_thr.get_omnibus_obj()->set_new_data(MKO, adr_device, 1, synchr_w);
+	qDebug() << "synchr_w = " << synchr_w;
 }
 
 void N736_widg::paint_buttons()
@@ -273,7 +345,7 @@ void N736_widg::paint_buttons()
 	case CURRENT_COMP::MAIN:
 		main_comp->setStyleSheet("background-color: rgb(142, 198, 156);"); //green light - working
 		reserve_comp->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
-		QApplication::processEvents();
+		//QApplication::processEvents();
 		break;
 	case CURRENT_COMP::OFF:
 		main_comp->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -292,7 +364,7 @@ void N736_widg::paint_buttons()
 	case CURRENT_MKO::MAIN:
 		line_mko_0->setStyleSheet("background-color: rgb(142, 198, 156);"); //green light - working
 		line_mko_1->setStyleSheet("background-color: rgb(204, 204, 204);"); //grey light - off
-		QApplication::processEvents();
+		//QApplication::processEvents();
 		break;
 	case CURRENT_MKO::OFF:
 		line_mko_0->setStyleSheet("background-color: rgb(204, 204, 204);");
@@ -356,7 +428,7 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 	
 	if (maskList.isEmpty() || dataList.isEmpty())
 		return;
-	
+	// перебор приход информации 
 	for (auto const& i : boost::combine(dataList, maskList)) // range based
 	{
 		QVariant MASKVar, DATAVar;
@@ -364,8 +436,11 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 		qulonglong MASK = MASKVar.toULongLong();
 		qulonglong DATA = DATAVar.toULongLong();
 		qulonglong res = MASK & DATA;
-		qDebug() << "res=" << res;
 		
+		//проверка комплекта (основной/резервный) по сигналу блокировки
+		//num_chnl - ответный сигнал 
+
+		//флаг off_device- устройство выключено
 		if (off_device == true)
 		{
 			if (isset(res, CHAN_BLOCK_1 - 1))
@@ -383,45 +458,49 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 				kr = false;
 			}
 		}
+		// сдвигаем на 32 (бит) позиций при резервном комплекте (тк это такой же основной комплект только сдвинутый)
 		if (kr == false)
 		{
 			res = res >> 32;
 			num_chnl = num_chnl >> 32;
 		}
 
-
+		// отключение устройства 
 		if (off_device == false)
 		{
+			// name_lst_0 << CHAN_BLOCK_1 << CHAN_INCLUDE_1 << CHAN_CONNECT_1 << CHAN_WORK_1;
+			// зависимость выходн сигналов от входных 
 			for (int i = 0; i < 4; i++)
-			//for (int i = 3; i >= 0; i--)
 			{
 				if (!isset(res, ((name_lst_0[i]) - 1)))
 				{
 					main_btn[i]->setStyleSheet("background-color: rgb(204, 204, 204);");
-					qDebug() << "Отключение  i =" << i << "off_device = " << off_device << " num_chnl ====" << num_chnl;
+					
 					num_chnl &= ~(1i64 << (name_lst_0[i] - 1));
 
+					//отключение - это обратный порядок включения
+					// в num_chnl -1 потому что отсчет начинается с 1 (а не с 0)
 					switch (i)
 					{
 					case 0: 
 						main_btn[4]->setStyleSheet("background-color: rgb(204, 204, 204);");
-						num_chnl &= ~(1i64 << (name_lst_0[4] - 1));
+						num_chnl &= ~(1i64 << (CHAN_READY_CU_1 - 1));
 						main_btn[5]->setStyleSheet("background-color: rgb(204, 204, 204);");
-						num_chnl &= ~(1i64 << (name_lst_0[5] - 1));
+						num_chnl &= ~(1i64 << (CHAN_SET_BLOCK_1 - 1));
 						break;
 					case 1:
 						main_btn[6]->setStyleSheet("background-color: rgb(204, 204, 204);");
-						num_chnl &= ~(1i64 << (name_lst_0[6] - 1));
+						num_chnl &= ~(1i64 << (CHAN_SET_INCLUDE_1 - 1));
 						main_btn[7]->setStyleSheet("background-color: rgb(204, 204, 204);");
-						num_chnl &= ~(1i64 << (name_lst_0[7] - 1));
+						num_chnl &= ~(1i64 << (CHAN_SET_OK_1 - 1));
 						break;
 					case 2:
 						main_btn[8]->setStyleSheet("background-color: rgb(204, 204, 204);");
-						num_chnl &= ~(1i64 << (name_lst_0[8] - 1));
+						num_chnl &= ~(1i64 << (CHAN_SET_CONNECT_1 - 1));
 						break;
 					case 3:
 						main_btn[9]->setStyleSheet("background-color: rgb(204, 204, 204);");
-						num_chnl &= ~(1i64 << (name_lst_0[9] - 1));
+						num_chnl &= ~(1i64 << (CHAN_SET_WORK_1 - 1));
 						break;
 					default:
 						break;
@@ -431,7 +510,7 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 			if (kr == false)
 				num_chnl = num_chnl << 32;
 			set_tm_state();
-			qDebug() << "res=====" << res << num_chnl;
+			
 			//if ((res & 0xf) == 0x0)
 			if (num_chnl == 0)
 			{
@@ -443,70 +522,66 @@ void N736_widg::dataIn(QVariantList dataList, QVariantList maskList)
 			}
 			return;
 		}
-
+			// включение устройства по вход сигналу		
 			for (int i = 0; i < 4; i++)
 			{
-
+				// зависимость выходн сигналов от входных 
+				// при 0 - блокировка - блокировка установлена, при 1 - включить - включено, исправно и тд
 				if (isset(res, ((name_lst_0[i]) - 1)))
 				{
 					num_chnl |= (1i64 << (name_lst_0[i] - 1));
 					main_btn[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
 
-					//num_chnl = 0x7e00;
-
+					// в num_chnl -1 потому что отсчет начинается с 1. (а не с 0)
 					switch (i)
 					{
 					case 0:
 						main_btn[5]->setStyleSheet("background-color: rgb(142, 198, 156);");
-						num_chnl |= (1i64 << (name_lst_0[5] - 1));
+						num_chnl |= (1i64 << (CHAN_SET_BLOCK_1 - 1));
 						break;
 					case 1:
 						main_btn[6]->setStyleSheet("background-color: rgb(142, 198, 156);");
-						num_chnl |= (1i64 << (name_lst_0[6] - 1));
+						num_chnl |= (1i64 << (CHAN_SET_INCLUDE_1 - 1));
 						main_btn[7]->setStyleSheet("background-color: rgb(142, 198, 156);");
-						num_chnl |= (1i64 << (name_lst_0[7] - 1));
+						num_chnl |= (1i64 << (CHAN_SET_OK_1 - 1));
 						break;
 					case 2:
 						main_btn[8]->setStyleSheet("background-color: rgb(142, 198, 156);");
-						num_chnl |= (1i64 << (name_lst_0[8] - 1));
+						num_chnl |= (1i64 << (CHAN_SET_CONNECT_1 - 1));
 						break;
 					case 3:
 						main_btn[4]->setStyleSheet("background-color: rgb(142, 198, 156);");
-						num_chnl |= (1i64 << (name_lst_0[4] - 1));
+						num_chnl |= (1i64 << (CHAN_READY_CU_1 - 1));
 						main_btn[9]->setStyleSheet("background-color: rgb(142, 198, 156);");
-						num_chnl |= (1i64 << (name_lst_0[9] - 1));
+						num_chnl |= (1i64 << (CHAN_SET_WORK_1 - 1));
 						break;
 					default:
 						break;
 					}
-					/*if (num_chnl & 0xA) {
-						for (int i = 5; i < 8; i++)
-						{
-							main_btn[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-							num_chnl |= (1i64 << (name_lst_0[i] - 1));
-							qDebug() << "num_chnl в 0xA = " << num_chnl << res << i  ;
-						}
+
+
+					if ((res & 0xA) == 0xA)
+					{
+						if (!active_device)
+							imit_on();
 					}
-					if (num_chnl & 0x5) {
-						for (int i = 8; i < 10; i++)
-						{
-							main_btn[i]->setStyleSheet("background-color: rgb(142, 198, 156);");
-							num_chnl |= (1i64 << (name_lst_0[i] - 1));
-							qDebug() << "num_chnl в  = 0x5" << num_chnl;
-						}
-						main_btn[4]->setStyleSheet("background-color: rgb(142, 198, 156);");	
-					}*/
+
+
 					if ((res & 0xF) == 0xF) /// сделать везде как здесь
 					{
-						qDebug() << "(res & 0xF) = " << (res & 0xF) << (res && 0xF);
+						//if (off_device)
+						//	imit_on();
 						off_device = false;
 					}
 				}
 			}		
 	}
+	// при резервном комплекте выходной сигнал сдвигаем обратно на 32 позициии
 	if (kr == false)
 		num_chnl = num_chnl << 32;
+
 	set_tm_state();
+
 	qDebug() << "set_tm_state" << num_chnl;
 	paint_buttons();
 }

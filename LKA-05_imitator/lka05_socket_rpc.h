@@ -99,6 +99,10 @@ public:
 	QVariant new_tm(QVariantList& _values);
 	QVariant new_ku_732(QVariantList& _values);
 	QVariant get_power(QVariantList& _values);
+	QVariant set_mu_working(QVariantList& _values);
+	QVariant set_ku_working(QVariantList& _values);
+	QVariant set_mk_working(QVariantList& _values);
+	QVariant set_mpvn_working(QVariantList& _values);
 public slots:
 	void read_data();
 	void sock_error(QAbstractSocket::SocketError _err);
@@ -117,10 +121,11 @@ public:
 	lka05_Socket_RPC_SLOT_Thread(LKA05_widg* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<lka05_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<lka05_Socket_RPC_SLOT_Object> rpc_obj;
 	LKA05_widg* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class lka05_Socket_RPC_SLOT_Server : public QTcpServer

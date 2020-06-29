@@ -72,7 +72,7 @@ enum chnl {
 
 };
 union ZaprSinch {
-	WORD  Zapr_word;
+	WORD  Zapr_word[3];
 	struct
 	{
 		WORD  pSP : 1,     // признак синхронизации
@@ -89,6 +89,7 @@ union ZaprSinch {
 			NumVxW1 : 6; // номер вхождения в синхронизацию
 
 		WORD NumVxW2;   // номер вхождения в синхронизацию
+	
 	};
 };
 
@@ -101,8 +102,64 @@ struct SYNCHR_STRUCT
 	unsigned char niis;
 	unsigned int nsync;
 	unsigned char sync[16];
+
+
+
 };
 
+//---------------------------------------------------------------------------
+
+#define PR_PSP						0x0001    // признак готовности синхропосылки (01)
+#define PR_RSSP						0x0002    // признак готовности состояния СП  (02) (синхронизации)
+#define PR_RSSCHBK					0x0004    // признак готовности слова состояния СЧБК (04)
+#define PR_RSendSHKPI				0x0008    // признак готовности посылки ШКПИ (08)
+#define PR_RSSKPI					0x0010    // признак готовности состояния передачи ШКПИ (10)
+#define PR_REndSeanceConn			0x0020	  // признак готовности завершения сеанса связи (20)
+#define PR_RS14H736					0x0040    // признак готовности получения состояния МПШ (40)
+#define PR_REndSync					0x0080    // признак готовности состояния завершения синхронизации(80)
+#define PR_RSPrKPI					0x0100    // признак готовности преобраз.КПИ (100)
+#define PR_MinRezHandlerInf			0x0200	  // призн.отриц.результат обработки информации(200)
+
+//---------------------------------------------------------------------------
+// Определение структуры слова состояния 14H736
+//
+typedef struct _STATEMPSH
+{
+	union
+	{
+		struct
+		{
+			WORD pRSP : 1,           // признак готовности синхропосылки (01)
+				pRSSP : 1,            // признак готовности состояния СП  (02) (синхронизации)
+				pRSSCHBK : 1,         // признак готовности слова состояния СЧБК (04)
+				pRSendSHKPI : 1,      // признак готовности посылки ШКПИ (08)
+				pRSSKPI : 1,          // признак готовности состояния передачи ШКПИ (10)
+				pREndSeanceConn : 1,  // признак готовности завершения сеанса связи (20)
+				pRS14H736 : 1,        // признак готовности получения состояния МПШ (40)
+				pREndSync : 1,        // признак готовности состояния завершения синхронизации(80)
+				pRSPrKPI : 1,         // признак готовности преобраз.КПИ (100)
+				pMinRezHandlerInf : 1,// призн.отриц.результат обработки информации(200)
+				Rezerve : 6;          // резерв
+		};
+		WORD state;
+	};
+}STATEMPSH, *PSTATEMPSH;
+
+//struct {};
+union word_SP
+{
+	WORD SP[10];
+};
+
+union format_SCHBK{
+	WORD  SCHBK_word[2];
+	struct
+	{
+		WORD scbk_1;
+
+		WORD scbk_2;
+	};
+};
 
 class N736_widg : public QWidget
 {
@@ -162,19 +219,23 @@ private:
 	bool flag_on;
 	bool kr;
 	bool off_device;
+	bool active_device;
 	//QCheckBox* add_set(QString name, QString data, bool is_main = true);
 	QList<int> name_lst_0;
 	
 	int adr_0;
 	int adr_1;
 	int adr_device;
+	_STATEMPSH _state;
+
 	void omni_connect();
 	void new_tm(int tm);
-
-
+	QVariantList synchr_w;
+	void set_state();
 
 	QString name = "14Н736"; // русская н
 	QTimer *AbOn_tmr;
+	void imit_on();
 	SYNCHR_STRUCT synchr_strct;
 	void example_but();
 

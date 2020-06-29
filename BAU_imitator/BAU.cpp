@@ -387,10 +387,7 @@ BAU_widg::BAU_widg(QWidget *parent)
 void BAU_widg::get_power(double _volt)
 {
 	volt = _volt;
-	if (volt >= 20.0)
-		imit_on();
-	else
-		if (volt < 1) imit_off();
+	if (volt < 1) imit_off();
 }
 
 void BAU_widg::imit_on()
@@ -442,7 +439,6 @@ void BAU_widg::imit_off()
 	tm_data.VPBAU_3 = 0;
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	update_graphics_BAU();
-	set_tm_state();
 }
 
 void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
@@ -499,33 +495,11 @@ void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m
 			default:
 				if ((tmp_mshm >= 3) && (tmp_mshm <= 5))
 				{
-					current_MU = MU_OFF;
-					current_MT = MT_OFF;
-					current_MK = MK_OFF;
-					MT_widget.current_UM = UM_OFF;
-					MT_widget.current_LBV = LBV_OFF;
-					MT_widget.current_PRM_Ant_1 = PRM_Ant_OFF;
-					MT_widget.current_PRM_Ant_A = PRM_Ant_OFF;
-					MT_widget.current_SGTS_Ant_1 = SGTS_Ant_OFF;
-					MT_widget.current_SGTS_Ant_A = SGTS_Ant_OFF;
-					MT_widget.current_BOCH = BOCH_OFF;
-					MT_widget.current_FOS = FOS_OFF;
-					MT_widget.current_AOS = AOS_OFF;
-					MT_widget.current_UPCH = UPCH_OFF;
-					AT_widget.current_ALPS = ALPS_OFF;
-					AT_widget.current_MFS = MFS_OFF;
-					AT_widget.current_LPch = LPch_OFF;
-					AT_widget.current_BUFAR = BUFAR_OFF;
-					tm_data.VBAU_1 = 0;
-					tm_data.VBAU_2 = 0;
-					tm_data.VBAU_3 = 0;
-					tm_data.VPBAU_1 = 0;
-					tm_data.VPBAU_2 = 0;
-					tm_data.VPBAU_3 = 0;
-					MT_widget.hide();
-					AT_widget.hide();
+					imit_off();
+					return;
 				}
 			}
+			imit_on();
 			update_graphics_BAU();
 			ZTM_create();
 			set_tm_state();
@@ -772,12 +746,28 @@ void BAU_widg::K_BRTK_M(QVariantList words)
 	if (ZOB.zob_word == 0)
 	{
 		//mku_slot_thr.get_mku_bus_obj()->make_mt_at_state(1,1);
+		
 		MT_widget.current_UM = UM(d_words.UM_com);
 		MT_widget.current_LBV = LBV(d_words.LBV_com);
 		MT_widget.current_BOCH = BOCH(BOCH_full.data_words);
 		MT_widget.current_FOS = FOS(d_words.FOS_com);
 		MT_widget.current_AOS = AOS(d_words.AOS_com);
 		MT_widget.current_UPCH = UPCH(d_words.UPCH_com);
+
+		int tmp_current_bufar = 0;
+		switch (MT_widget.current_AOS)
+		{
+		case 1:
+			tmp_current_bufar = 3;
+			break;
+		case 2:
+			tmp_current_bufar = 2;
+			break;
+		case 4:
+			tmp_current_bufar = 1;
+			break;
+		}
+		mku_slot_thr.get_mku_bus_obj()->make_mt_at_state(BAU_at_mt(AOS_st), MT_widget.current_AOS);
 
 		///ПРМ, антена 1
 		MT_widget.current_PRM_Ant_1 = PRM(d_words.PRM_ant_one_com);
