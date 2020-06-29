@@ -71,10 +71,10 @@ AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
 
 	// connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
 
-	connect(mku_signal_thr.get_obj().get(), 
-		    SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), 
-		    this, 
-		    SLOT(new_ku_mk(int name_ustroistva, int number_komplekta))
+	connect(mku_signal_thr.get_obj().get(),                               // указатель на объект, который отправляет сигнал
+		    SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), // тот сигнал с которым осуществляется соединение (тот кто отправляет)
+		    this,                                                         // указатель на тот объект который обработает сигнал (имеет слот для обработки сигналов)
+		    SLOT(new_ku_mk(int name_ustroistva, int number_komplekta))    // то что вызывается при получении сигнала (тот кто получает)
 	       );
 
 	// --------- добавление виджетов на форму ------- НАЧАЛО --------
@@ -197,14 +197,14 @@ AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
 	aos_modes.gpfm2 = 1;
 	aos_modes.cgo = 1;
 	aos_modes.kontr = 1; // */
-
+	                      // это нужно затереть !!!! начало -----------------
 	aos_modes.gpfm1 = 3;
 	aos_modes.gpfm2 = 1;
 	aos_modes.cgo = 0;
 	aos_modes.kontr = 2;
 
-	number_komplekta_AOS = 123;
-
+	//number_komplekta_AOS = 123;
+	                      // это нужно затереть !!!! конец -----------------
 	funk_perescheta();
 	update_graphics(); //*/
 	// -------------------- искуственная вставка номера комплекта ----- конец ---------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
