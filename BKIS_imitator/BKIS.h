@@ -207,6 +207,10 @@ private:
 	QPushButton* reserve_blk;
 	QPushButton* main_interface;
 	QPushButton* reserve_interface;
+	QPushButton* first_pyro_bus;
+	QPushButton* second_pyro_bus;
+	QPushButton* third_pyro_bus;
+	QPushButton pyro_buses[3];
 	
 	RPC_omnibus_SLOT_Thread slot_thr;
 	RPC_omnibus_SIGNAL_Thread signal_thr;

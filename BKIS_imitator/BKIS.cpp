@@ -37,13 +37,31 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	reserve_interface = new QPushButton("Вкл резервный интерфейс", this);
 	reserve_interface->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 
-	QVBoxLayout* lay = new QVBoxLayout(this);
-	lay->addStretch(10);
-	lay->addWidget(main_blk);
-	lay->addWidget(reserve_blk);
-	lay->addWidget(main_interface);
-	lay->addWidget(reserve_interface);
-			
+	first_pyro_bus = new QPushButton("Вкл первую шину пиропатронов", this);
+	first_pyro_bus->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+	second_pyro_bus = new QPushButton("Вкл вторую шину пиропатронов", this);
+	second_pyro_bus->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+	third_pyro_bus = new QPushButton("Вкл третью шину пиропатронов", this);
+	third_pyro_bus->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
+
+	QHBoxLayout* main_lay = new QHBoxLayout(this);
+
+	QVBoxLayout* lay_blk_interface = new QVBoxLayout(this);
+	//lay_blk_interface->addStretch(10);
+	lay_blk_interface->addWidget(main_blk);
+	lay_blk_interface->addWidget(reserve_blk);
+	lay_blk_interface->addWidget(main_interface);
+	lay_blk_interface->addWidget(reserve_interface);
+	QVBoxLayout* lay_pyro_buses = new QVBoxLayout(this);
+
+	//lay_pyro_buses->addStretch(10);
+	lay_pyro_buses->addWidget(first_pyro_bus);
+	lay_pyro_buses->addWidget(second_pyro_bus);
+	lay_pyro_buses->addWidget(third_pyro_bus);
+	
+	main_lay->addLayout(lay_blk_interface);
+	main_lay->addLayout(lay_pyro_buses);
+
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start();
 
@@ -90,14 +108,23 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	connect(mku_signal_thr.get_obj().get(), SIGNAL(new_ku(int, int, double, int)), this, SLOT(make_ku(int, int, double, int)));
 	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
 
+	QString ip_str = "127.0.0.1";
+	int slot_port = BKIS_SLOT;
+	int signal_port = BKIS_SIGNAL;
+	bkis_Socket_RPC_SLOT_Server_Thread* rpc_slot_srv = new bkis_Socket_RPC_SLOT_Server_Thread;
+	rpc_slot_srv->set_app(this);
+	rpc_slot_srv->set_params(ip_str, slot_port);
+	rpc_slot_srv->start();
+	bkis_Socket_RPC_SIGNAL_Thread* rpc_signal_srv = new bkis_Socket_RPC_SIGNAL_Thread;
+	rpc_signal_srv->set_app(this);
+	rpc_signal_srv->set_params(ip_str, signal_port);
+	rpc_signal_srv->start();
+
 	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
 	restoreGeometry(settings.value("bkis_geometry").toByteArray());
 
 	blk_state = 0;
 	interface_state = 0;
-	for (int i = 1; i <= 14; i++) {
-		electric_heaters_states[i] = 0;
-	}
 
 	for (int i = 1; i <= 6; i++) {
 		pyro_groups_states[i] = 0;
@@ -107,6 +134,7 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	for (int i = 1; i <= 14; i++) {
 		electric_heaters_states[i] = i%2;
 	}
+
 	//инициализация состояния шин пиропатронов
 	for (int i = 0; i < 3 ; i++) {
 		pyro_buses_state[i] = 0;
@@ -140,7 +168,6 @@ void BKIS_widg::make_ku(int ku_n, int length, double u, int line)
 		slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 		main_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
 		reserve_blk->setStyleSheet("background-color: rgb(204, 204, 204)");
-
 		break;
 	}
 }
@@ -163,7 +190,7 @@ int BKIS_widg::set_electric_heater_state(int name, bool state)
 
 int BKIS_widg::set_pyro_group_state(int group_num, bool state)
 {
-	if ((pyro_buses_state[0] + pyro_buses_state[1] + pyro_buses_state[2]) == 0)
+	if ((pyro_buses_state[0] + pyro_buses_state[1] + pyro_buses_state[2]) > 2)
 	{
 		pyro_groups_states[group_num] = state;
 		return 0;
@@ -200,6 +227,9 @@ void BKIS_widg::imit_on()
 
 	main_interface->setStyleSheet("background-color: rgb(142, 198, 156)");
 	reserve_interface->setStyleSheet("background-color: rgb(204, 204, 204)");
+	first_pyro_bus->setStyleSheet("background-color: rgb(204, 204, 204)");
+	second_pyro_bus->setStyleSheet("background-color: rgb(204, 204, 204)");
+	third_pyro_bus->setStyleSheet("background-color: rgb(204, 204, 204)");
 }
 
 void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os)
@@ -210,10 +240,11 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 		return;
 	if ((mko == MKO) && (tmp_cwd.adr == adr) && (tmp_cwd.trans_dir == 0))
 	{
+
 		int tmp_word = words[0].toInt();
 		if (tmp_cwd.subadr == 2)
 		{
-			/* Переключение шин пиропатронов*/
+			/* Переключение шин пиротехники */
 			if (tmp_word >> 4 == 0x600)
 			{
 				int bus_num = tmp_word & 0x000F;
@@ -222,20 +253,115 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					pyro_buses_state[0] = 0;
 					pyro_buses_state[1] = 0;
 					pyro_buses_state[2] = 0;
+					first_pyro_bus->setStyleSheet("background-color: rgb(204, 204, 204)");
+					second_pyro_bus->setStyleSheet("background-color: rgb(204, 204, 204)");
+					third_pyro_bus->setStyleSheet("background-color: rgb(204, 204, 204)");
 				}
-				else pyro_buses_state[bus_num] = 1;
+				else {
+					pyro_buses_state[bus_num - 1] = 1;//смещение на -1, т.к. нумерация массива состояний шин пиропатронов начинается с 0
+					switch (bus_num) {
+					case 1:
+						first_pyro_bus->setStyleSheet("background-color: rgb(142, 198, 156)");
+						break;
+					case 2:
+						second_pyro_bus->setStyleSheet("background-color: rgb(142, 198, 156)");
+						break;
+					case 3:
+						third_pyro_bus->setStyleSheet("background-color: rgb(142, 198, 156)");
+						break;
+					}
+				}
 				return;
 			}
 				
 			/*Подрыв пиропатронов*/
 			if (tmp_word >> 4 == 0x660)
 			{
-				int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 бита хранят данные о том, какая группа подрывается
-				pyro_groups_states[group_num] = 1;
-				emit send_pyro_group_activation(group_num);
-				return;//todo для быстроты работы?
+				if ((pyro_buses_state[0] + pyro_buses_state[1] + pyro_buses_state[2]) >= 2)
+				{
+					int group_num = tmp_word & 0x000F;//Таким способом реализовано, так как последние 4 бита хранят данные о том, какая группа подрывается
+					pyro_groups_states[group_num] = 1;
+					emit send_pyro_group_activation(group_num);
+					return;//todo для быстроты работы?
+				}
 			}
 			
+			if (tmp_word >> 6 == 0x33)
+			{
+				switch (tmp_word & 0x004F)
+				{
+				case 9:
+					BLKIIH_word.s_9_heater_work = 1;
+					break;
+				case 10:
+					BLKIIH_word.s_10_heater_work = 1;
+					break;
+				case 11:
+					BLKIIH_word.s_11_heater_work = 1;
+					break;
+				case 18:
+					BLKIIH_word.s_18_heater_work = 1;
+					break;
+				case 19:
+					BLKIIH_word.s_19_heater_work = 1;
+					break;
+				case 20:
+					BLKIIH_word.s_20_heater_work = 1;
+					break;
+				case 21:
+					BLKIIH_word.s_21_heater_work = 1;
+					break;
+				case 22:
+					BLKIIH_word.s_22_heater_work = 1;
+					break;
+				case 23:
+					BLKIIH_word.s_23_heater_work = 1;
+					break;
+				case 24:
+					BLKIIH_word.s_24_heater_work = 1;
+					break;
+				case 25:
+					BLKIIH_word.s_25_heater_work = 1;
+					break;
+				}
+				switch (tmp_word & 0x00CF)
+				{
+				case 9:
+					BLKIIH_word.s_9_heater_work = 0;
+					break;
+				case 10:
+					BLKIIH_word.s_10_heater_work = 0;
+					break;
+				case 11:
+					BLKIIH_word.s_11_heater_work = 0;
+					break;
+				case 18:
+					BLKIIH_word.s_18_heater_work = 0;
+					break;
+				case 19:
+					BLKIIH_word.s_19_heater_work = 0;
+					break;
+				case 20:
+					BLKIIH_word.s_20_heater_work = 0;
+					break;
+				case 21:
+					BLKIIH_word.s_21_heater_work = 0;
+					break;
+				case 22:
+					BLKIIH_word.s_22_heater_work = 0;
+					break;
+				case 23:
+					BLKIIH_word.s_23_heater_work = 0;
+					break;
+				case 24:
+					BLKIIH_word.s_24_heater_work = 0;
+					break;
+				case 25:
+					BLKIIH_word.s_25_heater_work = 0;
+					break;
+				}
+			}
+
 			//вкл. основного/резервного внутреннего интерфейса
 			switch (tmp_word)
 			{

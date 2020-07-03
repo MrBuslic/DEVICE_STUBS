@@ -16,10 +16,11 @@ int main(int argc, char **argv)
 #endif
     QApplication app(argc, argv);
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
-//	LogWidget log_w;
-//	log_w.show();
+	LogWidget log_w;
+	log_w.show();
 
 	BKIS_widg BKIS_widget;
+	BKIS_widget.resize(200, 200);
 	BKIS_widget.show();
 
     return app.exec();

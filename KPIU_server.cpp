@@ -209,7 +209,7 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 		mfsk24_grd_layout->addWidget(mfsk24_0_label, 0, 0, Qt::AlignCenter);
 		mfsk24_grd_layout->addWidget(mfsk24_1_label, 0, 1, Qt::AlignCenter);
 		mfsk24_grd_layout->addWidget(mfsk24_2_label, 0, 2, Qt::AlignCenter);
-		mfsk24_grd_layout->addWidget(mfsk24_0_widget, 1, 0);//отладить 
+		mfsk24_grd_layout->addWidget(mfsk24_0_widget, 1, 0);//РѕС‚Р»Р°РґРёС‚СЊ 
 		mfsk24_grd_layout->addWidget(mfsk24_1_widget, 1, 1);
 		mfsk24_grd_layout->addWidget(mfsk24_2_widget, 1, 2);
 		mfsk24_grd_layout->addWidget(mfsk24_3_label, 2, 0, Qt::AlignCenter);
@@ -221,7 +221,7 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 		mfsk24_grd_layout->addWidget(mfsk24_6_label, 4, 0, Qt::AlignCenter);
 		mfsk24_grd_layout->addWidget(mfsk24_7_label, 4, 1, Qt::AlignCenter);
 		mfsk24_grd_layout->addWidget(mfsk24_8_label, 4, 2, Qt::AlignCenter);
-		mfsk24_grd_layout->addWidget(mfsk24_6_widget, 5, 0);//отладить 
+		mfsk24_grd_layout->addWidget(mfsk24_6_widget, 5, 0);//РѕС‚Р»Р°РґРёС‚СЊ 
 		mfsk24_grd_layout->addWidget(mfsk24_7_widget, 5, 1);
 		mfsk24_grd_layout->addWidget(mfsk24_8_widget, 5, 2);
 	}
@@ -261,8 +261,8 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 
 		if (rm_type == "mca")
 		{
-			QProcess::startDetached(QApplication::applicationDirPath() + "/N736_imitator");
-			QProcess::startDetached(QApplication::applicationDirPath() + "/N737_imitator");
+			//QProcess::startDetached(QApplication::applicationDirPath() + "/N736_imitator");
+			//QProcess::startDetached(QApplication::applicationDirPath() + "/N737_imitator");
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BAU_imitator");
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BAO");
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BKIS_imitator");
@@ -285,75 +285,74 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 
 		mds1_chans.chans = 0xFFFFFFFF;
 		mds2_chans.chans = 0xFFFFFFFF;
-	
+		
 		///slot_thr.set_connection_params(instr::GetIpFromSettings("rpc_omnibus"), 50001); FIX!!!!!
 		lka05_slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-		lka05_slot_thr.start(); // вот тут падает
+		lka05_slot_thr.start(); // РІРѕС‚ С‚СѓС‚ РїР°РґР°РµС‚
 
 		lka05_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-		lka05_signal_thr.start(); // вот тут падает
+		lka05_signal_thr.start(); // РІРѕС‚ С‚СѓС‚ РїР°РґР°РµС‚
 
 		if (!lka05_slot_thr.wait_connected(3) || !lka05_signal_thr.wait_connected(3))
 		{
-			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka_05");
+			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ lka_05");
 			this->deleteLater();
 			return;
 		}
 
-		bkis_slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
-		bkis_slot_thr.start(); // вот тут падает
+		bkis_slot_thr.set_connection_params("127.0.0.1", BKIS_SLOT);
+		bkis_slot_thr.start(); // РІРѕС‚ С‚СѓС‚ РїР°РґР°РµС‚
 
-		bkis_signal_thr.set_connection_params("127.0.0.1", OMNIBUS_SIGNAL);
-		bkis_signal_thr.start(); // вот тут падает
+		bkis_signal_thr.set_connection_params("127.0.0.1", BKIS_SIGNAL);
+		bkis_signal_thr.start(); // РІРѕС‚ С‚СѓС‚ РїР°РґР°РµС‚
 
 		if (!bkis_slot_thr.wait_connected(3) || !bkis_signal_thr.wait_connected(3))
 		{
-			QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с lka_05");
+			QMessageBox::critical(0, "РќРµС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ", "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ СЃ bkis");
 			this->deleteLater();
 			return;
 		}
 
 		connect(this, SLOT(LKA05_MK_USTANOVIT_SOSTOYANIE(int, int, bool)), lka05_slot_thr.get_obj().get(), SLOT(set_mk_working(int, int, bool)));
 
-		connect(bkis_signal_thr.get_obj().get(), SLOT(send_pyro_group_activation(int)), this, SLOT(activate_pyro(int)));
-
-
+		connect(bkis_signal_thr.get_obj().get(), SIGNAL(send_pyro_group_activation(int)), this, SLOT(activate_pyro(int)), Qt::DirectConnection);
+		
 		connect(is4_widget, SIGNAL(is4_measure(uint, QVariant&)), this, SLOT(get_resistance(uint, QVariant&)), Qt::DirectConnection);
 
 		
-		pyro_state.insert("ПП1_О",  pyro_chan_state(QList<int>() << 111 << 112, 0));
-		pyro_state.insert("ПП1_Р",  pyro_chan_state(QList<int>() << 113 << 114, 0));
-		pyro_state.insert("ПП2_О",  pyro_chan_state(QList<int>() << 115 << 116, 0));
-		pyro_state.insert("ПП2_Р",  pyro_chan_state(QList<int>() << 117 << 118, 0));
-		pyro_state.insert("ПП3_О",  pyro_chan_state(QList<int>() << 119 << 120, 0));
-		pyro_state.insert("ПП3_Р",  pyro_chan_state(QList<int>() << 121 << 122, 0));
-		pyro_state.insert("ПП4_О",  pyro_chan_state(QList<int>() << 123 << 124, 0));
-		pyro_state.insert("ПП4_Р",  pyro_chan_state(QList<int>() << 125 << 126, 0));
+		pyro_state.insert("РџРџ1_Рћ",  pyro_chan_state(QList<int>() << 111 << 112, 0));
+		pyro_state.insert("РџРџ1_Р ",  pyro_chan_state(QList<int>() << 113 << 114, 0));
+		pyro_state.insert("РџРџ2_Рћ",  pyro_chan_state(QList<int>() << 115 << 116, 0));
+		pyro_state.insert("РџРџ2_Р ",  pyro_chan_state(QList<int>() << 117 << 118, 0));
+		pyro_state.insert("РџРџ3_Рћ",  pyro_chan_state(QList<int>() << 119 << 120, 0));
+		pyro_state.insert("РџРџ3_Р ",  pyro_chan_state(QList<int>() << 121 << 122, 0));
+		pyro_state.insert("РџРџ4_Рћ",  pyro_chan_state(QList<int>() << 123 << 124, 0));
+		pyro_state.insert("РџРџ4_Р ",  pyro_chan_state(QList<int>() << 125 << 126, 0));
 
-		pyro_state.insert("ПП5_О",  pyro_chan_state(QList<int>() << 161 << 162, 0));
-		pyro_state.insert("ПП5_Р",  pyro_chan_state(QList<int>() << 163 << 164, 0));
-		pyro_state.insert("ПП6_О",  pyro_chan_state(QList<int>() << 165 << 166, 0));
-		pyro_state.insert("ПП6_Р",  pyro_chan_state(QList<int>() << 167 << 168, 0));
+		pyro_state.insert("РџРџ5_Рћ",  pyro_chan_state(QList<int>() << 161 << 162, 0));
+		pyro_state.insert("РџРџ5_Р ",  pyro_chan_state(QList<int>() << 163 << 164, 0));
+		pyro_state.insert("РџРџ6_Рћ",  pyro_chan_state(QList<int>() << 165 << 166, 0));
+		pyro_state.insert("РџРџ6_Р ",  pyro_chan_state(QList<int>() << 167 << 168, 0));
 
-		pyro_state.insert("ПП7_О",  pyro_chan_state(QList<int>() << 169 << 170, 0));
-		pyro_state.insert("ПП7_Р",  pyro_chan_state(QList<int>() << 171 << 172, 0));
-		pyro_state.insert("ПП8_О",  pyro_chan_state(QList<int>() << 173 << 174, 0));
-		pyro_state.insert("ПП8_Р",  pyro_chan_state(QList<int>() << 175 << 176, 0));
-		pyro_state.insert("ПП9_О",  pyro_chan_state(QList<int>() << 177 << 178, 0));
-		pyro_state.insert("ПП9_Р",  pyro_chan_state(QList<int>() << 179 << 180, 0));
-		pyro_state.insert("ПП10_О",  pyro_chan_state(QList<int>() << 181 << 182, 0));
-		pyro_state.insert("ПП10_Р",  pyro_chan_state(QList<int>() << 183 << 184, 0));
+		pyro_state.insert("РџРџ7_Рћ",  pyro_chan_state(QList<int>() << 169 << 170, 0));
+		pyro_state.insert("РџРџ7_Р ",  pyro_chan_state(QList<int>() << 171 << 172, 0));
+		pyro_state.insert("РџРџ8_Рћ",  pyro_chan_state(QList<int>() << 173 << 174, 0));
+		pyro_state.insert("РџРџ8_Р ",  pyro_chan_state(QList<int>() << 175 << 176, 0));
+		pyro_state.insert("РџРџ9_Рћ",  pyro_chan_state(QList<int>() << 177 << 178, 0));
+		pyro_state.insert("РџРџ9_Р ",  pyro_chan_state(QList<int>() << 179 << 180, 0));
+		pyro_state.insert("РџРџ10_Рћ",  pyro_chan_state(QList<int>() << 181 << 182, 0));
+		pyro_state.insert("РџРџ10_Р ",  pyro_chan_state(QList<int>() << 183 << 184, 0));
 
-		pyro_state.insert("ПП11_О",  pyro_chan_state(QList<int>() << 185 << 186, 0));
-		pyro_state.insert("ПП11_Р",  pyro_chan_state(QList<int>() << 187 << 188, 0));
-		pyro_state.insert("ПП12_О",  pyro_chan_state(QList<int>() << 189 << 190, 0));
-		pyro_state.insert("ПП12_Р",  pyro_chan_state(QList<int>() << 191 << 192, 0));
-		pyro_state.insert("ПП13_О",  pyro_chan_state(QList<int>() << 193 << 194, 0));
-		pyro_state.insert("ПП13_Р",  pyro_chan_state(QList<int>() << 195 << 196, 0));
-		pyro_state.insert("ПП14_О",  pyro_chan_state(QList<int>() << 197 << 198, 0));
-		pyro_state.insert("ПП14_Р",  pyro_chan_state(QList<int>() << 199 << 200, 0));
+		pyro_state.insert("РџРџ11_Рћ",  pyro_chan_state(QList<int>() << 185 << 186, 0));
+		pyro_state.insert("РџРџ11_Р ",  pyro_chan_state(QList<int>() << 187 << 188, 0));
+		pyro_state.insert("РџРџ12_Рћ",  pyro_chan_state(QList<int>() << 189 << 190, 0));
+		pyro_state.insert("РџРџ12_Р ",  pyro_chan_state(QList<int>() << 191 << 192, 0));
+		pyro_state.insert("РџРџ13_Рћ",  pyro_chan_state(QList<int>() << 193 << 194, 0));
+		pyro_state.insert("РџРџ13_Р ",  pyro_chan_state(QList<int>() << 195 << 196, 0));
+		pyro_state.insert("РџРџ14_Рћ",  pyro_chan_state(QList<int>() << 197 << 198, 0));
+		pyro_state.insert("РџРџ14_Р ",  pyro_chan_state(QList<int>() << 199 << 200, 0));
 		
-		first_pyros_in_groups << "ПП1_О" << "ПП3_О" << "ПП5_О" << "ПП7_О" << "ПП9_О" << "ПП11_О";//инициализация первых пиропатронов в группах
+		first_pyros_in_groups << "РџРџ1_Рћ" << "РџРџ3_Рћ" << "РџРџ5_Рћ" << "РџРџ7_Рћ" << "РџРџ9_Рћ" << "РџРџ11_Рћ";//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРµСЂРІС‹С… РїРёСЂРѕРїР°С‚СЂРѕРЅРѕРІ РІ РіСЂСѓРїРїР°С…
 
 		bau_chans.clear();
 		bau_chans << 141 << 142 << 143 << 144 << 145 << 146;
@@ -410,7 +409,7 @@ int KPIUServer::ANTENNA_USTANOVKA_KOMMUTACII(QString antenna_name, QString conne
 int KPIUServer::OMNIBUS_NASTROYKA_CELOSTNOSTI_KANALOV(int _n, int _chan)
 {
 	omnibus_widget->unomnibus_map_channels_setup(_n, _chan);
-	SRPCSignalClass::Instance().toLog(QString("Присваиваю каналу %1 значение %2").arg(_n).arg(_chan));
+	SRPCSignalClass::Instance().toLog(QString("РџСЂРёСЃРІР°РёРІР°СЋ РєР°РЅР°Р»Сѓ %1 Р·РЅР°С‡РµРЅРёРµ %2").arg(_n).arg(_chan));
 	return 0;
 }
 
@@ -422,13 +421,13 @@ int KPIUServer::USTANOVIT_SOSTOYANIE_SHINI_PITANIYA(int bus, int state)
 }
 
 //pyro
-int KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//Производить установку по названию пир-на?
+int KPIUServer::PYRO_USTANOVIT_SOSTOYANIE(QString _name, int _state)//РџСЂРѕРёР·РІРѕРґРёС‚СЊ СѓСЃС‚Р°РЅРѕРІРєСѓ РїРѕ РЅР°Р·РІР°РЅРёСЋ РїРёСЂ-РЅР°?
 {
 	QMap<QString, pyro_chan_state>::iterator itr = pyro_state.find(_name);
 
 	if (itr == pyro_state.end())
 	{
-		SRPCSignalClass::Instance().toLog(QString("Соединение %1 не найдено!").arg(_name));
+		SRPCSignalClass::Instance().toLog(QString("РЎРѕРµРґРёРЅРµРЅРёРµ %1 РЅРµ РЅР°Р№РґРµРЅРѕ!").arg(_name));
 		return 1;
 	}
 	itr->state = _state;
@@ -581,7 +580,7 @@ void KPIUServer::get_resistance(uint NProcess, QVariant& resistance)
 		else
 		{
 			channels = ei_chanels_list + sum_chanels_list;
-			// вставить функцию опроса ВВК
+			// РІСЃС‚Р°РІРёС‚СЊ С„СѓРЅРєС†РёСЋ РѕРїСЂРѕСЃР° Р’Р’Рљ
 			connection_state = get_connection_state(channels);
 			switch (connection_state)
 			{
@@ -607,8 +606,8 @@ int KPIUServer::get_connection_state(QVariantList& _chans)
 			//((it->chan_num[0] == _chans[0]) || (it->chan_num[1] == _chans[0]) || (it->chan_num[0] == _chans[1]) || (it->chan_num[1] == _chans[1]))//todo ??????
 			return it->state;
 	}
-	SRPCSignalClass::Instance().toLog(QString("Не найдено соединения каналов пиропатронов %1 %2").arg(_chans[0].toString()).arg(_chans[1].toString()));
-	return 0; //возвращать -1?
+	SRPCSignalClass::Instance().toLog(QString("РќРµ РЅР°Р№РґРµРЅРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ РєР°РЅР°Р»РѕРІ РїРёСЂРѕРїР°С‚СЂРѕРЅРѕРІ %1 %2").arg(_chans[0].toString()).arg(_chans[1].toString()));
+	return 0; //РІРѕР·РІСЂР°С‰Р°С‚СЊ -1?
 }
 
 void KPIUServer::mshr_data_in(QVariantList dataList, QVariantList maskList)
@@ -689,7 +688,7 @@ int KPIUServer::LKA05_MU_USTANOVIT_SOSTOYANIE(int _dev, bool _flag)
 
 void KPIUServer::activate_pyro(int group_num)
 {
-	QString pyro_group_name;//название первого пиропатрона в группе
+	QString pyro_group_name;//РЅР°Р·РІР°РЅРёРµ РїРµСЂРІРѕРіРѕ РїРёСЂРѕРїР°С‚СЂРѕРЅР° РІ РіСЂСѓРїРїРµ
 	QMap<QString, pyro_chan_state>::iterator itr;
 	int i_last;
 	pyro_group_name = first_pyros_in_groups[group_num - 1];
@@ -700,8 +699,15 @@ void KPIUServer::activate_pyro(int group_num)
 	else i_last = 4;
 	for (int i = 0; i < i_last; i++)
 	{
+		if (itr == pyro_state.end())
+		{
+			itr = pyro_state.begin();
+			i--;
+			continue;
+		}
 		itr->state = 1;
-		SRPCSignalClass::Instance().toLog(QString("Активирован пиропатрон %1").arg(itr.key()));
+		SRPCSignalClass::Instance().toLog(QString("РђРєС‚РёРІРёСЂРѕРІР°РЅ РїРёСЂРѕРїР°С‚СЂРѕРЅ %1").arg(itr.key()));
+		
 		itr++;
 	}
 }
