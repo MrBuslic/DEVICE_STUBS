@@ -3,6 +3,7 @@
 int kpiu_Socket_RPC_SLOT_Object::obj_num = 0;
 int kpiu_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
+int kpiu_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	kpiu_Socket_RPC_SIGNAL_Thread::kpiu_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int kpiu_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	kpiu_Socket_RPC_SLOT_Thread::kpiu_Socket_RPC_SLOT_Thread(KPIUServer* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("kpiu_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void kpiu_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{

@@ -301,9 +301,11 @@ public:
 private:
 	//AOS_KP current_KP = AOS_OFF;
 	// ---------- виджеты --------- начало --------
-
+	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры ( name_ustroistva = 8 (AOC); number_komplekta_AOS = 1|2|3 )
 	QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
 	QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie; // сам номер устройства
+	//QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
+	//;.QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie; // сам номер устройства
 	// ----- объявление кнопок ------- начало --------
 	QPushButton *perviy_komplekt_GPFM1;
 	QPushButton *vtoroi_komplekt_GPFM1;
@@ -323,14 +325,13 @@ private:
 	// ----- объявление кнопок ------- конец --------
 
     // ---------- виджеты --------- конец --------
-
-	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры
-
 	const int MKO = 1;
 	const int adr = 21;
 	//QHBoxLayout *a;
 //	QGroupBox *Group_Vkl_kompl_AOS;
-	void update_graphics();  // обновление графики
+	
+	void risovanie_okna_AOS();  // и остальных виджетов АОС
+	void update_graphics(int);  // обновление графики
 	void funk_perescheta(); // преобразует входные данные 0,1,2,3 в 0,1,2,4
 	void set_new_tm();     // составление ОК-ов
 	void TMI_1_AOS();   // составление ТМИ - 1 
@@ -341,7 +342,7 @@ protected:
 	void closeEvent(QCloseEvent *event);
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
-	void new_ku_mk(int name_ustroistva, int number_komplekta);
+	void new_ku_mk(int name_ustroistva, int number_komplekta_AOS);
 
 private:
 	QString name = "АОС";  // Имя устройства

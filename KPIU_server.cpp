@@ -266,6 +266,7 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BAU_imitator");
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BAO");
 			QProcess::startDetached(QApplication::applicationDirPath() + "/BKIS_imitator");
+			QProcess::startDetached(QApplication::applicationDirPath() + "/AOS_imitator");
 		}
 
 		QProcess::startDetached(QApplication::applicationDirPath() + "/common");

@@ -60,106 +60,156 @@ AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
 		this->deleteLater();
 		return;
 	}
-
-	connect(signal_thr.get_obj().get(), 
-		    SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)), 
-		    this, 
-		    SLOT(new_message(QVariant, int, int, int, QVariantList, int))
-	       );
-
+	// --------- подключение устройств ----- НАЧАЛО ------
+	// ---------- подключение к МКО ------ начало -----------
+	connect(signal_thr.get_obj().get(),
+		SIGNAL(new_message(QVariant, int, int, int, QVariantList, int)),
+		this,
+		SLOT(new_message(QVariant, int, int, int, QVariantList, int))
+	);
+	// ---------- подключение к МКО ------ конец -----------
 	slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 
 	// connect( mku_signal_thr.get_obj().get(), SIGNAL(new_ku_mk(int, int, double, int)), this, SLOT(new_ku_mk(int, int, double, int)) );
 
+	// -------- подключение к матричным командам ------ начало ----------
 	connect(mku_signal_thr.get_obj().get(),                               // указатель на объект, который отправляет сигнал
-		    SIGNAL(new_ku_mk(int name_ustroistva, int number_komplekta)), // тот сигнал с которым осуществляется соединение (тот кто отправляет)
-		    this,                                                         // указатель на тот объект который обработает сигнал (имеет слот для обработки сигналов)
-		    SLOT(new_ku_mk(int name_ustroistva, int number_komplekta))    // то что вызывается при получении сигнала (тот кто получает)
-	       );
+		SIGNAL(new_mt_at_state(int, int)), // тот сигнал с которым осуществляется соединение (тот кто отправляет)
+		this,                                                         // указатель на тот объект который обработает сигнал (имеет слот для обработки сигналов)
+		SLOT(new_ku_mk(int, int))    // то что вызывается при получении сигнала (тот кто получает)
+	);
+	// -------- подключение к матричным командам  ------ конец ----------
 
+	// -------- подключение к электропитанию ----- начало ------
+	connect(power_signal_thr.get_obj().get(),
+		SIGNAL(u_on_k1(double)),
+		this,
+		SLOT(get_power(double))
+	);
+	// -------- подключение к электропитанию ----- конец ------
+	// --------- подключение устройств ----- КОНЕЦ ------
+
+	risovanie_okna_AOS();
+	
+	// -------------------- искуственная вставка номера комплекта ----- начало ---------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	aos_modes.kontr = 0;
+	aos_modes.cgo = 0;
+	aos_modes.gpfm2 = 0;
+	aos_modes.gpfm1 = 0;
+
+	aos_state.kontr_dev_state = 0;
+	aos_state.cgo_dev_state = 0;
+	aos_state.gpfm2_dev_state = 0;
+	aos_state.gpfm1_dev_state = 0;
+	                      // это нужно затереть !!!! начало -----------------
+	aos_modes.gpfm1 = 3;
+	aos_modes.gpfm2 = 1;
+	aos_modes.cgo = 0;
+	aos_modes.kontr = 2;
+	// это нужно затереть !!!! конец -----------------
+	funk_perescheta();
+	update_graphics(number_komplekta_AOS); 
+	// -------------------- искуственная вставка номера комплекта ----- конец ---------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	
+	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
+	restoreGeometry(settings.value("aos_geometry").toByteArray());
+	
+
+	kontr_dev = AOS_KP_OFF; // отключение устройства контроллера устройства  (значение kontr_dev равно нуль)
+	cgo_dev = AOS_KP_OFF;   // отключение устройства цифровой групповой обработки  (значение cgo_dev равно нуль)
+	gpfm2_dev = AOS_KP_OFF; // отключение устройства группового приемника фазоманипулированных сигналов (2) (значение gpfm2_dev равно нуль)
+	gpfm1_dev = AOS_KP_OFF; // отключение устройства группового приемника фазоманипулированных сигналов (1) (значение gpfm1_dev равно нуль)
+
+	for (int i = 0; i < 32; i++)
+	{
+		gsu_kommut << GSU_kommut();
+	}
+
+}
+void AOS_widg::risovanie_okna_AOS() // и остальных виджетов АОС
+
+{
 	// --------- добавление виджетов на форму ------- НАЧАЛО --------
-    
 	// -------------- группировка справочной информации ----------------------- начало ----------------
 	nomer_vkluchaemogo_komplekta_Label = new QLabel("№ включенного комплекта AOC: ", this);
-	nomer_vkluchaemogo_komplekta_samo_znachenie = new QLabel("0",this);
+	nomer_vkluchaemogo_komplekta_samo_znachenie = new QLabel("0", this);
 	QGroupBox *group_spravochnay_inform = new QGroupBox(this); // создание указателя на группировку справочной информации, которую мне присылают с "БАО"
-	group_spravochnay_inform -> setFixedSize(220, 50);
+	group_spravochnay_inform->setFixedSize(220, 50);
 	QGridLayout *vbox_Grid_sprav_inforn = new QGridLayout;     // отображение виджетов ввиде таблицы 2Х2.
 
-    vbox_Grid_sprav_inforn -> addWidget(nomer_vkluchaemogo_komplekta_Label, 0, 0);
-	vbox_Grid_sprav_inforn -> addWidget(nomer_vkluchaemogo_komplekta_samo_znachenie, 0, 1);
-	group_spravochnay_inform -> setLayout(vbox_Grid_sprav_inforn);
+	vbox_Grid_sprav_inforn->addWidget(nomer_vkluchaemogo_komplekta_Label, 0, 0);
+	vbox_Grid_sprav_inforn->addWidget(nomer_vkluchaemogo_komplekta_samo_znachenie, 0, 1);
+	group_spravochnay_inform->setLayout(vbox_Grid_sprav_inforn);
 	// -------------- группировка справочной информации ----------------------- конец ----------------
 
 	// -------------- группировка данных для выбора комплектов устройств АОС и режим работы АОС -------------- начало -------------
 	QGroupBox *group_ustroistv = new QGroupBox("Данные для выбора комплектов устройств АОС и режим работы АОС", this);   // создание указателя на группировку для кнопок комплектов устройств
-	group_ustroistv -> setFixedSize(400, 270);
+	group_ustroistv->setFixedSize(400, 270);
 	QGridLayout *vbox_Grid_ustruistv = new QGridLayout; // отображение группировок ввиде таблицы 2Х2
 
 	QGroupBox *group_GPFM1 = new QGroupBox("ГПФМ1", this);
-	group_GPFM1 -> setFixedSize(190, 110);
+	group_GPFM1->setFixedSize(190, 110);
 	QVBoxLayout *vbox_Grid_GPFM1_knopok = new QVBoxLayout;
 
 	QGroupBox *group_GPFM2 = new QGroupBox("ГПФМ2", this);
-	group_GPFM2 -> setFixedSize(190, 110);
+	group_GPFM2->setFixedSize(190, 110);
 	QVBoxLayout *vbox_Grid_GPFM2_knopok = new QVBoxLayout;
 
 	QGroupBox *group_ustroistvo_CGO = new QGroupBox("Устройство ЦГО", this);
-	group_ustroistvo_CGO -> setFixedSize(190, 110);
+	group_ustroistvo_CGO->setFixedSize(190, 110);
 	QVBoxLayout *vbox_Grid_ustroistvo_CGO_knopok = new QVBoxLayout;
 
 	QGroupBox *group_ustroistvo_kontroly = new QGroupBox("Устройство контроля", this);
-	group_ustroistvo_kontroly -> setFixedSize(190, 110);
+	group_ustroistvo_kontroly->setFixedSize(190, 110);
 	QVBoxLayout *vbox_Grid_group_ustroistvo_kontroly_knopok = new QVBoxLayout;
 
-	vbox_Grid_ustruistv -> addWidget( group_GPFM1, 0, 0 );
-	vbox_Grid_ustruistv -> addWidget( group_GPFM2, 0, 1 );
-	vbox_Grid_ustruistv -> addWidget( group_ustroistvo_CGO, 1, 0 );
-	vbox_Grid_ustruistv -> addWidget( group_ustroistvo_kontroly, 1, 1 );
-	group_ustroistv -> setLayout( vbox_Grid_ustruistv );
+	vbox_Grid_ustruistv->addWidget(group_GPFM1, 0, 0);
+	vbox_Grid_ustruistv->addWidget(group_GPFM2, 0, 1);
+	vbox_Grid_ustruistv->addWidget(group_ustroistvo_CGO, 1, 0);
+	vbox_Grid_ustruistv->addWidget(group_ustroistvo_kontroly, 1, 1);
+	group_ustroistv->setLayout(vbox_Grid_ustruistv);
 	// -------------- группировка данных для выбора комплектов устройств АОС и режим работы АОС -------------- конец -------------
 
 	// --------- группировка кнопок комплектов по устройсвам ----------- начало ---------------
-		perviy_komplekt_GPFM1 = new QPushButton("Первый комплект", this);
-		vtoroi_komplekt_GPFM1 = new QPushButton("Второй комплект", this);
-		tretiy_komplekt_GPFM1 = new QPushButton("Третий комплект", this);
-		  vbox_Grid_GPFM1_knopok -> addWidget(perviy_komplekt_GPFM1);
-		  vbox_Grid_GPFM1_knopok -> addWidget(vtoroi_komplekt_GPFM1);
-		  vbox_Grid_GPFM1_knopok -> addWidget(tretiy_komplekt_GPFM1);
-		  group_GPFM1 -> setLayout(vbox_Grid_GPFM1_knopok);
+	perviy_komplekt_GPFM1 = new QPushButton("Первый комплект", this);
+	vtoroi_komplekt_GPFM1 = new QPushButton("Второй комплект", this);
+	tretiy_komplekt_GPFM1 = new QPushButton("Третий комплект", this);
+	vbox_Grid_GPFM1_knopok->addWidget(perviy_komplekt_GPFM1);
+	vbox_Grid_GPFM1_knopok->addWidget(vtoroi_komplekt_GPFM1);
+	vbox_Grid_GPFM1_knopok->addWidget(tretiy_komplekt_GPFM1);
+	group_GPFM1->setLayout(vbox_Grid_GPFM1_knopok);
 
-		perviy_komplekt_GPFM2 = new QPushButton("Первый комплект", this);
-		vtoroi_komplekt_GPFM2 = new QPushButton("Второй комплект", this);
-		tretiy_komplekt_GPFM2 = new QPushButton("Третий комплект", this);
-	      vbox_Grid_GPFM2_knopok -> addWidget(perviy_komplekt_GPFM2);
-		  vbox_Grid_GPFM2_knopok -> addWidget(vtoroi_komplekt_GPFM2);
-		  vbox_Grid_GPFM2_knopok -> addWidget(tretiy_komplekt_GPFM2);
-		  group_GPFM2 -> setLayout(vbox_Grid_GPFM2_knopok);
+	perviy_komplekt_GPFM2 = new QPushButton("Первый комплект", this);
+	vtoroi_komplekt_GPFM2 = new QPushButton("Второй комплект", this);
+	tretiy_komplekt_GPFM2 = new QPushButton("Третий комплект", this);
+	vbox_Grid_GPFM2_knopok->addWidget(perviy_komplekt_GPFM2);
+	vbox_Grid_GPFM2_knopok->addWidget(vtoroi_komplekt_GPFM2);
+	vbox_Grid_GPFM2_knopok->addWidget(tretiy_komplekt_GPFM2);
+	group_GPFM2->setLayout(vbox_Grid_GPFM2_knopok);
 
-		perviy_komplekt_CGO = new QPushButton("Первый комплект", this);
-		vtorji_komplekt_CGO = new QPushButton("Второй комплект", this);
-		tretiy_komplekt_CGO = new QPushButton("Третий комплект", this);
-		  vbox_Grid_ustroistvo_CGO_knopok -> addWidget(perviy_komplekt_CGO);
-		  vbox_Grid_ustroistvo_CGO_knopok -> addWidget(vtorji_komplekt_CGO);
-		  vbox_Grid_ustroistvo_CGO_knopok -> addWidget(tretiy_komplekt_CGO);
-		  group_ustroistvo_CGO -> setLayout(vbox_Grid_ustroistvo_CGO_knopok);
+	perviy_komplekt_CGO = new QPushButton("Первый комплект", this);
+	vtorji_komplekt_CGO = new QPushButton("Второй комплект", this);
+	tretiy_komplekt_CGO = new QPushButton("Третий комплект", this);
+	vbox_Grid_ustroistvo_CGO_knopok->addWidget(perviy_komplekt_CGO);
+	vbox_Grid_ustroistvo_CGO_knopok->addWidget(vtorji_komplekt_CGO);
+	vbox_Grid_ustroistvo_CGO_knopok->addWidget(tretiy_komplekt_CGO);
+	group_ustroistvo_CGO->setLayout(vbox_Grid_ustroistvo_CGO_knopok);
 
-		perviy_komplekt_kontroly = new QPushButton("Первый комплект", this);
-		vtoroi_komplekt_kontroly = new QPushButton("Второй комплект", this);
-		tretiy_komplekt_kontroly = new QPushButton("Третий комплект", this);
-		  vbox_Grid_group_ustroistvo_kontroly_knopok -> addWidget(perviy_komplekt_kontroly);
-		  vbox_Grid_group_ustroistvo_kontroly_knopok -> addWidget(vtoroi_komplekt_kontroly);
-		  vbox_Grid_group_ustroistvo_kontroly_knopok -> addWidget(tretiy_komplekt_kontroly);
-		  group_ustroistvo_kontroly -> setLayout(vbox_Grid_group_ustroistvo_kontroly_knopok);	
+	perviy_komplekt_kontroly = new QPushButton("Первый комплект", this);
+	vtoroi_komplekt_kontroly = new QPushButton("Второй комплект", this);
+	tretiy_komplekt_kontroly = new QPushButton("Третий комплект", this);
+	vbox_Grid_group_ustroistvo_kontroly_knopok->addWidget(perviy_komplekt_kontroly);
+	vbox_Grid_group_ustroistvo_kontroly_knopok->addWidget(vtoroi_komplekt_kontroly);
+	vbox_Grid_group_ustroistvo_kontroly_knopok->addWidget(tretiy_komplekt_kontroly);
+	group_ustroistvo_kontroly->setLayout(vbox_Grid_group_ustroistvo_kontroly_knopok);
 	// --------- группировка кнопок комплектов по устройсвам ----------- конец ---------------
-
 	// ----------- BIG  QVBoxLayout ------- начало ----- 
 	QVBoxLayout *vbox_BIG_GroupBox = new QVBoxLayout(this);
-	vbox_BIG_GroupBox -> addWidget(group_spravochnay_inform);
-	vbox_BIG_GroupBox -> addWidget(group_ustroistv);
+	vbox_BIG_GroupBox->addWidget(group_spravochnay_inform);
+	vbox_BIG_GroupBox->addWidget(group_ustroistv);
 	// ----------- BIG  QVBoxLayout ------- конец -----
-
-    // --------- закрашивание кнопок серым цветом --------- начало -------------
+	// --------- закрашивание кнопок серым цветом --------- начало -------------
 	perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
 	vtoroi_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
 	tretiy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
@@ -177,61 +227,11 @@ AOS_widg::AOS_widg(QWidget *parent) : QWidget(parent)
 	tretiy_komplekt_kontroly->setStyleSheet(" background-color: rgb(204, 204, 204);");
 	// --------- закрашивание кнопок серым цветом --------- конец -------------
 	setMaximumSize(420, 340); // фиксация размера окна
-	// -------------------- искуственная вставка номера комплекта ----- начало ---------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	aos_modes.kontr = 0;
-	aos_modes.cgo = 0;
-	aos_modes.gpfm2 = 0;
-	aos_modes.gpfm1 = 0;
-
-	aos_state.kontr_dev_state = 0;
-	aos_state.cgo_dev_state = 0;
-	aos_state.gpfm2_dev_state = 0;
-	aos_state.gpfm1_dev_state = 0;
-
-	/* aos_modes.gpfm2 = 3;
-	aos_modes.gpfm1 = 3;
-	aos_modes.cgo = 3;
-	aos_modes.kontr = 3; 
-
-	/* aos_modes.gpfm1 = 1;
-	aos_modes.gpfm2 = 1;
-	aos_modes.cgo = 1;
-	aos_modes.kontr = 1; // */
-	                      // это нужно затереть !!!! начало -----------------
-	aos_modes.gpfm1 = 3;
-	aos_modes.gpfm2 = 1;
-	aos_modes.cgo = 0;
-	aos_modes.kontr = 2;
-
-	//number_komplekta_AOS = 123;
-	                      // это нужно затереть !!!! конец -----------------
-	funk_perescheta();
-	update_graphics(); //*/
-	// -------------------- искуственная вставка номера комплекта ----- конец ---------- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// --------- добавление виджетов на форму ------- КОНЕЦ --------
-
-
-
-
-	connect(power_signal_thr.get_obj().get(), SIGNAL(u_on_k1(double)), this, SLOT(get_power(double)));
-
-	QSettings settings(QApplication::applicationDirPath() + "/positions.ini", QSettings::IniFormat);
-	restoreGeometry(settings.value("aos_geometry").toByteArray());
-	
-
-	kontr_dev = AOS_KP_OFF; // отключение устройства контроллера устройства  (значение kontr_dev равно нуль)
-	cgo_dev = AOS_KP_OFF;   // отключение устройства цифровой групповой обработки  (значение cgo_dev равно нуль)
-	gpfm2_dev = AOS_KP_OFF; // отключение устройства группового приемника фазоманипулированных сигналов (2) (значение gpfm2_dev равно нуль)
-	gpfm1_dev = AOS_KP_OFF; // отключение устройства группового приемника фазоманипулированных сигналов (1) (значение gpfm1_dev равно нуль)
-
-	for (int i = 0; i < 32; i++)
-	{
-		gsu_kommut << GSU_kommut();
-	}
+							  // --------- добавление виджетов на форму ------- КОНЕЦ --------
 
 }
-
-
+// ??????при включении БАУ и подключении одного из комплектов АОС. Окно АОС должно самопо появляться 
+// с указанием номера включенного объекта???? 
 void AOS_widg::imit_off()
 {
 
@@ -241,13 +241,15 @@ void AOS_widg::imit_on()
 {
 
 }
-void AOS_widg::update_graphics()
+void AOS_widg::update_graphics(int number_komplekta_AOS)
 {
 	//AOS_modes aos_modes;
+	nomer_vkluchaemogo_komplekta_samo_znachenie -> setText(QString("%1").arg(number_komplekta_AOS));
 	// --------- закрашиваине зелёным цветом конопок, которые оказались активными --------- начало -------
 	if (aos_modes.gpfm1 == 0)
 	{
-		nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
+		//nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
+		nomer_vkluchaemogo_komplekta_samo_znachenie->setNum(number_komplekta_AOS);
 		perviy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
 		vtoroi_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
 		tretiy_komplekt_GPFM1->setStyleSheet(" background-color: rgb(204, 204, 204);");
@@ -403,9 +405,9 @@ void AOS_widg::update_graphics()
 
 void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta_AOS)
 {
-	// printf("%d %c ", name_ustroistva, " = name_ustroistva \n");
-	// printf("%d %c ", number_komplekta, " = number_komplekta \n");
-	
+	//nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
+	nomer_vkluchaemogo_komplekta_samo_znachenie -> setNum(number_komplekta_AOS);
+	//risovanie_okna_AOS(number_komplekta_AOS);
 	if (name_ustroistva == 8)
 	{
 		funk_perescheta();
@@ -414,18 +416,18 @@ void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta_AOS)
 			AOS_KP_OFF; // значение равно 0
 			nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
 
-			update_graphics();
-			return;
+			update_graphics(number_komplekta_AOS);
+			return ;
 		};
 
 		if (number_komplekta_AOS == 1)
 		{// включить 1-й комплект
 		 // признак включения первого комплекта и передача этого признака отправителю
 			nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
-
-			update_graphics();
+			//nomer_vkluchaemogo_komplekta_samo_znachenie->setNum(number_komplekta_AOS);
+			update_graphics(number_komplekta_AOS);
 			AOS_KP_1; // значение равно 4
-			return;
+			return ;
 					  //  return emit  make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 1-го комплекта //
 		};
 		if (number_komplekta_AOS == 2)
@@ -433,7 +435,7 @@ void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta_AOS)
 		 // признак включения второго комплекта и передача этого признака отправителю
 			nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
 
-			update_graphics();
+			update_graphics(number_komplekta_AOS);
 			AOS_KP_2; // значение равно 2
 			return;
 					  //  return emit make_mt_at_state( name_ustroistva, number_komplekta); //  отправление информации отправителю от 2-го комплекта //
@@ -444,7 +446,7 @@ void AOS_widg::new_ku_mk(int name_ustroistva, int number_komplekta_AOS)
 		 // признак включения третьего комплекта и передача этого признака отправителю
 			nomer_vkluchaemogo_komplekta_samo_znachenie->setText(QString("%1").arg(number_komplekta_AOS));
 
-			update_graphics();
+			update_graphics(number_komplekta_AOS);
 			AOS_KP_3; // значение равно 1
 			return;
 					  //  return emit make_mt_at_state( name_ustroistva, number_komplekta); // отправление информации отправителю от 3-го комплекта // 
@@ -509,7 +511,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 			aos_state.gpfm1_dev_state = aos_modes.gpfm1;
 
 			funk_perescheta();
-			update_graphics();
+			update_graphics(number_komplekta_AOS);
 
 		}
 		if (tmp_cwd.subadr == 4)//данные СхОС
@@ -549,7 +551,7 @@ void AOS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantList
 		}
 
 
-		update_graphics();
+		update_graphics(number_komplekta_AOS);
 		set_new_tm();
 	}
 }
