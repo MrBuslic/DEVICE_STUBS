@@ -122,10 +122,11 @@ public:
 	omnibus_Socket_RPC_SLOT_Thread(RpcOmnibusWidget* _app, int _socketDescriptor);
 	void run();
 	std::shared_ptr<omnibus_Socket_RPC_SLOT_Object> get_obj(){ return rpc_obj; }
-	private:
+private:
 	std::shared_ptr<omnibus_Socket_RPC_SLOT_Object> rpc_obj;
 	RpcOmnibusWidget* app;
 	int socketDescriptor;
+	static int obj_num;
 };
 
 class omnibus_Socket_RPC_SLOT_Server : public QTcpServer

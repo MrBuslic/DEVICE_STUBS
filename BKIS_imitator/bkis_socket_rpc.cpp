@@ -232,11 +232,11 @@ int bkis_Socket_RPC_SLOT_Thread::obj_num = 0;
 			QVariantList signal_data;
 			QString signal_name;
 			tmp_stream >> signal_name;
-			if (!data_map.contains(signal_name))
-				return;
 			if (signal_name == "connect")
 			{
 				tmp_stream >> signal_name;
+				if (!data_map.contains(signal_name))
+					return;
 				SRPCSignalClass::Instance().toLog(QString("%1 connect signal %2").arg(objectName()).arg(signal_name));
 				data_map[signal_name]->signal_needed = true;
 			}
@@ -244,11 +244,15 @@ int bkis_Socket_RPC_SLOT_Thread::obj_num = 0;
 			if (signal_name == "disconnect")
 			{
 				tmp_stream >> signal_name;
+				if (!data_map.contains(signal_name))
+					return;
 				SRPCSignalClass::Instance().toLog(QString("%1 disconnect signal %2").arg(objectName()).arg(signal_name));
 				data_map[signal_name]->signal_needed = false;
 			}
 			else
 			{
+				if (!data_map.contains(signal_name))
+					return;
 				auto& descriptor = *data_map[signal_name].get();
 				SRPCSignalClass::Instance().toLog(QString("%1 signal %2 received data").arg(objectName()).arg(signal_name));
 				if (signal_name.toLocal8Bit().size() != tmp_size)

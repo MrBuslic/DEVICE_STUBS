@@ -27,6 +27,7 @@ public:
 	std::shared_ptr<RPC_ols_SLOT_Object> get_ols_obj() {return rpc_obj;}
 private:
 	std::shared_ptr<RPC_ols_SLOT_Object> rpc_obj;
+
 };
 
 class RPC_ols_SIGNAL_Object : public RPC_SIGNAL_Object
