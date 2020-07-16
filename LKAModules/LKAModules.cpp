@@ -222,10 +222,11 @@ QVariantList LKA06_MODULE::get_pups_words_list()
 	{
 		unsigned short tmp_word = 0x8000;
 		tmp_word += ((vchm_index & 0x3) << 9); //номер ВЧМа (биты 9-10)
-		tmp_word += 0xC0; //разрешение чтения и записи (биты 6-7)
+		
 		if (get_working(vchm_index))
 		{
 			tmp_word += 0x100; //признак включения ВЧМ (бит 8)
+			tmp_word += 0xC0; //разрешение чтения и записи (биты 6-7)
 			tmp_word += (PUPS & 0x1F); //пупс
 		}
 		tm_words << tmp_word;
