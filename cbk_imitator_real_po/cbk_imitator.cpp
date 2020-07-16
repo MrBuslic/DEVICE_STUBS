@@ -249,7 +249,7 @@ void CBK_MainWindow::set_VM_OFF(int n_vm)
 		STimeThread::Instance().cbk_conf.of = 0xF;
 		STimeThread::Instance().cbk_conf.er = 0xF;
 	}
-
+	on_timers_[n_vm]->stop();
 	set_tm_state();
 }
 
