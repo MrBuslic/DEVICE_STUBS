@@ -50,9 +50,9 @@ union AOS_modes
 			                         //   01 - включение первого устройства
 			                         //   10 - включение второго устройства
 			                         //   11 - включение третьего устройств 
-			sig_96 : 1,     // 0 - сигнал от УПИ, 1- сигнал от 15Э1827
-			dev_on : 1,     // 1 - включать устр-ва,1 - игнорировать первые биты
-			res : 4,
+			sig_96 : 1,     // 0 - сигнал от УПИ, 1 - сигнал от 15Э1827
+			dev_on : 1,     // 1 - включать устр-ва, 0 - игнорировать первые 7-0 битoв
+			res : 5,
 			kontr_mode : 1; // 0 - режим контроля, 1 - рабочий режим
 
 	};
@@ -62,107 +62,109 @@ union AOS_shos
 {
 	quint16 _words[32];
 	struct
-	{
+	{   // СД1
 		quint16 pprch_chans;
+		// СД2
 		quint16 pprch_key : 1, // 1 - основной ключ, 0 - резервный
 			dpkr_mode : 1,     // 1 - штатная работа, 0 - контроль // режим работы
 			res1 : 2,
 			pprch_afs2_mode : 1, //1 - многочастотный, 0 - одночастотный 
 			pprch_afs1_mode : 1, //1 - многочастотный, 0 - одночастотный
 			res2 : 10;            
+		// СД3
 		quint16 sts_afs1_freq_code : 9,  // поле "Код частоты синтезаторов точной сетки АФС1"
 			sgs_afs1_freq_code : 7;      // поле "Код частоты синтезаторов грубой сетки АФС1"
+		// СД4
 		quint16 sts_afs2_freq_code : 9,    // поле "Код частоты синтезаторов точной сетки АФС2"
 			sgs_afs2_freq_code : 7;        // поле "Код частоты синтезаторов грубой сетки АФС2"
-
+		//СД5
 		quint16 gs_chan_2 : 7,   // поле "адрес канала ГС" 
 			gs_chan_202 : 1,     // указатель "Канал приёма" | 0- 102 ; 1- 202  |
 			gs_chan_1 : 7,       // поле "адрес канала ГС"
 			gs_chan_201 : 1;     // указатель "Канал приёма" | 0- 101 ; 1- 201  |
-
-
+		//СД6
 		quint16 gs_chan_4 : 7,    // поле "адрес канала ГС"
 			gs_chan_204 : 1,      // указатель "Канал приёма" | 0- 104 ; 1- 204  |
 			gs_chan_3 : 7,        // поле "адрес канала ГС"
 			gs_chan_203 : 1;      // указатель "Канал приёма" | 0- 103 ; 1- 203  |
-
+		//СД7
 		quint16 gs_chan_6 : 7,  // поле "адрес канала ГС"
 			gs_chan_206 : 1,    // указатель "Канал приёма" | 0- 106 ; 1- 206  |
 			gs_chan_5 : 7,      // поле "адрес канала ГС"
 			gs_chan_205 : 1;    // указатель "Канал приёма" | 0- 105 ; 1- 205  |
-
+		//СД8
 		quint16 gs_chan_8 : 7,  // поле "адрес канала ГС"
 			gs_chan_208 : 1,    // указатель "Канал приёма" | 0- 108 ; 1- 208  |
 			gs_chan_7 : 7,      // поле "адрес канала ГС"
 			gs_chan_207 : 1;    // указатель "Канал приёма" | 0- 107 ; 1- 207  |
-
+		//СД9
 		quint16 gs_chan_10 : 7,   // поле "адрес канала ГС"
 			gs_chan_210 : 1,      // указатель "Канал приёма" | 0- 110 ; 1- 210  |
 			gs_chan_9 : 7,        // поле "адрес канала ГС"
 			gs_chan_209 : 1;      // указатель "Канал приёма" | 0- 109 ; 1- 209  |
-
+		//СД10
 		quint16 gs_chan_12 : 7, // поле "адрес канала ГС"
 			gs_chan_212 : 1,    // указатель "Канал приёма" | 0- 112 ; 1- 212  |
 			gs_chan_11 : 7,     // поле "адрес канала ГС"
 			gs_chan_211 : 1;    // указатель "Канал приёма" | 0- 111 ; 1- 211  |
-
+		//СД11
 		quint16 gs_chan_14 : 7,   // поле "адрес канала ГС"
 			gs_chan_214 : 1,      // указатель "Канал приёма" | 0- 114 ; 1- 214  |
 			gs_chan_13 : 7,       // поле "адрес канала ГС"
 			gs_chan_213 : 1;      // указатель "Канал приёма" | 0- 113 ; 1- 213  |
-
+		//СД12
 		quint16 gs_chan_16 : 7,  // поле "адрес канала ГС"
 			gs_chan_216 : 1,     // указатель "Канал приёма" | 0- 116 ; 1- 216  |
 			gs_chan_15 : 7,      // поле "адрес канала ГС"
 			gs_chan_215 : 1;     // указатель "Канал приёма" | 0- 115 ; 1- 215  |
-
+		//СД13
 		quint16 gs_chan_18 : 7,  // поле "адрес канала ГС"
 			gs_chan_218 : 1,     // указатель "Канал приёма" | 0- 118 ; 1- 218  |
 			gs_chan_17 : 7,      // поле "адрес канала ГС"
 			gs_chan_217 : 1;     // указатель "Канал приёма" | 0- 117 ; 1- 217  |
-
+		//СД14
 		quint16 gs_chan_20 : 7,     // поле "адрес канала ГС"
 			gs_chan_220 : 1,        // указатель "Канал приёма" | 0- 120 ; 1- 220  |
 			gs_chan_19 : 7,         // поле "адрес канала ГС"
 			gs_chan_219 : 1;        // указатель "Канал приёма" | 0- 119 ; 1- 219  |
-
+		//СД15
 		quint16 gs_chan_22 : 7,  // поле "адрес канала ГС"
 			gs_chan_222 : 1,     // указатель "Канал приёма" | 0- 122 ; 1- 222  |
 			gs_chan_21 : 7,      // поле "адрес канала ГС"
 			gs_chan_221 : 1;     // указатель "Канал приёма" | 0- 121 ; 1- 221  |
-
+		//СД16
 		quint16 gs_chan_24 : 7,    // поле "адрес канала ГС"
 			gs_chan_224 : 1,       // указатель "Канал приёма" | 0- 124 ; 1- 224  |
 			gs_chan_23 : 7,        // поле "адрес канала ГС"
 			gs_chan_223 : 1;       // указатель "Канал приёма" | 0- 123 ; 1- 223  |
-
+		//СД17
 		quint16 gs_chan_26 : 7,  // поле "адрес канала ГС"
 			gs_chan_226 : 1,     // указатель "Канал приёма" | 0- 126 ; 1- 226  |
 			gs_chan_25 : 7,      // поле "адрес канала ГС"
 			gs_chan_225 : 1;     // указатель "Канал приёма" | 0- 125 ; 1- 225  |
-
+		//СД18
 		quint16 gs_chan_gr2 : 7,   // поле "адрес каналов ГР2 в ГС [131 - 134] и [231 - 234]"
 			gs_chan_2gr2 : 1,      // указатель "каналы приёма ГР2" | 0-  [131 - 134] ; 1- [231 - 234] |
 			gs_chan_gr1 : 7,       // поле "адрес каналов ГР1 в ГС [127 - 130] и [227-230]"
 			gs_chan_2gr1 : 1;      // указатель "каналы приёма ГР1" | 0-  [127 - 130] ; 1- [227 - 230] |
-
+		//СД19
 		quint16 gs_chan_gr4 : 7, // поле "адрес каналов ГР4 в ГС [139 - 142] и [239 - 242]"
 			gs_chan_2gr4 : 1,    // указатель "каналы приёма ГР3" | 0-  [139 - 142] ; 1- [239 - 242] |
 			gs_chan_gr3 : 7,     // поле "адрес каналов ГР3 в ГС [135 - 138] и [235-238]"
 			gs_chan_2gr3 : 1;    // указатель "каналы приёма ГР3" | 0-  [135 - 138] ; 1- [235 - 238] |
-
+		//СД20
 		quint16 gs_chan_gr_res : 8,
 			gs_chan_gr5 : 7,          // поле "адрес каналов ГР5 в ГС [143 - 146] и [243 - 246]"
 			gs_chan_2gr5 : 1;         // указатель "каналы приёма ГР5" | 0- [143 - 146] ; 1- [243 - 246]  |
-
+		//СД21
 		quint16 komut_12 : 12,  // поле "Данные комутатора сигнала 1,2 Кбит/с"
 			pr_12 : 1,          // 0 - АФС-1, 1 - АФС-2 !адрес приёмника!
 			res_12 : 3;
-
+		//СД22
 		quint16 komut_01 : 12,   // поле "Данные комутатора сигнала 0,1 Кбит/с"
 			pr_01 : 1,           // 0 - АФС-1, 1 - АФС-2 !признак "адреса приёмника"!
 			res_01 : 3;
-
+		//СД23
 		quint16 res3 : 4,
 			trans_mode : 1,  // 0 - 1 только СС, 1 - ГС + СС
 			shps_freq : 1,   // 0 - 19.2 МГц, 1 - 4.8 МГц
@@ -190,10 +192,12 @@ union AOS_shos
 							//01 – резерв
 							//10 – 300 кбит / с
 							//11 – 600 кбит / с
+		// СД24 - СД32 = 0
 		quint16 res_words[9];
 
 	};
 };
+
 
 union GSU_kommut
 {
@@ -221,7 +225,7 @@ union AOS_state
 			gpfm1_dev_state : 3,     // 3 комплекта ПРМ тракта АФС1
 			res_sd2 : 1,
 			restart_watchdog : 1,    // 1 - перезаупск по сторожевому таймеру, 0 - после включения АОС-МЧ потенциальной командой
-			aos_test_data_ready : 1,  
+			aos_test_data_ready : 1, // указатель "Готовность данных самоконтроля АОС-МЧ" 
 			kontr_mode : 1;          // указатель "Режим работы АОС" | 1- штатная работа; 0- самоконтроль |
 		// СД3
 		quint16 kontr_dev_working : 3,  // 3 комплекта устройства контроля
@@ -255,7 +259,7 @@ union AOS_state
 			signal_OG_v_ustroistve_CGO : 1,  // 1- cигнал ОГ присутствует на входе ЦГО; 0 - отсутствие сигнала ОГ на входе ЦГО
 			rezerv_SD5_2 : 1,                // резерв ( значение разряда - 1 ) 
 			rezerv_SD5_3 : 2,                // резерв ( значение разряда - 0 ) 
-			rabotosposobnost_intef_VMU_BU_AOS : 1,              // работоспособность интерфейса ВМУ БУ АОС  (_VMU_ внутренняя гистраль управления)
+			rabotosposobnost_intef_VMU_BU_AOS : 1,              // работоспособность интерфейса ВМУ БУ АОС  (_VMU_ внутренняя магистраль управления)
 			rabotosposobnost_intef_VMU_ustroistva_kontrily : 1, // работоспособность интерфейса ВМУ устройства контроля
 			rabotosposobnost_intef_VMU_ustroistva_CGO : 1,      // работоспособность интерфейса ВМУ устройства ЦГО;        | 1 - исправно ; 0 - неисправно | 
 			rabotosposobnost_intef_VMU_PRM_trakta_AFS2 : 1,     // работоспособность интерфейса ВМУ ПРМ тракта АФС2 (ГПФМ2)
@@ -288,7 +292,68 @@ union AOS_state
 	};
 };
 
+union AOS_PPRCH
+{
+	quint16 _words_p[32];
+	struct
+	{
+		quint16 osn_key_pprch1;
+		quint16 osn_key_pprch2;
+		quint16 osn_key_pprch3;
+		quint16 osn_key_pprch4;
+		quint16 osn_key_pprch5;
+		quint16 osn_key_pprch6;
+		quint16 osn_key_pprch7;
+		quint16 osn_key_pprch8;
+		quint16 rez1 : 8,
+			    uslovn_number_osn_key_pprch : 8;
+		quint16 rez_key_pprch1;
+		quint16 rez_key_pprch2;
+		quint16 rez_key_pprch3;
+		quint16 rez_key_pprch4;
+		quint16 rez_key_pprch5;
+		quint16 rez_key_pprch6;
+		quint16 rez_key_pprch7;
+		quint16 rez_key_pprch8;
+		quint16 rez2 : 8,
+			    uslovn_number_rez_key_pprch : 8;
+		quint16 res1_words_pprch[10];
+		quint16 kontrolnay_summa_pprch;
+		quint16 res2_words_pprch[3];
+	};
+};
 
+
+union AOS_shps
+{
+	quint16 _words_s[32];
+	struct
+	{
+		quint16 osn_key_shos1;
+		quint16 osn_key_shos2;
+		quint16 osn_key_shos3;
+		quint16 osn_key_shos4;
+		quint16 osn_key_shos5;
+		quint16 osn_key_shos6;
+		quint16 osn_key_shos7;
+		quint16 osn_key_shos8;
+		quint16 kod_PilotSignala_shps : 11,
+			    rez1 : 5;
+		quint16 rez_key_shos1;
+		quint16 rez_key_shos2;
+		quint16 rez_key_shos3;
+		quint16 rez_key_shos4;
+		quint16 rez_key_shos5;
+		quint16 rez_key_shos6;
+		quint16 rez_key_shos7;
+		quint16 rez_key_shos8;
+		quint16 kod_PilotSignala_shps2 : 11,
+			    rez2 : 5;
+		quint16 res1_words_shps[10];
+		quint16 kontrolnay_summa_shps;
+		quint16 res2_words_shps[3];
+	};
+};
 
 class AOS_widg : public QWidget
 {
@@ -301,7 +366,7 @@ public:
 private:
 	//AOS_KP current_KP = AOS_OFF;
 	// ---------- виджеты --------- начало --------
-	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры ( name_ustroistva = 8 (AOC); number_komplekta_AOS = 1|2|3 )
+	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры ( name_ustroistva = 8 (AOC); number_komplekta_AOS = 0|1|2|3 )
 	QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
 	QLabel *nomer_vkluchaemogo_komplekta_samo_znachenie; // сам номер устройства
 	//QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
@@ -331,11 +396,13 @@ private:
 //	QGroupBox *Group_Vkl_kompl_AOS;
 	
 	void risovanie_okna_AOS();  // и остальных виджетов АОС
-	void update_graphics(int);  // обновление графики
+	void update_graphics(int); // обновление графики
 	void funk_perescheta(); // преобразует входные данные 0,1,2,3 в 0,1,2,4
 	void set_new_tm();     // составление ОК-ов
-	void TMI_1_AOS();   // составление ТМИ - 1 
-	void TMI_2_AOS();  // составление ТМИ - 2
+	void TMI_1_AOS();   // составление ТМИ - 1 (для чтения)
+	void TMI_2_AOS();  // составление ТМИ - 2 (для чтения)
+	void PPRCH_chten(); // для чтения ключей ППРЧ | - не используется
+	void CHPS_chten(); // для чтения ключей ШПС   | - не используется
 	void imit_off();  // включение имитатора
 	void imit_on();  // выключение имитатора
 protected:
@@ -354,14 +421,14 @@ private:
 	DEVICE_STATES gpfm2_dev;
 	DEVICE_STATES gpfm1_dev;
 	
-	AOS_shos shos;
-	AOS_state aos_state;
+	AOS_shos shos;  // для ТМИ-1 АОС записывается по подадресу 4 читается по подадресу 15
+    AOS_state aos_state;
+	AOS_PPRCH AOS_PPRCH;
+	AOS_shps AOS_shps;
+//	AOS_shos2 shos2;  // для ТМИ-2 АОС записывается по подадресу 5 читается по подадресу 16
+
 	AOS_modes aos_modes;
 	QList<GSU_kommut> gsu_kommut;
-
-	//QGroupBox group_spravochnay_inform;
-	//QGroupBox group_komplektov;
-
 
 	QByteArray pprch_main_key_data;
 	int pprch_main_key_num;

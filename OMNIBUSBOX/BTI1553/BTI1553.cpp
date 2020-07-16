@@ -188,7 +188,29 @@ BTI1553API VOID __stdcall BTI1553_MsgDataWr(LPUSHORT buf,INT count,MSGADDR msgad
 BTI1553API ULONG __stdcall BTI1553_MsgFieldRd(USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API ULONG __stdcall BTI1553_MsgFieldWr(ULONG fieldval,USHORT fieldtype,MSGADDR msgaddr,HCORE handleval){ return 0; }
 BTI1553API VOID __stdcall BTI1553_MsgGroupDataRd(INT nummsgs,USHORT databufs[][32],LPMSGADDR msgaddrptr,HCORE handleval){  }
-BTI1553API VOID __stdcall BTI1553_MsgGroupDataWr(INT nummsgs,USHORT databufs[][32],LPMSGADDR msgaddrptr,HCORE handleval){  }
+BTI1553API VOID __stdcall BTI1553_MsgGroupDataWr(INT nummsgs,USHORT databufs[][32],LPMSGADDR msgaddrptr,HCORE handleval)
+{
+	for (int i = 0; i < nummsgs; i++)
+	{
+
+		QVariantList tmp_msgs;
+		for (int j = 0; j < 32; j++)
+			tmp_msgs << databufs[i][j];
+
+		rpc_buffer_class_1553& tmp_buf(Srpc_buffer_class_1553::Instance());
+		MsgAddr& tmp_addr(tmp_buf.msg_addrs[msgaddrptr[i]]);
+		if (tmp_addr.f5)
+		{
+			tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data_f5(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs.at(0).toInt());
+		}
+		else
+		{
+			tmp_buf.omnibus_slot_thr.get_omnibus_obj()->set_new_data(tmp_addr.mko, tmp_addr.addr, tmp_addr.saddr, tmp_msgs);
+		}
+
+
+	}
+}
 BTI1553API VOID __stdcall BTI1553_MsgGroupRd(INT nummsgs,LPMSGFIELDS1553 msgflds,LPMSGADDR msgaddrptr,HCORE handleval){ }
 BTI1553API VOID __stdcall BTI1553_MsgGroupWr(INT nummsgs,LPMSGFIELDS1553 msgflds,LPMSGADDR msgaddrptr,HCORE handleval){ }
 BTI1553API BOOL __stdcall BTI1553_MsgSkipRd(MSGADDR msgaddr,HCORE handleval){ return 0; }
