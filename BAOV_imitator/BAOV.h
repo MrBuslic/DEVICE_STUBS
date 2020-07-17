@@ -176,7 +176,7 @@ private:
 
 	QPlainTextEdit* Logs;
 	QLineEdit* Mode_le;
-	const int MKO = 1;
+	const int MKO = 0;
 	const int adr = 10;
 	QPushButton * okBut;
 	QDialog *dlg;

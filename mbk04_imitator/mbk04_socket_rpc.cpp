@@ -3,6 +3,7 @@
 int mbk04_Socket_RPC_SLOT_Object::obj_num = 0;
 int mbk04_Socket_RPC_SIGNAL_Object::obj_num = 0;
 int mbk04_Socket_RPC_SIGNAL_Object::call_number = 0;
+int mbk04_Socket_RPC_SLOT_Thread::obj_num = 0;
 
 	mbk04_Socket_RPC_SIGNAL_Thread::mbk04_Socket_RPC_SIGNAL_Thread() : QThread()
 	{
@@ -61,7 +62,9 @@ int mbk04_Socket_RPC_SIGNAL_Object::call_number = 0;
 	}
 
 	mbk04_Socket_RPC_SLOT_Thread::mbk04_Socket_RPC_SLOT_Thread(MainWidget* _app, int _socketDescriptor) : app(_app), socketDescriptor(_socketDescriptor)
-	{}
+	{
+	setObjectName(QString("mbk04_Socket_RPC_SLOT_Thread_%1").arg(obj_num++));
+	}
 
 	void mbk04_Socket_RPC_SLOT_Server::incomingConnection(qintptr socketDescriptor)
 	{
@@ -229,6 +232,8 @@ int mbk04_Socket_RPC_SIGNAL_Object::call_number = 0;
 			if (signal_name == "connect")
 			{
 				tmp_stream >> signal_name;
+				if (!data_map.contains(signal_name))
+					return;
 				SRPCSignalClass::Instance().toLog(QString("%1 connect signal %2").arg(objectName()).arg(signal_name));
 				data_map[signal_name]->signal_needed = true;
 			}
@@ -236,11 +241,15 @@ int mbk04_Socket_RPC_SIGNAL_Object::call_number = 0;
 			if (signal_name == "disconnect")
 			{
 				tmp_stream >> signal_name;
+				if (!data_map.contains(signal_name))
+					return;
 				SRPCSignalClass::Instance().toLog(QString("%1 disconnect signal %2").arg(objectName()).arg(signal_name));
 				data_map[signal_name]->signal_needed = false;
 			}
 			else
 			{
+				if (!data_map.contains(signal_name))
+					return;
 				auto& descriptor = *data_map[signal_name].get();
 				SRPCSignalClass::Instance().toLog(QString("%1 signal %2 received data").arg(objectName()).arg(signal_name));
 				if (signal_name.toLocal8Bit().size() != tmp_size)
