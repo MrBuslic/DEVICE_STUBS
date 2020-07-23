@@ -5,7 +5,6 @@ set(CMAKE_AUTOMOC ON)
 SET (CMAKE_AUTOUIC ON)
 enable_language(CXX)
 
-include_directories($ENV{LOKI_HOME}/include)	
 find_package(Qt5Core)
 find_package (Qt5Gui)
 find_package(Qt5Widgets)

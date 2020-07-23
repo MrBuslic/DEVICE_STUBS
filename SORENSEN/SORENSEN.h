@@ -18,10 +18,7 @@
 #include <QTcpServer>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
 #include "../UNKP50/kp50_rpc.h"
-
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class SORENSENWidget : public QWidget
 {

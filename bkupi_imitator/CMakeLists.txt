@@ -30,7 +30,6 @@ include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/incl
 add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(-DNOMINMAX)
 
-include_directories($ENV{LOKI_HOME}/include)
 include_directories("../../vendor/libgit2/include")
 include_directories("../../lib/my_git")
 include_directories("../../lib/common_functions")

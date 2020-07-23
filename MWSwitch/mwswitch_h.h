@@ -4,14 +4,22 @@
 #include "mwswitch_rpc.h"
 #include "rpc_ports.h"
 
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class rpc_buffer_class
 {
 public:
 	QList<RPC_mwswitch_SLOT_Thread*> mwswitch_slot_thr;
 	QList<RPC_mwswitch_SIGNAL_Thread*> mwswitch_signal_thr;
-	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+
+
+	static rpc_buffer_class& Instance()
+	{
+		static rpc_buffer_class inst;
+		return inst;
+	}
+	rpc_buffer_class(rpc_buffer_class const&) = delete;
+	rpc_buffer_class& operator= (rpc_buffer_class const&) = delete;
+
 private:
 	rpc_buffer_class()
 	{
@@ -34,6 +42,6 @@ private:
 	}
 };
 
-SINGLETON_DEF(rpc_buffer_class);
+typedef rpc_buffer_class Srpc_buffer_class;
 
 #endif /* __UNMDS32_H */

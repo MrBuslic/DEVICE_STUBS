@@ -14,7 +14,6 @@
 #include <QMutex>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
 #include "rpc_ports.h"
 #include "rpc_loger.h"
 
@@ -39,8 +38,6 @@ enum F4_COMMAND
 	DEBLOCK_Nth_TRANSMITTER,
 	END
 };
-
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 struct RpcAbonent
 {

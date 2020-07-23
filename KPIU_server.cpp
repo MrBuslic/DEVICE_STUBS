@@ -243,6 +243,12 @@ KPIUServer::KPIUServer(QWidget* parent, QString platform) : QWidget(parent), rm_
 		ip_state.insert(2, false);
 		ip_state.insert(3, false);
 	}
+	if (rm_type == "iksa")
+	{
+		QProcess::startDetached(QApplication::applicationDirPath() + "/iksa_server");
+		QThread::currentThread()->msleep(2000);
+		//QProcess::startDetached(QApplication::applicationDirPath() + "/client");
+	}
 	if ((rm_type == "bkupi")|| (rm_type == "mca"))
 	{
 		QThread::currentThread()->msleep(3000);
