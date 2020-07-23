@@ -14,7 +14,6 @@
 #include <QMutex>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
 
 #include "../buses_imitator/power_bus_rpc.h"
 
@@ -28,8 +27,6 @@ enum KP50_CHANNELS
 	KPCHANNEL_3,
 	KPLAST
 };
-
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class RpcKP50Widget : public QWidget
 {

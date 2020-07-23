@@ -4,7 +4,6 @@
 #include <socket_rpc.h>
 #include <windows.h>
 #include "ols_rpc.h"
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class ols_rpc_buffer_class : public QObject
 {
@@ -19,7 +18,6 @@ public:
 	};*/
 	int rec_packs;
 	int rec_event;
-	friend struct Loki::CreateUsingNew<ols_rpc_buffer_class>;
 		
 	QList<int> pack_num;
 	QList<QVector <int> > periods;
@@ -38,10 +36,19 @@ public:
 		}
 	}
 	void unols_mKRLastFrameReceivedUserCallback(ViSession vi, ViUInt16 eventREG);
+
+	static ols_rpc_buffer_class& Instance()
+	{
+		static ols_rpc_buffer_class inst;
+		return inst;
+	}
+	ols_rpc_buffer_class(ols_rpc_buffer_class const&) = delete;
+	ols_rpc_buffer_class& operator= (ols_rpc_buffer_class const&) = delete;
+
 public slots:
 	void packet_ready(unsigned int vi, QVariantList& data_buffer);
 signals:
 	void read_data_kr(QVariantList& data_buffer);
 };
-SINGLETON_DEF(ols_rpc_buffer_class);
+typedef ols_rpc_buffer_class Sols_rpc_buffer_class;
 #endif /* __UNOLS_H_H */

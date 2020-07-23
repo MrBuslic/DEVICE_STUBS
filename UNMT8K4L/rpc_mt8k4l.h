@@ -16,9 +16,6 @@
 #include <QLineEdit>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
-
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class RpcMT8K4LWidget : public QWidget
 {

@@ -14,14 +14,10 @@
 #include <QMutex>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
 #include "frameSettings.hpp"
 
 #include "../buses_imitator/frame_bus_rpc.h"
 
-#ifndef SINGLETON_DEF
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-#endif
 class RpcMKPRMWidget : public QWidget
 {
 	Q_OBJECT

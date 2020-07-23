@@ -4,16 +4,21 @@
 #ifndef UNMFSK24_H_H
 #define UNMFSK24_H_H
 
-#ifndef SINGLETON_DEF
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-#endif
-
 class rpc_buffer_class
 {
 public:
 	QList<RPC_mfsk24_SLOT_Thread*> mfsk24_slot_thr;
 	QList<RPC_mfsk24_SIGNAL_Thread*> mfsk24_signal_thr;
-	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+
+
+	static rpc_buffer_class& Instance()
+	{
+		static rpc_buffer_class inst;
+		return inst;
+	}
+	rpc_buffer_class(rpc_buffer_class const&) = delete;
+	rpc_buffer_class& operator= (rpc_buffer_class const&) = delete;
+
 	int num_add;
 	QMap<int, QMap<int, int> > mfsk_addrs;
 private:
@@ -67,6 +72,6 @@ private:
 
 };
 
-SINGLETON_DEF(rpc_buffer_class);
+typedef rpc_buffer_class Srpc_buffer_class;
 
 #endif /* UNMFSK24_H_H */

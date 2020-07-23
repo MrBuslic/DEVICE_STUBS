@@ -31,7 +31,6 @@ include_directories(${Qt5Gui_INCLUDES})
 include_directories(${Qt5Widgets_INCLUDES})
 include_directories(${Qt5Network_INCLUDES})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories($ENV{LOKI_HOME}/include)
 
 add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(-DNOMINMAX)

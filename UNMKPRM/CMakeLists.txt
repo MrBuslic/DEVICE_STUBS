@@ -2,7 +2,6 @@ project(UNMKPRM)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_AUTOMOC ON)
-include_directories($ENV{LOKI_HOME}/include)	
 
 find_package(Qt5Core)
 find_package(Qt5Gui)
