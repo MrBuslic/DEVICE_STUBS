@@ -6,15 +6,20 @@
 #include <QTextEdit>
 #include "interrupt_bus_rpc.h"
 #include <QMutex>
-#include "loki\Singleton.h"
-
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 	class  InterImitObject : public QObject
 	{
 		Q_OBJECT
 	public:
-		InterImitObject();
+
+		static InterImitObject& Instance()
+		{
+			static InterImitObject inst;
+			return inst;
+		}
+		InterImitObject(InterImitObject const&) = delete;
+		InterImitObject& operator= (InterImitObject const&) = delete;
+
 		void create_signal_thread();
 		void stop_signal_thread();
 		void create_slot_thread();
@@ -30,6 +35,8 @@
 		RPC_interrupt_bus_SLOT_Thread* get_interrupt_slot_thread() { return interrupt_slot_thread; };
 
 	private:
+		InterImitObject();
+
 		int IrqMask;
 		int GotIrqMask;
 		RPC_interrupt_bus_SLOT_Thread* interrupt_slot_thread;
@@ -44,7 +51,7 @@
 
 	};
 
-	SINGLETON_DEF(InterImitObject);
+	typedef InterImitObject SInterImitObject;
 
 
 #endif

@@ -10,9 +10,6 @@
 
 #include "omnibus_rpc.h"
 
-#ifndef SINGLETON_DEF
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-#endif
 //структура командного слова сообщения МКО
 //
 union MkoWord1553
@@ -70,7 +67,6 @@ class rpc_buffer_class_1553 : public QObject
 {
 	Q_OBJECT
 public:
-	rpc_buffer_class_1553() { msg_ind = 0;}
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
 	int create_msg_addr(int addr, int saddr, int mko, bool f5);
@@ -79,12 +75,24 @@ public:
 	QMap<int, LstAddr> lst_addrs;
 	QMutex msg_mutex;
 	bool signal_connected = false;
+
+
+	static rpc_buffer_class_1553& Instance()
+	{
+		static rpc_buffer_class_1553 inst;
+		return inst;
+	}
+	rpc_buffer_class_1553(rpc_buffer_class_1553 const&) = delete;
+	rpc_buffer_class_1553& operator= (rpc_buffer_class_1553 const&) = delete;
+
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 private:
+	rpc_buffer_class_1553() { msg_ind = 0; }
+
 	int msg_ind;
 };
 
-SINGLETON_DEF(rpc_buffer_class_1553);
+typedef rpc_buffer_class_1553 Srpc_buffer_class_1553;
 
 #endif

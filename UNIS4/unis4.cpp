@@ -4,9 +4,6 @@
 #include "is4_rpc.h"
 #include "rpc_ports.h"
 
-#ifndef SINGLETON_DEF
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-#endif
 
 int is4_count = 0;
 
@@ -15,7 +12,13 @@ class rpc_buffer_class
 public:
 	QList<RPC_is4_SLOT_Thread*> is4_slot_thr;
 	QList<RPC_is4_SIGNAL_Thread*> is4_signal_thr;
-	friend struct Loki::CreateUsingNew<rpc_buffer_class>;
+	static rpc_buffer_class& Instance()
+	{
+		static rpc_buffer_class inst;
+		return inst;
+	}
+	rpc_buffer_class(rpc_buffer_class const&) = delete;
+	rpc_buffer_class& operator= (rpc_buffer_class const&) = delete;
 private:
 	rpc_buffer_class()
 	{
@@ -37,7 +40,7 @@ private:
 	}
 };
 
-SINGLETON_DEF(rpc_buffer_class);
+typedef rpc_buffer_class Srpc_buffer_class;
 
 #if defined(__cplusplus) || defined(__cplusplus__)
 extern "C" {

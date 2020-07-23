@@ -10,8 +10,6 @@
 
 #include "omnibus_rpc.h"
 
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-
 //структура командного слова сообщения МКО
 //
 union MkoWord
@@ -35,6 +33,16 @@ private:
 	QMutex msg_mutex;
 
 public:
+
+
+	static rpc_buffer_class& Instance()
+	{
+		static rpc_buffer_class inst;
+		return inst;
+	}
+	rpc_buffer_class(rpc_buffer_class const&) = delete;
+	rpc_buffer_class& operator= (rpc_buffer_class const&) = delete;
+
 	RPC_omnibus_SLOT_Thread omnibus_slot_thr;
 	RPC_omnibus_SIGNAL_Thread omnibus_signal_thr;
 	int get_msgs_size();
@@ -44,9 +52,10 @@ public:
 public slots:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
 private:
+	rpc_buffer_class() {}
 	SEQRECORD1553 last_msg;
 	SEQRECORDMORE1553 more_msg;
 };
 
-SINGLETON_DEF(rpc_buffer_class);
+typedef rpc_buffer_class Srpc_buffer_class;
 #endif

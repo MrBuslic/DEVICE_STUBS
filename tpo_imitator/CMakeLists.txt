@@ -26,7 +26,6 @@ include_directories(${Qt5Network_INCLUDES})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories($ENV{MONGO_HOME}/include)
 include_directories($ENV{MONGO_HOME}/include/libmongoc-1.0 $ENV{MONGO_HOME}/include/libbson-1.0 $ENV{MONGO_HOME}/include/mongocxx/v_noabi $ENV{MONGO_HOME}/include/bsoncxx/v_noabi)
-include_directories($ENV{LOKI_HOME}/include)
 
 add_definitions(-DSTATIC_LIBMONGOCLIENT)
 add_definitions(-DNOMINMAX)

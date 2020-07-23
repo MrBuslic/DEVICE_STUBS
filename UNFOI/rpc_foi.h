@@ -14,13 +14,9 @@
 #include <QMutex>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
 
 #include "../buses_imitator/interrupt_bus_rpc.h"
 
-#ifndef SINGLETON_DEF
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
-#endif
 class RpcFoiWidget : public QWidget
 {
 	Q_OBJECT

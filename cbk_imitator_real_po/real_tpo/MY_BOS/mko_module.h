@@ -6,15 +6,13 @@
 #include <QTextEdit>
 #include "omnibus_rpc.h"
 #include <QMutex>
-#include "loki\Singleton.h"
 
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 	class  MkoImitObject : public QObject
 	{
 		Q_OBJECT
 	public:
-		MkoImitObject();
+		
 		void create_slot_thread();
 		void stop_slot_thread();
 		public slots:
@@ -22,7 +20,16 @@
 		void slot_send_msg_def_mko(int adr, int subadr, int direct, int count_words, QVariantList& words);
 		RPC_omnibus_SLOT_Thread* get_mko_slot_thread() { return mko_slot_thread; };
 
+		static MkoImitObject& Instance()
+		{
+			static MkoImitObject inst;
+			return inst;
+		}
+		MkoImitObject(MkoImitObject const&) = delete;
+		MkoImitObject& operator= (MkoImitObject const&) = delete;
+
 	private:
+		MkoImitObject();
 		RPC_omnibus_SLOT_Thread* mko_slot_thread;
 		RPC_omnibus_SIGNAL_Thread* mko_signal_thread;
 		QString log_filename;
@@ -35,7 +42,7 @@
 
 	};
 
-	SINGLETON_DEF(MkoImitObject);
+	typedef MkoImitObject SMkoImitObject;
 
 
 #endif

@@ -17,11 +17,9 @@
 #include <QTime>
 #include <memory>
 #include <qlayout.h>
-#include <loki/Singleton.h>
 #include "../buses_imitator/mku_bus_rpc.h"
 #include "rpc_loger.h"
 
-#define SINGLETON_DEF(x) typedef Loki::SingletonHolder<x,Loki::CreateUsingNew,Loki::NoDestroy> S##x;
 
 class RpcADS128Widget : public QWidget
 {
