@@ -25,8 +25,6 @@
 			static MkoImitObject inst;
 			return inst;
 		}
-		MkoImitObject(MkoImitObject const&) = delete;
-		MkoImitObject& operator= (MkoImitObject const&) = delete;
 
 	private:
 		MkoImitObject();

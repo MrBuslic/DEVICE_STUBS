@@ -98,7 +98,7 @@ taskResumVec(
 taskDelay(
 	UINT delayTime  /* интервал времени */
 ){
-	 Sleep(delayTime);
+	 QThread::currentThread()->msleep(delayTime);
 	 return 0;}
 
 /* Приостановка задачи до заданного времени */

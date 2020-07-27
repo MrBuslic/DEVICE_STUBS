@@ -7,7 +7,7 @@
 
 struct TASK_STR
 {
-	USHORT task_ind;
+	unsigned short task_ind;
 	int start_arg;
 };
 
@@ -19,7 +19,7 @@ public:
 	int add_mutex();
 	void remove_mutex(int ind);
 
-	void create_task(USHORT task_ind, int start_arg);
+	void create_task(unsigned short task_ind, int start_arg);
 	void run();
 
 
