@@ -157,6 +157,9 @@ mkoPackIniStart(
 		case 2:
 			trans_dir = 1;
 			break;
+		case 4:
+			trans_dir = 1;
+			break;
 		}
 		mko = numMKO;
 		line = DescMsgArray[i]->Chan;
@@ -168,6 +171,8 @@ mkoPackIniStart(
 		int word_count = CMWord.count_word;
 		if (word_count == 0)
 			word_count = 32;
+
+		trans_dir = CMWord.trans_dir;
 		if (trans_dir == 0)
 		{
 			for (int j = 0; j < word_count; j++)
