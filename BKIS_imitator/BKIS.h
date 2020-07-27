@@ -203,6 +203,10 @@ private:
 	QMap<int, int> pyro_groups_states;
 	QMap<int, int> electric_heaters_states;
 	
+	QGroupBox *blk_gb;
+	QGroupBox *interfaces_gb;
+	QGroupBox *pyro_buses_gb;
+
 	QPushButton* main_blk;
 	QPushButton* reserve_blk;
 	QPushButton* main_interface;
@@ -220,7 +224,6 @@ private:
 
 	RPC_power_bus_SLOT_Thread power_slot_thr;
 	RPC_power_bus_SIGNAL_Thread power_signal_thr;
-
 
 };
 

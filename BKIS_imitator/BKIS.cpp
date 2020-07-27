@@ -27,7 +27,7 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	{
 		BLKIIH_word.ok_tm_word[i] = 0;
 	}
-
+		
 	main_blk = new QPushButton("Вкл основной БЛК", this);
 	main_blk->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 	reserve_blk = new QPushButton("Вкл резервный БЛК", this);
@@ -44,23 +44,41 @@ BKIS_widg::BKIS_widg(QWidget *parent)
 	third_pyro_bus = new QPushButton("Вкл третью шину пиропатронов", this);
 	third_pyro_bus->setSizePolicy(QSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed));
 
+	QGroupBox* blk_interface_gb = new QGroupBox(this);
+	QGroupBox* blk_gb = new QGroupBox("БЛК", this);
+	QGroupBox* interface_gb = new QGroupBox("Интерфейсы", this);
+	QGroupBox* pyro_buses_gb = new QGroupBox("Шины пиропатронов", this);
+
 	QHBoxLayout* main_lay = new QHBoxLayout(this);
+	QVBoxLayout* lay_blk_interface = new QVBoxLayout(blk_interface_gb);
+	QVBoxLayout* lay_blk = new QVBoxLayout(blk_gb);
+	QVBoxLayout* lay_interface = new QVBoxLayout(interface_gb);
+	QVBoxLayout* lay_pyro_buses = new QVBoxLayout(pyro_buses_gb);
+	
+	blk_gb->setAlignment(Qt::AlignHCenter);
+	interface_gb->setAlignment(Qt::AlignHCenter);
+	pyro_buses_gb->setAlignment(Qt::AlignHCenter);
+	
+	lay_blk_interface->addWidget(blk_gb);
+	lay_blk_interface->addWidget(interface_gb);
 
-	QVBoxLayout* lay_blk_interface = new QVBoxLayout(this);
-	//lay_blk_interface->addStretch(10);
-	lay_blk_interface->addWidget(main_blk);
-	lay_blk_interface->addWidget(reserve_blk);
-	lay_blk_interface->addWidget(main_interface);
-	lay_blk_interface->addWidget(reserve_interface);
-	QVBoxLayout* lay_pyro_buses = new QVBoxLayout(this);
+	//----------Добавление кнопок----------
+	lay_blk->addWidget(main_blk);
+	lay_blk->addWidget(reserve_blk);
+	lay_blk->setAlignment(Qt::AlignHCenter);
 
-	//lay_pyro_buses->addStretch(10);
+	lay_interface->addWidget(main_interface);
+	lay_interface->addWidget(reserve_interface);
+	lay_interface->setAlignment(Qt::AlignHCenter);
+	
 	lay_pyro_buses->addWidget(first_pyro_bus);
 	lay_pyro_buses->addWidget(second_pyro_bus);
 	lay_pyro_buses->addWidget(third_pyro_bus);
-	
-	main_lay->addLayout(lay_blk_interface);
-	main_lay->addLayout(lay_pyro_buses);
+	lay_pyro_buses->setAlignment(Qt::AlignHCenter);
+	//-------------------------------------
+
+	main_lay->addWidget(blk_interface_gb);
+	main_lay->addWidget(pyro_buses_gb);
 
 	slot_thr.set_connection_params("127.0.0.1", OMNIBUS_SLOT);
 	slot_thr.start();
@@ -286,9 +304,9 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 				}
 			}
 			
-			if (tmp_word >> 6 == 0x33)
+			if (tmp_word >> 6 == 0xCD)
 			{
-				switch (tmp_word & 0x004F)
+				switch (tmp_word & 0x003F)
 				{
 				case 9:
 					BLKIIH_word.s_9_heater_work = 1;
@@ -324,7 +342,9 @@ void BKIS_widg::new_message(QVariant dt, int mko, int line, int cwd, QVariantLis
 					BLKIIH_word.s_25_heater_work = 1;
 					break;
 				}
-				switch (tmp_word & 0x00CF)
+			}
+			else if (tmp_word >> 6 == 0xCF) {
+				switch (tmp_word & 0x003F)
 				{
 				case 9:
 					BLKIIH_word.s_9_heater_work = 0;
