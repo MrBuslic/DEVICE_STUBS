@@ -439,6 +439,8 @@ void BAU_widg::imit_off()
 	tm_data.VPBAU_3 = 0;
 	omnibus_slot_thr.get_omnibus_obj()->switch_ab(MKO, adr, false);
 	update_graphics_BAU();
+	ZTM_create();
+	set_tm_state();
 }
 
 void BAU_widg::new_mk(int mshm, int pshm, int length_m, int length_p, double u_m, double u_p, int dt, int line_m, int line_p)
@@ -1078,28 +1080,72 @@ void BAU_widg::ZTM_create()
 		ZTM.TM_LBV_FP_1 = 0;
 		ZTM.TM_LBV_FP_2 = 0;
 		ZTM.TM_LBV_FP_3 = 0;
+
+		ZTM.TM_Uc_LBV_1 = 0;
+		ZTM.TM_Uc_LBV_2 = 0;  
+		ZTM.TM_Uc_LBV_3 = 0;
+
+		ZTM.TM_Rout_FOS_1 = 0; // mVt
+		ZTM.TM_Rout_FOS_2 = 0;
+		ZTM.TM_Rout_FOS_3 = 0;
+
+		ZTM.TM_Rout_LBV = 0; // mVt
+		ZTM.TM_Ic_LBV = 0; // mA
 		break;
 	case LBV_1:
 		ZTM.TM_LBV_FP_1 = 1;
 		ZTM.TM_LBV_FP_2 = 0;
 		ZTM.TM_LBV_FP_3 = 0;
+
+		ZTM.TM_Uc_LBV_1 = 1100100;
+		ZTM.TM_Uc_LBV_2 = 0;  
+		ZTM.TM_Uc_LBV_3 = 0; 
+
+		ZTM.TM_Rout_FOS_1 = 1100100; // mVt
+		ZTM.TM_Rout_FOS_2 = 0;
+		ZTM.TM_Rout_FOS_3 = 0;
+
+		ZTM.TM_Rout_LBV = 1100100; // mVt
+		ZTM.TM_Ic_LBV = 1100100; // mA
 		break;
 	case LBV_2:
 		ZTM.TM_LBV_FP_1 = 0;
 		ZTM.TM_LBV_FP_2 = 1;
 		ZTM.TM_LBV_FP_3 = 0;
+
+		ZTM.TM_Uc_LBV_1 = 0;
+		ZTM.TM_Uc_LBV_2 = 1100100;
+		ZTM.TM_Uc_LBV_3 = 0;
+
+		ZTM.TM_Rout_FOS_1 = 0; // mVt
+		ZTM.TM_Rout_FOS_2 = 1100100;
+		ZTM.TM_Rout_FOS_3 = 0;
+
+		ZTM.TM_Rout_LBV = 1100100; // mVt
+		ZTM.TM_Ic_LBV = 1100100; // mA
 		break;
 	case LBV_3:
 		ZTM.TM_LBV_FP_1 = 0;
 		ZTM.TM_LBV_FP_2 = 0;
 		ZTM.TM_LBV_FP_3 = 1;
+
+		ZTM.TM_Uc_LBV_1 = 0;
+		ZTM.TM_Uc_LBV_2 = 0;
+		ZTM.TM_Uc_LBV_3 = 1100100;
+
+		ZTM.TM_Rout_FOS_1 = 0; // mVt
+		ZTM.TM_Rout_FOS_2 = 0;
+		ZTM.TM_Rout_FOS_3 = 1100100;
+
+		ZTM.TM_Rout_LBV = 1100100; // mVt
+		ZTM.TM_Ic_LBV = 1100100; // mA
 		break;
 	}
 	//5
 	ZTM.TM_AOS = MT_widget.current_AOS;
-	ZTM.TM_RBU_AOS = 0;
-	ZTM.TM_RAOS = 0;
-	ZTM.rez5 = 0;
+	ZTM.TM_RBU_AOS = 1; // !!!!ПОКА!!!!! будем считать что исправено !!!! было 0
+	ZTM.TM_RAOS = 1; // !!!!ПОКА!!!!! будем считать что АОС всегда исправен !!!! было 0
+	ZTM.rez5 = 0; 
 	ZTM.SAK = 0;//Таблица 25
 	if (kcbk)
 	ZTM.TAK = 1;
@@ -1109,17 +1155,17 @@ void BAU_widg::ZTM_create()
 	ZTM.TM_ARU_UPch_1 = 0;
 	ZTM.TM_ARU_UPch_2 = 0;
 	//7
-	ZTM.TM_Rout_FOS_1 = 0;
-	ZTM.TM_Rout_FOS_2 = 0;
+	//ZTM.TM_Rout_FOS_1 = 1100100; // mVt
+	//ZTM.TM_Rout_FOS_2 = 1100100;
 	//8
-	ZTM.TM_Rout_FOS_3 = 0;
-	ZTM.TM_Rout_LBV = 0;
+	//ZTM.TM_Rout_FOS_3 = 1100100;
+	//ZTM.TM_Rout_LBV = 1100100; // mVt
 	//9
-	ZTM.TM_Ic_LBV = 0;
-	ZTM.TM_Uc_LBV_1 = 0;
+	//ZTM.TM_Ic_LBV = 1100100; // mA
+ // ZTM.TM_Uc_LBV_1 = 1100100;//3200 mV
 	//10
-	ZTM.TM_Uc_LBV_2 = 0;
-	ZTM.TM_Uc_LBV_3 = 0;
+ // ZTM.TM_Uc_LBV_2 = 0; //  
+ // ZTM.TM_Uc_LBV_3 = 0; //
 	//11
 	ZTM.T_VIP_BAU = 0;
 	ZTM.T_rez = 0;

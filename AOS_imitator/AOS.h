@@ -362,9 +362,10 @@ class AOS_widg : public QWidget
 public:
 	AOS_widg(QWidget *parent = 0);
 	~AOS_widg();
-
+	
 private:
 	//AOS_KP current_KP = AOS_OFF;
+	int AOS_number;
 	// ---------- виджеты --------- начало --------
 	int name_ustroistva, number_komplekta_AOS; // передаваемые параметры ( name_ustroistva = 8 (AOC); number_komplekta_AOS = 0|1|2|3 )
 	QLabel *nomer_vkluchaemogo_komplekta_Label; // просто надпись "№ включенного комплекта AOC: "
@@ -396,8 +397,12 @@ private:
 //	QGroupBox *Group_Vkl_kompl_AOS;
 	
 	void risovanie_okna_AOS();  // и остальных виджетов АОС
-	void update_graphics(int); // обновление графики
+	//void update_graphics(int); // обновление графики
+	void update_graphics(); // обновление графики
 	void funk_perescheta(); // преобразует входные данные 0,1,2,3 в 0,1,2,4
+	void formirovanie_SD_kolv07(QVariantList);
+	void formirovanie_SD_kolv07_3(AOS_modes);
+	//void formirovanie_SD_kolv07(AOS_state);
 	void set_new_tm();     // составление ОК-ов
 	void TMI_1_AOS();   // составление ТМИ - 1 (для чтения)
 	void TMI_2_AOS();  // составление ТМИ - 2 (для чтения)
