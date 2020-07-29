@@ -406,8 +406,8 @@ private:
 	void set_new_tm();     // составление ОК-ов
 	void TMI_1_AOS();   // составление ТМИ - 1 (для чтения)
 	void TMI_2_AOS();  // составление ТМИ - 2 (для чтения)
-	void PPRCH_chten(); // для чтения ключей ППРЧ | - не используется
-	void CHPS_chten(); // для чтения ключей ШПС   | - не используется
+	//void PPRCH_chten(); // для чтения ключей ППРЧ | - не используется
+	//void CHPS_chten(); // для чтения ключей ШПС   | - не используется
 	void imit_off();  // включение имитатора
 	void imit_on();  // выключение имитатора
 protected:
@@ -427,12 +427,12 @@ private:
 	DEVICE_STATES gpfm1_dev;
 	
 	AOS_shos shos;  // для ТМИ-1 АОС записывается по подадресу 4 читается по подадресу 15
-    AOS_state aos_state;
+    AOS_state aos_state, aos_state_old;
 	AOS_PPRCH AOS_PPRCH;
 	AOS_shps AOS_shps;
 //	AOS_shos2 shos2;  // для ТМИ-2 АОС записывается по подадресу 5 читается по подадресу 16
 
-	AOS_modes aos_modes;
+	AOS_modes aos_modes, aos_modes_old;
 	QList<GSU_kommut> gsu_kommut;
 
 	QByteArray pprch_main_key_data;
