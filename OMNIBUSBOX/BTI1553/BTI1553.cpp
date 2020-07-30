@@ -63,6 +63,10 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 {
 	MkoWord1553 tmp_cwd;
 	tmp_cwd.cw = xmitfields->cwd1;
+	int word_count = tmp_cwd.count;
+	if (word_count == 0)
+		word_count = 32;
+
 	QVariantList tmp_msgs;
 	if ((tmp_cwd.subadr == 0) || (tmp_cwd.subadr == 31))
 	{
@@ -72,7 +76,7 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 		}
 	}
 	else
-		for (int i = 0; i < tmp_cwd.count; i++)
+		for (int i = 0; i < word_count; i++)
 			tmp_msgs << xmitfields->data[i];
 
 	int os;
