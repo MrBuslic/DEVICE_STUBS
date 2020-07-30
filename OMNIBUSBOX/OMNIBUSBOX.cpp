@@ -122,7 +122,7 @@ void RpcOmnibusWidget::send_msg(int mko, int line, int cwd, QVariantList& words,
 	MkoWord tmp_cwd;
 	tmp_cwd.cw = cwd;
 	int work_line = line + 1;//для совпадения значений работающей линией с мапой каналов (1;2) вместо (0;1)
-	mko = 1 - mko;///IKSA!!!
+	//mko = 1 - mko;///IKSA!!!
 	if (!(map_channels[mko] & work_line))
 	{
 		QString _msg = QString("МКО %1 канал %2 не работает").arg(mko).arg(line);
