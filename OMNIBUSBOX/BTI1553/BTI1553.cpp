@@ -97,7 +97,7 @@ BTI1553API ERRVAL __stdcall BTI1553_BCTransmitMsg(LPXMITFIELDS1553 xmitfields,IN
 			}
 		}
 		else
-			for (int i = 0; i < tmp_cwd.count; i++)
+			for (int i = 0; i < word_count; i++)
 				xmitfields->data[i] = tmp_msgs[i].toInt();
 	}
 	return 0;
