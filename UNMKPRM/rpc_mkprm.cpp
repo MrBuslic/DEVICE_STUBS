@@ -12,8 +12,6 @@
 
 RpcMKPRMWidget::RpcMKPRMWidget() : QWidget(), working(false)
 {
-	LogWidget* log_widg = new LogWidget(this);
-
 	QString ip_str = "127.0.0.1";
 	int slot_port = MKPRM_SLOT;
 	int signal_port = MKPRM_SIGNAL;
@@ -36,8 +34,8 @@ RpcMKPRMWidget::RpcMKPRMWidget() : QWidget(), working(false)
 	if (!frame_slot_thr.wait_connected(3) || !frame_signal_thr.wait_connected(3))
 	{
 		QMessageBox::critical(0, "Нет соединения", "Ошибка соединения с frame_bus в Mkprm");
-		this->deleteLater();
-		return;
+		//this->deleteLater();
+		//return;
 	}
 
 	connect(frame_signal_thr.get_obj().get(), SIGNAL(new_frame_rm07(QString, QVariant)), this, SLOT(new_frame(QString, QVariant)));
