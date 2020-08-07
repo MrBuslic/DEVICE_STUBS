@@ -55,7 +55,7 @@ class RpcOmnibusWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	RpcOmnibusWidget(QWidget* parent = 0);
+	RpcOmnibusWidget(QWidget* parent = 0, QString mode = "");
 public slots:
 
 	void switch_ab_os(int mko, int addr, int _os, int _s_addr = -1);
@@ -77,6 +77,7 @@ private:
 	short chan;
 	double u;
 	double t;
+	QString mode;	// ׀והטל נאבמעû (ָÊְׁ)
 	LogWidget* log_widget;
 signals:
 	void new_message(QVariant dt, int mko, int line, int cwd, QVariantList words, int os);
